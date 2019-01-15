@@ -465,7 +465,7 @@ void D_AdvanceDemo (void)
 // D_DoAdvanceDemo
 //
 // This cycles through the demo sequences.
-// FIXME - version dependend demo numbers?
+// [Julia] TODO - recreate Jaguar demos?
 // -----------------------------------------------------------------------------
 
 void D_DoAdvanceDemo (void)
@@ -515,7 +515,7 @@ void D_DoAdvanceDemo (void)
             gamestate = GS_DEMOSCREEN;
             pagetic = TICRATE * 11;
             pagename1 = DEH_String("M_TITLE");
-            pagename2 = DEH_String("TITLE");
+            pagename2 = DEH_String("CREDIT2");
             S_StartMusic(mus_title);
             break;
         }
