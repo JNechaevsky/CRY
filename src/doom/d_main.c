@@ -1382,7 +1382,7 @@ void D_DoomMain (void)
     W_GenerateHashTable();
 
     // [Julia] Set window title
-    gamedescription = GetGameName("DOOM for Atari Jaguar");
+    gamedescription = GetGameName("Yaguar Doom");
 
 #ifdef _WIN32
     // In -cdrom mode, we write savegames to c:\doomdata as well as configs.

@@ -181,9 +181,9 @@ void I_PrintDivider(void)
 {
     int i;
 
-    for (i=0; i<75; ++i)
+    for (i=0 ; i<80 ; ++i)
     {
-        putchar('=');
+        putchar('-');
     }
 
     putchar('\n');
@@ -193,34 +193,6 @@ void I_PrintStartupBanner(char *gamedescription)
 {
     I_PrintDivider();
     I_PrintBanner(gamedescription);
-    I_PrintDivider();
-
-    if (english_language)
-    {
-        printf(
-        " The project is based on Chocolate Doom by Simon Howard and Crispy Doom by\n"
-        " Fabian Greffrath, with significant additions from Doom Retro by Brad Harding,\n"
-        " and distributes with their approval.\n"
-        " \n"
-        " Project source codes and translation materials are available under the terms\n"
-        " and conditions of GNU General Public License v2.0.\n"
-        " \n"
-        " Russian Doom is created by Julian Nechaevsky.\n");
-    }
-    else
-    {
-        printf(
-        " Проект основан на порте Chocolate Doom от Саймона Говарда (Simon Howard)\n"
-        " и Crispy Doom от Фабиана Греффрата (Fabian Greffrath), со значительными\n"
-        " улучшениями из Doom Retro от Брэда Хардинга (Brad Harding),\n"
-        " и распространяется с их одобрения.\n"
-        " \n"
-        " Исходные коды проекта, а также все материалы перевода доступны\n"
-        " по лицензии GNU General Public License v2.0.\n"
-        " \n"
-        " Автор проекта Russian Doom: Юлиан Нечаевский.\n");
-    }
-
     I_PrintDivider();
 }
 
