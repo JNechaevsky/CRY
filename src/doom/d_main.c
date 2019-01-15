@@ -982,17 +982,6 @@ void PrintGameVersion(void)
 }
 
 
-// Load dehacked patches needed for certain IWADs.
-static void LoadIwadDeh(void)
-{
-    // [JN] Doom Press Beta and Doom for Atari Jaguar 
-    // have some info in DEHACKED lump, load it.
-    if (gamemode == pressbeta || gamemission == jaguar)
-    {
-        DEH_LoadLumpByName("DEHACKED", false, true);
-    }
-}
-
 static void G_CheckDemoStatusAtExit (void)
 {
     G_CheckDemoStatus();
@@ -1260,19 +1249,6 @@ void D_DoomMain (void)
     else if (W_CheckNumForName("RDJAGUAR") >= 0)
     {
         gamemission = jaguar;
-    }
-
-    //!
-    // @category mod
-    //
-    // Disable automatic loading of Dehacked patches for certain
-    // IWAD files.
-    //
-    if (!M_ParmExists("-nodeh"))
-    {
-        // Some IWADs have dehacked patches that need to be loaded for
-        // them to be played properly.
-        LoadIwadDeh();
     }
 
     // Doom 3: BFG Edition includes modified versions of the classic
