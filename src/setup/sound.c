@@ -42,7 +42,7 @@ int opl_io_port = 0x388;
 int snd_cachesize = 64 * 1024 * 1024;
 int snd_maxslicetime_ms = 28;
 char *snd_musiccmd = "";
-int snd_pitchshift = 0;
+int snd_pitchshift = 1;
 char *snd_dmxoption = "-opl3"; // [crispy] default to OPL3 emulation
 
 static int numChannels = 8;
