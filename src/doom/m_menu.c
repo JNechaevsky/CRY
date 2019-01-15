@@ -294,7 +294,7 @@ menuitem_t OptionsMenu[]=
     {1,"Detail level:", M_ChangeDetail,'g'},
     {2,"Screen size", M_SizeDisplay,'s'},
     {-1,"",0,'\0'},
-    {20,"Mouse sensivity", M_ChangeSensitivity,'m'},
+    {2,"Mouse sensivity", M_ChangeSensitivity,'m'},
     {-1,"",0,'\0'},
     {1,"Sound volume", M_Sound,'s'}
 };
