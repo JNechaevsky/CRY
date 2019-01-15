@@ -387,18 +387,14 @@ int DEH_LoadFile(char *filename)
     deh_allow_long_cheats = false;
     deh_allow_extended_strings = false;
 
-    printf(english_language ?
-           " loading %s\n" :
-           " загрузка %s\n",
+    printf(" loading %s\n",
            filename);
 
     context = DEH_OpenFile(filename);
 
     if (context == NULL)
     {
-        fprintf(stderr, english_language?
-                        "DEH_LoadFile: Unable to open %s\n" :
-                        "DEH_LoadFile: невозможно открыть %s\n",
+        fprintf(stderr, "DEH_LoadFile: Unable to open %s\n",
                         filename);
         return 0;
     }
@@ -409,9 +405,7 @@ int DEH_LoadFile(char *filename)
 
     if (DEH_HadError(context))
     {
-        I_Error(english_language ?
-                "Error parsing dehacked file" :
-                "Ошибка обработки файла Dehacked");
+        I_Error("Error parsing dehacked file");
     }
 
     return 1;
@@ -438,9 +432,7 @@ int DEH_LoadLump(int lumpnum, boolean allow_long, boolean allow_error)
 
     if (context == NULL)
     {
-        fprintf(stderr, english_language ?
-                        "DEH_LoadFile: Unable to open lump %i\n" :
-                        "DEH_LoadFile: невозможно открыть блок %i\n",
+        fprintf(stderr, "DEH_LoadFile: Unable to open lump %i\n",
                         lumpnum);
         return 0;
     }
@@ -453,9 +445,7 @@ int DEH_LoadLump(int lumpnum, boolean allow_long, boolean allow_error)
     // errors to just be ignored if allow_error=true.
     if (!allow_error && DEH_HadError(context))
     {
-        I_Error(english_language ?
-                "Error parsing dehacked lump" :
-                "Ошибка обработки блока Dehacked");
+        I_Error("Error parsing dehacked lump");
     }
 
     return 1;
@@ -469,9 +459,7 @@ int DEH_LoadLumpByName(char *name, boolean allow_long, boolean allow_error)
 
     if (lumpnum == -1)
     {
-        fprintf(stderr, english_language ?
-        "DEH_LoadLumpByName: '%s' lump not found\n" :
-        "DEH_LoadLumpByName: блок '%s' не найден\n", name);
+        fprintf(stderr, "DEH_LoadLumpByName: '%s' lump not found\n", name);
         return 0;
     }
 

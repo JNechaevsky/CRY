@@ -104,9 +104,7 @@ static byte *AutoAllocMemory(int *size, int default_ram, int min_ram)
 
         if (default_ram < min_ram)
         {
-            I_Error(english_language ?
-                    "Unable to allocate %i MiB of RAM for zone" :
-                    "Невозможно обнаружить %i МБ памяти для распределения",
+            I_Error("Unable to allocate %i MiB of RAM for zone",
                     default_ram);
         }
 
@@ -158,9 +156,7 @@ byte *I_ZoneBase (int *size)
     // [crispy] if called again, allocate another zone twice as big
     i *= 2;
 
-    printf(english_language ?
-           "zone memory: %p, %x allocated for zone\n" :
-           "Распределение памяти: %p, %x обнаружено.\n", 
+    printf("zone memory: %p, %x allocated for zone\n", 
            zonemem, *size);
 
     return zonemem;
@@ -274,9 +270,7 @@ void I_Error (char *error, ...)
 
     if (already_quitting)
     {
-        fprintf(stderr, english_language ?
-                        "Warning: recursive call to I_Error detected.\n" :
-                        "Внимание: обнаружен рекурсивный вызов в I_Error.\n");
+        fprintf(stderr, "Warning: recursive call to I_Error detected.\n");
         exit(-1);
     }
     else
@@ -351,9 +345,7 @@ void *I_Realloc(void *ptr, size_t size)
 
     if (size != 0 && new_ptr == NULL)
     {
-        I_Error (english_language ?
-                 "I_Realloc: failed on reallocation of %" PRIuPTR " bytes" :
-                 "I_Realloc: ошибка переобнаружения %i байт",
+        I_Error ("I_Realloc: failed on reallocation of %" PRIuPTR " bytes",
                  size);
     }
 

@@ -96,9 +96,7 @@ static boolean NET_CL_InitClient(void)
 
 static boolean NET_CL_InitServer(void)
 {
-    I_Error(english_language ?
-            "NET_CL_InitServer: attempted to initialize client pipe end as a server!" :
-            "NET_CL_InitServer: попытка инициалиализировать клиент как сервер!");
+    I_Error("NET_CL_InitServer: attempted to initialize client pipe end as a server!");
     return false;
 }
 
@@ -167,9 +165,7 @@ net_module_t net_loop_client_module =
 
 static boolean NET_SV_InitClient(void)
 {
-    I_Error(english_language ?
-            "NET_SV_InitClient: attempted to initialize server pipe end as a client!" :
-            "NET_SV_InitClient: попытка инициализировать сервер как клиент!");
+    I_Error("NET_SV_InitClient: attempted to initialize server pipe end as a client!");
     return false;
 }
 

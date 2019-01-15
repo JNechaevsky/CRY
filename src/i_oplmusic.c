@@ -1212,9 +1212,7 @@ static void ControllerEvent(opl_track_data_t *track, midi_event_t *event)
 
         default:
 #ifdef OPL_MIDI_DEBUG
-            fprintf(stderr, english_language ?
-                            "Unknown MIDI controller type: %i\n" :
-                            "Неизвестный тип MIDI контроллера: %i\n",
+            fprintf(stderr, "Unknown MIDI controller type: %i\n",
                             controller);
 #endif
             break;
@@ -1308,9 +1306,7 @@ static void MetaEvent(opl_track_data_t *track, midi_event_t *event)
 
         default:
 #ifdef OPL_MIDI_DEBUG
-            fprintf(stderr, english_language ?
-                            "Unknown MIDI meta event type: %i\n" :
-                            "Неизвестный тип мета-события MIDI: %i\n",
+            fprintf(stderr, "Unknown MIDI meta event type: %i\n",
                             event->data.meta.type);
 #endif
             break;
@@ -1355,9 +1351,7 @@ static void ProcessEvent(opl_track_data_t *track, midi_event_t *event)
 
         default:
 #ifdef OPL_MIDI_DEBUG
-            fprintf(stderr, english_language ?
-            "Unknown MIDI event type %i\n" :
-            "Неизвестный тип события MIDI %i\n",
+            fprintf(stderr, "Unknown MIDI event type %i\n",
             event->event_type);
 #endif
             break;
@@ -1677,9 +1671,7 @@ static void *I_OPL_RegisterSong(void *data, int len)
 
     if (result == NULL)
     {
-        fprintf(stderr, english_language ?
-                        "I_OPL_RegisterSong: Failed to load MID.\n" :
-                        "I_OPL_RegisterSong: Ошибка загрузки MID.\n");
+        fprintf(stderr, "I_OPL_RegisterSong: Failed to load MID.\n");
     }
 
     // remove file now

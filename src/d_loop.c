@@ -269,16 +269,12 @@ static void D_Disconnected(void)
 
     if (drone)
     {
-        I_Error(english_language ?
-                "Disconnected from server in drone mode." :
-                "Отключение от сервера в режиме разделенного экрана");
+        I_Error("Disconnected from server in drone mode.");
     }
 
     // disconnected from server
 
-    printf(english_language ?
-           "Disconnected from server.\n" :
-           "Отключение от сервера.\n");
+    printf("Disconnected from server.\n");
 }
 
 //
@@ -339,17 +335,13 @@ static void BlockUntilStart(net_gamesettings_t *settings,
 
         if (!net_client_connected)
         {
-            I_Error(english_language ?
-                    "Lost connection to server" :
-                    "Потеряно соединение с сервером");
+            I_Error("Lost connection to server");
         }
 
         if (callback != NULL && !callback(net_client_wait_data.ready_players,
                                           net_client_wait_data.num_players))
         {
-            I_Error(english_language ?
-                    "Netgame startup aborted" :
-                    "Запуск сетевой игры отменен");
+            I_Error("Netgame startup aborted");
         }
 
         I_Sleep(100);
@@ -787,18 +779,9 @@ boolean D_NonVanillaRecord(boolean conditional, char *feature)
         return false;
     }
 
-    if (english_language)
-    {
-        printf("Warning: Recording a demo file with a non-vanilla extension "
-               "(%s). Use -strictdemos to disable this extension.\n",
-               feature);
-    }
-    else
-    {
-        printf("Внимание: совершается демозапись с отличным от оригинального "
-               "расширением (%s). Используйте -strictdemos для отключения этого расширения.\n",
-               feature);
-    }
+    printf("Warning: Recording a demo file with a non-vanilla extension "
+           "(%s). Use -strictdemos to disable this extension.\n",
+           feature);
 
     return true;
 }
@@ -836,31 +819,15 @@ boolean D_NonVanillaPlayback(boolean conditional, int lumpnum,
 
     if (!IsDemoFile(lumpnum))
     {
-        if (english_language)
-        {
-            printf("Warning: WAD contains demo with a non-vanilla extension "
-                   "(%s)\n", feature);
-        }
-        else
-        {
-            printf("Внимание: WAD-файл содержит демозапись с расширением, отличным от оригинального "
-                   "(%s)\n", feature);
-        }
+        printf("Warning: WAD contains demo with a non-vanilla extension "
+               "(%s)\n", feature);
+
         return false;
     }
 
-    if (english_language)
-    {
-        printf("Warning: Playing back a demo file with a non-vanilla extension "
-               "(%s). Use -strictdemos to disable this extension.\n",
-               feature);
-    }
-    else
-    {
-        printf("Внимание: проигрывается демозапись с отличным от оригинального "
-               "расширением (%s). Используйте -strictdemos для отключения этого расширения.\n",
-               feature);
-    }
+    printf("Warning: Playing back a demo file with a non-vanilla extension "
+           "(%s). Use -strictdemos to disable this extension.\n",
+           feature);
 
     return true;
 }

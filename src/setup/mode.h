@@ -29,7 +29,6 @@ char *GetExecutableName(void);
 char *GetGameTitle(void);
 const iwad_t **GetIwads(void);
 
-extern int english_language;
 
 #endif /* #ifndef SETUP_MODE_H */
 

@@ -100,7 +100,6 @@ boolean flip_levels_cmdline = false;
 int startepisode;
 int startmap;
 int startloadgame;
-int english_language = 0;   // [Julia] TODO - REMOVE
 int translucency  = 1;      // [Julia] Прозрачность объектов
 
 skill_t startskill;
@@ -325,9 +324,6 @@ void D_BindVariables(void)
     M_BindWeaponControls();
     M_BindMapControls();
     M_BindMenuControls();
-
-    // [JN] Support for fallback to the English language.
-    M_BindIntVariable("english_language",       &english_language);
 
     M_BindIntVariable("uncapped_fps",           &uncapped_fps);
     M_BindIntVariable("mouse_sensitivity",      &mouseSensitivity);
@@ -1015,9 +1011,7 @@ void D_DoomMain (void)
     // print banner
     I_PrintBanner(PACKAGE_STRING);
 
-    DEH_printf(english_language ?
-               "Z_Init: Init zone memory allocation daemon. \n" :
-               "Z_Init: Инициализация распределения памяти.\n");
+    DEH_printf("Z_Init: Init zone memory allocation daemon. \n");
     Z_Init ();
 
 #ifdef FEATURE_MULTIPLAYER
@@ -1030,9 +1024,7 @@ void D_DoomMain (void)
 
     if (M_CheckParm("-dedicated") > 0)
     {
-        printf(english_language ?
-               "Dedicated server mode.\n" :
-               "Режим выделенного сервера.\n");
+        printf("Dedicated server mode.\n");
         NET_DedicatedServer();
         // Never returns
     }
@@ -1195,10 +1187,7 @@ void D_DoomMain (void)
         if (scale > 400)
             scale = 400;
         
-        DEH_printf(english_language ?
-                   "turbo scale: %i%%\n" :
-                   "турбо ускорение: %i%%\n",
-                   scale);
+        DEH_printf("turbo scale: %i%%\n", scale);
         forwardmove[0] = forwardmove[0]*scale/100;
         forwardmove[1] = forwardmove[1]*scale/100;
         sidemove[0] = sidemove[0]*scale/100;
@@ -1206,15 +1195,11 @@ void D_DoomMain (void)
     }
 
     // init subsystems
-    DEH_printf(english_language ?
-               "V_Init: allocate screens.\n" :
-               "V_Init: Обнаружение экранов.\n");
+    DEH_printf("V_Init: allocate screens.\n");
     V_Init ();
 
     // Load configuration files before initialising other subsystems.
-    DEH_printf(english_language ?
-               "M_LoadDefaults: Load system defaults.\n" :
-               "M_LoadDefaults: Загрузка системных стандартов.\n");
+    DEH_printf("M_LoadDefaults: Load system defaults.\n");
     M_SetConfigFilenames(PROGRAM_PREFIX "doom.ini");
     D_BindVariables();
     M_LoadDefaults();
@@ -1229,23 +1214,13 @@ void D_DoomMain (void)
 
     if (iwadfile == NULL)
     {
-        if (english_language)
-        {
-            I_Error("Game mode indeterminate.  No IWAD file was found.  Try\n"
-                    "specifying one with the '-iwad' command line parameter.\n");
-        }
-        else
-        {
-            I_Error("Невозможно определить игру из за отсутствующего IWAD-файла.\n"
-                    "Попробуйте указать IWAD-файл командой '-iwad'.\n");
-        }
+        I_Error("Game mode indeterminate.  No IWAD file was found.  Try\n"
+                "specifying one with the '-iwad' command line parameter.\n");
     }
 
     modifiedgame = false;
 
-    DEH_printf(english_language ?
-               "W_Init: Init WADfiles.\n" :
-               "W_Init: Инициализация WAD-файлов.\n");
+    DEH_printf("W_Init: Init WADfiles.\n");
     D_AddFile(iwadfile);
     numiwadlumps = numlumps;
 
@@ -1371,9 +1346,7 @@ void D_DoomMain (void)
             M_StringCopy(demolumpname, myargv[p + 1], sizeof(demolumpname));
         }
 
-        printf(english_language ?
-               "Playing demo %s.\n" :
-               "Проигрывание демозаписи: %s.\n", file);
+        printf("Playing demo %s.\n", file);
     }
 
     I_AtExit(G_CheckDemoStatusAtExit, true);
@@ -1396,41 +1369,10 @@ void D_DoomMain (void)
         savegamedir = M_GetSaveGameDir(D_SaveGameIWADName(gamemission));
     }
 
-    // Check for -file in shareware
-    if (modifiedgame && (gamevariant != freedoom))
-    {
-        // These are the lumps that will be checked in IWAD,
-        // if any one is not present, execution will be aborted.
-        char name[23][8]=
-        {
-            "e2m1","e2m2","e2m3","e2m4","e2m5","e2m6","e2m7","e2m8","e2m9",
-            "e3m1","e3m3","e3m3","e3m4","e3m5","e3m6","e3m7","e3m8","e3m9",
-            "dphoof","bfgga0","heada1","cybra1","spida1d1"
-        };
-
-        int i;
-
-        if ( gamemode == shareware)
-            I_Error(DEH_String(english_language ?
-                               "\nYou cannot -file with the shareware version. Register!" :
-                               "\nВы не можете использовать -file в демонстрационной версии. Приобретите полную версию!"));
-
-        // Check for fake IWAD with right name,
-        // but w/o all the lumps of the registered version. 
-        if (gamemode == registered)
-            for (i = 0;i < 23; i++)
-            if (W_CheckNumForName(name[i])<0)
-                I_Error(DEH_String(english_language ?
-                                   "\nThis is not the registered version." :
-                                   "\nДанная версия не является зарегистрированной."));
-    }
-
     I_PrintStartupBanner(gamedescription);
     PrintDehackedBanners();
 
-    DEH_printf(english_language ?
-               "I_Init: Setting up machine state.\n" :
-               "I_Init: Инициализация состояния компьютера.\n");
+    DEH_printf("I_Init: Setting up machine state.\n");
     I_CheckIsScreensaver();
     I_InitTimer();
     I_InitJoystick();
@@ -1438,9 +1380,7 @@ void D_DoomMain (void)
     I_InitMusic();
 
 #ifdef FEATURE_MULTIPLAYER
-    printf (english_language ?
-            "NET_Init: Init network subsystem.\n" :
-            "NET_Init: Инициализация сетевой подсистемы.\n");
+    printf ("NET_Init: Init network subsystem.\n");
     NET_Init ();
 #endif
 
@@ -1561,41 +1501,27 @@ void D_DoomMain (void)
         startloadgame = -1;
     }
 
-    DEH_printf(english_language ?
-               "M_Init: Init miscellaneous info.\n" :
-               "M_Init: Инициализация внутренних данных.\n");
+    DEH_printf("M_Init: Init miscellaneous info.\n");
     M_Init ();
 
-    DEH_printf(english_language ?
-               "R_Init: Init DOOM refresh daemon - " :
-               "R_Init: Инициализация процесса запуска DOOM - ");
+    DEH_printf("R_Init: Init DOOM refresh daemon - ");
     R_Init ();
 
-    DEH_printf(english_language ?
-               "\nP_Init: Init Playloop state.\n" :
-               "\nP_Init: Инициализация игрового окружения.\n");
+    DEH_printf("\nP_Init: Init Playloop state.\n");
     P_Init ();
 
-    DEH_printf(english_language ?
-               "S_Init: Setting up sound.\n" :
-               "S_Init: Активация звуковой системы.\n");
+    DEH_printf("S_Init: Setting up sound.\n");
     S_Init (sfxVolume * 8, musicVolume * 8);
 
-    DEH_printf(english_language ?
-               "D_CheckNetGame: Checking network game status.\n" :
-               "D_CheckNetGame: Проверка статуса сетевой игры.\n");
+    DEH_printf("D_CheckNetGame: Checking network game status.\n");
     D_CheckNetGame ();
 
     PrintGameVersion();
 
-    DEH_printf(english_language ?
-               "HU_Init: Setting up heads up display.\n" :
-               "HU_Init: Настройка игрового дисплея.\n");
+    DEH_printf("HU_Init: Setting up heads up display.\n");
     HU_Init ();
 
-    DEH_printf(english_language ?
-               "ST_Init: Init status bar.\n" :
-               "ST_Init: Инициализация строки состояния.\n");
+    DEH_printf("ST_Init: Init status bar.\n");
     ST_Init ();
 
     //!

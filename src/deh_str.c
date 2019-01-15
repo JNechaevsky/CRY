@@ -377,16 +377,8 @@ static char *FormatStringReplacement(char *s)
 
     if (!ValidFormatReplacement(s, repl))
     {
-        if (english_language)
-        {
-            printf("WARNING: Unsafe dehacked replacement provided for "
-                   "printf format string: %s\n", s);
-        }
-        else
-        {
-            printf("ВНИМАНИЕ: используется небезопасная printf замена "
-                   "строчки Dehacked в формате: %s\n", s);
-        }
+        printf("WARNING: Unsafe dehacked replacement provided for "
+               "printf format string: %s\n", s);
 
         return s;
     }

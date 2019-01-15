@@ -93,15 +93,11 @@ static void LoadResponseFile(int argv_index)
 
     if (handle == NULL)
     {
-        printf (english_language ?
-                "\nNo such response file!" :
-                "\nОтветный файл не обнаружен!");
+        printf ("\nNo such response file!");
         exit(1);
     }
 
-    printf(english_language ?
-           "Found response file %s!\n" :
-           "Ответный файл %s обнаружен!\n",
+    printf("Found response file %s!\n",
            response_filename);
 
     size = M_FileLength(handle);
@@ -121,9 +117,7 @@ static void LoadResponseFile(int argv_index)
 
         if (k < 0)
         {
-            I_Error(english_language ?
-                    "Failed to read full contents of '%s'" :
-                    "Невозможно прочитать содержимое \"%s\"",
+            I_Error("Failed to read full contents of '%s'",
                     response_filename);
         }
 

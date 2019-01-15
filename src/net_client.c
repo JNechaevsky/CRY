@@ -806,9 +806,7 @@ static void NET_CL_ParseConsoleMessage(net_packet_t *packet)
         return;
     }
 
-    printf(english_language ?
-           "Message from server: " :
-           "Сообщение от сервера: ");
+    printf("Message from server: ");
 
     NET_SafePuts(msg);
 }
@@ -1062,9 +1060,7 @@ void NET_CL_Disconnect(void)
 
             client_state = CLIENT_STATE_WAITING_START;
 
-            fprintf(stderr, english_language ?
-                    "NET_CL_Disconnect: Timeout while disconnecting from server\n" :
-                    "NET_CL_Disconnect: тайм-аут при отсоединении от сервера\n");
+            fprintf(stderr, "NET_CL_Disconnect: Timeout while disconnecting from server\n");
             break;
         }
 

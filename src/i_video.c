@@ -553,10 +553,7 @@ static void CreateUpscaledTexture(boolean force)
     // window size (because of highdpi).
     if (SDL_GetRendererOutputSize(renderer, &w, &h) != 0)
     {
-        I_Error(english_language ?
-                "Failed to get renderer output size: %s" :
-                "Невозможно выполнить рендеринг размера: %s",
-                SDL_GetError());
+        I_Error("Failed to get renderer output size: %s", SDL_GetError());
     }
 
     // When the screen or window dimensions do not match the aspect ratio
@@ -1034,29 +1031,17 @@ static void CenterWindow(int *x, int *y, int w, int h)
     // and if it doesn't, reset it.
     if (video_display < 0 || video_display >= SDL_GetNumVideoDisplays())
     {
-        if (english_language)
-        {
-            fprintf(stderr,
-                    "CenterWindow: We were configured to run on display #%d, but "
-                    "it no longer exists (max %d). Moving to display 0.\n",
-                    video_display, SDL_GetNumVideoDisplays() - 1);
-        }
-        else
-        {
-            fprintf(stderr,
-                    "CenterWindow: программа была настроена для запуска на "
-                    "мониторе #%d, он он более недоступен (max %d). Перемещение на "
-                    "монитор 0.\n",
-                    video_display, SDL_GetNumVideoDisplays() - 1);
-        }
+        fprintf(stderr,
+                "CenterWindow: We were configured to run on display #%d, but "
+                "it no longer exists (max %d). Moving to display 0.\n",
+                video_display, SDL_GetNumVideoDisplays() - 1);
+
         video_display = 0;
     }
 
     if (SDL_GetDisplayBounds(video_display, &bounds) < 0)
     {
-        fprintf(stderr, english_language ?
-                "CenterWindow: Failed to read display bounds for display #%d!\n" :
-                "CenterWindow: Ошибка обнаружения границ монитора #%d!\n",
+        fprintf(stderr, "CenterWindow: Failed to read display bounds for display #%d!\n",
                 video_display);
         return;
     }
@@ -1093,9 +1078,7 @@ static void GetWindowPosition(int *x, int *y, int w, int h)
     else if (sscanf(window_position, "%i,%i", x, y) != 2)
     {
         // invalid format: revert to default
-        fprintf(stderr, english_language ?
-                "GetWindowPosition: invalid window_position setting\n" :
-                "GetWindowPosition: некорректное значение window_position\n");
+        fprintf(stderr, "GetWindowPosition: invalid window_position setting\n");
         *x = *y = SDL_WINDOWPOS_UNDEFINED;
     }
 }
@@ -1149,9 +1132,7 @@ static void SetVideoMode(void)
 
         if (screen == NULL)
         {
-            I_Error(english_language ?
-                    "Error creating window for video startup: %s" :
-                    "Ошибка создания окна для видео-загрузки: %s",
+            I_Error("Error creating window for video startup: %s",
             SDL_GetError());
         }
 
@@ -1191,9 +1172,7 @@ static void SetVideoMode(void)
 
     if (renderer == NULL)
     {
-        I_Error(english_language ?
-                "Error creating renderer for screen window: %s" :
-                "Ошибка создания рендеринга для окна: %s",
+        I_Error("Error creating renderer for screen window: %s",
                 SDL_GetError());
     }
 
@@ -1295,9 +1274,7 @@ void I_InitGraphics(void)
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) 
     {
-        I_Error(english_language ?
-                "Failed to initialize video: %s" :
-                "Ошибка инициализации видео: %s",
+        I_Error("Failed to initialize video: %s",
         SDL_GetError());
     }
 

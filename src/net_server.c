@@ -1261,9 +1261,7 @@ static void NET_SV_SendTics(net_client_t *client,
 
         if (i != cmd->seq)
         {
-            I_Error(english_language ?
-                    "Wanted to send %i, but %i is in its place" :
-                    "Попытка отправки %i, но %i расположен некорректно",
+            I_Error("Wanted to send %i, but %i is in its place",
                     i, cmd->seq);
         }
 
@@ -1886,9 +1884,7 @@ void NET_SV_Shutdown(void)
         return;
     }
     
-    fprintf(stderr, english_language ?
-            "SV: Shutting down server...\n" :
-            "SV: выключение сервера...\n");
+    fprintf(stderr, "SV: Shutting down server...\n");
 
     // Disconnect all clients
     
@@ -1924,9 +1920,7 @@ void NET_SV_Shutdown(void)
         if (I_GetTimeMS() - start_time > 5000)
         {
             running = false;
-            fprintf(stderr, english_language ?
-                    "SV: Timed out waiting for clients to disconnect.\n" :
-                    "SV: тайм-аут ожидание отключения клиентов.\n");
+            fprintf(stderr, "SV: Timed out waiting for clients to disconnect.\n");
         }
 
         // Run the client code in case this is a loopback client.

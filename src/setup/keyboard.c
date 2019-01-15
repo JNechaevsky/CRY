@@ -178,10 +178,7 @@ static void ConfigExtraKeys(TXT_UNCAST_ARG(widget), TXT_UNCAST_ARG(unused))
 
     window = TXT_NewWindow("Extra keyboard controls");
 
-    if (english_language)
     TXT_SetWindowHelpURL(window, WINDOW_HELP_URL);
-    else
-    TXT_SetWindowHelpURL_RUS(window, WINDOW_HELP_URL);
 
     TXT_SetWindowAction(window, TXT_HORIZ_LEFT, TXT_NewWindowAbortAction(window));
     TXT_SetWindowAction(window, TXT_HORIZ_RIGHT, TXT_NewWindowSelectAction(window));

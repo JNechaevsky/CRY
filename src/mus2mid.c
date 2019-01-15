@@ -709,10 +709,7 @@ int main(int argc, char *argv[])
 
     if (argc != 3)
     {
-        printf(english_language ?
-               "Usage: %s <musfile> <midfile>\n" :
-               "Используется: %s <musfile> <midfile>\n",
-               argv[0]);
+        printf("Usage: %s <musfile> <midfile>\n", argv[0]);
         exit(-1);
     }
 
@@ -725,9 +722,7 @@ int main(int argc, char *argv[])
 
     if (mus2mid(src, dst))
     {
-        fprintf(stderr, english_language ?
-                "mus2mid() failed\n" :
-                "ошибка mus2mid()\n");
+        fprintf(stderr, "mus2mid() failed\n");
         exit(-1);
     }
 

@@ -311,9 +311,7 @@ void DEH_Warning(deh_context_t *context, char *msg, ...)
 
     va_start(args, msg);
 
-    fprintf(stderr, english_language ?
-                    "%s:%i: warning: " :
-                    "%s:%i: внимание: ",
+    fprintf(stderr, "%s:%i: warning: ",
                     context->filename, context->linenum);
     vfprintf(stderr, msg, args);
     fprintf(stderr, "\n");

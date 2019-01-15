@@ -170,9 +170,7 @@ static void NET_Conn_ParseReject(net_connection_t *conn, net_packet_t *packet)
         conn->state = NET_CONN_STATE_DISCONNECTED;
         conn->disconnect_reason = NET_DISCONNECT_REMOTE;
 
-        printf(english_language ?
-               "Rejected by server: " :
-               "Отказ сервера: ");
+        printf("Rejected by server: ");
         NET_SafePuts(msg);
     }
 }

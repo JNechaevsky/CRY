@@ -266,9 +266,7 @@ static void UnlockAllocatedSound(allocated_sound_t *snd)
 {
     if (snd->use_count <= 0)
     {
-        I_Error(english_language ?
-                "Sound effect released more times than it was locked..." :
-                "Количество воспроизведения звукового эффекта превысило допустимый лимит...");
+        I_Error("Sound effect released more times than it was locked...");
     }
 
     --snd->use_count;
@@ -507,9 +505,7 @@ static boolean ExpandSoundData_SRC(sfxinfo_t *sfxinfo,
 
     if (clipped > 0)
     {
-        fprintf(stderr, english_language ?
-                        "Sound '%s': clipped %u samples (%0.2f %%)\n" :
-                        "Звук '%s': совершен клиппинг %u сэмплов (%0.2f %%)\n", 
+        fprintf(stderr, "Sound '%s': clipped %u samples (%0.2f %%)\n", 
                         sfxinfo->name, clipped,
                         400.0 * clipped / chunk->alen);
     }
@@ -831,9 +827,7 @@ static void I_SDL_PrecacheSounds(sfxinfo_t *sounds, int num_sounds)
 	return;
     }
 
-    printf(english_language ?
-           "I_SDL_PrecacheSounds: Precaching all sound effects.."
-           "I_SDL_PrecacheSounds: Кэширование всех звуковых эффектов...");
+    printf("I_SDL_PrecacheSounds: Precaching all sound effects..");
 
     for (i=0; i<num_sounds; ++i)
     {
@@ -1095,17 +1089,13 @@ static boolean I_SDL_InitSound(boolean _use_sfx_prefix)
 
     if (SDL_Init(SDL_INIT_AUDIO) < 0)
     {
-        fprintf(stderr, english_language ?
-        "Unable to set up sound.\n" :
-        "Невозможно активировать звуковую систему.\n");
+        fprintf(stderr, "Unable to set up sound.\n");
         return false;
     }
 
     if (Mix_OpenAudio(snd_samplerate, AUDIO_S16SYS, 2, GetSliceSize()) < 0)
     {
-        fprintf(stderr, english_language ?
-                        "Error initialising SDL_mixer: %s\n" :
-                        "Ошибка инициализации SDL_mixer: %s\n",
+        fprintf(stderr, "Error initialising SDL_mixer: %s\n",
                         Mix_GetError());
         return false;
     }
@@ -1119,9 +1109,7 @@ static boolean I_SDL_InitSound(boolean _use_sfx_prefix)
     {
         if (SRC_ConversionMode() < 0)
         {
-            I_Error(english_language ?
-            "I_SDL_InitSound: Invalid value for use_libsamplerate: %i" :
-            "I_SDL_InitSound: неизвестная переменная в use_libsamplerate: %i",
+            I_Error("I_SDL_InitSound: Invalid value for use_libsamplerate: %i",
                     use_libsamplerate);
         }
 
@@ -1130,9 +1118,7 @@ static boolean I_SDL_InitSound(boolean _use_sfx_prefix)
 #else
     if (use_libsamplerate != 0)
     {
-        fprintf(stderr, english_language ?
-                "I_SDL_InitSound: use_libsamplerate=%i, but libsamplerate support not compiled in.\n" :
-                "I_SDL_InitSound: указано use_libsamplerate=%i, но код libsamplerate не скомпилирован.\n",
+        fprintf(stderr, "I_SDL_InitSound: use_libsamplerate=%i, but libsamplerate support not compiled in.\n",
                 use_libsamplerate);
     }
 #endif

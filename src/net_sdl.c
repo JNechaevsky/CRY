@@ -153,9 +153,7 @@ static void NET_SDL_FreeAddress(net_addr_t *addr)
         }
     }
 
-    I_Error(english_language ?
-            "NET_SDL_FreeAddress: Attempted to remove an unused address!" :
-            "NET_SDL_FreeAddress: попытка удаления неиспользованного адреса!");
+    I_Error("NET_SDL_FreeAddress: Attempted to remove an unused address!");
 }
 
 static boolean NET_SDL_InitClient(void)
@@ -183,9 +181,7 @@ static boolean NET_SDL_InitClient(void)
 
     if (udpsocket == NULL)
     {
-        I_Error(english_language ?
-                "NET_SDL_InitClient: Unable to open a socket!" :
-                "NET_SDL_InitClient: невозможно открыть сокет!");
+        I_Error("NET_SDL_InitClient: Unable to open a socket!");
     }
     
     recvpacket = SDLNet_AllocPacket(1500);
@@ -216,10 +212,7 @@ static boolean NET_SDL_InitServer(void)
 
     if (udpsocket == NULL)
     {
-        I_Error(english_language ?
-                "NET_SDL_InitServer: Unable to bind to port %i" :
-                "NET_SDL_InitServer: невозможно назначить порт %i",
-                port);
+        I_Error("NET_SDL_InitServer: Unable to bind to port %i", port);
     }
 
     recvpacket = SDLNet_AllocPacket(1500);
@@ -256,9 +249,7 @@ static void NET_SDL_SendPacket(net_addr_t *addr, net_packet_t *packet)
 
         if (I_GetTime() - lasttime > TICRATE)
         {
-            printf(english_language ?
-                   "%i bytes sent in the last second\n" :
-                   "Отправлено байт в последнюю секунду: %i\n",
+            printf("%i bytes sent in the last second\n",
                    this_second_sent);
             lasttime = I_GetTime();
             this_second_sent = 0;
@@ -278,9 +269,7 @@ static void NET_SDL_SendPacket(net_addr_t *addr, net_packet_t *packet)
 
     if (!SDLNet_UDP_Send(udpsocket, -1, &sdl_packet))
     {
-        I_Error(english_language ?
-                "NET_SDL_SendPacket: Error transmitting packet: %s" :
-                "NET_SDL_SendPacket: ошибка передачи пакета: %s",
+        I_Error("NET_SDL_SendPacket: Error transmitting packet: %s",
                 SDLNet_GetError());
     }
 }
@@ -293,9 +282,7 @@ static boolean NET_SDL_RecvPacket(net_addr_t **addr, net_packet_t **packet)
 
     if (result < 0)
     {
-        I_Error(english_language ?
-                "NET_SDL_RecvPacket: Error receiving packet: %s" :
-                "NET_SDL_RecvPacket: ошибка получения пакета: %s",
+        I_Error("NET_SDL_RecvPacket: Error receiving packet: %s",
                 SDLNet_GetError());
     }
 

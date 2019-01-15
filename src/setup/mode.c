@@ -70,7 +70,6 @@ static GameSelectCallback game_selected_callback;
 
 // Miscellaneous variables that aren't used in setup.
 
-int english_language = 0;
 static int showMessages = 1;
 static int screenblocks = 10;
 static int detailLevel = 0;
@@ -79,8 +78,6 @@ static char *game_title = "Doom";
 
 static void BindMiscVariables(void)
 {
-    // [JN] Initialise language variable first
-    M_BindIntVariable("english_language", &english_language);
     M_BindIntVariable("detaillevel",   &detailLevel);
     M_BindIntVariable("show_messages", &showMessages);
     M_BindIntVariable("screenblocks",   &screenblocks);

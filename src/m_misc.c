@@ -214,10 +214,7 @@ int M_ReadFile(char *name, byte **buffer)
 	
     handle = fopen(name, "rb");
     if (handle == NULL)
-	I_Error (english_language ?
-             "Couldn't read file %s" :
-             "Невозможно прочитать файл %s",
-             name);
+	I_Error ("Couldn't read file %s", name);
 
     // find the size of the file by seeking to the end and
     // reading the current position
@@ -229,10 +226,7 @@ int M_ReadFile(char *name, byte **buffer)
     fclose (handle);
 	
     if (count < length)
-	I_Error (english_language ?
-             "Couldn't read file %s" :
-             "Невозможно прочитать файл %s",
-             name);
+	I_Error ("Couldn't read file %s", name);
 		
     *buffer = buf;
     return length;
@@ -302,9 +296,7 @@ void M_ExtractFileBase(char *path, char *dest)
     {
         if (length >= 8)
         {
-            printf(english_language ?
-                   "Warning: Truncated '%s' lump name to '%.8s'.\n" :
-                   "Внимание: название блока '%s' сокращено до '%.8s'.\n",
+            printf("Warning: Truncated '%s' lump name to '%.8s'.\n",
                    filename, dest);
             break;
         }
@@ -396,9 +388,7 @@ char *M_StringDuplicate(const char *orig)
 
     if (result == NULL)
     {
-        I_Error(english_language ?
-                "Failed to duplicate string (length %" PRIuPTR ")\n" :
-                "Невозможно дублировать строку (длина %i)\n",
+        I_Error("Failed to duplicate string (length %" PRIuPTR ")\n",
                 strlen(orig));
     }
 
@@ -439,9 +429,7 @@ char *M_StringReplace(const char *haystack, const char *needle,
     result = malloc(result_len);
     if (result == NULL)
     {
-        I_Error(english_language ?
-                "M_StringReplace: Failed to allocate new string" :
-                "M_StringReplace: не удалось обнаружить новую строку");
+        I_Error("M_StringReplace: Failed to allocate new string");
         return NULL;
     }
 
@@ -552,9 +540,7 @@ char *M_StringJoin(const char *s, ...)
 
     if (result == NULL)
     {
-        I_Error(english_language ?
-                "M_StringJoin: Failed to allocate new string." :
-                "M_StringJoin: не удалось обнаружить новую строку");
+        I_Error("M_StringJoin: Failed to allocate new string.");
         return NULL;
     }
 

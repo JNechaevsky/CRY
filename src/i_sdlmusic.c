@@ -650,9 +650,7 @@ static boolean ReadSubstituteConfig(char *filename)
 
         if (error != NULL)
         {
-            fprintf(stderr, english_language ?
-                            "%s:%i: Error: %s\n" :
-                            "%s:%i: Ошибка: %s\n",
+            fprintf(stderr, "%s:%i: Error: %s\n",
                             filename, linenum, error);
         }
 
@@ -696,9 +694,7 @@ static void LoadSubstituteConfigs(void)
 
     if (subst_music_len > 0)
     {
-        printf(english_language ?
-               "Loaded %i music substitutions from config files.\n" :
-               "Загружено %i музыкальных замен из конфигурационных файлов.\n",
+        printf("Loaded %i music substitutions from config files.\n",
                subst_music_len);
     }
 }
@@ -745,9 +741,7 @@ static void DumpSubstituteConfig(char *filename)
 
     if (fs == NULL)
     {
-        I_Error(english_language ?
-                "Failed to open %s for writing" :
-                "Невозможно открыть %s для записи",
+        I_Error("Failed to open %s for writing",
                 filename);
         return;
     }
@@ -851,15 +845,11 @@ static boolean I_SDL_InitMusic(void)
     {
         if (SDL_Init(SDL_INIT_AUDIO) < 0)
         {
-            fprintf(stderr, english_language ?
-            "Unable to set up sound.\n" :
-            "Невозможно активировать звуковую систему.\n");
+            fprintf(stderr, "Unable to set up sound.\n");
         }
         else if (Mix_OpenAudio(snd_samplerate, AUDIO_S16SYS, 2, 1024) < 0)
         {
-            fprintf(stderr, english_language ?
-                    "Error initializing SDL_mixer: %s\n" :
-                    "Ошибка initializing SDL_mixer: %s\n",
+            fprintf(stderr, "Error initializing SDL_mixer: %s\n",
                     Mix_GetError());
             SDL_QuitSubSystem(SDL_INIT_AUDIO);
         }
@@ -1073,9 +1063,7 @@ static void *I_SDL_RegisterSong(void *data, int len)
         {
             // Fall through and play MIDI normally, but print an error
             // message.
-            fprintf(stderr, english_language ?
-                    "Failed to load substitute music file: %s: %s\n" :
-                    "Ошибка загрузки заменяемого музыкального файла: %s: %s\n",
+            fprintf(stderr, "Failed to load substitute music file: %s: %s\n",
                     filename, Mix_GetError());
         }
         else
@@ -1116,10 +1104,7 @@ static void *I_SDL_RegisterSong(void *data, int len)
     {
         // Failed to load
 
-        fprintf(stderr, english_language ?
-                        "Error loading midi: %s\n" :
-                        "Ошибка загрузки MIDI: %s\n",
-                        Mix_GetError());
+        fprintf(stderr, "Error loading midi: %s\n", Mix_GetError());
     }
 
     // Remove the temporary MIDI file; however, when using an external

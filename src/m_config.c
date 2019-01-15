@@ -138,12 +138,6 @@ static default_collection_t doom_defaults =
 static default_t extra_defaults_list[] =
 {
     //!
-    // [JN] Support for switching to the English language.
-    //
-
-    CONFIG_VARIABLE_INT(english_language),
-
-    //!
     // Mouse sensitivity.  This value is used to multiply input mouse
     // movement to control the effect of moving the mouse.
     //
@@ -2011,9 +2005,7 @@ void M_LoadDefaults (void)
     if (i)
     {
 	doom_defaults.filename = myargv[i+1];
-	printf (english_language ?
-            "	default file: %s\n" :
-            "   файл конфигурации: %s\n",
+	printf ("	default file: %s\n",
             doom_defaults.filename);
     }
     else
@@ -2022,9 +2014,7 @@ void M_LoadDefaults (void)
             = M_StringJoin(configdir, default_extra_config, NULL);
     }
 
-    printf(english_language ?
-           "saving config in %s\n" :
-           "Сохранение файла конфигурации: %s\n",
+    printf("saving config in %s\n",
            doom_defaults.filename);
 
     //!
@@ -2039,9 +2029,7 @@ void M_LoadDefaults (void)
     if (i)
     {
         extra_defaults.filename = myargv[i+1];
-        printf(english_language ?
-               "        extra configuration file: %s\n" :
-               "        дополнительный файл конфигурации: %s\n", 
+        printf("        extra configuration file: %s\n", 
                extra_defaults.filename);
     }
     else
@@ -2073,10 +2061,7 @@ static default_t *GetDefaultForName(char *name)
 
     if (result == NULL)
     {
-        I_Error(english_language ?
-                "Unknown configuration variable: '%s'" :
-                "Неизвестная переменная в файле конфигурации: '%s'",
-                name);
+        I_Error("Unknown configuration variable: '%s'", name);
     }
 
     return result;
@@ -2229,10 +2214,7 @@ void M_SetConfigDir(char *dir)
 
     if (strcmp(configdir, "") != 0)
     {
-        printf(english_language ?
-               "Using %s for configuration and saves\n" :
-               "Настройки программы и сохраненные игры будут расположены в папке:\n \t%s\n",
-               configdir);
+        printf("Using %s for configuration and saves\n", configdir);
     }
 
     // Make the directory if it doesn't already exist:

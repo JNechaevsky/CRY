@@ -62,9 +62,7 @@ static void MapFile(win32_wad_file_t *wad, char *filename)
 
     if (wad->handle_map == NULL)
     {
-        fprintf(stderr, english_language ?
-                "W_Win32_OpenFile: Unable to CreateFileMapping() for %s\n" :
-                "W_Win32_OpenFile: ошибка применения CreateFileMapping() к %s\n",
+        fprintf(stderr, "W_Win32_OpenFile: Unable to CreateFileMapping() for %s\n",
                 filename);
         return;
     }
@@ -75,9 +73,7 @@ static void MapFile(win32_wad_file_t *wad, char *filename)
 
     if (wad->wad.mapped == NULL)
     {
-        fprintf(stderr, english_language ?
-                "W_Win32_OpenFile: Unable to MapViewOfFile() for %s\n" :
-                "W_Win32_OpenFile: ошибка применения MapViewOfFile() к %s\n",
+        fprintf(stderr, "W_Win32_OpenFile: Unable to MapViewOfFile() for %s\n",
                 filename);
     }
 }
@@ -90,9 +86,7 @@ unsigned int GetFileLength(HANDLE handle)
 
     if (result == INVALID_SET_FILE_POINTER)
     {
-        I_Error(english_language?
-                "W_Win32_OpenFile: Failed to read file length" :
-                "W_Win32_OpenFile: ошибка чтения длины файла");
+        I_Error("W_Win32_OpenFile: Failed to read file length");
     }
 
     return result;
@@ -184,19 +178,14 @@ size_t W_Win32_Read(wad_file_t *wad, unsigned int offset,
 
     if (result == INVALID_SET_FILE_POINTER)
     {
-        I_Error(english_language ?
-                "W_Win32_Read: Failed to set file pointer to %i" :
-                "W_Win32_Read: невозможно задать указатель файла %i",
-                offset);
+        I_Error("W_Win32_Read: Failed to set file pointer to %i", offset);
     }
 
     // Read into the buffer.
 
     if (!ReadFile(win32_wad->handle, buffer, buffer_len, &bytes_read, NULL))
     {
-        I_Error(english_language ?
-                "W_Win32_Read: Error reading from file" :
-                "W_Win32_Read: ошибка чтения файла");
+        I_Error("W_Win32_Read: Error reading from file");
     }
 
     return bytes_read;

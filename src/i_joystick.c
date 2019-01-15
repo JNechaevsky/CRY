@@ -132,9 +132,7 @@ static int DeviceIndex(void)
         dev_guid = SDL_JoystickGetDeviceGUID(i);
         if (!memcmp(&guid, &dev_guid, sizeof(SDL_JoystickGUID)))
         {
-            printf(english_language ?
-                   "I_InitJoystick: Joystick moved to index %d.\n" :
-                   "I_InitJoystick: Joystick перемещен в индекс %d.\n", i);
+            printf("I_InitJoystick: Joystick moved to index %d.\n", i);
             return i;
         }
     }
@@ -161,18 +159,10 @@ void I_InitJoystick(void)
 
     if (index < 0)
     {
-        if (english_language)
-        {
-            printf("I_InitJoystick: Couldn't find joystick with GUID \"%s\": "
-                   "device not found or not connected?\n",
-                   joystick_guid);
-        }
-        else
-        {
-            printf("I_InitJoystick: невозможно обнаружить джойстик с GUID \"%s\": "
-                   "устройство не обнаружено или не подключено?\n",
-                   joystick_guid);
-        }
+        printf("I_InitJoystick: Couldn't find joystick with GUID \"%s\": "
+               "device not found or not connected?\n",
+               joystick_guid);
+
         SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
         return;
     }
@@ -183,9 +173,7 @@ void I_InitJoystick(void)
 
     if (joystick == NULL)
     {
-        printf(english_language ?
-               "I_InitJoystick: Failed to open joystick #%i\n" :
-               "I_InitJoystick: ошибка активизации джойстика #%i\n",
+        printf("I_InitJoystick: Failed to open joystick #%i\n", 
                index);
         SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
         return;
@@ -195,16 +183,8 @@ void I_InitJoystick(void)
      || !IsValidAxis(joystick_y_axis)
      || !IsValidAxis(joystick_strafe_axis))
     {
-        if (english_language)
-        {
-            printf("I_InitJoystick: Invalid joystick axis for configured joystick "
-                   "(run joystick setup again)\n");
-        }
-        else
-        {
-            printf("I_InitJoystick: некорректно настроенная ось джойстика "
-                   "(запустите программу настройки повторно).\n");
-        }
+        printf("I_InitJoystick: Invalid joystick axis for configured joystick "
+               "(run joystick setup again)\n");
 
         SDL_JoystickClose(joystick);
         joystick = NULL;

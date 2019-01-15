@@ -27,8 +27,6 @@
 #include "z_zone.h"
 
 
-extern int english_language;
-
 typedef enum {
 	MODE_READ,
 	MODE_WRITE,
@@ -66,9 +64,7 @@ size_t mem_fread(void *buf, size_t size, size_t nmemb, MEMFILE *stream)
 
 	if (stream->mode != MODE_READ)
 	{
-		printf(english_language ?
-               "not a read stream\n" :
-               "потом не читабелен\n");
+		printf("not a read stream\n");
 		return -1;
 	}
 
@@ -196,10 +192,7 @@ int mem_fseek(MEMFILE *stream, signed long position, mem_rel_t whence)
 	}
 	else
 	{
-		printf(english_language ?
-               "Error seeking to %i\n" :
-               "Ошибка обращения к %i\n",
-               newpos);
+		printf("Error seeking to %i\n", newpos);
 		return -1;
 	}
 }
