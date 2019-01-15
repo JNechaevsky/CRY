@@ -1316,12 +1316,6 @@ void D_DoomMain (void)
     DEH_ParseCommandLine();
 #endif
 
-    // Load PWAD files.
-    modifiedgame = W_ParseCommandLine();
-
-    // Debug:
-    // W_PrintDirectory();
-
     //!
     // @arg <demo>
     // @category demo
