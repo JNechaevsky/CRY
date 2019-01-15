@@ -1008,8 +1008,10 @@ void D_DoomMain (void)
     char    file[256];
     char    demolumpname[9];
 
-    // print banner
+    // [Julia] Print startup banner only once
+    I_PrintDivider();
     I_PrintBanner(PACKAGE_STRING);
+    I_PrintDivider();
 
     DEH_printf("Z_Init: Init zone memory allocation daemon. \n");
     Z_Init ();
@@ -1368,9 +1370,6 @@ void D_DoomMain (void)
     {
         savegamedir = M_GetSaveGameDir(D_SaveGameIWADName(gamemission));
     }
-
-    I_PrintStartupBanner(gamedescription);
-    PrintDehackedBanners();
 
     DEH_printf("I_Init: Setting up machine state.\n");
     I_CheckIsScreensaver();

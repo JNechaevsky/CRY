@@ -185,13 +185,6 @@ void I_PrintDivider(void)
     putchar('\n');
 }
 
-void I_PrintStartupBanner(char *gamedescription)
-{
-    I_PrintDivider();
-    I_PrintBanner(gamedescription);
-    I_PrintDivider();
-}
-
 // 
 // I_ConsoleStdout
 //
