@@ -36,7 +36,7 @@ void R_InitBrightmaps(void)
     // for example, no need to lookup Doom 1 textures in TNT.
 
     // Print informative message
-    printf("\nR_Init: Brightmapping initialization.");
+    printf("\nR_Init: Init brightmaps");
 
     // All the textures we need in Atari Jaguar...
     // Red only:
