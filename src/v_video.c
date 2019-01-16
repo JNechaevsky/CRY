@@ -452,7 +452,7 @@ void V_DrawPatchUnscaled(int x, int y, patch_t *patch)
 // -----------------------------------------------------------------------------
 // [JN] V_DrawPatchFinale
 // Draws pixel-doubled sprite. Used exclusively on casting sequence screen.
-// TODO!
+// Written with extensive support of Fabian Greffrath, thanks! (16.01.2019)
 // -----------------------------------------------------------------------------
 
 void V_DrawPatchFinale(int x, int y, patch_t *patch)
@@ -486,7 +486,9 @@ void V_DrawPatchFinale(int x, int y, patch_t *patch)
     V_MarkRect(x, y, SHORT(patch->width), SHORT(patch->height));
 
     col = 0;
-    desttop = dest_screen + (y << hires) * SCREENWIDTH + x;
+    desttop = dest_screen 
+            + (y * 4)                   // Proper vertical offset for Y * 4 factor
+            * SCREENWIDTH + x;
 
     w = SHORT(patch->width);
 
@@ -497,23 +499,30 @@ void V_DrawPatchFinale(int x, int y, patch_t *patch)
         // step through the posts in a column
         while (column->topdelta != 0xff)
         {
-            for (f = 0; f <= 3; f++)    // [Julia] Scale X by 3
+            for (f = 0; f <= 3; f++)    // Make X scale factor * 4 (0, 1, 2, 3)
             {
             source = (byte *)column + 3;
-            dest = desttop + column->topdelta*(SCREENWIDTH << hires) + (x * 3) + f;   // [Julia] Scale X by 3
+
+            dest = desttop 
+                 + column->topdelta 
+                 * (SCREENWIDTH * 4)    // Scale Y by 4
+                 + (x * 3)              // Scale X by 4
+                 + f;
+
             count = column->length;
 
             while (count--)
             {
-                if (hires)
+                int g;
+
+                for (g = 0; g <= 3; g++)
                 {
                     *dest = *source;
                     dest += SCREENWIDTH;
                 }
-                
-                *dest = *source++;
-                dest += SCREENWIDTH;
+                source++;
             }
+
             }
             column = (column_t *)((byte *)column + column->length + 4);
         }
