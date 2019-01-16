@@ -263,7 +263,7 @@ menu_t  NewDef =
     &MainDef,        // previous menu
     NewGameMenu,    // menuitem_t ->
     M_DrawNewGame,  // drawing routine ->
-    48,63,          // x,y
+    58,60,          // x,y
     hurtme          // lastOn
 };
 
@@ -305,7 +305,7 @@ menu_t  OptionsDef =
     &MainDef,
     OptionsMenu,
     M_DrawOptions,
-    60,37,
+    60,30,
     0
 };
 
@@ -494,8 +494,8 @@ void M_DrawLoad(void)
 {
     int i;
 
-    // [Julia] Write capitalized title "LOAD GAME"
-    HU_WriteTextBig(97, 11, "LOAD GAME");
+    // [Julia] Write capitalized title
+    HU_WriteTextBigCentered(10, "LOAD GAME");
     
     for (i = 0 ; i < load_end ; i++)
     {
@@ -564,12 +564,12 @@ void M_DrawSave(void)
     if (QuickSaveTitle)
     {
         // [Julia] Write capitalized title
-        HU_WriteTextBig(84, 11, "QUICK SAVING");
+        HU_WriteTextBigCentered(10, "QUICK SAVING");
     }
     else
     {
         // [Julia] Write capitalized title
-        HU_WriteTextBig(99, 11, "SAVE GAME");
+        HU_WriteTextBigCentered(10, "SAVE GAME");
     }
 
     for (i = 0 ; i < load_end ; i++)
@@ -748,7 +748,7 @@ void M_DrawReadThis2(void)
 void M_DrawSound(void)
 {
     // [Julia] Write capitalized title
-    HU_WriteTextBig(71, 39, "SOUND VOLUME");
+    HU_WriteTextBigCentered(39, "SOUND VOLUME");
 
     M_DrawThermo(SoundDef.x,SoundDef.y+LINEHEIGHT*(sfx_vol+1), 16,sfxVolume);
     M_DrawThermo(SoundDef.x,SoundDef.y+LINEHEIGHT*(music_vol+1), 16,musicVolume);
@@ -828,8 +828,8 @@ void M_DrawMainMenu(void)
 void M_DrawNewGame(void)
 {
     // [Julia] Write capitalized titles
-    HU_WriteTextBig(99, 13, "NEW GAME");
-    HU_WriteTextBig(48, 38, "Choose Skill Level:");
+    HU_WriteTextBigCentered(10, "NEW GAME");
+    HU_WriteTextBigCentered(35, "Choose Skill Level:");
 }
 
 // -----------------------------------------------------------------------------
@@ -860,11 +860,11 @@ void M_ChooseSkill(int choice)
 
 void M_DrawOptions(void)
 {
-    // [Julia] Write capitalized titles
-    HU_WriteTextBig(110, 11, "OPTIONS");
+    // [Julia] Write capitalized title
+    HU_WriteTextBigCentered(10, "OPTIONS");
 
-    HU_WriteTextBig(180, 53, showMessages == 1 ? "on" : "off");
-    HU_WriteTextBig(202, 69, detailLevel == 1 ? "low" : "high");
+    HU_WriteTextBig(180, 46, showMessages == 1 ? "on" : "off");
+    HU_WriteTextBig(202, 62, detailLevel == 1 ? "low" : "high");
 
     // [Julia] Draw sliders
     M_DrawThermo(OptionsDef.x, OptionsDef.y 
