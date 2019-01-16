@@ -1618,6 +1618,7 @@ static default_t extra_defaults_list[] =
 
     // Графика
     CONFIG_VARIABLE_INT(uncapped_fps),
+    CONFIG_VARIABLE_INT(hightlight_things),
     CONFIG_VARIABLE_INT(brightmaps),
     CONFIG_VARIABLE_INT(translucency),
     CONFIG_VARIABLE_INT(swirling_liquids),

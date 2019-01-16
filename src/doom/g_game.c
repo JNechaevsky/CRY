@@ -219,15 +219,16 @@ int             bodyqueslot;
 // [Julia] Optional Gameplay Enhancements
 
 // int translucency = 1; (d_main.c)
-int brightmaps       = 1;
-int swirling_liquids = 1;
-int colored_blood    = 1;
-int weapon_bobbing   = 1;
-int snd_monomode     = 0;
+int hightlight_things = 0;
+int brightmaps        = 1;
+int swirling_liquids  = 1;
+int colored_blood     = 1;
+int weapon_bobbing    = 1;
+int snd_monomode      = 0;
 
-int crosshair_draw   = 0;
-int crosshair_health = 1;
-int crosshair_scale  = 0;
+int crosshair_draw    = 0;
+int crosshair_health  = 1;
+int crosshair_scale   = 0;
 
  
 int G_CmdChecksum (ticcmd_t* cmd) 

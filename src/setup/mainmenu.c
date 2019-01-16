@@ -68,6 +68,7 @@ static void SensibleDefaults(void)
     png_screenshots = 1;
 
     // Графика
+    hightlight_things = 0;
     brightmaps = 1;
     translucency = 1;
     swirling_liquids = 1;

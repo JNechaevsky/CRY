@@ -27,6 +27,7 @@
 // [JN] Дополнительные параметры игры
 
 // Графика
+int hightlight_things = 0;
 int brightmaps = 1;
 int translucency = 1;
 int swirling_liquids = 1;
@@ -88,6 +89,7 @@ void CompatibilitySettings(void)
     
     TXT_AddWidgets(window_features,
 
+        TXT_NewCheckBox("Hightlighted things",          &hightlight_things),
         TXT_NewCheckBox("Brightmaps",                   &brightmaps),
         TXT_NewCheckBox("Translucency",                 &translucency),
         TXT_NewCheckBox("Swirling liquids",             &swirling_liquids),
@@ -100,6 +102,7 @@ void CompatibilitySettings(void)
 void BindCompatibilityVariables(void)
 {
     // Графика
+    M_BindIntVariable("hightlight_things",      &hightlight_things);
     M_BindIntVariable("brightmaps",             &brightmaps);
     M_BindIntVariable("translucency",           &translucency);
     M_BindIntVariable("swirling_liquids",       &swirling_liquids);

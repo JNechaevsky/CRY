@@ -339,6 +339,7 @@ void D_BindVariables(void)
     // [Julia] Optional Gameplay Enhancements
     
     // Common
+    M_BindIntVariable("hightlight_things",      &hightlight_things);
     M_BindIntVariable("brightmaps",             &brightmaps);
     M_BindIntVariable("translucency",           &translucency);
     M_BindIntVariable("swirling_liquids",       &swirling_liquids);

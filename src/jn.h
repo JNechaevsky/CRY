@@ -61,11 +61,13 @@ extern int uncapped_fps;
 // Optional gameplay features
 // -----------------------------------------------------------------------------
 
+extern int hightlight_things;
 extern int brightmaps;
 extern int translucency;
 extern int swirling_liquids;
 extern int colored_blood;
 extern int weapon_bobbing;
+
 extern int snd_monomode;
 
 extern int crosshair_draw;

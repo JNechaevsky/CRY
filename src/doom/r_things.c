@@ -668,9 +668,8 @@ void R_ProjectSprite (mobj_t *thing)
         }
     }	
 
-    // [Julia] Jaguar: highlight everything, but only on easiest skill level.
-    // TODO: make optional
-    if (gamemission == jaguar && gameskill == sk_baby)
+    // [Julia] Jaguar: highlight everything
+    if (hightlight_things)
     {
         vis->colormap = colormaps;
     }

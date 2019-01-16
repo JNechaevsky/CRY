@@ -25,6 +25,7 @@ void BindCompatibilityVariables(void);
 // [JN] Дополнительные параметры игры
 
 // Графика
+extern int hightlight_things;
 extern int brightmaps;
 extern int translucency;
 extern int swirling_liquids;

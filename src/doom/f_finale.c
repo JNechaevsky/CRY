@@ -483,7 +483,8 @@ void F_CastPrint (char *text)
 
         w = SHORT (hu_font2[c]->width);
 
-        V_DrawShadowedPatch(cx, 180, hu_font2[c]);
+        // [Julia] Jaguar: print casting name on top of the screen
+        V_DrawShadowedPatch(cx, 8, hu_font2[c]);
 
         cx+=w;
     }
