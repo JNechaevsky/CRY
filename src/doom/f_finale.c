@@ -513,7 +513,7 @@ void F_CastDrawer (void)
 
     patch = W_CacheLumpNum (lump+firstspritelump, PU_CACHE);
 
-    V_DrawPatchFinale(ORIGWIDTH/4, 100, patch);
+    V_DrawPatchFinale(ORIGWIDTH/4, 86, patch);
 }
 
 
