@@ -1275,16 +1275,18 @@ void AM_drawLineCharacter (mline_t *lineguy, int lineguylines, fixed_t scale,
 // -----------------------------------------------------------------------------
 // AM_drawPlayers
 //
-// [Julia] Draw dark green, blinking arrow
-// TODO: don't blink if player is dead.
+// [Julia] Draw dark green, blinking arrow.
+// Draw blinking arrow if player alive, draw static arrow if player dead.
 // -----------------------------------------------------------------------------
 
 void AM_drawPlayers (void)
 {
-    if (leveltime & 8)
-    AM_drawLineCharacter (player_arrow, arrlen(player_arrow), 0, 
-                          plr->mo->angle, GREEN_JAGUAR, 
-                          plr->mo->x, plr->mo->y);
+    if ((plr->mo->health > 0 && leveltime & 8) || plr->mo->health <= 0)
+    {
+        AM_drawLineCharacter (player_arrow, arrlen(player_arrow), 0, 
+                              plr->mo->angle, GREEN_JAGUAR, 
+                              plr->mo->x, plr->mo->y);
+    }
 }
 
 
