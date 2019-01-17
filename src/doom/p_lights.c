@@ -131,11 +131,10 @@ void P_SpawnStrobeFlash (sector_t *sector, int fastOrSlow, int inSync)
 		
     if (flash->minlight == flash->maxlight)
     {
-        // [Julia] TODO: apply special fix for Deimos Lab?
-        // if (gamemap == 12)
-        // flash->minlight = 112;
-
-        // else
+        // [Julia] Apply special fix for Deimos Lab
+        if (gamemap == 12)
+        flash->minlight = 112;
+        else
         flash->minlight = 0;
     }
 
