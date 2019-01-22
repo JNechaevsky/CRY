@@ -964,7 +964,7 @@ void G_Ticker (void)
             break; 
 
             case ga_screenshot:
-            V_ScreenShot("YAGUAR%02i.%s");
+            V_ScreenShot("screenshot-%03i.%s");
             if (devparm)
             {
                 players[consoleplayer].message = STSTR_SCRNSHT;

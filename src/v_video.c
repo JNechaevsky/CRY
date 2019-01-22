@@ -887,8 +887,9 @@ void WritePNGfile(char *filename, byte *data,
 void V_ScreenShot(char *format)
 {
     int i;
-    char lbmname[16]; // haleyjd 20110213: BUG FIX - 12 is too small!
-    char *ext;
+    char lbmname[19]; // haleyjd 20110213: BUG FIX - 12 is too small!
+    char *ext;        // [Julia] 22.01.2019: 16 is too small for 
+                      //         "screenshot-XXX.png", now it is 19.
     
     // find a file name to save it to
 
@@ -904,7 +905,8 @@ void V_ScreenShot(char *format)
         ext = "pcx";
     }
 
-    for (i=0; i<=99; i++)
+    // [Julia] Increased screenshots limit from 99 to 999
+    for (i=0; i<=999; i++)
     {
         M_snprintf(lbmname, sizeof(lbmname), format, i, ext);
 
@@ -914,7 +916,8 @@ void V_ScreenShot(char *format)
         }
     }
 
-    if (i == 100)
+    // [Julia] Increased last screenshot from 100 to 1000
+    if (i == 1000)
     {
 #ifdef HAVE_LIBPNG
         if (png_screenshots)
