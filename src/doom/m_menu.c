@@ -150,7 +150,7 @@ void M_ChooseSkill(int choice);
 void M_LoadGame(int choice);
 void M_SaveGame(int choice);
 void M_Options(int choice);
-void M_EndGame(int choice);
+void M_Features(int choice);
 void M_ReadThis(int choice);
 void M_ReadThis2(int choice);
 void M_QuitDOOM(int choice);
@@ -190,6 +190,16 @@ int  M_StringHeight(char *string);
 void M_StartMessage(char *string,void *routine,boolean input);
 void M_StopMessage(void);
 void M_ClearMenus (void);
+
+// [Julia] Prototypes for Gameplay features 
+void M_DrawFeatures(void);
+void M_ChangeHighlight(int choice);
+void M_ChangeBrightmaps(int choice);
+void M_ChangeTranslucency(int choice);
+void M_ChangeLiquids(int choice);
+void M_ChangeBlood(int choice);
+void M_ChangeBobbing(int choice);
+void M_ChangeFps(int choice);
 
 
 // =============================================================================
@@ -274,7 +284,7 @@ menu_t  NewDef =
 
 enum
 {
-    endgame,
+    features,
     messages,
     detail,
     scrnsize,
@@ -289,9 +299,9 @@ enum
 // [Julia] Now writing menu elements with text, don't using graphical patches.
 menuitem_t OptionsMenu[]=
 {
-    {1,"End game", M_EndGame,'e'},
+    {1,"Gameplay features", M_Features,'g'},
     {1,"Messages:", M_ChangeMessages,'m'},
-    {1,"Detail level:", M_ChangeDetail,'g'},
+    {1,"Detail level:", M_ChangeDetail,'d'},
     {2,"Screen size", M_SizeDisplay,'s'},
     {-1,"",0,'\0'},
     {2,"Mouse sensivity", M_ChangeSensitivity,'m'},
@@ -355,6 +365,134 @@ menu_t  ReadDef2 =
     330,175,
     0
 };
+
+
+// =============================================================================
+// [Julia] GAMEPLAY FEATURES MENU
+// =============================================================================
+
+enum
+{
+    features_hightlight,
+    features_bmaps,
+    features_trans,
+    features_liquids,
+    features_blood,
+    features_bobbing,
+    features_fps,
+    features_end
+} features_e;
+
+menuitem_t FeaturesMenu[]=
+{
+    {1,"Highlighted objects", M_ChangeHighlight,    'h'},
+    {1,"Brightmaps",          M_ChangeBrightmaps,   'b'},
+    {1,"Translucency",        M_ChangeTranslucency, 't'},
+    {1,"Swirling liquids",    M_ChangeLiquids,      's'},
+    {1,"Colored blood",       M_ChangeBlood,        'c'},
+    {1,"Improved bobbing",    M_ChangeBobbing,      'i'},
+    {1,"Uncapped FPS",        M_ChangeFps,          'u'}
+};
+
+menu_t  FeaturesDef =
+{
+    features_end,
+    &OptionsDef,
+    FeaturesMenu,
+    M_DrawFeatures,
+    44,30,
+    0
+};
+
+// -----------------------------------------------------------------------------
+// [Julia] M_DrawFeatures
+// -----------------------------------------------------------------------------
+
+void M_DrawFeatures(void)
+{
+    // Write capitalized title
+    HU_WriteTextBigCentered(10, "  GAMEPLAY FEATURES");
+
+    // Write "on" / "off" strings for features
+    HU_WriteTextBig(278, 30, hightlight_things == 1 ? "on" : "off");
+    HU_WriteTextBig(278, 46, brightmaps == 1 ? "on" : "off");
+    HU_WriteTextBig(278, 62, translucency == 1 ? "on" : "off");
+    HU_WriteTextBig(278, 78, swirling_liquids == 1 ? "on" : "off");
+    HU_WriteTextBig(278, 94, colored_blood == 1 ? "on" : "off");
+    HU_WriteTextBig(278, 110, weapon_bobbing == 1 ? "on" : "off");
+    HU_WriteTextBig(278, 126, uncapped_fps == 1 ? "on" : "off");
+}
+
+// -----------------------------------------------------------------------------
+// Toggle hightlighted things on/off
+// -----------------------------------------------------------------------------
+
+void M_ChangeHighlight(int choice)
+{
+    choice = 0;
+    hightlight_things = 1 - hightlight_things;
+}
+
+// -----------------------------------------------------------------------------
+// Toggle brightmaps on/off
+// -----------------------------------------------------------------------------
+
+void M_ChangeBrightmaps(int choice)
+{
+    choice = 0;
+    brightmaps = 1 - brightmaps;
+}
+
+// -----------------------------------------------------------------------------
+// Toggle translucency on/off
+// -----------------------------------------------------------------------------
+
+void M_ChangeTranslucency(int choice)
+{
+    choice = 0;
+    translucency = 1 - translucency;
+}
+
+// -----------------------------------------------------------------------------
+// Toggle swirling liquids on/off
+// -----------------------------------------------------------------------------
+
+void M_ChangeLiquids(int choice)
+{
+    choice = 0;
+    swirling_liquids = 1 - swirling_liquids;
+}
+
+// -----------------------------------------------------------------------------
+// Toggle colored blood on/off
+// -----------------------------------------------------------------------------
+
+void M_ChangeBlood(int choice)
+{
+    choice = 0;
+    colored_blood = 1 - colored_blood;
+}
+
+
+// -----------------------------------------------------------------------------
+// Toggle improved weapon bobbing on/off
+// -----------------------------------------------------------------------------
+
+void M_ChangeBobbing(int choice)
+{
+    choice = 0;
+    weapon_bobbing = 1 - weapon_bobbing;
+}
+
+// -----------------------------------------------------------------------------
+// Toggle uncapped FPS on/off
+// -----------------------------------------------------------------------------
+
+void M_ChangeFps(int choice)
+{
+    choice = 0;
+    uncapped_fps = 1 - uncapped_fps;
+}
 
 
 // =============================================================================
@@ -932,6 +1070,15 @@ void M_EndGame(int choice)
     }
 
     M_StartMessage(DEH_String(ENDGAME), M_EndGameResponse,true);
+}
+
+// -----------------------------------------------------------------------------
+// M_Features
+// -----------------------------------------------------------------------------
+
+void M_Features(int choice)
+{
+    M_SetupNextMenu(&FeaturesDef);
 }
 
 
