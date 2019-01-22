@@ -32,7 +32,7 @@
 
 #define PRESSKEY    "press a key."
 #define PRESSYN     "(press \"y\" or \"n\")"
-#define QUITMSG     "are you sure you want to quit\nthis great game?"
+#define QUITMSG     "are you sure you want to quit?"
 #define QSAVESPOT   "you haven't picked a quicksave slot yet!\n\n"PRESSKEY
 #define SAVEDEAD    "you can't save if you aren't playing!\n\n"PRESSKEY
 
