@@ -70,7 +70,8 @@ void P_CalcHeight (player_t *player, boolean safe)
     
         // [Julia] Reduce bobbing amplitude while not in full
         // speed movement. Affects both camera and weapon bobbing.
-        if (!max_bobbing)
+        // Apply reduced bobbing only if improved bobbing activated.
+        if (!max_bobbing && weapon_bobbing)
         player->bob >>= 3;
         else
         player->bob >>= 2;

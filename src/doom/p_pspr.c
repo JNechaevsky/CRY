@@ -193,6 +193,16 @@ void P_FireWeapon (player_t *player)
     return;
 
     P_SetMobjState (player->mo, S_PLAY_ATK1);
+
+    // [Julia] Jaguar: center weapon while firing, 
+    // if improved bobbing is not active.
+    // Note: in Jaguar code FRACUNIT is WEAPONX.
+    if (!weapon_bobbing)
+    {
+        player->psprites[ps_weapon].sx = FRACUNIT;
+        player->psprites[ps_weapon].sy = WEAPONTOP;
+    }
+
     newstate = weaponinfo[player->readyweapon].atkstate;
     P_SetPsprite (player, ps_weapon, newstate);
     P_NoiseAlert (player->mo, player->mo);
