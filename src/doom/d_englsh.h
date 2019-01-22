@@ -36,7 +36,7 @@
 #define QSAVESPOT   "you haven't picked a quicksave slot yet!\n\n"PRESSKEY
 #define SAVEDEAD    "you can't save if you aren't playing!\n\n"PRESSKEY
 
-#define SAVEGAMENAME "yaguar-save-"
+#define SAVEGAMENAME "savegame-"
 
 #define MSGON       "Messages ON"
 #define MSGOFF      "Messages OFF"
