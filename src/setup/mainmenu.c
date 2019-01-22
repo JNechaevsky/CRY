@@ -226,7 +226,8 @@ void MainMenu(void)
     TXT_NewButton2("Configure Keyboard", (TxtWidgetSignalFunc) ConfigKeyboard, NULL),
     TXT_NewButton2("Configure Mouse",    (TxtWidgetSignalFunc) ConfigMouse, NULL),
     TXT_NewButton2("Configure Gamepad/Joystick",    (TxtWidgetSignalFunc) ConfigJoystick, NULL),
-    TXT_NewButton2("Optional Gameplay Enhacements", (TxtWidgetSignalFunc) CompatibilitySettings, NULL),
+    // [Julia] No longer used, now available as in-game menu
+    // TXT_NewButton2("Optional Gameplay Enhacements", (TxtWidgetSignalFunc) CompatibilitySettings, NULL),
 
     TXT_NewStrut(0, 1),
 
