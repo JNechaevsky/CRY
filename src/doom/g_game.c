@@ -1507,7 +1507,7 @@ void G_DoSaveGame (void)
     {
         // Failed to save the game, so we're going to have to abort. But
         // to be nice, save to somewhere else before we call I_Error().
-        recovery_savegame_file = M_TempFile("recovery.dsg");
+        recovery_savegame_file = M_TempFile("recovery.sav");
         save_stream = fopen(recovery_savegame_file, "wb");
         if (save_stream == NULL)
         {
