@@ -461,8 +461,10 @@ void D_AdvanceDemo (void)
 // -----------------------------------------------------------------------------
 // D_DoAdvanceDemo
 //
-// This cycles through the demo sequences.
-// [Julia] TODO - recreate Jaguar demos?
+// [Julia] Cycles through the screens (no internal demos):
+//  1) Title 
+//  2) id Software credits
+//  3) Yaguar Doom credits
 // -----------------------------------------------------------------------------
 
 void D_DoAdvanceDemo (void)
@@ -472,14 +474,14 @@ void D_DoAdvanceDemo (void)
     usergame = false;                               // no save / end game here
     paused = false;
     gameaction = ga_nothing;
-    demosequence = (demosequence+1)%6;
+    gamestate = GS_DEMOSCREEN;
+    pagetic = TICRATE * 8;
+    demosequence = (demosequence+1)%3;
 
     switch (demosequence)
     {
         case 0:
         {
-            pagetic = TICRATE * 11;
-            gamestate = GS_DEMOSCREEN;
             pagename1 = DEH_String("M_TITLE");
             pagename2 = DEH_String("TITLE");
             S_StartMusic (mus_title);
@@ -488,38 +490,15 @@ void D_DoAdvanceDemo (void)
 
         case 1:
         {
-            // G_DeferedPlayDemo(DEH_String("demo1"));
-            break;
-        }
-
-        case 2:
-        {
-            pagetic = TICRATE * 11;
-            gamestate = GS_DEMOSCREEN;
             pagename1 = DEH_String("M_TITLE");
             pagename2 = DEH_String("CREDIT");
             break;
         }
 
-        case 3:
+        case 2:
         {
-            // G_DeferedPlayDemo(DEH_String("demo2"));
-            break;
-        }
-
-        case 4:
-        {
-            gamestate = GS_DEMOSCREEN;
-            pagetic = TICRATE * 11;
             pagename1 = DEH_String("M_TITLE");
             pagename2 = DEH_String("CREDIT2");
-            S_StartMusic(mus_title);
-            break;
-        }
-
-        case 5:
-        {
-            // G_DeferedPlayDemo(DEH_String("demo3"));
             break;
         }
     }
