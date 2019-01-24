@@ -219,10 +219,18 @@ void F_TextWrite (void)
     {
         if (player_is_cheater)
         {
-            // [Julia] Cheated ending! Draw C:\DOOM>_
+            // [Julia] Cheated ending! Console code is:
+            /*
+            ** CLS
+            ** @ECHO OFF
+            ** ECHO Runtime error 666 at 0000:029A 
+            ** ECHO - user cheated
+            ** ECHO.
+            */
+
             V_DrawPatchUnscaled (1, 2, W_CacheLumpName (DEH_String("C_DOOM"), PU_CACHE));
             if (gametic & 4)
-            V_DrawPatchUnscaled (65, 12, W_CacheLumpName (DEH_String("C_CURSOR"), PU_CACHE));
+            V_DrawPatchUnscaled (65, 60, W_CacheLumpName (DEH_String("C_CURSOR"), PU_CACHE));
 
             // Don't go any farther
             return;
