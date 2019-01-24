@@ -146,7 +146,8 @@ void F_Ticker (void)
     return;
 
     // check for skipping
-    if (finalecount > 50)
+    // [Julia] Don't allow skipping until whole text is written on the screen.
+    if (finalecount > 810)
     {
         // go on to the next level
         for (i=0 ; i<MAXPLAYERS ; i++)
