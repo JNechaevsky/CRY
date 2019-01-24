@@ -83,6 +83,7 @@ extern int      startloadgame;
 extern int      gameepisode;
 extern int      gamemap;
 extern int      deathmatch;     // 0=Cooperative; 1=Deathmatch; 2=Altdeath
+extern boolean  player_is_cheater; // [Julia] True = player was using cheats.
 extern boolean  autostart;
 extern skill_t  gameskill;      // Selected by user. 
 extern boolean  respawnmonsters; // Nightmare mode flag, single player.

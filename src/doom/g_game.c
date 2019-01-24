@@ -230,6 +230,9 @@ int crosshair_draw    = 0;
 int crosshair_health  = 1;
 int crosshair_scale   = 0;
 
+// [Julia] Special boolean. Changes game ending if true.
+boolean player_is_cheater;
+
  
 int G_CmdChecksum (ticcmd_t* cmd) 
 { 
@@ -1578,6 +1581,21 @@ void G_DeferedInitNew (skill_t skill, int episode, int map)
     d_episode = episode; 
     d_map = map; 
     gameaction = ga_newgame; 
+}
+
+// -----------------------------------------------------------------------------
+// [Julia] G_DeferedInitNewCheated
+//
+// Same as above, but going to G_InitNew directly instead of G_DoNewGame
+// for keeping player_is_cheater flag. Called by IDCLEV cheat.
+// -----------------------------------------------------------------------------
+
+void G_DeferedInitNewCheated (skill_t skill, int episode, int map) 
+{
+    d_skill = skill; 
+    d_episode = episode; 
+    d_map = map; 
+    G_InitNew (d_skill, d_episode, d_map); 
 } 
 
 
@@ -1599,6 +1617,7 @@ void G_DoNewGame (void)
     nomonsters = false;
     */
     consoleplayer = 0;
+    player_is_cheater = false;  // [Julia] Reset cheating boolean
     G_InitNew (d_skill, d_episode, d_map); 
     gameaction = ga_nothing; 
 } 

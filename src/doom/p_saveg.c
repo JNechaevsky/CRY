@@ -1396,6 +1396,7 @@ void P_WriteSaveGameHeader(char *description)
     saveg_write8(gameskill);
     saveg_write8(gameepisode);
     saveg_write8(gamemap);
+    saveg_write8(player_is_cheater);
 
     for (i=0 ; i<MAXPLAYERS ; i++) 
         saveg_write8(playeringame[i]);
@@ -1433,6 +1434,7 @@ boolean P_ReadSaveGameHeader(void)
     gameskill = saveg_read8();
     gameepisode = saveg_read8();
     gamemap = saveg_read8();
+    player_is_cheater = saveg_read8();
 
     for (i=0 ; i<MAXPLAYERS ; i++) 
 	playeringame[i] = saveg_read8();

@@ -39,6 +39,9 @@ void G_InitNew (skill_t skill, int episode, int map);
 // but a warp test can start elsewhere
 void G_DeferedInitNew (skill_t skill, int episode, int map);
 
+// [Julia] Same as above, used for keeping player_is_cheater flag.
+void G_DeferedInitNewCheated (skill_t skill, int episode, int map);
+
 void G_DeferedPlayDemo (char* name);
 
 // Can be called by the startup code or M_Responder,

@@ -309,6 +309,7 @@ boolean ST_Responder (event_t* ev)
                 plyr->message = DEH_String(STSTR_DQDON);
                 else 
                 plyr->message = DEH_String(STSTR_DQDOFF);
+                player_is_cheater = true;
             }
 
             // 'fa' cheat for killer fucking arsenal
@@ -325,6 +326,7 @@ boolean ST_Responder (event_t* ev)
                 plyr->ammo[i] = plyr->maxammo[i] = 500;
 
                 plyr->message = DEH_String(STSTR_FAADDED);
+                player_is_cheater = true;
             }
 
             // 'kfa' cheat for key full ammo
@@ -344,6 +346,7 @@ boolean ST_Responder (event_t* ev)
                 plyr->cards[i] = true;
 
                 plyr->message = DEH_String(STSTR_KFAADDED);
+                player_is_cheater = true;
             }
 
             // [Julia] 'ka' cheat for keys only
@@ -353,9 +356,11 @@ boolean ST_Responder (event_t* ev)
                 plyr->cards[i] = true;
 
                 plyr->message = DEH_String(STSTR_KAADDED);
+                player_is_cheater = true;
             }
 
             // [crispy] implement Boom's "tntem" cheat
+            // [Julia] TODO: remove or allow only in -devparm
             else if (cht_CheckCheat(&cheat_massacre, ev->data2))
             {
                 ST_cheat_massacre();
@@ -378,6 +383,7 @@ boolean ST_Responder (event_t* ev)
                 plyr->message = DEH_String(STSTR_NOMUS);
                 else
                 S_ChangeMusic(musnum, 1);
+                player_is_cheater = true;
             }
 
             // [Julia] Noclip cheat
@@ -389,6 +395,7 @@ boolean ST_Responder (event_t* ev)
                 plyr->message = DEH_String(STSTR_NCON);
                 else
                 plyr->message = DEH_String(STSTR_NCOFF);
+                player_is_cheater = true;
             }
 
             // 'behold?' power-up cheats
@@ -419,6 +426,7 @@ boolean ST_Responder (event_t* ev)
             if (cht_CheckCheat(&cheat_powerup[4], ev->data2))
             {
                 plyr->message = DEH_String(STSTR_BEHOLD);
+                player_is_cheater = true;
             }
 
             // 'choppers' invulnerability & chainsaw
@@ -426,6 +434,7 @@ boolean ST_Responder (event_t* ev)
             {
                 plyr->weaponowned[wp_chainsaw] = true;
                 plyr->message = DEH_String(STSTR_CHOPPERS);
+                player_is_cheater = true;
             }
 
             // 'mypos' for player position
@@ -439,6 +448,7 @@ boolean ST_Responder (event_t* ev)
                     players[consoleplayer].mo->y);
 
                 plyr->message = buf;
+                player_is_cheater = true;
             }
         }
 
@@ -467,7 +477,8 @@ boolean ST_Responder (event_t* ev)
 
             // So be it.
             plyr->message = DEH_String(STSTR_CLEV);
-            G_DeferedInitNew(gameskill, epsd, map);
+            player_is_cheater = true;
+            G_DeferedInitNewCheated(gameskill, epsd, map);
         }
     }
 

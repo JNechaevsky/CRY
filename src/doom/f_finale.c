@@ -60,7 +60,7 @@ typedef struct
 
 static textscreen_t textscreens[] =
 {
-    { jaguar, 1, 23, "ROCKS", JAGENDING},
+    { jaguar, 1, 23, "BLACK", JAGENDING},
 };
 
 
@@ -86,6 +86,9 @@ void F_StartFinale (void)
     viewactive = false;
     automapactive = false;
 
+    if (player_is_cheater)
+    S_StopMusic();  // [Julia] Shut down music in cheated ending
+    else
     S_ChangeMusic(mus_ending, true);
 
     // Find the right screen and set the text and background
@@ -138,6 +141,10 @@ void F_Ticker (void)
     if (paused)
     return;
     
+    // [Julia] Can't skip cheated ending!
+    if (player_is_cheater)
+    return;
+
     // check for skipping
     if (finalecount > 50)
     {
@@ -209,7 +216,23 @@ void F_TextWrite (void)
 
     // [Julia] Draw special background
     if (gamemap == 23)
-    V_DrawPatch (0, 0, W_CacheLumpName (DEH_String("ENDPIC"), PU_CACHE));
+    {
+        if (player_is_cheater)
+        {
+            // [Julia] Cheated ending! Draw C:\DOOM>_
+            V_DrawPatchUnscaled (1, 2, W_CacheLumpName (DEH_String("C_DOOM"), PU_CACHE));
+            if (gametic & 4)
+            V_DrawPatchUnscaled (65, 12, W_CacheLumpName (DEH_String("C_CURSOR"), PU_CACHE));
+
+            // Don't go any farther
+            return;
+        }
+        else
+        {
+            // [Julia] Normal ending
+            V_DrawPatch (0, 0, W_CacheLumpName (DEH_String("ENDPIC"), PU_CACHE));
+        }
+    }
 
     // draw some of the text onto the screen
     cx = 10;
