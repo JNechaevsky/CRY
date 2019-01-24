@@ -57,6 +57,8 @@ musicinfo_t S_music[] =
     MUSIC("map22"),
     MUSIC("map23"),
     MUSIC("map24"),
+    MUSIC("map25"),
+    MUSIC("map26"),
     MUSIC("title"),
     MUSIC("inter"),
     MUSIC("ending"),

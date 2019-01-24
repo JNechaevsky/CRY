@@ -490,7 +490,9 @@ void WI_drawStats(void)
         gamemap == 21 ? JAGLVL_21 :
         gamemap == 22 ? JAGLVL_22 :
         gamemap == 23 ? JAGLVL_23 : 
-                        JAGLVL_24);
+        gamemap == 24 ? JAGLVL_24 :
+        gamemap == 25 ? JAGLVL_25 :
+                        JAGLVL_26);
 
         // [Julia] Write "Finished"
         HU_WriteTextBigCentered (20, "Finished");
@@ -560,7 +562,9 @@ void WI_drawStats(void)
         wminfo.next == 21-1 ? JAGLVL_21 :
         wminfo.next == 22-1 ? JAGLVL_22 :
         wminfo.next == 23-1 ? JAGLVL_23 : 
-                              JAGLVL_24);
+        wminfo.next == 24-1 ? JAGLVL_24 :
+        wminfo.next == 25-1 ? JAGLVL_25 :
+                              JAGLVL_26);
     }
 }
 
@@ -701,7 +705,7 @@ static void WI_loadCallback(char *name, patch_t **variable)
 
 void WI_loadData(void)
 {
-    NUMCMAPS = 24;  // [Julia] Only 24 maps available
+    NUMCMAPS = 26;  // [Julia] Only 26 maps available
 
     WI_loadUnloadData(WI_loadCallback);
 }

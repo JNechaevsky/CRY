@@ -56,6 +56,8 @@ typedef enum
     mus_map22,
     mus_map23,
     mus_map24,
+    mus_map25,
+    mus_map26,
     mus_title,
     mus_inter,
     mus_ending,

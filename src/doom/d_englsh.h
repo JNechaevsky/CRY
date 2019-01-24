@@ -173,6 +173,7 @@
 #define JHUSTR_23   "level 23: Dis"
 #define JHUSTR_24   "level 24: Military Base"
 #define JHUSTR_25   "level 25: Extra Map"
+#define JHUSTR_26   "level 26: Warrens"
 
 // -----------------------------------------------------------------------------
 // Short map names for intermission screen
@@ -203,6 +204,7 @@
 #define JAGLVL_23   "Dis"
 #define JAGLVL_24   "Military Base"
 #define JAGLVL_25   "Extra Map"
+#define JAGLVL_26   "Warrens"
 
 
 // -----------------------------------------------------------------------------

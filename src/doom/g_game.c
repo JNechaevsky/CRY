@@ -1312,20 +1312,28 @@ void G_DoCompleted (void)
     wminfo.last = gamemap -1;
 
     // wminfo.next is 0 biased, unlike gamemap
-    // [Julia] Handling secret exit
+    // [Julia] Handling secret exits:
 	if (secretexit)
 	    switch(gamemap)
 	    {
-	      // [Julia] Secret exit from Toxin Refinery (04) to Military Base (23)
+	      // Secret exit from Toxin Refinery (3) to Military Base (24-1)
 	      case 3:  wminfo.next = 23;
+          break;
+	      // Secret exit from Mt. Erebus (21) to Warrens (26-1)
+	      case 21:  wminfo.next = 25;
 	      break;
 	    }
 	else
 	    switch(gamemap)
 	    {
-	      // [Julia] After Military Base go to Command Control
+	      // After Military Base (24) go to Command Control (4-1)
 	      case 24: wminfo.next = 3;
 	      break;
+
+	      // After Warrens (26) go to Limbo (22-1)
+	      case 26: wminfo.next = 21;
+	      break;
+
 	      default: wminfo.next = gamemap;
 	    }
 
@@ -1649,8 +1657,8 @@ void G_InitNew (skill_t skill, int episode, int map)
     // [Julia] Catch unexisting maps
     if (map < 1)
         map = 1;
-    if (map > 24)
-        map = 24;
+    if (map > 26)
+        map = 26;
 
     M_ClearRandom ();
 

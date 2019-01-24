@@ -131,7 +131,8 @@ char *mapnames_jaguar[] =
     JHUSTR_22,
     JHUSTR_23,
     JHUSTR_24,
-    JHUSTR_25
+    JHUSTR_25,
+    JHUSTR_26
 };
 
 

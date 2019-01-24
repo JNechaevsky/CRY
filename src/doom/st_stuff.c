@@ -469,8 +469,8 @@ boolean ST_Responder (event_t* ev)
             {
                 return false;
             }
-            // [Julia] Don't warp to map 25 and higher
-            if (map > 24)
+            // [Julia] Don't warp to map 27 and higher
+            if (map > 26)
             {
                 return false;
             }
