@@ -564,11 +564,6 @@ void PrintGameVersion(void)
 }
 
 
-static void G_CheckDemoStatusAtExit (void)
-{
-    G_CheckDemoStatus();
-}
-
 //
 // D_DoomMain
 //
@@ -577,7 +572,6 @@ void D_DoomMain (void)
 {
     int     p;
     char    file[256];
-    char    demolumpname[9];
 
     // [Julia] Print startup banner only once
     I_PrintDivider();
@@ -587,88 +581,6 @@ void D_DoomMain (void)
     DEH_printf("Z_Init: Init zone memory allocation daemon. \n");
     Z_Init ();
 
-#ifdef FEATURE_MULTIPLAYER
-    //!
-    // @category net
-    //
-    // Start a dedicated server, routing packets but not participating
-    // in the game itself.
-    //
-
-    if (M_CheckParm("-dedicated") > 0)
-    {
-        printf("Dedicated server mode.\n");
-        NET_DedicatedServer();
-        // Never returns
-    }
-
-    //!
-    // @category net
-    //
-    // Query the Internet master server for a global list of active
-    // servers.
-    //
-
-    if (M_CheckParm("-search"))
-    {
-        NET_MasterQuery();
-        exit(0);
-    }
-
-    //!
-    // @arg <address>
-    // @category net
-    //
-    // Query the status of the server running on the given IP
-    // address.
-    //
-
-    p = M_CheckParmWithArgs("-query", 1);
-
-    if (p)
-    {
-        NET_QueryAddress(myargv[p+1]);
-        exit(0);
-    }
-
-    //!
-    // @category net
-    //
-    // Search the local LAN for running servers.
-    //
-
-    if (M_CheckParm("-localsearch"))
-    {
-        NET_LANQuery();
-        exit(0);
-    }
-
-#endif
-
-    //!
-    // @vanilla
-    //
-    // Disable monsters.
-    //
-
-    nomonsters = M_CheckParm ("-nomonsters");
-
-    //!
-    // @vanilla
-    //
-    // Monsters respawn after being killed.
-    //
-
-    respawnparm = M_CheckParm ("-respawn");
-
-    //!
-    // @vanilla
-    //
-    // Monsters move faster.
-    //
-
-    fastparm = M_CheckParm ("-fast");
-
     //! 
     // @vanilla
     //
@@ -677,40 +589,7 @@ void D_DoomMain (void)
     //
 
     devparm = M_CheckParm ("-devparm");
-
     I_DisplayFPSDots(devparm);
-
-    //!
-    // @category net
-    // @vanilla
-    //
-    // Start a deathmatch game.
-    //
-
-    if (M_CheckParm ("-deathmatch"))
-        deathmatch = 1;
-
-    //!
-    // @category net
-    // @vanilla
-    //
-    // Start a deathmatch 2.0 game.  Weapons do not stay in place and
-    // all items respawn after 30 seconds.
-    //
-
-    if (M_CheckParm ("-altdeath"))
-        deathmatch = 2;
-
-    //!
-    // @category net
-    // @vanilla
-    //
-    // Start a deathmatch 3.0 game.  Weapons stay in place and
-    // all items respawn after 30 seconds.
-    //
-
-    if (M_CheckParm ("-dm3"))
-        deathmatch = 3;
 
     if (devparm)
         DEH_printf(D_DEVSTR);
@@ -737,34 +616,6 @@ void D_DoomMain (void)
     {
         // Auto-detect the configuration dir.
         M_SetConfigDir(NULL);
-    }
-
-    //!
-    // @arg <x>
-    // @vanilla
-    //
-    // Turbo mode.  The player's speed is multiplied by x%.  If unspecified,
-    // x defaults to 200.  Values are rounded up to 10 and down to 400.
-    //
-
-    if ( (p=M_CheckParm ("-turbo")) )
-    {
-        int         scale = 200;
-        extern int  forwardmove[2];
-        extern int  sidemove[2];
-
-        if (p<myargc-1)
-            scale = atoi (myargv[p+1]);
-        if (scale < 10)
-            scale = 10;
-        if (scale > 400)
-            scale = 400;
-        
-        DEH_printf("turbo scale: %i%%\n", scale);
-        forwardmove[0] = forwardmove[0]*scale/100;
-        forwardmove[1] = forwardmove[1]*scale/100;
-        sidemove[0] = sidemove[0]*scale/100;
-        sidemove[1] = sidemove[1]*scale/100;
     }
 
     // init subsystems
@@ -803,84 +654,6 @@ void D_DoomMain (void)
     gameversion = exe_doom_1_9;
     gamemission = jaguar;
     gamemode = commercial;
-
-    // Doom 3: BFG Edition includes modified versions of the classic
-    // IWADs which can be identified by an additional DMENUPIC lump.
-    // Furthermore, the M_GDHIGH lumps have been modified in a way that
-    // makes them incompatible to Vanilla Doom and the modified version
-    // of doom2.wad is missing the TITLEPIC lump.
-    // We specifically check for DMENUPIC here, before PWADs have been
-    // loaded which could probably include a lump of that name.
-
-#ifdef FEATURE_DEHACKED
-    // Load Dehacked patches specified on the command line with -deh.
-    // Note that there's a very careful and deliberate ordering to how
-    // Dehacked patches are loaded. The order we use is:
-    //  1. IWAD dehacked patches.
-    //  2. Command line dehacked patches specified with -deh.
-    //  3. PWAD dehacked patches in DEHACKED lumps.
-    DEH_ParseCommandLine();
-#endif
-
-    //!
-    // @arg <demo>
-    // @category demo
-    // @vanilla
-    //
-    // Play back the demo named demo.lmp.
-    //
-
-    p = M_CheckParmWithArgs ("-playdemo", 1);
-
-    if (!p)
-    {
-        //!
-        // @arg <demo>
-        // @category demo
-        // @vanilla
-        //
-        // Play back the demo named demo.lmp, determining the framerate
-        // of the screen.
-        //
-    p = M_CheckParmWithArgs("-timedemo", 1);
-
-    }
-
-    if (p)
-    {
-        char *uc_filename = strdup(myargv[p + 1]);
-        M_ForceUppercase(uc_filename);
-
-        // With Vanilla you have to specify the file without extension,
-        // but make that optional.
-        if (M_StringEndsWith(uc_filename, ".LMP"))
-        {
-            M_StringCopy(file, myargv[p + 1], sizeof(file));
-        }
-        else
-        {
-            DEH_snprintf(file, sizeof(file), "%s.lmp", myargv[p+1]);
-        }
-
-        free(uc_filename);
-
-        if (D_AddFile(file))
-        {
-            M_StringCopy(demolumpname, lumpinfo[numlumps - 1]->name, sizeof(demolumpname));
-        }
-        else
-        {
-            // If file failed to load, still continue trying to play
-            // the demo in the same way as Vanilla Doom.  This makes
-            // tricks like "-playdemo demo1" possible.
-
-            M_StringCopy(demolumpname, myargv[p + 1], sizeof(demolumpname));
-        }
-
-        printf("Playing demo %s.\n", file);
-    }
-
-    I_AtExit(G_CheckDemoStatusAtExit, true);
 
     // Generate the WAD hash table.  Speed things up a bit.
     W_GenerateHashTable();
@@ -938,22 +711,6 @@ void D_DoomMain (void)
     }
 
     //!
-    // @arg <n>
-    // @vanilla
-    //
-    // Start playing on episode n (1-4)
-    //
-
-    p = M_CheckParmWithArgs("-episode", 1);
-
-    if (p)
-    {
-        startepisode = myargv[p+1][0]-'0';
-        startmap = 1;
-        autostart = true;
-    }
-
-    //!
     // @arg [<x> <y> | <xy>]
     // @vanilla
     //
@@ -965,21 +722,7 @@ void D_DoomMain (void)
 
     if (p)
     {
-        if (gamemode == commercial)
-            startmap = atoi (myargv[p+1]);
-        else
-        {
-            startepisode = myargv[p+1][0]-'0';
-
-            if (p + 2 < myargc)
-            {
-                startmap = myargv[p+2][0]-'0';
-            }
-            else
-            {
-                startmap = 1;
-            }
-        }
+        startmap = atoi (myargv[p+1]);
         gameaction = ga_newgame;
         autostart = true;
     }
@@ -1051,37 +794,6 @@ void D_DoomMain (void)
 
     DEH_printf("ST_Init: Init status bar.\n");
     ST_Init ();
-
-    //!
-    // @arg <x>
-    // @category demo
-    // @vanilla
-    //
-    // Record a demo named x.lmp.
-    //
-
-    p = M_CheckParmWithArgs("-record", 1);
-
-    if (p)
-    {
-        G_RecordDemo (myargv[p+1]);
-        autostart = true;
-    }
-
-    p = M_CheckParmWithArgs("-playdemo", 1);
-    if (p)
-    {
-        singledemo = true;  // quit after one demo
-        G_DeferedPlayDemo (demolumpname);
-        D_DoomLoop ();      // never returns
-    }
-
-    p = M_CheckParmWithArgs("-timedemo", 1);
-    if (p)
-    {
-        G_TimeDemo (demolumpname);
-        D_DoomLoop ();      // never returns
-    }
 
     if (startloadgame >= 0)
     {
