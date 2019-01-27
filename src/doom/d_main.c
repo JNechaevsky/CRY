@@ -516,112 +516,6 @@ void D_StartTitle (void)
     D_AdvanceDemo ();
 }
 
-// Strings for dehacked replacements of the startup banner
-//
-// These are from the original source: some of them are perhaps
-// not used in any dehacked patches
-
-static char *banners[] =
-{
-    // doom2.wad
-    "                         "
-    "DOOM 2: Hell on Earth v%i.%i"
-    "                           ",
-    // doom2.wad v1.666
-    "                         "
-    "DOOM 2: Hell on Earth v%i.%i66"
-    "                          ",
-    // doom1.wad
-    "                            "
-    "DOOM Shareware Startup v%i.%i"
-    "                           ",
-    // doom.wad
-    "                            "
-    "DOOM Registered Startup v%i.%i"
-    "                           ",
-    // Registered DOOM uses this
-    "                          "
-    "DOOM System Startup v%i.%i"
-    "                          ",
-    // Doom v1.666
-    "                          "
-    "DOOM System Startup v%i.%i66"
-    "                          "
-    // doom.wad (Ultimate DOOM)
-    "                         "
-    "The Ultimate DOOM Startup v%i.%i"
-    "                        ",
-    // tnt.wad
-    "                     "
-    "DOOM 2: TNT - Evilution v%i.%i"
-    "                           ",
-    // plutonia.wad
-    "                   "
-    "DOOM 2: Plutonia Experiment v%i.%i"
-    "                           ",
-};
-
-
-// -----------------------------------------------------------------------------
-// Get game name: if the startup banner has been replaced, use that.
-// Otherwise, use the name given
-// -----------------------------------------------------------------------------
-
-static char *GetGameName(char *gamename)
-{
-    size_t  i;
-    char    *deh_sub;
-
-    for (i=0; i<arrlen(banners); ++i)
-    {
-        // Has the banner been replaced?
-        deh_sub = DEH_String(banners[i]);
-
-        if (deh_sub != banners[i])
-        {
-            size_t gamename_size;
-            int version;
-
-            // Has been replaced.
-            // We need to expand via printf to include the Doom version number
-            // We also need to cut off spaces to get the basic name
-
-            gamename_size = strlen(deh_sub) + 10;
-            gamename = Z_Malloc(gamename_size, PU_STATIC, 0);
-            version = G_VanillaVersionCode();
-            M_snprintf(gamename, gamename_size, deh_sub, version / 100, version % 100);
-
-            while (gamename[0] != '\0' && isspace(gamename[0]))
-            {
-                memmove(gamename, gamename + 1, gamename_size - 1);
-            }
-
-            while (gamename[0] != '\0' && isspace(gamename[strlen(gamename)-1]))
-            {
-                gamename[strlen(gamename) - 1] = '\0';
-            }
-
-            return gamename;
-        }
-    }
-
-    return gamename;
-}
-
-
-// -----------------------------------------------------------------------------
-// Set the gamedescription string
-// [JN] На этом этапе указываем заголовок окна игры и подгрузку 
-// необходимых файлов с локализованными ресурсами.
-
-void D_SetGameDescription(void)
-{
-    gamedescription = GetGameName("DOOM for Atari Jaguar");
-}
-
-
-//      print title for every printed line
-char    title[128];
 
 static boolean D_AddFile(char *filename)
 {
@@ -992,7 +886,7 @@ void D_DoomMain (void)
     W_GenerateHashTable();
 
     // [Julia] Set window title
-    gamedescription = GetGameName("Yaguar Doom");
+    gamedescription = "Yaguar Doom";
 
 #ifdef _WIN32
     // In -cdrom mode, we write savegames to c:\doomdata as well as configs.
