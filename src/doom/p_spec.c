@@ -487,6 +487,7 @@ void P_CrossSpecialLine (int linenum, int side, mobj_t *thing)
         {
             case 39:    // TELEPORT TRIGGER
             case 97:    // TELEPORT RETRIGGER
+            case 125:   // TELEPORT MONSTERONLY TRIGGER
             case 4:     // RAISE DOOR
             case 10:    // PLAT DOWN-WAIT-UP-STAY TRIGGER
             case 88:    // PLAT DOWN-WAIT-UP-STAY RETRIGGER
@@ -651,6 +652,14 @@ void P_CrossSpecialLine (int linenum, int side, mobj_t *thing)
         case 104:   // Turn lights off in sector(tag)
         EV_TurnTagLightsOff(line);
         line->special = 0;
+        break;
+
+        case 125:   // TELEPORT Monster ONLY
+        if (!thing->player)
+        {
+            EV_Teleport( line, side, thing );
+            line->special = 0;
+        }
         break;
 
         // RETRIGGERS. All from here till end.
