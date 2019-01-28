@@ -84,7 +84,6 @@ extern anim_t *lastanim;
 // [Julia] All the flats for animation in Jaguar.
 animdef_t animdefs[] =
 {
-    {false, "BLOOD3",   "BLOOD1",   8},
     {false, "NUKAGE3",  "NUKAGE1",  8},
     {false, "FWATER4",  "FWATER1",  8},
     {false, "LAVA4",    "LAVA1",    8},
