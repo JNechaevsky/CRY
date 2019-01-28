@@ -170,8 +170,6 @@ static patch_t *background; // Buffer storing the backdrop
 // slam background
 void WI_slamBackground(void)
 {
-    // [Julia] Remove level's remaining  background, fill it with black color
-    V_DrawFilledBox(viewwindowx, viewwindowy, scaledviewwidth, scaledviewheight, 0);
     V_DrawPatch(0, 0, background);
 }
 
@@ -400,11 +398,10 @@ void WI_updateStats(void)
     // [Julia] Jaguar: count everything simultaneously:
     if (sp_state == 2)
     {
-        // [Julia] Jaguar: count 2x time faster (standard: += 2)
-        cnt_kills[0] += 4;
-        cnt_items[0] += 4;
-        cnt_secret[0] += 4;
-        cnt_time += 4;
+        cnt_kills[0] += 2;
+        cnt_items[0] += 2;
+        cnt_secret[0] += 2;
+        cnt_time += 4;  // [Julia] Count time 2x faster
 
         // [Julia] Don't go higher than 100%
         if (cnt_kills[0] >= (plrs[me].skills * 100) / wbs->maxkills)
