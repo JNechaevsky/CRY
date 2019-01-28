@@ -41,7 +41,7 @@ switchlist_t alphSwitchList[] =
     {"SW1HOT",      "SW2HOT",   3},
     {"SW1STAR",     "SW2STAR",  3},
     {"SW1WOOD",     "SW2WOOD",  3},
-    {"SW1WOOD",     "SW2WOOD",  3},
+    {"SW1BLUE",     "SW2BLUE",  3},
 };
 
 int      switchlist[MAXSWITCHES * 2];
