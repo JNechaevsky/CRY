@@ -372,9 +372,6 @@ boolean D_GrabMouseCallback(void)
 
 void D_DoomLoop (void)
 {
-    if (demorecording)
-    G_BeginRecording ();
-
     main_loop_started = true;
 
     I_SetWindowTitle(gamedescription);

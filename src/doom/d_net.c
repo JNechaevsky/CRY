@@ -59,13 +59,6 @@ static void PlayerQuitGame(player_t *player)
 
     playeringame[player_num] = false;
     players[consoleplayer].message = exitmsg;
-
-    // TODO: check if it is sensible to do this:
-
-    if (demorecording) 
-    {
-        G_CheckDemoStatus ();
-    }
 }
 
 
