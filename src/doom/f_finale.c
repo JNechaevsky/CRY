@@ -239,7 +239,7 @@ void F_TextWrite (void)
         else
         {
             // [Julia] Normal ending
-            V_DrawPatch (0, 0, W_CacheLumpName (DEH_String("ENDPIC"), PU_CACHE));
+            V_DrawPatch (0, 0, W_CacheLumpName (DEH_String("ENDPIC1"), PU_CACHE));
         }
     }
 
@@ -516,7 +516,7 @@ void F_CastPrint (char *text)
         w = SHORT (hu_font2[c]->width);
 
         // [Julia] Jaguar: print casting name on top of the screen
-        V_DrawShadowedPatch(cx, 8, hu_font2[c]);
+        V_DrawShadowedPatch(cx, 15, hu_font2[c]);
 
         cx+=w;
     }
@@ -534,8 +534,8 @@ void F_CastDrawer (void)
     patch_t       *patch;
     int            lump;
 
-    // erase the entire screen to a background
-    V_DrawPatch (0, 0, W_CacheLumpName (DEH_String("M_TITLE"), PU_CACHE));
+    // [Julia] Draw special background
+    V_DrawPatch (0, 0, W_CacheLumpName (DEH_String("ENDPIC2"), PU_CACHE));
 
     F_CastPrint (DEH_String(castorder[castnum].name));
 
@@ -546,7 +546,7 @@ void F_CastDrawer (void)
 
     patch = W_CacheLumpNum (lump+firstspritelump, PU_CACHE);
 
-    V_DrawPatchFinale(ORIGWIDTH/4, 86, patch);
+    V_DrawPatchFinale(ORIGWIDTH/4, 90, patch);
 }
 
 
