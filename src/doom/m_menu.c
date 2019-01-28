@@ -855,7 +855,7 @@ void M_QuickLoad(void)
 // Read This Menus
 // Had a "quick hack to fix romero bug"
 //
-// [Julia] Jaguar HELP screen and skull placement. Same to Doom II.
+// [Julia] Jaguar HELP screen and skull placement.
 // -----------------------------------------------------------------------------
 
 void M_DrawReadThis1(void)
@@ -865,8 +865,8 @@ void M_DrawReadThis1(void)
     V_DrawPatch (0, 0, W_CacheLumpName(DEH_String("M_TITLE"), PU_CACHE));
     V_DrawShadowedPatch (0, 0, W_CacheLumpName(DEH_String("HELP"), PU_CACHE));
 
-    ReadDef1.x = 330;
-    ReadDef1.y = 162;
+    ReadDef1.x = 329;
+    ReadDef1.y = 182;
 }
 
 
