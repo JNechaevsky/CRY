@@ -705,7 +705,7 @@ void G_DoLoadLevel (void)
     // [Julia] Set Jaguar skies
     if (gamemap < 9 || gamemap == 24)
     skytexturename = "SKY1";
-    else if (gamemap < 17)
+    else if (gamemap < 17 || gamemap == 25)
     skytexturename = "SKY2";
     else
     skytexturename = "SKY3";
@@ -1319,6 +1319,11 @@ void G_DoCompleted (void)
 	      // Secret exit from Toxin Refinery (3) to Military Base (24-1)
 	      case 3:  wminfo.next = 23;
           break;
+
+	      // Secret exit from Command Controls (13) to Extra Map (25-1)
+	      case 13:  wminfo.next = 24;
+	      break;
+
 	      // Secret exit from Mt. Erebus (21) to Warrens (26-1)
 	      case 21:  wminfo.next = 25;
 	      break;
@@ -1328,6 +1333,10 @@ void G_DoCompleted (void)
 	    {
 	      // After Military Base (24) go to Command Control (4-1)
 	      case 24: wminfo.next = 3;
+	      break;
+
+	      // After Extra Map (25) go to Halls of the Damned (14-1)
+	      case 25: wminfo.next = 13;
 	      break;
 
 	      // After Warrens (26) go to Limbo (22-1)
@@ -1742,7 +1751,7 @@ void G_InitNew (skill_t skill, int episode, int map)
     // [Julia] Set the Jaguar sky to use
     if (gamemap < 9 || gamemap == 24)
     skytexturename = "SKY1";
-    else if (gamemap < 17)
+    else if (gamemap < 17 || gamemap == 25)
     skytexturename = "SKY2";
     else
     skytexturename = "SKY3";

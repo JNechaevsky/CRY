@@ -13,7 +13,7 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// [Julia] TODO - remove unnecessary stuff
+
 
 #include <ctype.h>
 #include <stdio.h>
@@ -61,10 +61,6 @@
 #include "d_englsh.h"
 #include "jn.h"
 
-// [JN] Сделана глобальной, нужна для функции автоподргузки 
-// блоков DEHACKED, а также в цикле D_DoomMain.
-int numiwadlumps; 
-
 
 // =============================================================================
 // D-DoomLoop
@@ -100,7 +96,7 @@ boolean flip_levels_cmdline = false;
 int startepisode;
 int startmap;
 int startloadgame;
-int translucency  = 1;      // [Julia] Прозрачность объектов
+int translucency = 1;      // [Julia] On by default
 
 skill_t startskill;
 
@@ -336,7 +332,7 @@ void D_BindVariables(void)
     M_BindIntVariable("snd_channels",           &snd_channels);
     M_BindIntVariable("mlook",                  &mlook);
 
-    // [Julia] Optional Gameplay Enhancements
+    // [Julia] Gameplay Features
     
     // Common
     M_BindIntVariable("hightlight_things",      &hightlight_things);
@@ -646,7 +642,6 @@ void D_DoomMain (void)
 
     DEH_printf("W_Init: Init WADfiles.\n");
     D_AddFile(iwadfile);
-    numiwadlumps = numlumps;
 
     W_CheckCorrectIWAD(doom);
 
