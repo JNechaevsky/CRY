@@ -741,7 +741,8 @@ void D_DoomMain (void)
     DEH_printf("S_Init: Setting up sound.\n");
     S_Init (sfxVolume * 8, musicVolume * 8);
 
-    DEH_printf("D_CheckNetGame: Checking network game status.\n");
+    // [Julia] There is no network game, altrough D_CheckNetGame is needed.
+    // DEH_printf("D_CheckNetGame: Checking network game status.\n");
     D_CheckNetGame ();
 
     DEH_printf("HU_Init: Setting up heads up display.\n");
