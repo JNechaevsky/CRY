@@ -238,7 +238,7 @@ static void SetIcon(void)
 
 static void SetWindowTitle(void)
 {
-    TXT_SetDesktopTitle("Setup.exe");
+    TXT_SetDesktopTitle("Setup");
 }
 
 // Initialize the textscreen library.
@@ -252,6 +252,12 @@ static void InitTextscreen(void)
             fprintf(stderr, "Failed to initialize GUI\n");
             exit(-1);
         }
+
+    // [Julia] Use Yaguar brand colors
+    TXT_SetColor(TXT_COLOR_BLUE, 0, 63, 148);           // Background
+    TXT_SetColor(TXT_COLOR_BRIGHT_CYAN, 84, 206, 254);  // Borders
+    TXT_SetColor(TXT_COLOR_BRIGHT_GREEN, 255, 232, 59); // FN buttons
+    TXT_SetColor(TXT_COLOR_CYAN, 70, 176, 219);         // Highlighted item
 
     SetIcon();
     SetWindowTitle();
