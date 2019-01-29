@@ -199,6 +199,7 @@ void M_ChangeTranslucency(int choice);
 void M_ChangeLiquids(int choice);
 void M_ChangeBlood(int choice);
 void M_ChangeBobbing(int choice);
+void M_ChangeAspectRatio(int choice);
 void M_ChangeFps(int choice);
 
 
@@ -379,6 +380,7 @@ enum
     features_liquids,
     features_blood,
     features_bobbing,
+    features_aspect,
     features_fps,
     features_end
 } features_e;
@@ -391,6 +393,7 @@ menuitem_t FeaturesMenu[]=
     {1,"Swirling liquids",    M_ChangeLiquids,      's'},
     {1,"Colored blood",       M_ChangeBlood,        'c'},
     {1,"Improved bobbing",    M_ChangeBobbing,      'i'},
+    {1,"Fix aspect ratio",    M_ChangeAspectRatio,  'f'},
     {1,"Uncapped FPS",        M_ChangeFps,          'u'}
 };
 
@@ -420,7 +423,8 @@ void M_DrawFeatures(void)
     HU_WriteTextBig(278, 78, swirling_liquids == 1 ? "on" : "off");
     HU_WriteTextBig(278, 94, colored_blood == 1 ? "on" : "off");
     HU_WriteTextBig(278, 110, weapon_bobbing == 1 ? "on" : "off");
-    HU_WriteTextBig(278, 126, uncapped_fps == 1 ? "on" : "off");
+    HU_WriteTextBig(278, 126, aspect_ratio_correct == 1 ? "on" : "off");
+    HU_WriteTextBig(278, 142, uncapped_fps == 1 ? "on" : "off");
 }
 
 // -----------------------------------------------------------------------------
@@ -482,6 +486,17 @@ void M_ChangeBobbing(int choice)
 {
     choice = 0;
     weapon_bobbing = 1 - weapon_bobbing;
+}
+
+// -----------------------------------------------------------------------------
+// Toggle fixing of aspect ratio on/off
+// -----------------------------------------------------------------------------
+
+void M_ChangeAspectRatio(int choice)
+{
+    choice = 0;
+    aspect_ratio_correct = 1 - aspect_ratio_correct;
+    I_InitGraphics();
 }
 
 // -----------------------------------------------------------------------------
