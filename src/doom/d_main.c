@@ -541,22 +541,6 @@ static struct
 };
 
 
-void PrintGameVersion(void)
-{
-    int i;
-
-    for (i=0; gameversions[i].description != NULL; ++i)
-    {
-        if (gameversions[i].version == gameversion)
-        {
-            printf("Emulating the behavior of the '%s' executable.\n",
-                   gameversions[i].description);
-            break;
-        }
-    }
-}
-
-
 //
 // D_DoomMain
 //
@@ -778,8 +762,6 @@ void D_DoomMain (void)
 
     DEH_printf("D_CheckNetGame: Checking network game status.\n");
     D_CheckNetGame ();
-
-    PrintGameVersion();
 
     DEH_printf("HU_Init: Setting up heads up display.\n");
     HU_Init ();
