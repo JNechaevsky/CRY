@@ -1658,10 +1658,6 @@ static default_t extra_defaults_list[] =
 
     // Прицел
     CONFIG_VARIABLE_INT(crosshair_draw),
-    CONFIG_VARIABLE_INT(crosshair_health),
-    CONFIG_VARIABLE_INT(crosshair_scale),
-
-    // CONFIG_VARIABLE_INT(show_exit_sequence),    // [Strife]
 };
 
 static default_collection_t extra_defaults =

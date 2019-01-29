@@ -71,9 +71,6 @@ extern int weapon_bobbing;
 extern int snd_monomode;
 
 extern int crosshair_draw;
-extern int crosshair_health;
-extern int crosshair_scale;
-
 
 
 #endif

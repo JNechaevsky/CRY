@@ -65,8 +65,6 @@ extern int no_internal_demos;
 
 // Прицел
 extern int crosshair_draw;
-extern int crosshair_health;
-extern int crosshair_scale;
 
 
 #endif /* #ifndef SETUP_COMPATIBILITY_H */

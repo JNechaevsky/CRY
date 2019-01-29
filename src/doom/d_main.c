@@ -344,8 +344,6 @@ void D_BindVariables(void)
   
     // Crosshair
     M_BindIntVariable("crosshair_draw",         &crosshair_draw);
-    M_BindIntVariable("crosshair_health",       &crosshair_health);
-    M_BindIntVariable("crosshair_scale",        &crosshair_scale);
 }
 
 

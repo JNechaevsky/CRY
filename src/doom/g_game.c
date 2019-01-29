@@ -224,8 +224,7 @@ int weapon_bobbing    = 1;
 int snd_monomode      = 0;
 
 int crosshair_draw    = 0;
-int crosshair_health  = 1;
-int crosshair_scale   = 0;
+
 
 // [Julia] Special boolean. Changes game ending if true.
 boolean player_is_cheater;

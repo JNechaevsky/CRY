@@ -67,10 +67,7 @@ int no_internal_demos = 0;
 
 // Прицел
 int crosshair_draw = 0;
-int crosshair_health = 1;
-int crosshair_scale = 0;
 
-// int show_exit_sequence = 1;  // [Strife]
 
 void CompatibilitySettings(void)
 {
@@ -142,9 +139,5 @@ void BindCompatibilityVariables(void)
 
     // Прицел
     M_BindIntVariable("crosshair_draw",         &crosshair_draw);
-    M_BindIntVariable("crosshair_health",       &crosshair_health);
-    M_BindIntVariable("crosshair_scale",        &crosshair_scale);
-
-    // M_BindIntVariable("show_exit_sequence",     &show_exit_sequence);    // [Strife]
 }
 
