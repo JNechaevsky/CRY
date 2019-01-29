@@ -78,6 +78,16 @@ typedef struct
     int        count;
     int        maxlight;
     int        minlight;
+} fireflicker_t;
+
+
+typedef struct
+{
+    thinker_t  thinker;
+    sector_t  *sector;
+    int        count;
+    int        maxlight;
+    int        minlight;
     int        maxtime;
     int        mintime;
 } lightflash_t;
@@ -110,6 +120,8 @@ typedef struct
 #define FASTDARK        15
 #define SLOWDARK        35
 
+void P_SpawnFireFlicker (sector_t *sector);
+void T_FireFlicker (fireflicker_t *flick);
 void T_LightFlash (lightflash_t *flash);
 void P_SpawnLightFlash (sector_t *sector);
 void T_StrobeFlash (strobe_t *flash);
