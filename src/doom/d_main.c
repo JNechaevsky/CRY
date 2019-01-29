@@ -521,25 +521,6 @@ static boolean D_AddFile(char *filename)
 }
 
 
-static struct 
-{
-    char *description;
-    char *cmdline;
-    GameVersion_t version;
-} gameversions[] = {
-    {"Doom 1.666",           "1.666",      exe_doom_1_666},
-    {"Doom 1.7/1.7a",        "1.7",        exe_doom_1_7},
-    {"Doom 1.8",             "1.8",        exe_doom_1_8},
-    {"Doom 1.9",             "1.9",        exe_doom_1_9},
-//  {"Hacx",                 "hacx",       exe_hacx},
-    {"Ultimate Doom",        "ultimate",   exe_ultimate},
-    {"Doom 1.9 SE",          "doomse",     exe_doom_se},
-    {"Final Doom",           "final",      exe_final},
-    {"Final Doom (alt)",     "final2",     exe_final2},
-//  {"Chex Quest",           "chex",       exe_chex},
-    { NULL,                  NULL,         0},
-};
-
 
 //
 // D_DoomMain
