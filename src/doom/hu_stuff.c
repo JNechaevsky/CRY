@@ -302,30 +302,14 @@ void HU_Drawer(void)
     // thanks to Zodomaniac for proper health values!
     if (!automapactive && crosshair_draw)
     {
-        if (crosshair_scale)
-        {   // Scaled crosshair
-            V_DrawPatch(ORIGWIDTH/2,
-                ((screenblocks <= 10) ? (ORIGHEIGHT-ST_HEIGHT+2)/2 : (ORIGHEIGHT+2)/2),
-                W_CacheLumpName(DEH_String(!crosshair_health ?
-                                           "XHAIRSR" :             // Red (only)
-                                           plr->health >= 67 ?
-                                           "XHAIRSG" :             // Green
+        V_DrawPatchUnscaled(SCREENWIDTH/2,
+            ((screenblocks <= 10) ? (SCREENHEIGHT-ST_HEIGHT-26)/2 : (SCREENHEIGHT+4)/2),
+                W_CacheLumpName(DEH_String(plr->health >= 67 ?
+                                           "XHAIRG" : // Green
                                            plr->health >= 34 ?
-                                           "XHAIRSY" : "XHAIRSR"), // Yellow or Red
+                                           "XHAIRY" : // Yellow
+                                           "XHAIRR"), // Red
                                            PU_CACHE));
-        }
-        else
-        {   // Unscaled crosshair
-            V_DrawPatchUnscaled(SCREENWIDTH/2,
-                ((screenblocks <= 10) ? (SCREENHEIGHT-ST_HEIGHT-26)/2 : (SCREENHEIGHT+4)/2),
-                W_CacheLumpName(DEH_String(!crosshair_health ? 
-                                           "XHAIRUR" :              // Red (only)
-                                           plr->health >= 67 ?
-                                           "XHAIRUG" :             // Green
-                                           plr->health >= 34 ?
-                                           "XHAIRUY" : "XHAIRUR"),  // Yellow or Red
-                                           PU_CACHE));
-        }
     }
 }
 
