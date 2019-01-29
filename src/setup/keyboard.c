@@ -310,7 +310,9 @@ void ConfigKeyboard(void)
     // There is a small gap between the two conceptual "columns" of
     // controls, just for spacing.
     TXT_SetTableColumns(window, 5);
-    TXT_SetColumnWidths(window, 16, 8, 2, 16, 8);
+    TXT_SetColumnWidths(window, 16, 8, 1, 16, 8);
+    TXT_SetWindowPosition(window, TXT_HORIZ_CENTER, TXT_VERT_TOP,
+                                  TXT_SCREEN_W / 2, 4);
 
     TXT_AddWidget(window, TXT_NewSeparator("Movement"));
     AddKeyControl(window, "Move Forward",   &key_up);

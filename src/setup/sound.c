@@ -62,9 +62,9 @@ void ConfigSound(void)
 
     TXT_SetWindowHelpURL(window, WINDOW_HELP_URL);
 
-    TXT_SetColumnWidths(window, 40);
+    TXT_SetColumnWidths(window, 35);
     TXT_SetWindowPosition(window, TXT_HORIZ_CENTER, TXT_VERT_TOP,
-                                  TXT_SCREEN_W / 2, 3);
+                                  TXT_SCREEN_W / 2, 4);
 
     TXT_AddWidgets(window,
 

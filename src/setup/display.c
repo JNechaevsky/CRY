@@ -213,7 +213,7 @@ void ConfigDisplay(void)
     TXT_NewCheckBox("Full screen", &fullscreen),
     TXT_NewConditional(&fullscreen, 0, sizes_table = TXT_NewTable(3)), NULL);
 
-    TXT_SetColumnWidths(window, 42);    
+    TXT_SetColumnWidths(window, 35);    
     
     // The window is set at a fixed vertical position.  This keeps
     // the top of the window stationary when switching between
