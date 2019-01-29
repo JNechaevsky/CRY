@@ -13,7 +13,7 @@ execgames_SCRIPTS = $(SETUP_BINARIES)
 
 AM_CFLAGS = -I$(top_srcdir)/textscreen            \
             -I$(top_srcdir)/opl                   \
-            @SDLMIXER_CFLAGS@ @SDLNET_CFLAGS@
+            @SDLMIXER_CFLAGS@
 
 # Common source files used by absolutely everything:
 
@@ -23,24 +23,6 @@ i_main.c                                   \
 i_system.c           i_system.h            \
 m_argv.c             m_argv.h              \
 m_misc.c             m_misc.h
-
-# Dedicated server (chocolate-server):
-
-# DEDSERV_FILES=\
-# d_mode.c             d_mode.h              \
-# i_timer.c            i_timer.h             \
-# net_common.c         net_common.h          \
-# net_dedicated.c      net_dedicated.h       \
-# net_io.c             net_io.h              \
-# net_packet.c         net_packet.h          \
-# net_sdl.c            net_sdl.h             \
-# net_query.c          net_query.h           \
-# net_server.c         net_server.h          \
-# net_structrw.c       net_structrw.h        \
-# z_native.c           z_zone.h
-
-# @PROGRAM_PREFIX@server_SOURCES=$(COMMON_SOURCE_FILES) $(DEDSERV_FILES)
-# @PROGRAM_PREFIX@server_LDADD = @LDFLAGS@ @SDLNET_LIBS@
 
 # Source files used by the game binaries (chocolate-doom, etc.)
 
@@ -90,23 +72,6 @@ deh_main.c           deh_main.h            \
 deh_mapping.c        deh_mapping.h         \
 deh_text.c
 
-# source files needed for FEATURE_MULTIPLAYER
-
-FEATURE_MULTIPLAYER_SOURCE_FILES=          \
-aes_prng.c           aes_prng.h            \
-net_client.c         net_client.h          \
-net_common.c         net_common.h          \
-net_dedicated.c      net_dedicated.h       \
-net_defs.h                                 \
-net_gui.c            net_gui.h             \
-net_io.c             net_io.h              \
-net_loop.c           net_loop.h            \
-net_packet.c         net_packet.h          \
-net_query.c          net_query.h           \
-net_sdl.c            net_sdl.h             \
-net_server.c         net_server.h          \
-net_structrw.c       net_structrw.h
-
 # source files needed for FEATURE_WAD_MERGE
 
 FEATURE_WAD_MERGE_SOURCE_FILES =           \
@@ -137,8 +102,7 @@ EXTRA_LIBS =                                               \
                $(top_builddir)/opl/libopl.a                \
                @LDFLAGS@                                   \
                @SDL_LIBS@                                  \
-               @SDLMIXER_LIBS@                             \
-               @SDLNET_LIBS@
+               @SDLMIXER_LIBS@
 
 if HAVE_WINDRES
 @PROGRAM_PREFIX@doom_SOURCES=$(SOURCE_FILES_WITH_DEH) resource.rc
@@ -160,11 +124,6 @@ d_iwad.c             d_iwad.h              \
 i_timer.c            i_timer.h             \
 m_config.c           m_config.h            \
 m_controls.c         m_controls.h          \
-net_io.c             net_io.h              \
-net_packet.c         net_packet.h          \
-net_sdl.c            net_sdl.h             \
-net_query.c          net_query.h           \
-net_structrw.c       net_structrw.h        \
 z_native.c           z_zone.h
 
 if HAVE_WINDRES
@@ -174,7 +133,7 @@ else
 endif
 @PROGRAM_PREFIX@setup_LDADD = setup/libsetup.a                             \
                         $(top_builddir)/textscreen/libtextscreen.a   \
-                        @LDFLAGS@ @SDL_LIBS@ @SDLMIXER_LIBS@ @SDLNET_LIBS@
+                        @LDFLAGS@ @SDL_LIBS@ @SDLMIXER_LIBS@
 
 EXTRA_DIST =                        \
         icon.c                      \
