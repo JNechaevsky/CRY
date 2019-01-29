@@ -58,7 +58,7 @@ extern int uncapped_fps;
 
 
 // -----------------------------------------------------------------------------
-// Optional gameplay features
+// Gameplay features
 // -----------------------------------------------------------------------------
 
 extern int hightlight_things;

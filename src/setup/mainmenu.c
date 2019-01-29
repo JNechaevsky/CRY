@@ -67,47 +67,14 @@ static void SensibleDefaults(void)
     snd_dmxoption = "-opl3 -reverse";
     png_screenshots = 1;
 
-    // Графика
+    // [Julia] Gameplay features
     hightlight_things = 0;
-    brightmaps = 1;
-    translucency = 1;
-    swirling_liquids = 1;
-    invul_sky = 1;
-    colored_blood = 1;
-    draw_shadowed_text = 1;
-
-    // Звук
-    crushed_corpses_sfx = 1;
-    blazing_door_fix_sfx = 1;
-    correct_endlevel_sfx = 0;
-    play_exit_sfx = 1;
-    noise_alert_sfx = 0;
-
-    // Тактика
-    automap_stats = 1;
-    secret_notification = 1;
-    negative_health = 0;
-    infragreen_visor = 0;
-
-    // Физика
-    over_under = 0;
-    torque = 1;
-    weapon_bobbing = 1;
-    ssg_blast_enemies = 1;
-    randomly_flipcorpses = 1;
-    floating_powerups = 0;
-
-    // Геймплей
-    fix_map_errors = 1;
-    flip_levels = 0;
-    extra_player_faces = 1;
-    unlimited_lost_souls = 1;
-    agressive_lost_souls = 0;
-    fast_quickload = 1;
-    no_internal_demos = 0;
-
-    // Прицел
-    crosshair_draw = 0;
+    brightmaps        = 1;
+    translucency      = 1;
+    swirling_liquids  = 1;
+    colored_blood     = 1;
+    weapon_bobbing    = 1;
+    crosshair_draw    = 0;
 }
 
 static int MainMenuKeyPress(txt_window_t *window, int key, void *user_data)
@@ -168,10 +135,6 @@ static void QuitConfirm(void *unused1, void *unused2)
     TXT_SetWidgetAlign(yes_button, TXT_HORIZ_CENTER);
     TXT_SetWidgetAlign(no_button, TXT_HORIZ_CENTER);
 
-    //
-    // [JN] Create translated button ("Cancel" only)
-    //
-
     TXT_SetWindowAction(window, TXT_HORIZ_LEFT, NULL);
     TXT_SetWindowAction(window, TXT_HORIZ_CENTER, TXT_NewWindowAbortAction(window));
     TXT_SetWindowAction(window, TXT_HORIZ_RIGHT, NULL);
@@ -202,7 +165,7 @@ static txt_button_t *GetLaunchButton(void)
 {
     char *label;
 
-    label = "Save parameters and launch DOOM";
+    label = "Save settings and launch DOOM";
 
     return TXT_NewButton2(label, LaunchDoom, NULL);
 }
@@ -234,15 +197,12 @@ void MainMenu(void)
     NULL);
 
     //
-    // [Julia] Bottom keys: ESC = Quit, F2 = Warp, Enter = Select
+    // [Julia] Bottom keys: ESC = Quit, Enter = Select
     //
 
     quit_action = TXT_NewWindowAction(KEY_ESCAPE, "Quit");
-
     TXT_SignalConnect(quit_action, "pressed", QuitConfirm, NULL);
-
     TXT_SetWindowAction(window, TXT_HORIZ_LEFT, quit_action);
-
     TXT_SetKeyListener(window, MainMenuKeyPress, NULL);
 }
 
