@@ -210,22 +210,22 @@ boolean P_UseSpecialLine (mobj_t *thing, line_t *line, int side)
     switch (line->special)
     {
         // MANUALS
-        case 1:     // Vertical Door
-        case 26:    // Blue Card Door Raise
-        case 27:    // Yellow Card Door Raise
-        case 28:    // Red Card Door Raise
+        case 1:     // Vertical door raise
+        case 26:    // Blue Card door raise
+        case 27:    // Yellow Card door raise
+        case 28:    // Red Card door raise
 
-        case 31:    // Manual door open
+        case 31:    // Vertical door open
         case 32:    // Blue Card door open
         case 33:    // Red Card door open
         case 34:    // Yellow Card door open
 
-        case 99:    // Blue Skull Door Open
-        case 106:   // Blue Skull Door Raise
-        case 105:   // Yellow Skull Door Open
-        case 108:   // Yellow Skull Door Raise
-        case 100:   // Red Skull Door Open
-        case 107:   // Red Skull Door Raise
+        case 99:    // Blue Skull door open
+        case 106:   // Blue Skull door raise
+        case 105:   // Yellow Skull roor open
+        case 108:   // Yellow Skull roor raise
+        case 100:   // Red Skull door open
+        case 107:   // Red Skull door raise
 
         EV_VerticalDoor (line, thing);
         break;

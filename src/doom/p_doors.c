@@ -379,22 +379,31 @@ void EV_VerticalDoor (line_t *line, mobj_t *thing)
 
     switch (line->special)
     {
-        case 1:
-        case 26:
-        case 27:
-        case 28:
+        case 1:     // Vertical door
+        case 26:    // Blue Card door raise
+        case 27:    // Yellow Card door raise
+        case 28:    // Red Card door raise
+        // [Julia] Jaguar special doors (keycards):
+        case 106:   // Blue Skull door raise
+        case 108:   // Yellow Skull roor raise
+        case 107:   // Red Skull door raise
         door->type = vld_normal;
         break;
 
-        case 31:
-        case 32:
-        case 33:
-        case 34:
+        case 31:    // Vertical door open
+        case 32:    // Blue Card door open
+        case 33:    // Red Card door open
+        case 34:    // Yellow Card door open
+        // [Julia]  Jaguar special doors (skull keys):
+        case 99:    // Blue Skull door open
+        case 100:   // Red Skull door open
+        case 105:   // Yellow Skull roor open
         door->type = vld_open;
+
         // [Julia] following line is not existing in Jaguar source code,
         // which explains an ability to press "use" multiple times on D1 door
         // types, speed it up and hear opening sound while every "use" action.
-        /* line->special = 0; */
+        // line->special = 0;
         break;
     }
 
