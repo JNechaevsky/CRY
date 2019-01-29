@@ -482,7 +482,7 @@ void D_DoAdvanceDemo (void)
         case 1:
         {
             pagename1 = DEH_String("M_TITLE");
-            pagename2 = DEH_String("CREDIT");
+            pagename2 = DEH_String("CREDIT1");
             break;
         }
 
