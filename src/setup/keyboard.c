@@ -273,7 +273,6 @@ static void OtherKeysDialog(TXT_UNCAST_ARG(widget), TXT_UNCAST_ARG(unused))
     AddKeyControl(table, "Decrease screen size",    &key_menu_decscreen);
     AddKeyControl(table, "Save a screenshot",       &key_menu_screenshot);
     AddKeyControl(table, "Display last message",    &key_message_refresh);
-    AddKeyControl(table, "Finish recording demo",   &key_demo_quit);
 
     AddSectionLabel(table, "Map", true);
 

@@ -28,7 +28,6 @@
 // [Julia] Gameplay features
 // -----------------------------------------------------------------------------
 
-// Графика
 int hightlight_things = 0;
 int brightmaps        = 1;
 int translucency      = 1;

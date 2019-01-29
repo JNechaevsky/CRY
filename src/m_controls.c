@@ -60,7 +60,6 @@ int mousebnextweapon = 3; // [crispy]
 
 int key_message_refresh = KEY_ENTER;
 int key_pause = KEY_PAUSE;
-int key_demo_quit = 'q';
 
 // Weapon selection keys:
 
@@ -122,12 +121,10 @@ int key_menu_screenshot = KEY_PRTSCR;
 // Joystick controls
 //
 
-// [JN] Постоянный бег ключен по умолчанию.
-// Ранее: joybspeed = 2;
 int joybfire = 0;
 int joybstrafe = 1;
 int joybuse = 3;
-int joybspeed = 29;
+int joybspeed = 29; // [Julia] Always run enabled by default
 
 int joybstrafeleft = -1;
 int joybstraferight = -1;
@@ -254,7 +251,6 @@ void M_BindMenuControls(void)
     M_BindIntVariable("key_menu_incscreen", &key_menu_incscreen);
     M_BindIntVariable("key_menu_decscreen", &key_menu_decscreen);
     M_BindIntVariable("key_menu_screenshot",&key_menu_screenshot);
-    M_BindIntVariable("key_demo_quit",      &key_demo_quit);
 }
 
 //

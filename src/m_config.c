@@ -214,192 +214,6 @@ static default_t extra_defaults_list[] =
     CONFIG_VARIABLE_KEY(key_straferight),
 
     //!
-    // @game strife
-    //
-    // Keyboard key to use health.
-    //
-
-    CONFIG_VARIABLE_KEY(key_useHealth),
-
-    //!
-    // @game hexen
-    //
-    // Keyboard key to jump.
-    //
-
-    CONFIG_VARIABLE_KEY(key_jump),
-
-    //!
-    // @game heretic hexen
-    //
-    // Keyboard key to fly upward.
-    //
-
-    CONFIG_VARIABLE_KEY(key_flyup),
-
-    //!
-    // @game heretic hexen
-    //
-    // Keyboard key to fly downwards.
-    //
-
-    CONFIG_VARIABLE_KEY(key_flydown),
-
-    //!
-    // @game heretic hexen
-    //
-    // Keyboard key to center flying.
-    //
-
-    CONFIG_VARIABLE_KEY(key_flycenter),
-
-    //!
-    // @game heretic hexen
-    //
-    // Keyboard key to look up.
-    //
-
-    CONFIG_VARIABLE_KEY(key_lookup),
-
-    //!
-    // @game heretic hexen
-    //
-    // Keyboard key to look down.
-    //
-
-    CONFIG_VARIABLE_KEY(key_lookdown),
-
-    //!
-    // @game heretic hexen
-    //
-    // Keyboard key to center the view.
-    //
-
-    CONFIG_VARIABLE_KEY(key_lookcenter),
-
-    /*
-    //!
-    // @game strife
-    //
-    // Keyboard key to query inventory.
-    //
-
-    CONFIG_VARIABLE_KEY(key_invquery),
-    */
-
-    //!
-    // @game strife
-    //
-    // Keyboard key to display mission objective.
-    //
-
-    CONFIG_VARIABLE_KEY(key_mission),
-
-    //!
-    // @game strife
-    //
-    // Keyboard key to display inventory popup.
-    //
-
-    CONFIG_VARIABLE_KEY(key_invPop),
-
-    //!
-    // @game strife
-    //
-    // Keyboard key to display keys popup.
-    //
-
-    CONFIG_VARIABLE_KEY(key_invKey),
-
-    //!
-    // @game strife
-    //
-    // Keyboard key to jump to start of inventory.
-    //
-
-    CONFIG_VARIABLE_KEY(key_invHome),
-
-    //!
-    // @game strife
-    //
-    // Keyboard key to jump to end of inventory.
-    //
-
-    CONFIG_VARIABLE_KEY(key_invEnd),
-
-    //!
-    // @game heretic hexen
-    //
-    // Keyboard key to scroll left in the inventory.
-    //
-
-    CONFIG_VARIABLE_KEY(key_invleft),
-
-    //!
-    // @game heretic hexen
-    //
-    // Keyboard key to scroll right in the inventory.
-    //
-
-    CONFIG_VARIABLE_KEY(key_invright),
-
-    //!
-    // @game strife
-    //
-    // Keyboard key to scroll left in the inventory.
-    //
-
-    CONFIG_VARIABLE_KEY(key_invLeft),
-
-    //!
-    // @game strife
-    //
-    // Keyboard key to scroll right in the inventory.
-    //
-
-    CONFIG_VARIABLE_KEY(key_invRight),
-
-    //!
-    // @game heretic hexen
-    //
-    // Keyboard key to use the current item in the inventory.
-    //
-
-    CONFIG_VARIABLE_KEY(key_useartifact),
-
-    //!
-    // @game strife
-    //
-    // Keyboard key to use inventory item.
-    //
-
-    CONFIG_VARIABLE_KEY(key_invUse),
-
-    //!
-    // @game strife
-    //
-    // Keyboard key to drop an inventory item.
-    //
-
-    CONFIG_VARIABLE_KEY(key_invDrop),
-
-    //!
-    // @game strife
-    //
-    // Keyboard key to look up.
-    //
-
-    CONFIG_VARIABLE_KEY(key_lookUp),
-
-    //!
-    // @game strife
-    //
-    // Keyboard key to look down.
-    //
-
-    CONFIG_VARIABLE_KEY(key_lookDown),
-
-    //!
     // Keyboard key to fire the currently selected weapon.
     //
 
@@ -450,14 +264,6 @@ static default_t extra_defaults_list[] =
     //
 
     CONFIG_VARIABLE_INT(mouseb_forward),
-
-    //!
-    // @game hexen strife
-    //
-    // Mouse button to jump.
-    //
-
-    CONFIG_VARIABLE_INT(mouseb_jump),
 
     //!
     // If non-zero, joystick input is enabled.
@@ -583,90 +389,6 @@ static default_t extra_defaults_list[] =
     CONFIG_VARIABLE_INT(messageson),
 
     //!
-    // @game strife
-    //
-    // Name of background flat used by view border.
-    //
-
-    CONFIG_VARIABLE_STRING(back_flat),
-
-    //!
-    // @game strife
-    //
-    // Multiplayer nickname (?).
-    //
-
-    CONFIG_VARIABLE_STRING(nickname),
-
-    //!
-    // Multiplayer chat macro: message to send when alt+0 is pressed.
-    //
-
-    CONFIG_VARIABLE_STRING(chatmacro0),
-
-    //!
-    // Multiplayer chat macro: message to send when alt+1 is pressed.
-    //
-
-    CONFIG_VARIABLE_STRING(chatmacro1),
-
-    //!
-    // Multiplayer chat macro: message to send when alt+2 is pressed.
-    //
-
-    CONFIG_VARIABLE_STRING(chatmacro2),
-
-    //!
-    // Multiplayer chat macro: message to send when alt+3 is pressed.
-    //
-
-    CONFIG_VARIABLE_STRING(chatmacro3),
-
-    //!
-    // Multiplayer chat macro: message to send when alt+4 is pressed.
-    //
-
-    CONFIG_VARIABLE_STRING(chatmacro4),
-
-    //!
-    // Multiplayer chat macro: message to send when alt+5 is pressed.
-    //
-
-    CONFIG_VARIABLE_STRING(chatmacro5),
-
-    //!
-    // Multiplayer chat macro: message to send when alt+6 is pressed.
-    //
-
-    CONFIG_VARIABLE_STRING(chatmacro6),
-
-    //!
-    // Multiplayer chat macro: message to send when alt+7 is pressed.
-    //
-
-    CONFIG_VARIABLE_STRING(chatmacro7),
-
-    //!
-    // Multiplayer chat macro: message to send when alt+8 is pressed.
-    //
-
-    CONFIG_VARIABLE_STRING(chatmacro8),
-
-    //!
-    // Multiplayer chat macro: message to send when alt+9 is pressed.
-    //
-
-    CONFIG_VARIABLE_STRING(chatmacro9),
-
-    //!
-    // @game strife
-    //
-    // Serial port number to use for SERSETUP.EXE (unused).
-    //
-
-    CONFIG_VARIABLE_INT(comport),
-
-    //!
     // If non-zero, the game will run in full screen mode.  If zero,
     // the game will run in a window.
     //
@@ -689,7 +411,7 @@ static default_t extra_defaults_list[] =
     CONFIG_VARIABLE_INT(aspect_ratio_correct),
 
     //!
-    // [JN] Эксперементальное сглаживание текстур.
+    // [Julia] Smooth pixel scaling.
 
     CONFIG_VARIABLE_INT(smoothing),
     
@@ -759,7 +481,7 @@ static default_t extra_defaults_list[] =
     CONFIG_VARIABLE_INT(novert),
 
     //!
-    // [JN] Mouselook: config variable initialization.
+    // [Julia] Mouselook: config variable initialization.
     //
 
     CONFIG_VARIABLE_INT(mlook),
@@ -840,30 +562,6 @@ static default_t extra_defaults_list[] =
     CONFIG_VARIABLE_INT(png_screenshots),
 
     //!
-    // @game doom strife
-    //
-    // If non-zero, the Vanilla savegame limit is enforced; if the
-    // savegame exceeds 180224 bytes in size, the game will exit with
-    // an error.  If this has a value of zero, there is no limit to
-    // the size of savegames.
-    //
-
-    // [JN] Лимит отключен за неактуальностью.
-    // CONFIG_VARIABLE_INT(vanilla_savegame_limit),
-
-    //!
-    // @game doom strife
-    //
-    // If non-zero, the Vanilla demo size limit is enforced; the game
-    // exits with an error when a demo exceeds the demo size limit
-    // (128KiB by default).  If this has a value of zero, there is no
-    // limit to the size of demos.
-    // 
-
-    // [JN] Лимит отключен за неактуальностью.
-    // CONFIG_VARIABLE_INT(vanilla_demo_limit),
-
-    //!
     // If non-zero, the game behaves like Vanilla Doom, always assuming
     // an American keyboard mapping.  If this has a value of zero, the
     // native keyboard mapping of the keyboard is used.
@@ -891,17 +589,6 @@ static default_t extra_defaults_list[] =
     // systems lacking hardware acceleration.
     //
     CONFIG_VARIABLE_INT(force_software_renderer),
-
-#ifdef FEATURE_MULTIPLAYER
-
-    //!
-    // Name to use in network games for identification.  This is only
-    // used on the "waiting" screen while waiting for the game to start.
-    //
-
-    CONFIG_VARIABLE_STRING(player_name),
-
-#endif
 
     //!
     // SDL GUID string indicating the joystick to use. An empty string
@@ -1425,238 +1112,40 @@ static default_t extra_defaults_list[] =
     CONFIG_VARIABLE_KEY(key_nextweapon),
 
     //!
-    // @game heretic
-    //
-    // [JN] Bindable keys for artifacts.
-    //
-
-    CONFIG_VARIABLE_KEY(key_arti_quartz),
-    CONFIG_VARIABLE_KEY(key_arti_urn),
-    CONFIG_VARIABLE_KEY(key_arti_bomb),
-    CONFIG_VARIABLE_KEY(key_arti_tome),
-    CONFIG_VARIABLE_KEY(key_arti_ring),
-    CONFIG_VARIABLE_KEY(key_arti_morphegg),
-    CONFIG_VARIABLE_KEY(key_arti_chaosdevice),
-    CONFIG_VARIABLE_KEY(key_arti_shadowsphere),
-    CONFIG_VARIABLE_KEY(key_arti_wings),
-    CONFIG_VARIABLE_KEY(key_arti_torch),
-
-    //!
-    // @game hexen
-    //
-    // Key to use one of each artifact.
-    //
-
-    CONFIG_VARIABLE_KEY(key_arti_all),
-
-    //!
-    // @game hexen
-    //
-    // Key to use "quartz flask" artifact.
-    //
-
-    CONFIG_VARIABLE_KEY(key_arti_health),
-
-    //!
-    // @game hexen
-    //
-    // Key to use "flechette" artifact.
-    //
-
-    CONFIG_VARIABLE_KEY(key_arti_poisonbag),
-
-    //!
-    // @game hexen
-    //
-    // Key to use "disc of repulsion" artifact.
-    //
-
-    CONFIG_VARIABLE_KEY(key_arti_blastradius),
-
-    //!
-    // @game hexen
-    //
-    // Key to use "chaos device" artifact.
-    //
-
-    CONFIG_VARIABLE_KEY(key_arti_teleport),
-
-    //!
-    // @game hexen
-    //
-    // Key to use "banishment device" artifact.
-    //
-
-    CONFIG_VARIABLE_KEY(key_arti_teleportother),
-
-    //!
-    // @game hexen
-    //
-    // Key to use "porkalator" artifact.
-    //
-
-    CONFIG_VARIABLE_KEY(key_arti_egg),
-
-    //!
-    // @game hexen
-    //
-    // Key to use "icon of the defender" artifact.
-    //
-
-    CONFIG_VARIABLE_KEY(key_arti_invulnerability),
-    
-    //!
-    // @game hexen
-    //
-    // [JN] Now we can bind all the Artifacts.
-    //
-
-    CONFIG_VARIABLE_KEY(key_arti_superhealth),
-    CONFIG_VARIABLE_KEY(key_arti_boostarmor),
-    CONFIG_VARIABLE_KEY(key_arti_boostmana),
-    CONFIG_VARIABLE_KEY(key_arti_summon),
-    CONFIG_VARIABLE_KEY(key_arti_fly),
-    CONFIG_VARIABLE_KEY(key_arti_speed),
-    CONFIG_VARIABLE_KEY(key_arti_torch),
-    CONFIG_VARIABLE_KEY(key_arti_healingradius),
-
-    //!
     // Key to re-display last message.
     //
 
     CONFIG_VARIABLE_KEY(key_message_refresh),
 
     //!
-    // Key to quit the game when recording a demo.
-    //
-
-    CONFIG_VARIABLE_KEY(key_demo_quit),
-
-    //!
-    // Key to send a message during multiplayer games.
-    //
-
-    CONFIG_VARIABLE_KEY(key_multi_msg),
-
-    //!
-    // Key to send a message to player 1 during multiplayer games.
-    //
-
-    CONFIG_VARIABLE_KEY(key_multi_msgplayer1),
-
-    //!
-    // Key to send a message to player 2 during multiplayer games.
-    //
-
-    CONFIG_VARIABLE_KEY(key_multi_msgplayer2),
-
-    //!
-    // Key to send a message to player 3 during multiplayer games.
-    //
-
-    CONFIG_VARIABLE_KEY(key_multi_msgplayer3),
-
-    //!
-    // Key to send a message to player 4 during multiplayer games.
-    //
-
-    CONFIG_VARIABLE_KEY(key_multi_msgplayer4),
-
-    //!
-    // @game hexen strife
-    //
-    // Key to send a message to player 5 during multiplayer games.
-    //
-
-    CONFIG_VARIABLE_KEY(key_multi_msgplayer5),
-
-    //!
-    // @game hexen strife
-    //
-    // Key to send a message to player 6 during multiplayer games.
-    //
-
-    CONFIG_VARIABLE_KEY(key_multi_msgplayer6),
-
-    //!
-    // @game hexen strife
-    //
-    // Key to send a message to player 7 during multiplayer games.
-    //
-
-    CONFIG_VARIABLE_KEY(key_multi_msgplayer7),
-
-    //!
-    // @game hexen strife
-    //
-    // Key to send a message to player 8 during multiplayer games.
-    //
-
-    CONFIG_VARIABLE_KEY(key_multi_msgplayer8),
-
-    //!
-    // [JN] Toggle always run.
+    // [Julia] Toggle always run.
     //
 
     CONFIG_VARIABLE_KEY(key_toggleautorun),
 
     //!
-    // [JN] Toggle crosshair.
+    // [Julia] Toggle crosshair.
     //
 
     CONFIG_VARIABLE_KEY(key_togglecrosshair),
 
     //!
-    // [JN] Toggle mouselook.
+    // [Julia] Toggle mouselook.
     //
 
     CONFIG_VARIABLE_KEY(key_togglemlook),
 
     //!
-    // [JN] Дополнительные параметры игры
+    // [Julia] Gameplay features
     //
 
-    // Графика
     CONFIG_VARIABLE_INT(uncapped_fps),
     CONFIG_VARIABLE_INT(hightlight_things),
     CONFIG_VARIABLE_INT(brightmaps),
     CONFIG_VARIABLE_INT(translucency),
     CONFIG_VARIABLE_INT(swirling_liquids),
-    CONFIG_VARIABLE_INT(invul_sky),
     CONFIG_VARIABLE_INT(colored_blood),
-    CONFIG_VARIABLE_INT(draw_shadowed_text),
-
-    // Звук
-    CONFIG_VARIABLE_INT(crushed_corpses_sfx),
-    CONFIG_VARIABLE_INT(blazing_door_fix_sfx),
-    CONFIG_VARIABLE_INT(correct_endlevel_sfx),
-    CONFIG_VARIABLE_INT(play_exit_sfx),
-    CONFIG_VARIABLE_INT(noise_alert_sfx),
-
-    // Тактика
-    CONFIG_VARIABLE_INT(automap_stats),
-    CONFIG_VARIABLE_INT(secret_notification),
-    CONFIG_VARIABLE_INT(negative_health),
-    CONFIG_VARIABLE_INT(infragreen_visor),
-
-    // Физика
-    CONFIG_VARIABLE_INT(over_under),
-    CONFIG_VARIABLE_INT(torque),
     CONFIG_VARIABLE_INT(weapon_bobbing),
-    CONFIG_VARIABLE_INT(ssg_blast_enemies),
-    CONFIG_VARIABLE_INT(randomly_flipcorpses),
-    CONFIG_VARIABLE_INT(floating_powerups),
-
-    // Геймплей
-    CONFIG_VARIABLE_INT(fix_map_errors),
-    CONFIG_VARIABLE_INT(flip_levels),
-    CONFIG_VARIABLE_INT(extra_player_faces),
-    CONFIG_VARIABLE_INT(unlimited_lost_souls),
-    CONFIG_VARIABLE_INT(agressive_lost_souls),
-    CONFIG_VARIABLE_INT(fast_quickload),
-    CONFIG_VARIABLE_INT(no_internal_demos),
-
-    // Прицел
     CONFIG_VARIABLE_INT(crosshair_draw),
 };
 

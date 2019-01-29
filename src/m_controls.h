@@ -32,38 +32,12 @@ extern int key_use;
 extern int key_strafe;
 extern int key_speed;
 
-extern int key_jump;
 extern int key_toggleautorun;
 extern int key_togglecrosshair;
 extern int key_togglemlook;
-extern int key_toggletime;
  
-extern int key_flyup;
-extern int key_flydown;
-extern int key_flycenter;
-extern int key_lookup;
-extern int key_lookdown;
-extern int key_lookcenter;
-extern int key_invleft;
-extern int key_invright;
-extern int key_useartifact;
-
-// villsa [STRIFE] strife keys
-extern int key_usehealth;
-// extern int key_invquery;
-extern int key_mission;
-extern int key_invpop;
-extern int key_invkey;
-extern int key_invhome;
-extern int key_invend;
-extern int key_invuse;
-extern int key_invdrop;
-
 extern int key_message_refresh;
 extern int key_pause;
-
-extern int key_multi_msg;
-extern int key_multi_msgplayer[8];
 
 extern int key_weapon1;
 extern int key_weapon2;
@@ -74,35 +48,6 @@ extern int key_weapon6;
 extern int key_weapon7;
 extern int key_weapon8;
 
-extern int key_arti_quartz;
-extern int key_arti_urn;
-extern int key_arti_bomb;
-extern int key_arti_tome;
-extern int key_arti_ring;
-extern int key_arti_morphegg;
-extern int key_arti_chaosdevice;
-extern int key_arti_shadowsphere;
-extern int key_arti_wings;
-extern int key_arti_torch;
-
-extern int key_arti_all;
-extern int key_arti_health;
-extern int key_arti_poisonbag;
-extern int key_arti_blastradius;
-extern int key_arti_teleport;
-extern int key_arti_teleportother;
-extern int key_arti_egg;
-extern int key_arti_invulnerability;
-
-extern int key_arti_superhealth;
-extern int key_arti_boostarmor;
-extern int key_arti_boostmana;
-extern int key_arti_summon;
-extern int key_arti_fly;
-extern int key_arti_speed;
-extern int key_arti_healingradius;
-
-extern int key_demo_quit;
 extern int key_spy;
 extern int key_prevweapon;
 extern int key_nextweapon;
