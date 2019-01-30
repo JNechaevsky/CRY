@@ -543,6 +543,34 @@ void ST_updateFaceWidget(void)
             faceindex = ST_DEADFACE;
             st_facecount = 1;
         }
+
+        // [Julia] Exploded and squished faces
+        if (plyr->health <= 0 
+        &&  plyr->mo->state - states >= mobjinfo[plyr->mo->type].xdeathstate)
+        {
+            priority = 9;
+            painoffset = 0;
+
+            // [Julia] Sync with actual player state
+            if (plyr->mo->state == &states[S_PLAY_XDIE1])
+                faceindex = ST_EXPLFACE0;
+            if (plyr->mo->state == &states[S_PLAY_XDIE2])
+                faceindex = ST_EXPLFACE1;
+            if (plyr->mo->state == &states[S_PLAY_XDIE3])
+                faceindex = ST_EXPLFACE2;
+            if (plyr->mo->state == &states[S_PLAY_XDIE4])
+                faceindex = ST_EXPLFACE3;
+            if (plyr->mo->state == &states[S_PLAY_XDIE5])
+                faceindex = ST_EXPLFACE4;
+            if ((plyr->mo->state == &states[S_PLAY_XDIE6])
+            ||  (plyr->mo->state == &states[S_PLAY_XDIE7])
+            ||  (plyr->mo->state == &states[S_PLAY_XDIE8])
+            ||  (plyr->mo->state == &states[S_PLAY_XDIE9]))
+                faceindex = ST_EXPLFACE5;
+
+            if (plyr->mo->state == &states[S_GIBS])
+                faceindex = ST_CRSHFACE0;
+        }
     }
 
     if (priority < 9)
