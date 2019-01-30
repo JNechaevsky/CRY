@@ -1,6 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2018-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -12,7 +13,6 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// [Julia] TODO - cleanup
 
 
 #include <stdio.h>
@@ -29,6 +29,7 @@
 #include "r_state.h"
 #include "d_englsh.h"
 #include "jn.h"
+
 
 FILE   *save_stream;
 int     savegamelength;
@@ -191,13 +192,14 @@ static void saveg_writep(void *p)
 #define saveg_read_enum saveg_read32
 #define saveg_write_enum saveg_write32
 
-//
-// Structure read/write functions
-//
 
-//
+// =============================================================================
+// Structure read/write functions
+// =============================================================================
+
+// -----------------------------------------------------------------------------
 // mapthing_t
-//
+// -----------------------------------------------------------------------------
 
 static void saveg_read_mapthing_t(mapthing_t *str)
 {
@@ -235,9 +237,10 @@ static void saveg_write_mapthing_t(mapthing_t *str)
     saveg_write16(str->options);
 }
 
-//
+
+// -----------------------------------------------------------------------------
 // actionf_t
-// 
+// -----------------------------------------------------------------------------
 
 static void saveg_read_actionf_t(actionf_t *str)
 {
@@ -251,18 +254,19 @@ static void saveg_write_actionf_t(actionf_t *str)
     saveg_writep(str->acp1);
 }
 
-//
+// -----------------------------------------------------------------------------
 // think_t
 //
 // This is just an actionf_t.
-//
+// -----------------------------------------------------------------------------
 
 #define saveg_read_think_t saveg_read_actionf_t
 #define saveg_write_think_t saveg_write_actionf_t
 
-//
+
+// -----------------------------------------------------------------------------
 // thinker_t
-//
+// -----------------------------------------------------------------------------
 
 static void saveg_read_thinker_t(thinker_t *str)
 {
@@ -288,9 +292,10 @@ static void saveg_write_thinker_t(thinker_t *str)
     saveg_write_think_t(&str->function);
 }
 
-//
+
+// -----------------------------------------------------------------------------
 // mobj_t
-//
+// -----------------------------------------------------------------------------
 
 static void saveg_read_mobj_t(mobj_t *str)
 {
@@ -528,9 +533,9 @@ static void saveg_write_mobj_t(mobj_t *str)
 }
 
 
-//
+// -----------------------------------------------------------------------------
 // ticcmd_t
-//
+// -----------------------------------------------------------------------------
 
 static void saveg_read_ticcmd_t(ticcmd_t *str)
 {
@@ -576,9 +581,10 @@ static void saveg_write_ticcmd_t(ticcmd_t *str)
     saveg_write8(str->buttons);
 }
 
-//
+
+// -----------------------------------------------------------------------------
 // pspdef_t
-//
+// -----------------------------------------------------------------------------
 
 static void saveg_read_pspdef_t(pspdef_t *str)
 {
@@ -628,9 +634,10 @@ static void saveg_write_pspdef_t(pspdef_t *str)
     saveg_write32(str->sy);
 }
 
-//
+
+// -----------------------------------------------------------------------------
 // player_t
-//
+// -----------------------------------------------------------------------------
 
 static void saveg_read_player_t(player_t *str)
 {
@@ -901,9 +908,9 @@ static void saveg_write_player_t(player_t *str)
 }
 
 
-//
+// -----------------------------------------------------------------------------
 // ceiling_t
-//
+// -----------------------------------------------------------------------------
 
 static void saveg_read_ceiling_t(ceiling_t *str)
 {
@@ -974,9 +981,10 @@ static void saveg_write_ceiling_t(ceiling_t *str)
     saveg_write32(str->olddirection);
 }
 
-//
+
+// -----------------------------------------------------------------------------
 // vldoor_t
-//
+// -----------------------------------------------------------------------------
 
 static void saveg_read_vldoor_t(vldoor_t *str)
 {
@@ -1035,9 +1043,10 @@ static void saveg_write_vldoor_t(vldoor_t *str)
     saveg_write32(str->topcountdown);
 }
 
-//
+
+// -----------------------------------------------------------------------------
 // floormove_t
-//
+// -----------------------------------------------------------------------------
 
 static void saveg_read_floormove_t(floormove_t *str)
 {
@@ -1102,9 +1111,10 @@ static void saveg_write_floormove_t(floormove_t *str)
     saveg_write32(str->speed);
 }
 
-//
+
+// -----------------------------------------------------------------------------
 // plat_t
-//
+// -----------------------------------------------------------------------------
 
 static void saveg_read_plat_t(plat_t *str)
 {
@@ -1187,9 +1197,10 @@ static void saveg_write_plat_t(plat_t *str)
     saveg_write_enum(str->type);
 }
 
-//
+
+// -----------------------------------------------------------------------------
 // lightflash_t
-//
+// -----------------------------------------------------------------------------
 
 static void saveg_read_lightflash_t(lightflash_t *str)
 {
@@ -1242,9 +1253,10 @@ static void saveg_write_lightflash_t(lightflash_t *str)
     saveg_write32(str->mintime);
 }
 
-//
+
+// -----------------------------------------------------------------------------
 // strobe_t
-//
+// -----------------------------------------------------------------------------
 
 static void saveg_read_strobe_t(strobe_t *str)
 {
@@ -1297,9 +1309,10 @@ static void saveg_write_strobe_t(strobe_t *str)
     saveg_write32(str->brighttime);
 }
 
-//
+
+// -----------------------------------------------------------------------------
 // glow_t
-//
+// -----------------------------------------------------------------------------
 
 static void saveg_read_glow_t(glow_t *str)
 {
@@ -1403,43 +1416,46 @@ static void saveg_write_button_t(button_t *str)
     saveg_write32(str->btimer);
 }
 
+
+// -----------------------------------------------------------------------------
+// P_WriteSaveGameHeader
 //
 // Write the header for a savegame
-//
+// -----------------------------------------------------------------------------
 
 void P_WriteSaveGameHeader(char *description)
 {
     char name[VERSIONSIZE]; 
     int i; 
-	
+
     for (i=0; description[i] != '\0'; ++i)
-        saveg_write8(description[i]);
+    saveg_write8(description[i]);
     for (; i<SAVESTRINGSIZE; ++i)
-        saveg_write8(0);
+    saveg_write8(0);
 
     memset(name, 0, sizeof(name));
     M_snprintf(name, sizeof(name), "version %i", 109);
 
     for (i=0; i<VERSIONSIZE; ++i)
-        saveg_write8(name[i]);
-	 
+    saveg_write8(name[i]);
+
     saveg_write8(gameskill);
     saveg_write8(gameepisode);
     saveg_write8(gamemap);
     saveg_write8(player_is_cheater);
 
     for (i=0 ; i<MAXPLAYERS ; i++) 
-        saveg_write8(playeringame[i]);
+    saveg_write8(playeringame[i]);
 
     saveg_write8((leveltime >> 16) & 0xff);
     saveg_write8((leveltime >> 8) & 0xff);
     saveg_write8(leveltime & 0xff);
-    
 }
 
-// 
+
+// -----------------------------------------------------------------------------
 // Read the header for a savegame
-//
+// -----------------------------------------------------------------------------
 
 boolean P_ReadSaveGameHeader(void)
 {
@@ -1447,19 +1463,20 @@ boolean P_ReadSaveGameHeader(void)
     byte a, b, c; 
     char vcheck[VERSIONSIZE]; 
     char read_vcheck[VERSIONSIZE];
-	 
+
     // skip the description field 
 
     for (i=0; i<SAVESTRINGSIZE; ++i)
-        saveg_read8();
-    
+    saveg_read8();
+
     for (i=0; i<VERSIONSIZE; ++i)
-        read_vcheck[i] = saveg_read8();
+    read_vcheck[i] = saveg_read8();
 
     memset(vcheck, 0, sizeof(vcheck));
     M_snprintf(vcheck, sizeof(vcheck), "version %i", 109);
+
     if (strcmp(read_vcheck, vcheck) != 0)
-	return false;				// bad version 
+    return false;   // bad version 
 
     gameskill = saveg_read8();
     gameepisode = saveg_read8();
@@ -1467,20 +1484,20 @@ boolean P_ReadSaveGameHeader(void)
     player_is_cheater = saveg_read8();
 
     for (i=0 ; i<MAXPLAYERS ; i++) 
-	playeringame[i] = saveg_read8();
+    playeringame[i] = saveg_read8();
 
     // get the times 
     a = saveg_read8();
     b = saveg_read8();
     c = saveg_read8();
     leveltime = (a<<16) + (b<<8) + c; 
-    
+
     return true;
 }
 
-//
+// -----------------------------------------------------------------------------
 // Read the end of file marker.  Returns true if read successfully.
-// 
+// -----------------------------------------------------------------------------
 
 boolean P_ReadSaveGameEOF(void)
 {
@@ -1491,155 +1508,160 @@ boolean P_ReadSaveGameEOF(void)
     return value == SAVEGAME_EOF;
 }
 
+
+// -----------------------------------------------------------------------------
+// P_WriteSaveGameEOF
 //
 // Write the end of file marker
-//
+// -----------------------------------------------------------------------------
+
 
 void P_WriteSaveGameEOF(void)
 {
     saveg_write8(SAVEGAME_EOF);
 }
 
-//
+
+// -----------------------------------------------------------------------------
 // P_ArchivePlayers
-//
+// -----------------------------------------------------------------------------
 void P_ArchivePlayers (void)
 {
-    int		i;
-		
+    int i;
+
     for (i=0 ; i<MAXPLAYERS ; i++)
     {
-	if (!playeringame[i])
-	    continue;
-	
-	saveg_write_pad();
+        if (!playeringame[i])
+        continue;
 
+        saveg_write_pad();
         saveg_write_player_t(&players[i]);
     }
 }
 
 
-
-//
+// -----------------------------------------------------------------------------
 // P_UnArchivePlayers
-//
+// -----------------------------------------------------------------------------
+
 void P_UnArchivePlayers (void)
 {
-    int		i;
-	
+    int i;
+
     for (i=0 ; i<MAXPLAYERS ; i++)
     {
-	if (!playeringame[i])
-	    continue;
-	
-	saveg_read_pad();
+        if (!playeringame[i])
+        continue;
 
+        saveg_read_pad();
         saveg_read_player_t(&players[i]);
 	
-	// will be set when unarc thinker
-	players[i].mo = NULL;	
-	players[i].message = NULL;
-	players[i].attacker = NULL;
+        // will be set when unarc thinker
+        players[i].mo = NULL;	
+        players[i].message = NULL;
+        players[i].attacker = NULL;
     }
 }
 
 
-//
+// -----------------------------------------------------------------------------
 // P_ArchiveWorld
-//
+// -----------------------------------------------------------------------------
+
 void P_ArchiveWorld (void)
 {
-    int			i;
-    int			j;
-    sector_t*		sec;
-    line_t*		li;
-    side_t*		si;
-    
+    int        i;
+    int        j;
+    sector_t  *sec;
+    line_t    *li;
+    side_t    *si;
+
     // do sectors
     for (i=0, sec = sectors ; i<numsectors ; i++,sec++)
     {
-	saveg_write16(sec->floorheight >> FRACBITS);
-	saveg_write16(sec->ceilingheight >> FRACBITS);
-	saveg_write16(sec->floorpic);
-	saveg_write16(sec->ceilingpic);
-	saveg_write16(sec->lightlevel);
-	saveg_write16(sec->special);		// needed?
-	saveg_write16(sec->tag);		// needed?
+        saveg_write16(sec->floorheight >> FRACBITS);
+        saveg_write16(sec->ceilingheight >> FRACBITS);
+        saveg_write16(sec->floorpic);
+        saveg_write16(sec->ceilingpic);
+        saveg_write16(sec->lightlevel);
+        saveg_write16(sec->special);    // needed?
+        saveg_write16(sec->tag);        // needed?
     }
 
-    
     // do lines
     for (i=0, li = lines ; i<numlines ; i++,li++)
     {
-	saveg_write16(li->flags);
-	saveg_write16(li->special);
-	saveg_write16(li->tag);
-	for (j=0 ; j<2 ; j++)
-	{
-	    if (li->sidenum[j] == NO_INDEX)
-		continue;
-	    
-	    si = &sides[li->sidenum[j]];
+        saveg_write16(li->flags);
+        saveg_write16(li->special);
+        saveg_write16(li->tag);
 
-	    saveg_write16(si->textureoffset >> FRACBITS);
-	    saveg_write16(si->rowoffset >> FRACBITS);
-	    saveg_write16(si->toptexture);
-	    saveg_write16(si->bottomtexture);
-	    saveg_write16(si->midtexture);	
-	}
+        for (j=0 ; j<2 ; j++)
+        {
+            if (li->sidenum[j] == NO_INDEX)
+            continue;
+
+            si = &sides[li->sidenum[j]];
+
+            saveg_write16(si->textureoffset >> FRACBITS);
+            saveg_write16(si->rowoffset >> FRACBITS);
+            saveg_write16(si->toptexture);
+            saveg_write16(si->bottomtexture);
+            saveg_write16(si->midtexture);	
+        }
     }
-    
+
     saveg_write8((totalleveltimes >> 16) & 0xff);
     saveg_write8((totalleveltimes >> 8) & 0xff);
     saveg_write8(totalleveltimes & 0xff);
 }
 
 
-
-//
+// -----------------------------------------------------------------------------
 // P_UnArchiveWorld
-//
+// -----------------------------------------------------------------------------
+
 void P_UnArchiveWorld (void)
 {
-    int			i;
-    int			j;
-    sector_t*		sec;
-    line_t*		li;
-    side_t*		si;
-    byte a, b, c; 
-    
+    int        i;
+    int        j;
+    sector_t  *sec;
+    line_t    *li;
+    side_t    *si;
+    byte       a, b, c; 
+
     // do sectors
-    for (i=0, sec = sectors ; i<numsectors ; i++,sec++)
+    for (i=0, sec = sectors ; i<numsectors ; i++, sec++)
     {
-	sec->floorheight = saveg_read16() << FRACBITS;
-	sec->ceilingheight = saveg_read16() << FRACBITS;
-	sec->floorpic = saveg_read16();
-	sec->ceilingpic = saveg_read16();
-	sec->lightlevel = saveg_read16();
-	sec->special = saveg_read16();		// needed?
-	sec->tag = saveg_read16();		// needed?
-	sec->specialdata = 0;
-	sec->soundtarget = 0;
+        sec->floorheight = saveg_read16() << FRACBITS;
+        sec->ceilingheight = saveg_read16() << FRACBITS;
+        sec->floorpic = saveg_read16();
+        sec->ceilingpic = saveg_read16();
+        sec->lightlevel = saveg_read16();
+        sec->special = saveg_read16();  // needed?
+        sec->tag = saveg_read16();      // needed?
+        sec->specialdata = 0;
+        sec->soundtarget = 0;
     }
-    
+
     // do lines
-    for (i=0, li = lines ; i<numlines ; i++,li++)
+    for (i=0, li = lines ; i<numlines ; i++, li++)
     {
-	li->flags = saveg_read16();
-	li->special = saveg_read16();
-	li->tag = saveg_read16();
-	for (j=0 ; j<2 ; j++)
-	{
-	    if (li->sidenum[j] == NO_INDEX)
-		continue;
-	    si = &sides[li->sidenum[j]];
-	    si->textureoffset = saveg_read16() << FRACBITS;
-	    si->rowoffset = saveg_read16() << FRACBITS;
-	    si->toptexture = saveg_read16();
-	    si->bottomtexture = saveg_read16();
-	    si->midtexture = saveg_read16();
-	}
+        li->flags = saveg_read16();
+        li->special = saveg_read16();
+        li->tag = saveg_read16();
+        for (j=0 ; j<2 ; j++)
+        {
+            if (li->sidenum[j] == NO_INDEX)
+            continue;
+            si = &sides[li->sidenum[j]];
+            si->textureoffset = saveg_read16() << FRACBITS;
+            si->rowoffset = saveg_read16() << FRACBITS;
+            si->toptexture = saveg_read16();
+            si->bottomtexture = saveg_read16();
+            si->midtexture = saveg_read16();
+        }
     }
+
     a = saveg_read8();
     b = saveg_read8();
     c = saveg_read8();
@@ -1647,12 +1669,10 @@ void P_UnArchiveWorld (void)
 }
 
 
-
-
-
-//
+// -----------------------------------------------------------------------------
 // Thinkers
-//
+// -----------------------------------------------------------------------------
+
 typedef enum
 {
     tc_end,
@@ -1661,26 +1681,24 @@ typedef enum
 } thinkerclass_t;
 
 
-//
+// -----------------------------------------------------------------------------
 // P_ArchiveThinkers
-//
+// -----------------------------------------------------------------------------
+
 void P_ArchiveThinkers (void)
 {
-    thinker_t*		th;
+    thinker_t *th;
 
     // save off the current thinkers
     for (th = thinkercap.next ; th != &thinkercap ; th=th->next)
     {
-	if (th->function.acp1 == (actionf_p1)P_MobjThinker)
-	{
+        if (th->function.acp1 == (actionf_p1)P_MobjThinker)
+        {
             saveg_write8(tc_mobj);
-	    saveg_write_pad();
+            saveg_write_pad();
             saveg_write_mobj_t((mobj_t *) th);
-
-	    continue;
-	}
-		
-	// I_Error ("P_ArchiveThinkers: Unknown thinker function");
+            continue;
+        }
     }
 
     // add a terminating marker
@@ -1688,101 +1706,105 @@ void P_ArchiveThinkers (void)
 }
 
 
-
-//
+// -----------------------------------------------------------------------------
 // P_UnArchiveThinkers
-//
+// -----------------------------------------------------------------------------
+
 void P_UnArchiveThinkers (void)
 {
-    byte		tclass;
-    thinker_t*		currentthinker;
-    thinker_t*		next;
-    mobj_t*		mobj;
-    
+    byte        tclass;
+    thinker_t  *currentthinker;
+    thinker_t  *next;
+    mobj_t     *mobj;
+
     // remove all the current thinkers
     currentthinker = thinkercap.next;
+
     while (currentthinker != &thinkercap)
     {
-	next = currentthinker->next;
-	
-	if (currentthinker->function.acp1 == (actionf_p1)P_MobjThinker)
-	    P_RemoveMobj ((mobj_t *)currentthinker);
-	else
-	    Z_Free (currentthinker);
+        next = currentthinker->next;
 
-	currentthinker = next;
+        if (currentthinker->function.acp1 == (actionf_p1)P_MobjThinker)
+        P_RemoveMobj ((mobj_t *)currentthinker);
+        else
+        Z_Free (currentthinker);
+
+        currentthinker = next;
     }
+
     P_InitThinkers ();
-    
+
     // read in saved thinkers
     while (1)
     {
-	tclass = saveg_read8();
-	switch (tclass)
-	{
-	  case tc_end:
-	    return; 	// end of list
-			
-	  case tc_mobj:
-	    saveg_read_pad();
-	    mobj = Z_Malloc (sizeof(*mobj), PU_LEVEL, NULL);
+        tclass = saveg_read8();
+        switch (tclass)
+        {
+            case tc_end:
+            return; // end of list
+
+            case tc_mobj:
+            saveg_read_pad();
+            mobj = Z_Malloc (sizeof(*mobj), PU_LEVEL, NULL);
             saveg_read_mobj_t(mobj);
 
-	    P_SetThingPosition (mobj);
-	    mobj->info = &mobjinfo[mobj->type];
+            P_SetThingPosition (mobj);
+            mobj->info = &mobjinfo[mobj->type];
 
-        // killough 2/28/98:
-        // Fix for falling down into a wall after savegame loaded:
-	    // mobj->floorz = mobj->subsector->sector->floorheight;
-	    // mobj->ceilingz = mobj->subsector->sector->ceilingheight;
+            // killough 2/28/98:
+            // Fix for falling down into a wall after savegame loaded:
+            // mobj->floorz = mobj->subsector->sector->floorheight;
+            // mobj->ceilingz = mobj->subsector->sector->ceilingheight;
 
-	    mobj->thinker.function.acp1 = (actionf_p1)P_MobjThinker;
-	    P_AddThinker (&mobj->thinker);
-	    break;
+            mobj->thinker.function.acp1 = (actionf_p1)P_MobjThinker;
+            P_AddThinker (&mobj->thinker);
+            break;
 
-	  default:
-	    I_Error ("Unknown tclass %i in savegame", tclass);
-	}
+            default:
+            I_Error ("Unknown tclass %i in savegame", tclass);
+        }
     }
 }
 
+
 int restoretargets_fail = 0;
 
-uint32_t P_ThinkerToIndex (thinker_t* thinker)
+uint32_t P_ThinkerToIndex (thinker_t *thinker)
 {
-    thinker_t*	th;
-    uint32_t	i;
+    thinker_t *th;
+    uint32_t   i;
 
     if (!thinker)
-	return 0;
+    return 0;
 
     for (th = thinkercap.next, i = 1; th != &thinkercap; th = th->next, i++)
     {
-	if (th->function.acp1 == (actionf_p1) P_MobjThinker)
-	{
-	    if (th == thinker)
-		return i;
-	}
+        if (th->function.acp1 == (actionf_p1) P_MobjThinker)
+        {
+            if (th == thinker)
+            return i;
+        }
     }
 
     return 0;
 }
 
-thinker_t* P_IndexToThinker (uint32_t index)
+
+thinker_t *P_IndexToThinker (uint32_t index)
 {
-    thinker_t*	th;
-    uint32_t	i;
+    thinker_t *th;
+    uint32_t   i;
 
     if (!index)
-	return NULL;
+    return NULL;
 
     for (th = thinkercap.next, i = 1; th != &thinkercap; th = th->next, i++)
     {
-	if (th->function.acp1 == (actionf_p1) P_MobjThinker)
-	{
-	    if (i == index)
-		return th;
-	}
+        if (th->function.acp1 == (actionf_p1) P_MobjThinker)
+        {
+            if (i == index)
+            return th;
+        }
     }
 
     restoretargets_fail++;
@@ -1790,33 +1812,50 @@ thinker_t* P_IndexToThinker (uint32_t index)
     return NULL;
 }
 
+
+// -----------------------------------------------------------------------------
+// P_RestoreTargets
+// -----------------------------------------------------------------------------
+
 void P_RestoreTargets (void)
 {
-    mobj_t*	mo;
-    thinker_t*	th;
-    uint32_t	i;
+    mobj_t     *mo;
+    thinker_t  *th;
+    uint32_t    i;
 
     for (th = thinkercap.next, i = 1; th != &thinkercap; th = th->next, i++)
     {
-	if (th->function.acp1 == (actionf_p1) P_MobjThinker)
-	{
-	    mo = (mobj_t*) th;
-	    mo->target = (mobj_t*) P_IndexToThinker((uintptr_t) mo->target);
-	    mo->tracer = (mobj_t*) P_IndexToThinker((uintptr_t) mo->tracer);
-	}
+        if (th->function.acp1 == (actionf_p1) P_MobjThinker)
+        {
+            mo = (mobj_t*) th;
+            mo->target = (mobj_t*) P_IndexToThinker((uintptr_t) mo->target);
+            mo->tracer = (mobj_t*) P_IndexToThinker((uintptr_t) mo->tracer);
+        }
     }
 
     if (restoretargets_fail)
     {
-	printf ("P_RestoreTargets: Failed to restore %d target thinkers.\n",
-            restoretargets_fail);
-	restoretargets_fail = 0;
+        printf ("P_RestoreTargets: Failed to restore %d target thinkers.\n",
+                restoretargets_fail);
+        restoretargets_fail = 0;
     }
 }
 
-//
+
+// -----------------------------------------------------------------------------
 // P_ArchiveSpecials
 //
+// Things to handle:
+//
+// T_MoveCeiling, (ceiling_t: sector_t * swizzle), - active list
+// T_VerticalDoor, (vldoor_t: sector_t * swizzle),
+// T_MoveFloor, (floormove_t: sector_t * swizzle),
+// T_LightFlash, (lightflash_t: sector_t * swizzle),
+// T_StrobeFlash, (strobe_t: sector_t *),
+// T_Glow, (glow_t: sector_t *),
+// T_PlatRaise, (plat_t: sector_t *), - active list
+// -----------------------------------------------------------------------------
+
 enum
 {
     tc_ceiling,
@@ -1832,125 +1871,111 @@ enum
 
 } specials_e;	
 
-
-
-//
-// Things to handle:
-//
-// T_MoveCeiling, (ceiling_t: sector_t * swizzle), - active list
-// T_VerticalDoor, (vldoor_t: sector_t * swizzle),
-// T_MoveFloor, (floormove_t: sector_t * swizzle),
-// T_LightFlash, (lightflash_t: sector_t * swizzle),
-// T_StrobeFlash, (strobe_t: sector_t *),
-// T_Glow, (glow_t: sector_t *),
-// T_PlatRaise, (plat_t: sector_t *), - active list
-//
 void P_ArchiveSpecials (void)
 {
-    thinker_t*		th;
-    int			i;
-    button_t		*button_ptr;
-	
+    thinker_t *th;
+    int        i;
+    button_t  *button_ptr;
+
     // save off the current thinkers
     for (th = thinkercap.next ; th != &thinkercap ; th=th->next)
     {
-	if (th->function.acv == (actionf_v)NULL)
-	{
-	    for (i = 0; i < MAXCEILINGS;i++)
-		if (activeceilings[i] == (ceiling_t *)th)
-		    break;
-	    
-	    if (i<MAXCEILINGS)
-	    {
+        if (th->function.acv == (actionf_v)NULL)
+        {
+            for (i = 0; i < MAXCEILINGS;i++)
+                if (activeceilings[i] == (ceiling_t *)th)
+                    break;
+
+            if (i<MAXCEILINGS)
+            {
                 saveg_write8(tc_ceiling);
-		saveg_write_pad();
+                saveg_write_pad();
                 saveg_write_ceiling_t((ceiling_t *) th);
-	    }
-        
-        // [JN] Исправление проблемы с поломкой лифта при сохранении игры
-        // [crispy] save plats in statis
-	    for (i = 0; i < MAXPLATS; i++)
-		if (activeplats[i] == (plat_t *)th)
-		    break;
+            }
 
-	    if (i < MAXPLATS)
-	    {
-		saveg_write8(tc_plat);
-		saveg_write_pad();
-		saveg_write_plat_t((plat_t *)th);
-	    }
+            // [crispy] save plats in statis
+            for (i = 0; i < MAXPLATS; i++)
+                if (activeplats[i] == (plat_t *)th)
+                    break;
 
-	    continue;
-	}
-			
-	if (th->function.acp1 == (actionf_p1)T_MoveCeiling)
-	{
+            if (i < MAXPLATS)
+            {
+                saveg_write8(tc_plat);
+                saveg_write_pad();
+                saveg_write_plat_t((plat_t *)th);
+            }
+
+            continue;
+        }
+
+        if (th->function.acp1 == (actionf_p1)T_MoveCeiling)
+        {
             saveg_write8(tc_ceiling);
-	    saveg_write_pad();
+            saveg_write_pad();
             saveg_write_ceiling_t((ceiling_t *) th);
-	    continue;
-	}
-			
-	if (th->function.acp1 == (actionf_p1)T_VerticalDoor)
-	{
+            continue;
+        }
+
+        if (th->function.acp1 == (actionf_p1)T_VerticalDoor)
+        {
             saveg_write8(tc_door);
-	    saveg_write_pad();
+            saveg_write_pad();
             saveg_write_vldoor_t((vldoor_t *) th);
-	    continue;
-	}
-			
-	if (th->function.acp1 == (actionf_p1)T_MoveFloor)
-	{
+            continue;
+        }
+
+        if (th->function.acp1 == (actionf_p1)T_MoveFloor)
+        {
             saveg_write8(tc_floor);
-	    saveg_write_pad();
+            saveg_write_pad();
             saveg_write_floormove_t((floormove_t *) th);
-	    continue;
-	}
-			
-	if (th->function.acp1 == (actionf_p1)T_PlatRaise)
-	{
+            continue;
+        }
+
+        if (th->function.acp1 == (actionf_p1)T_PlatRaise)
+        {
             saveg_write8(tc_plat);
-	    saveg_write_pad();
+            saveg_write_pad();
             saveg_write_plat_t((plat_t *) th);
-	    continue;
-	}
-			
-	if (th->function.acp1 == (actionf_p1)T_LightFlash)
-	{
+            continue;
+        }
+
+        if (th->function.acp1 == (actionf_p1)T_LightFlash)
+        {
             saveg_write8(tc_flash);
-	    saveg_write_pad();
+            saveg_write_pad();
             saveg_write_lightflash_t((lightflash_t *) th);
-	    continue;
-	}
-			
-	if (th->function.acp1 == (actionf_p1)T_StrobeFlash)
-	{
+            continue;
+        }
+
+        if (th->function.acp1 == (actionf_p1)T_StrobeFlash)
+        {
             saveg_write8(tc_strobe);
-	    saveg_write_pad();
+            saveg_write_pad();
             saveg_write_strobe_t((strobe_t *) th);
-	    continue;
-	}
-			
-	if (th->function.acp1 == (actionf_p1)T_Glow)
-	{
+            continue;
+        }
+
+        if (th->function.acp1 == (actionf_p1)T_Glow)
+        {
             saveg_write8(tc_glow);
-	    saveg_write_pad();
+            saveg_write_pad();
             saveg_write_glow_t((glow_t *) th);
-	    continue;
-	}
+            continue;
+        }
 
-    if (th->function.acp1 == (actionf_p1)T_FireFlicker)
-    {
+        if (th->function.acp1 == (actionf_p1)T_FireFlicker)
+        {
             saveg_write8(tc_fireflicker);
-        saveg_write_pad();
+            saveg_write_pad();
             saveg_write_fireflicker_t((fireflicker_t *)th);
-        continue;
+            continue;
+        }
     }
 
-    }
-    
     button_ptr = buttonlist;
     i = MAXBUTTONS;
+
     do
     {
         if (button_ptr->btimer != 0)
@@ -1961,129 +1986,130 @@ void P_ArchiveSpecials (void)
         }
         button_ptr++;
     } while (--i);
-	
+
     // add a terminating marker
     saveg_write8(tc_endspecials);
-
 }
 
-// [JN] Сохранение текстур кнопок и переключателей.
+
+// -----------------------------------------------------------------------------
+// P_StartButton
+//
+// [Julia] Save pressed button texture in saved ga,e
 // Thanks Brad Harding for the code and Jeff Doggett for optimization!
+// -----------------------------------------------------------------------------
+
 void P_StartButton(line_t *line, bwhere_e w, int texture, int time);
 
-//
+
+// -----------------------------------------------------------------------------
 // P_UnArchiveSpecials
-//
+// -----------------------------------------------------------------------------
+
 void P_UnArchiveSpecials (void)
 {
     byte            tclass;
-    ceiling_t*      ceiling;
-    vldoor_t*       door;
-    floormove_t*    floor;
-    plat_t*         plat;
-    lightflash_t*   flash;
-    strobe_t*       strobe;
-    glow_t*         glow;
-    fireflicker_t*  fireflicker;
+    ceiling_t      *ceiling;
+    vldoor_t       *door;
+    floormove_t    *floor;
+    plat_t         *plat;
+    lightflash_t   *flash;
+    strobe_t       *strobe;
+    glow_t         *glow;
+    fireflicker_t  *fireflicker;
     button_t        button;
-	
+
     // read in saved thinkers
     while (1)
     {
-	tclass = saveg_read8();
+        tclass = saveg_read8();
 
-	switch (tclass)
-	{
-	  case tc_endspecials:
-	    return;	// end of list
+        switch (tclass)
+        {
+            case tc_endspecials:
+            return;	// end of list
 			
-	  case tc_ceiling:
-	    saveg_read_pad();
-	    ceiling = Z_Malloc (sizeof(*ceiling), PU_LEVEL, NULL);
-            saveg_read_ceiling_t(ceiling);
-	    ceiling->sector->specialdata = ceiling;
+            case tc_ceiling:
+            saveg_read_pad();
+            ceiling = Z_Malloc (sizeof(*ceiling), PU_LEVEL, NULL);
+                saveg_read_ceiling_t(ceiling);
+            ceiling->sector->specialdata = ceiling;
+            if (ceiling->thinker.function.acp1)
+                ceiling->thinker.function.acp1 = (actionf_p1)T_MoveCeiling;
+            P_AddThinker (&ceiling->thinker);
+            P_AddActiveCeiling(ceiling);
+            break;
 
-	    if (ceiling->thinker.function.acp1)
-		ceiling->thinker.function.acp1 = (actionf_p1)T_MoveCeiling;
+            case tc_door:
+            saveg_read_pad();
+            door = Z_Malloc (sizeof(*door), PU_LEVEL, NULL);
+                saveg_read_vldoor_t(door);
+            door->sector->specialdata = door;
+            door->thinker.function.acp1 = (actionf_p1)T_VerticalDoor;
+            P_AddThinker (&door->thinker);
+            break;
 
-	    P_AddThinker (&ceiling->thinker);
-	    P_AddActiveCeiling(ceiling);
-	    break;
+            case tc_floor:
+            saveg_read_pad();
+            floor = Z_Malloc (sizeof(*floor), PU_LEVEL, NULL);
+                saveg_read_floormove_t(floor);
+            floor->sector->specialdata = floor;
+            floor->thinker.function.acp1 = (actionf_p1)T_MoveFloor;
+            P_AddThinker (&floor->thinker);
+            break;
 				
-	  case tc_door:
-	    saveg_read_pad();
-	    door = Z_Malloc (sizeof(*door), PU_LEVEL, NULL);
-            saveg_read_vldoor_t(door);
-	    door->sector->specialdata = door;
-	    door->thinker.function.acp1 = (actionf_p1)T_VerticalDoor;
-	    P_AddThinker (&door->thinker);
-	    break;
-				
-	  case tc_floor:
-	    saveg_read_pad();
-	    floor = Z_Malloc (sizeof(*floor), PU_LEVEL, NULL);
-            saveg_read_floormove_t(floor);
-	    floor->sector->specialdata = floor;
-	    floor->thinker.function.acp1 = (actionf_p1)T_MoveFloor;
-	    P_AddThinker (&floor->thinker);
-	    break;
-				
-	  case tc_plat:
-	    saveg_read_pad();
-	    plat = Z_Malloc (sizeof(*plat), PU_LEVEL, NULL);
-            saveg_read_plat_t(plat);
-	    plat->sector->specialdata = plat;
+            case tc_plat:
+            saveg_read_pad();
+            plat = Z_Malloc (sizeof(*plat), PU_LEVEL, NULL);
+                saveg_read_plat_t(plat);
+            plat->sector->specialdata = plat;
+            if (plat->thinker.function.acp1)
+                plat->thinker.function.acp1 = (actionf_p1)T_PlatRaise;
+            P_AddThinker (&plat->thinker);
+            P_AddActivePlat(plat);
+            break;
 
-	    if (plat->thinker.function.acp1)
-		plat->thinker.function.acp1 = (actionf_p1)T_PlatRaise;
+            case tc_flash:
+            saveg_read_pad();
+            flash = Z_Malloc (sizeof(*flash), PU_LEVEL, NULL);
+                saveg_read_lightflash_t(flash);
+            flash->thinker.function.acp1 = (actionf_p1)T_LightFlash;
+            P_AddThinker (&flash->thinker);
+            break;
 
-	    P_AddThinker (&plat->thinker);
-	    P_AddActivePlat(plat);
-	    break;
-				
-	  case tc_flash:
-	    saveg_read_pad();
-	    flash = Z_Malloc (sizeof(*flash), PU_LEVEL, NULL);
-            saveg_read_lightflash_t(flash);
-	    flash->thinker.function.acp1 = (actionf_p1)T_LightFlash;
-	    P_AddThinker (&flash->thinker);
-	    break;
-				
-	  case tc_strobe:
-	    saveg_read_pad();
-	    strobe = Z_Malloc (sizeof(*strobe), PU_LEVEL, NULL);
-            saveg_read_strobe_t(strobe);
-	    strobe->thinker.function.acp1 = (actionf_p1)T_StrobeFlash;
-	    P_AddThinker (&strobe->thinker);
-	    break;
-				
-	  case tc_glow:
-	    saveg_read_pad();
-	    glow = Z_Malloc (sizeof(*glow), PU_LEVEL, NULL);
-            saveg_read_glow_t(glow);
-	    glow->thinker.function.acp1 = (actionf_p1)T_Glow;
-	    P_AddThinker (&glow->thinker);
-	    break;
-        
-      case tc_fireflicker:
-        saveg_read_pad();
-        fireflicker = Z_Malloc(sizeof(*fireflicker), PU_LEVEL, NULL);
-            saveg_read_fireflicker_t(fireflicker);
-        fireflicker->thinker.function.acp1 = (actionf_p1)T_FireFlicker;
-        P_AddThinker(&fireflicker->thinker);
-        break;
+            case tc_strobe:
+            saveg_read_pad();
+            strobe = Z_Malloc (sizeof(*strobe), PU_LEVEL, NULL);
+                saveg_read_strobe_t(strobe);
+            strobe->thinker.function.acp1 = (actionf_p1)T_StrobeFlash;
+            P_AddThinker (&strobe->thinker);
+            break;
 
-      case tc_button:
-        saveg_read_pad();
-            saveg_read_button_t(&button);
-        P_StartButton(button.line, button.where, button.btexture, button.btimer);
-        break;
-				
-	  default:
-	    I_Error ("P_UnarchiveSpecials: Unknown tclass %i in savegame", tclass);
-	}
-	
+            case tc_glow:
+            saveg_read_pad();
+            glow = Z_Malloc (sizeof(*glow), PU_LEVEL, NULL);
+                saveg_read_glow_t(glow);
+            glow->thinker.function.acp1 = (actionf_p1)T_Glow;
+            P_AddThinker (&glow->thinker);
+            break;
+
+            case tc_fireflicker:
+            saveg_read_pad();
+            fireflicker = Z_Malloc(sizeof(*fireflicker), PU_LEVEL, NULL);
+                saveg_read_fireflicker_t(fireflicker);
+            fireflicker->thinker.function.acp1 = (actionf_p1)T_FireFlicker;
+            P_AddThinker(&fireflicker->thinker);
+            break;
+
+            case tc_button:
+            saveg_read_pad();
+                saveg_read_button_t(&button);
+            P_StartButton(button.line, button.where, button.btexture, button.btimer);
+            break;
+
+            default:
+            I_Error ("P_UnarchiveSpecials: Unknown tclass %i in savegame", tclass);
+        }
     }
-
 }
 

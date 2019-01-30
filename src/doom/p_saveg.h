@@ -1,6 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2018-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -12,17 +13,13 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// DESCRIPTION:
-//	Savegame I/O, archiving, persistence.
-//
-
-// Russian Doom (C) 2016-2018 Julian Nechaevsky
 
 
 #ifndef __P_SAVEG__
 #define __P_SAVEG__
 
 #include <stdio.h>
+
 
 #define SAVEGAME_EOF 0x1d
 #define VERSIONSIZE 16
@@ -67,7 +64,7 @@ void P_RestoreTargets (void);
 extern FILE *save_stream;
 extern boolean savegame_error;
 
-// [from crispy]
+// [Julia] From Crispy Doom
 extern void M_ConfirmDeleteGame (void);
 
 
