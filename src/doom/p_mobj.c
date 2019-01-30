@@ -547,26 +547,6 @@ void P_MobjThinker (mobj_t *mobj)
         if (!mobj->tics && !P_SetMobjState (mobj, mobj->state->nextstate) )
         return;     // freed itself
     }
-    else
-    {
-        // check for nightmare respawn
-        if (!(mobj->flags & MF_COUNTKILL))
-        return;
-
-        if (!respawnmonsters)
-        return;
-
-        mobj->movecount++;
-
-        if (mobj->movecount < 12*TICRATE)
-        return;
-
-        if (leveltime&31)
-        return;
-
-        if (P_Random () > 4)
-        return;
-    }
 }
 
 
@@ -655,27 +635,8 @@ mobj_t *P_SpawnMobj(fixed_t x, fixed_t y, fixed_t z, mobjtype_t type)
 // P_RemoveMobj
 // -----------------------------------------------------------------------------
 
-mapthing_t  itemrespawnque[ITEMQUESIZE];
-int         itemrespawntime[ITEMQUESIZE];
-int         iquehead;
-int         iquetail;
-
 void P_RemoveMobj (mobj_t *mobj)
 {
-    if ((mobj->flags & MF_SPECIAL)
-    && !(mobj->flags & MF_DROPPED)
-    && (mobj->type != MT_INV)
-    && (mobj->type != MT_INS))
-    {
-        itemrespawnque[iquehead] = mobj->spawnpoint;
-        itemrespawntime[iquehead] = leveltime;
-        iquehead = (iquehead+1)&(ITEMQUESIZE-1);
-
-        // lose one off the end?
-        if (iquehead == iquetail)
-            iquetail = (iquetail+1)&(ITEMQUESIZE-1);
-    }
-    
     P_UnsetThingPosition (mobj);        // unlink from sector and block lists
     S_StopSound (mobj);                 // stop any playing sound
     P_RemoveThinker ((thinker_t*)mobj); // free block

@@ -71,7 +71,6 @@
 // =============================================================================
 
 void D_DoomLoop (void);
-void D_ConnectNetGame(void);
 void D_CheckNetGame(void);
 void R_ExecuteSetViewSize (void);
 
@@ -82,8 +81,6 @@ char *savegamedir;      // Location where savegames are stored
 char *iwadfile;         // location of IWAD and WAD files
 
 boolean devparm;        // started game with -devparm
-boolean nomonsters;     // checkparm of -nomonsters
-boolean respawnparm;    // checkparm of -respawn
 boolean fastparm;       // checkparm of -fast
 boolean autostart;
 boolean advancedemo;
@@ -631,14 +628,6 @@ void D_DoomMain (void)
     I_InitJoystick();
     I_InitSound(true);
     I_InitMusic();
-
-#ifdef FEATURE_MULTIPLAYER
-    printf ("NET_Init: Init network subsystem.\n");
-    NET_Init ();
-#endif
-
-    // Initial netgame startup. Connect to server etc.
-    D_ConnectNetGame();
 
     // get skill / episode / map from parms
     startskill = sk_medium;

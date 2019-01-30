@@ -100,11 +100,6 @@ mobj_t **blocklinks;    // for thing chains
 byte *rejectmatrix;
 
 
-// Maintain single and multi player starting spots.
-#define MAX_DEATHMATCH_STARTS	10
-
-mapthing_t  deathmatchstarts[MAX_DEATHMATCH_STARTS];
-mapthing_t *deathmatch_p;
 mapthing_t  playerstarts[MAXPLAYERS];
 boolean     playerstartsingame[MAXPLAYERS];
 
@@ -1031,12 +1026,8 @@ void P_SetupLevel (int episode, int map, int playermask, skill_t skill)
     memset(st_keyorskull, 0, sizeof(st_keyorskull));
 
     bodyqueslot = 0;
-    deathmatch_p = deathmatchstarts;
     P_LoadThings (lumpnum+ML_THINGS);
     
-    // clear special respawning que
-    iquehead = iquetail = 0;		
-
     // set up world state
     P_SpawnSpecials ();
 

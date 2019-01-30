@@ -76,7 +76,6 @@ gamestate_t     oldgamestate;
 gameaction_t    gameaction;
 gamestate_t     gamestate;
 skill_t         gameskill;
-boolean         respawnmonsters;
 int             gameepisode;
 int             gamemap;
 
@@ -97,7 +96,6 @@ int             starttime;  // for comparative timing purposes
 
 boolean         viewactive;
 
-int             deathmatch; // only if started as net death
 boolean         netgame;    // only true if packets are broadcast
 boolean         playeringame[MAXPLAYERS];
 player_t        players[MAXPLAYERS];
@@ -1612,7 +1610,6 @@ void G_DoNewGame (void)
     demoplayback = false; 
     netdemo = false;
     netgame = false;
-    deathmatch = false;
     playeringame[1] = playeringame[2] = playeringame[3] = 0;
     // [crispy] do not reset -respawn, -fast and -nomonsters parameters
     /*

@@ -111,14 +111,11 @@ static void LoadGameSettings(net_gamesettings_t *settings)
 {
     unsigned int i;
 
-    deathmatch = settings->deathmatch;
     startepisode = settings->episode;
     startmap = settings->map;
     startskill = settings->skill;
     startloadgame = settings->loadgame;
-    nomonsters = settings->nomonsters;
     fastparm = settings->fast_monsters;
-    respawnparm = settings->respawn_monsters;
     consoleplayer = settings->consoleplayer;
 
     for (i = 0; i < MAXPLAYERS; ++i)
@@ -140,57 +137,12 @@ static void SaveGameSettings(net_gamesettings_t *settings)
     // Fill in game settings structure with appropriate parameters
     // for the new game
 
-    settings->deathmatch = deathmatch;
     settings->episode = startepisode;
     settings->map = startmap;
     settings->skill = startskill;
     settings->loadgame = startloadgame;
     settings->gameversion = gameversion;
-    settings->nomonsters = nomonsters;
     settings->fast_monsters = fastparm;
-    settings->respawn_monsters = respawnparm;
-}
-
-
-// -----------------------------------------------------------------------------
-// InitConnectData
-// -----------------------------------------------------------------------------
-
-static void InitConnectData(net_connect_data_t *connect_data)
-{
-    connect_data->max_players = MAXPLAYERS;
-    connect_data->drone = false;
-
-    //
-    // Connect data
-    //
-
-    // Game type fields:
-
-    connect_data->gamemode = gamemode;
-    connect_data->gamemission = gamemission;
-
-    // Read checksums of our WAD directory and dehacked information
-
-    W_Checksum(connect_data->wad_sha1sum);
-    DEH_Checksum(connect_data->deh_sha1sum);
-
-    // Are we playing with the Freedoom IWAD?
-
-    connect_data->is_freedoom = W_CheckNumForName("FREEDOOM") >= 0;
-}
-
-
-// -----------------------------------------------------------------------------
-// D_ConnectNetGame
-// -----------------------------------------------------------------------------
-
-void D_ConnectNetGame(void)
-{
-    net_connect_data_t connect_data;
-
-    InitConnectData(&connect_data);
-    netgame = D_InitNetGame(&connect_data);
 }
 
 
@@ -203,11 +155,6 @@ void D_ConnectNetGame(void)
 void D_CheckNetGame (void)
 {
     net_gamesettings_t settings;
-
-    if (netgame)
-    {
-        autostart = true;
-    }
 
     D_RegisterLoopCallbacks(&doom_loop_interface);
 

@@ -160,7 +160,6 @@ static boolean st_statusbaron;   // whether left-side main status bar is active
 static boolean st_chat;          // whether status bar chat is active
 static boolean st_oldchat;       // value of st_chat before message popped up
 static boolean st_cursoron;      // whether chat window has the cursor on
-static boolean st_notdeathmatch; // !deathmatch
 static boolean st_armson;        // !deathmatch && st_statusbaron
 
 static patch_t *sbar;                   // main bar left
@@ -756,11 +755,8 @@ void ST_updateWidgets(void)
     // refresh everything if this is him coming back to life
     ST_updateFaceWidget();
 
-    // used by the w_armsbg widget
-    st_notdeathmatch = !deathmatch;
-
     // used by w_arms[] widgets
-    st_armson = st_statusbaron && !deathmatch; 
+    st_armson = st_statusbaron;
 
     // get rid of chat window if up because of message
     if (!--st_msgcounter)
@@ -860,7 +856,7 @@ void ST_drawWidgets (boolean refresh)
     int     i;
 
     // used by w_arms[] widgets
-    st_armson = st_statusbaron && !deathmatch;
+    st_armson = st_statusbaron;
 
     STlib_updateNum(&w_ready, refresh);
 
