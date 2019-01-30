@@ -197,7 +197,7 @@ void T_MoveFloor(floormove_t *floor)
                       floor->floordestheight,
                       floor->crush,0,floor->direction);
 
-    // [Julia] TODO: Jaguar using gametic&3 instead of leveltime&7 -- hmm?
+    // [Julia] Jaguar using gametic&3 instead of leveltime&7 -- hmm?
     if (!(leveltime&7))
     S_StartSound(&floor->sector->soundorg, sfx_stnmov);
 

@@ -172,8 +172,7 @@ void M_QuickSave(void);
 void M_QuickLoad(void);
 
 void M_DrawMainMenu(void);
-void M_DrawReadThis1(void);
-void M_DrawReadThis2(void);
+void M_DrawReadThis(void);
 void M_DrawNewGame(void);
 void M_DrawEpisode(void);
 void M_DrawOptions(void);
@@ -341,7 +340,7 @@ menu_t  ReadDef1 =
     read1_end,
     &MainDef,
     ReadMenu1,
-    M_DrawReadThis1,
+    M_DrawReadThis,
     280,185,
     0
 };
@@ -355,16 +354,6 @@ enum
 menuitem_t ReadMenu2[]=
 {
     {1,"",M_FinishReadThis,0}
-};
-
-menu_t  ReadDef2 =
-{
-    read2_end,
-    &ReadDef1,
-    ReadMenu2,
-    M_DrawReadThis2,
-    330,175,
-    0
 };
 
 
@@ -873,7 +862,7 @@ void M_QuickLoad(void)
 // [Julia] Jaguar HELP screen and skull placement.
 // -----------------------------------------------------------------------------
 
-void M_DrawReadThis1(void)
+void M_DrawReadThis(void)
 {
     inhelpscreens = true;
     
@@ -882,15 +871,6 @@ void M_DrawReadThis1(void)
 
     ReadDef1.x = 329;
     ReadDef1.y = 182;
-}
-
-
-//
-// Read This Menus - optional second page.
-//
-void M_DrawReadThis2(void)
-{
-    // [Julia] TODO - REMOVE
 }
 
 
@@ -1692,12 +1672,7 @@ boolean M_Responder (event_t *ev)
         else if (key == key_menu_help)     // Help key
         {
         M_StartControlPanel ();
-
-        if ( gamemode == retail )
-            currentMenu = &ReadDef2;
-        else
-            currentMenu = &ReadDef1;
-
+        currentMenu = &ReadDef1;
         itemOn = 0;
         S_StartSound(NULL,sfx_swtchn);
         return true;

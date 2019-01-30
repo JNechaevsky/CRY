@@ -14,7 +14,6 @@
 // GNU General Public License for more details.
 //
 
-// [Julia] TODO - more chat cleanup
 
 #include <ctype.h>
 #include <time.h>
@@ -404,17 +403,6 @@ char HU_dequeueChatChar(void)
 
 
 // -----------------------------------------------------------------------------
-// StopChatInput
-// -----------------------------------------------------------------------------
-
-static void StopChatInput(void)
-{
-    chat_on = false;
-    I_StopTextInput();
-}
-
-
-// -----------------------------------------------------------------------------
 // HU_Responder
 // -----------------------------------------------------------------------------
 
@@ -422,10 +410,7 @@ boolean HU_Responder(event_t *ev)
 {
     int             i;
     int             numplayers;
-    unsigned char   c;
     boolean         eatkey = false;
-    static char     lastmessage[HU_MAXLINELENGTH+1];
-    static boolean  altdown = false;
 
     numplayers = 0;
 
@@ -438,7 +423,6 @@ boolean HU_Responder(event_t *ev)
     }
     else if (ev->data1 == KEY_RALT || ev->data1 == KEY_LALT)
     {
-        altdown = ev->type == ev_keydown;
         return false;
     }
 
@@ -452,56 +436,6 @@ boolean HU_Responder(event_t *ev)
             message_on = true;
             message_counter = HU_MSGTIMEOUT;
             eatkey = true;
-        }
-    }
-    else
-    {
-        // send a macro
-        if (altdown)
-        {
-            c = ev->data1 - '0';
-            if (c > 9)
-            return false;
-            // fprintf(stderr, "got here\n");
-            // [Julia] TODO - REMOVE
-            // macromessage = chat_macros[c];
-
-            // kill last message with a '\n'
-            HU_queueChatChar(KEY_ENTER); // DEBUG!!!
-
-            // leave chat mode and notify that it was sent
-            StopChatInput();
-            // [Julia] TODO - REMOVE
-            // M_StringCopy(lastmessage, chat_macros[c], sizeof(lastmessage));
-            plr->message = lastmessage;
-            eatkey = true;
-        }
-        else
-        {
-            c = ev->data3;
-        
-            eatkey = HUlib_keyInIText(&w_chat, c);
-            if (eatkey)
-            {
-                // static unsigned char buf[20]; // DEBUG
-                HU_queueChatChar(c);
-        
-                // M_snprintf(buf, sizeof(buf), "KEY: %d => %d", ev->data1, c);
-                //        plr->message = buf;
-            }
-            if (c == KEY_ENTER)
-            {
-                StopChatInput();
-                if (w_chat.l.len)
-                {
-                    M_StringCopy(lastmessage, w_chat.l.l, sizeof(lastmessage));
-                    plr->message = lastmessage;
-                }
-            }
-            else if (c == KEY_ESCAPE)
-            {
-                StopChatInput();
-            }
         }
     }
 
