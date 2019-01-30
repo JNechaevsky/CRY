@@ -359,8 +359,8 @@ boolean ST_Responder (event_t* ev)
             }
 
             // [crispy] implement Boom's "tntem" cheat
-            // [Julia] TODO: remove or allow only in -devparm
-            else if (cht_CheckCheat(&cheat_massacre, ev->data2))
+            // [Julia] Allowed only in "-devparm" mode
+            else if (devparm && cht_CheckCheat(&cheat_massacre, ev->data2))
             {
                 ST_cheat_massacre();
                 plyr->message = DEH_String(STSTR_MASSACRE);
