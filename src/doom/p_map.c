@@ -317,12 +317,18 @@ boolean PIT_CheckThing (mobj_t *thing)
 
         P_DamageMobj (thing, tmthing, tmthing, damage);
 
+        // [Julia] Fix: https://doomwiki.org/wiki/Lost_soul_colliding_with_items
+        // Allow Lost Souls to fly through non-solid things while attacking.
+        // Thanks to AXDOOMER for this!
+        
+        /* 
         tmthing->flags &= ~MF_SKULLFLY;
         tmthing->momx = tmthing->momy = tmthing->momz = 0;
 
         P_SetMobjState (tmthing, tmthing->info->spawnstate);
 
         return false;   // stop moving
+        */
     }
 
     
