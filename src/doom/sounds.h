@@ -99,6 +99,7 @@ typedef enum
     sfx_dmpain,
     sfx_popain,
     sfx_slop,
+    sfx_slop2,
     sfx_itemup,
     sfx_wpnup,
     sfx_oof,

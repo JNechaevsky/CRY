@@ -105,6 +105,7 @@ sfxinfo_t S_sfx[] =
     SOUND("dmpain",   96),
     SOUND("popain",   96),
     SOUND("slop",     78),
+    SOUND("slop2",    78),
     SOUND("itemup",   78),
     SOUND("wpnup",    78),
     SOUND("oof",      96),
