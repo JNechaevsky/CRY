@@ -666,6 +666,7 @@ void D_DoomMain (void)
         startmap = atoi (myargv[p+1]);
         gameaction = ga_newgame;
         autostart = true;
+        player_is_cheater = true; // [Julia] Consider warping as a cheat
     }
 
     // Undocumented:
