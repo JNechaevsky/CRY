@@ -60,7 +60,8 @@ void ConfigSound(void)
 
     window = TXT_NewWindow("Sound configuration");
 
-    TXT_SetWindowHelpURL(window, WINDOW_HELP_URL);
+    // [Julia] Not used
+    // TXT_SetWindowHelpURL(window, WINDOW_HELP_URL);
 
     TXT_SetColumnWidths(window, 35);
     TXT_SetWindowPosition(window, TXT_HORIZ_CENTER, TXT_VERT_TOP,

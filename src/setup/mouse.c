@@ -87,7 +87,8 @@ static void ConfigExtraButtons(TXT_UNCAST_ARG(widget), TXT_UNCAST_ARG(unused))
     
     window = TXT_NewWindow("Additional mouse buttons");
 
-    TXT_SetWindowHelpURL(window, WINDOW_HELP_URL);
+    // [Julia] Not used
+    // TXT_SetWindowHelpURL(window, WINDOW_HELP_URL);
 
     TXT_SetWindowAction(window, TXT_HORIZ_LEFT, TXT_NewWindowAbortAction(window));
     TXT_SetWindowAction(window, TXT_HORIZ_RIGHT, TXT_NewWindowSelectAction(window));
@@ -119,7 +120,8 @@ void ConfigMouse(void)
     TXT_SetWindowAction(window, TXT_HORIZ_CENTER, TestConfigAction());
     TXT_SetWindowAction(window, TXT_HORIZ_RIGHT, TXT_NewWindowSelectAction(window));
 
-    TXT_SetWindowHelpURL(window, WINDOW_HELP_URL);
+    // [Julia] Not used
+    // TXT_SetWindowHelpURL(window, WINDOW_HELP_URL);
 
     TXT_AddWidgets(window,
         TXT_NewCheckBox("Enable mouse", &usemouse),

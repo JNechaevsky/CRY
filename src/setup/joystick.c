@@ -896,7 +896,8 @@ void ConfigJoystick(void)
     TXT_SetTableColumns(window, 6);
     TXT_SetColumnWidths(window, 18, 10, 1, 15, 10, 0);
 
-    TXT_SetWindowHelpURL(window, WINDOW_HELP_URL);
+    // [Julia] Not used
+    // TXT_SetWindowHelpURL(window, WINDOW_HELP_URL);
 
     TXT_AddWidgets(window,
         TXT_NewLabel("Controller"),

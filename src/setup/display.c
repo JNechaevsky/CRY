@@ -190,7 +190,8 @@ void ConfigDisplay(void)
 
     window = TXT_NewWindow("Display Configuration");
 
-    TXT_SetWindowHelpURL(window, WINDOW_HELP_URL);
+    // [Julia] Not used
+    // TXT_SetWindowHelpURL(window, WINDOW_HELP_URL);
 
     // Build window:
 

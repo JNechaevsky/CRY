@@ -178,7 +178,8 @@ void MainMenu(void)
 
     window = TXT_NewWindow("Main Menu");
 
-    TXT_SetWindowHelpURL(window, WINDOW_HELP_URL);
+    // [Julia] Not used
+    // TXT_SetWindowHelpURL(window, WINDOW_HELP_URL);
 
     TXT_AddWidgets(window,
 
