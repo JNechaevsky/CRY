@@ -48,7 +48,7 @@
 #define WI_SPACINGY     33
 
 // SINGPLE-PLAYER STUFF
-#define SP_STATSX       50
+#define SP_STATSX       60
 #define SP_STATSY       50
 #define SP_TIMEX        16
 #define SP_TIMEY        (ORIGHEIGHT-32)
@@ -344,8 +344,8 @@ static boolean  snl_pointeron = false;
 
 void WI_drawShowNextLoc(void)
 {
-    // [Julia] Just clean up intermission stats
-    WI_slamBackground(); 
+    // [Julia] Don't erase intermission stats.
+    // WI_slamBackground();
 }
 
 
@@ -496,19 +496,19 @@ void WI_drawStats(void)
     }
 
     // Kills
-    HU_WriteTextBig(91, 50, "Kills");
+    HU_WriteTextBig(71, 50, "Kills");
     WI_drawPercent(ORIGWIDTH - SP_STATSX, SP_STATSY, cnt_kills[0]);
 
     // Items
-    HU_WriteTextBig(86, 68, "Items");
+    HU_WriteTextBig(66, 68, "Items");
     WI_drawPercent(ORIGWIDTH - SP_STATSX, SP_STATSY+lh, cnt_items[0]);
 
     // Secrets
-    HU_WriteTextBig(50, 86, "Secrets");
+    HU_WriteTextBig(30, 86, "Secrets");
     WI_drawPercent(ORIGWIDTH - SP_STATSX, SP_STATSY+2*lh, cnt_secret[0]);
 
     // Time
-    HU_WriteTextBig(94, 113, "Time");
+    HU_WriteTextBig(74, 113, "Time");
     WI_drawTime(ORIGWIDTH - SP_STATSX, SP_STATSY+4*lh-8+2, cnt_time, true);
 
     // [Julia] Draw total times only after finishing last level
@@ -517,7 +517,7 @@ void WI_drawStats(void)
         // [crispy] draw total time after level time and par time
         const int ttime = wbs->totaltimes / TICRATE;
 
-        HU_WriteTextBig(79, 131, "Total");
+        HU_WriteTextBig(59, 131, "Total");
         
         // [Julia] Show total time only after level time is counted
         if (cnt_time == plrs[me].stime / TICRATE)
