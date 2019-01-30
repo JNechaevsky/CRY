@@ -588,8 +588,8 @@ void D_DoomMain (void)
 
     if (iwadfile == NULL)
     {
-        I_Error("Game mode indeterminate.  No IWAD file was found.  Try\n"
-                "specifying one with the '-iwad' command line parameter.\n");
+        I_Error("Unable to find yaguar-doom.wad IWAD file.\n"
+                "Have you installed Yaguar Doom properly?\n");
     }
 
     modifiedgame = false;
