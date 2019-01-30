@@ -529,12 +529,12 @@ void WI_drawStats(void)
     if (gamemap != 23)
     {
         // [Julia] Write "Entering"
-        HU_WriteTextBigCentered (148, "Entering");
+        HU_WriteTextBigCentered (146, "Entering");
 
         // [Julia] Write <NextLevelName>
         // Note: wminfo.next is 0 biased, unlike gamemap, remember?
         // That's why I'm using "-1" here.
-        HU_WriteTextBigCentered (166, 
+        HU_WriteTextBigCentered (164, 
         wminfo.next ==  1-1 ? JAGLVL_01 :
         wminfo.next ==  2-1 ? JAGLVL_02 :
         wminfo.next ==  3-1 ? JAGLVL_03 :
