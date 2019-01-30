@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2018-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -32,8 +32,8 @@
 #include "w_wad.h"
 #include "s_sound.h"
 #include "doomstat.h"
-#include "st_stuff.h" // [JN] ST_HEIGHT
-#include "v_video.h"  // [JN] V_DrawPatch
+#include "st_stuff.h"
+#include "v_video.h"
 #include "sounds.h"
 #include "d_englsh.h"
 #include "jn.h"

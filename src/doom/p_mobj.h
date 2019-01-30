@@ -1,6 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -12,35 +13,17 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// DESCRIPTION:
-//	Map Objects, MObj, definition and handling.
-//
-
-// Russian Doom (C) 2016-2018 Julian Nechaevsky
 
 
 #ifndef __P_MOBJ__
 #define __P_MOBJ__
 
-// Basics.
+
 #include "tables.h"
 #include "m_fixed.h"
-
-// We need the thinker_t stuff.
 #include "d_think.h"
-
-// We need the WAD data structure for Map things,
-// from the THINGS lump.
 #include "doomdata.h"
-
-// States are tied to finite states are
-//  tied to animation frames.
-// Needs precompiled tables/data structures.
 #include "info.h"
-
-
-
-
 
 
 //

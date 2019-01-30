@@ -1,5 +1,6 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,14 +17,11 @@
 //     to the IWAD type.
 //
 
-// Russian Doom (C) 2016-2018 Julian Nechaevsky
-
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
-
 #include "deh_str.h"
 #include "doomkeys.h"
 #include "d_iwad.h"
@@ -34,6 +32,7 @@
 #include "w_wad.h"
 #include "z_zone.h"
 #include "jn.h"
+
 
 static const iwad_t iwads[] =
 {
@@ -51,7 +50,7 @@ static const iwad_t iwads[] =
     { "heretic1.wad", heretic,   shareware,  "Heretic Shareware" },
     { "hexen.wad",    hexen,     commercial, "Hexen" },
 //  { "strife0.wad",  strife,    commercial, "Strife" }, // haleyjd: STRIFE-FIXME
-//  { "strife1.wad",  strife,    commercial, "Strife" }, // [JN] Перевод не осуществлен
+//  { "strife1.wad",  strife,    commercial, "Strife" }, // [Julia] Перевод не осуществлен
 };
 
 // Array of locations to search for IWAD files

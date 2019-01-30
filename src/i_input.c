@@ -1,6 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,12 +17,9 @@
 //     SDL implementation of system-specific input interface.
 //
 
-// Russian Doom (C) 2016-2018 Julian Nechaevsky
-
 
 #include "SDL.h"
 #include "SDL_keycode.h"
-
 #include "doomkeys.h"
 #include "doomtype.h"
 #include "d_event.h"
@@ -84,10 +82,10 @@ static unsigned int mouse_button_state = 0;
 // motion.  Specified with the '-novert' command line parameter.
 // This is an int to allow saving to config file
 
-// [JN] Вертикальное перемещение отключено по умолчанию.
+// [Julia] Вертикальное перемещение отключено по умолчанию.
 int novert = 1;
 
-// [JN] Mouselook: disabled by default.
+// [Julia] Mouselook: disabled by default.
 int mlook = 0;
 
 // If true, keyboard mapping is ignored, like in Vanilla Doom.
@@ -450,7 +448,7 @@ void I_ReadMouse(void)
         ev.data1 = mouse_button_state;
         ev.data2 = AccelerateMouse(x);
 
-        // [JN] Mouselook: we need vertical mouse movement for mlook
+        // [Julia] Mouselook: we need vertical mouse movement for mlook
         if (!novert || mlook)
         {
             ev.data3 = -AccelerateMouse(y);

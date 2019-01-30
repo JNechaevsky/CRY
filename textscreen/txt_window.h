@@ -1,5 +1,6 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -11,8 +12,6 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-
-// Russian Doom (C) 2016-2018 Julian Nechaevsky
 
 
 #ifndef TXT_WINDOW_H
@@ -91,8 +90,8 @@ struct txt_window_s
 
     // URL of a webpage with help about this window. If set, a help key
     // indicator is shown while this window is active.
-    char *help_url;     // [JN] English "Online help"
-    char *help_url_rus; // [JN] Russian "Онлайн справка"
+    char *help_url;     // [Julia] English "Online help"
+    char *help_url_rus; // [Julia] Russian "Онлайн справка"
 };
 
 /**

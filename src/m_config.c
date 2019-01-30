@@ -2,6 +2,7 @@
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 1993-2008 Raven Software
 // Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,8 +18,6 @@
 //    Configuration file interface.
 //
 
-// Russian Doom (C) 2016-2018 Julian Nechaevsky
-
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,9 +25,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <assert.h>
-
 #include "SDL_filesystem.h"
-
 #include "config.h"
 #include "doomtype.h"
 #include "doomkeys.h"
@@ -116,7 +113,7 @@ typedef struct
 
 //! @begin_config_file default
 
-// [JN] Все стандартное управление перенесено в
+// [Julia] Все стандартное управление перенесено в
 // extra_defaults_list, что бы создать единый
 // конфигурационный файл для каждой игры.
 /*
@@ -162,7 +159,7 @@ static default_t extra_defaults_list[] =
 
     //!
     //
-    // [JN] Mono SFX mode
+    // [Julia] Mono SFX mode
     //
 
     CONFIG_VARIABLE_INT(snd_monomode),

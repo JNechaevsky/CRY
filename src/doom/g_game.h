@@ -1,6 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -12,11 +13,6 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// DESCRIPTION:
-//   Duh.
-// 
-
-// Russian Doom (C) 2016-2018 Julian Nechaevsky
 
 
 #ifndef __G_GAME__
@@ -27,9 +23,10 @@
 #include "d_ticcmd.h"
 
 
-//
+// =============================================================================
 // GAME
-//
+// =============================================================================
+
 void G_DeathMatchSpawnPlayer (int playernum);
 
 void G_InitNew (skill_t skill, int episode, int map);

@@ -1,6 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,11 +17,8 @@
 //	DOOM graphics stuff for SDL.
 //
 
-// Russian Doom (C) 2016-2018 Julian Nechaevsky
-
 
 #include <stdlib.h>
-
 #include "SDL.h"
 #include "SDL_opengl.h"
 
@@ -98,7 +96,7 @@ int usemouse = 1;
 
 // Save screenshots in PNG format.
 
-int png_screenshots = 1; // [JN] Crispy!
+int png_screenshots = 1; // [Julia] Crispy!
 
 // SDL video driver name
 
@@ -131,7 +129,7 @@ int fullscreen = true;
 int aspect_ratio_correct = true;
 static int actualheight;
 
-// [JN] Незначительное сглаживание текстур
+// [Julia] Незначительное сглаживание текстур
 
 int smoothing = false;
 
@@ -619,7 +617,7 @@ static void CreateUpscaledTexture(boolean force)
     // which looks much softer and smoother than "nearest" but does a better
     // job at downscaling from the upscaled texture to screen.
 
-    // [JN] smooting - функция и переменная незначительного сглаживания текстур.
+    // [Julia] smooting - функция и переменная незначительного сглаживания текстур.
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, smoothing ? "linear" : "nearest");
 
     texture_upscaled = SDL_CreateTexture(renderer,
@@ -747,7 +745,7 @@ void I_SetPalette (byte *doompalette)
 {
     int i;
 
-    // [JN] Check for incorrect gamma levels while startup
+    // [Julia] Check for incorrect gamma levels while startup
     if (usegamma < 0 || usegamma > 17)
     usegamma = 0;
 
@@ -812,7 +810,7 @@ void I_InitWindowTitle(void)
 {
     char *buf;
 
-    // [JN] В заголовке окна оставлено только название игры.
+    // [Julia] В заголовке окна оставлено только название игры.
     buf = M_StringJoin(window_title, /* " - ", PACKAGE_STRING, */ NULL);
     SDL_SetWindowTitle(screen, buf);
     free(buf);
@@ -1146,14 +1144,14 @@ static void SetVideoMode(void)
     renderer_flags = SDL_RENDERER_TARGETTEXTURE;
 
     // Turn on vsync if we aren't in a -timedemo
-    // [JN] Note: vsync is always enabled for both capped and uncapped modes.
+    // [Julia] Note: vsync is always enabled for both capped and uncapped modes.
     // In -timedemo mode it's always disabled to get a maximum possible fps.
     if (!singletics)
     {
         renderer_flags |= SDL_RENDERER_PRESENTVSYNC;
     }
 
-    // [JN] Note: vsync is always disabled in software rendering mode.
+    // [Julia] Note: vsync is always disabled in software rendering mode.
     if (force_software_renderer)
     {
         renderer_flags &= ~SDL_RENDERER_PRESENTVSYNC;

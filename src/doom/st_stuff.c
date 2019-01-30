@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2018-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -928,11 +928,11 @@ void ST_drawWidgets (boolean refresh)
     // face/background. Also don't draw signs in automap.
     if ((screenblocks == 11 || screenblocks == 12) && !automapactive)
     {
-        // [JN] Don't draw ammo for fist and chainsaw
+        // [Julia] Don't draw ammo for fist and chainsaw
         if (plyr->readyweapon != wp_fist && plyr->readyweapon != wp_chainsaw)
         V_DrawPatch(0, 0, W_CacheLumpName(DEH_String("STCHAMMO"), PU_CACHE));
 
-        // [JN] Health, armor, ammo
+        // [Julia] Health, armor, ammo
         V_DrawPatch(0, 0, W_CacheLumpName(DEH_String("STCHNAMS"), PU_CACHE));
     }
 
@@ -1110,7 +1110,7 @@ static void ST_loadUnloadGraphics(load_callback_t callback)
     callback(DEH_String("STFCRSH0"), &faces[facenum]);
     ++facenum;
 
-    // [JN] Удвоение массива спрайтов лиц, необходимое для бессмертия.
+    // [Julia] Doubling faces array for god mode.
     for (i = 0; i < ST_NUMPAINFACES; i++)
     {
         for (j = 0; j < ST_NUMSTRAIGHTFACES; j++)

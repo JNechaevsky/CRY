@@ -1,5 +1,6 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -11,8 +12,6 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-
-// Russian Doom (C) 2016-2018 Julian Nechaevsky
 
 
 #include <stdio.h>
@@ -193,7 +192,7 @@ static void DrawDesktopBackground(const char *title)
 }
 
 //
-// [JN] English "F1=Help"
+// [Julia] English "F1=Help"
 //
 
 static void DrawHelpIndicator(void)
@@ -228,7 +227,7 @@ static void DrawHelpIndicator(void)
 }
 
 //
-// [JN] Russian "F1=Онлайн справка"
+// [Julia] Russian "F1=Онлайн справка"
 //
 
 static void DrawHelpIndicatorRus(void)
@@ -286,13 +285,13 @@ void TXT_DrawDesktop(void)
 
     active_window = TXT_GetActiveWindow();
 
-    // [JN] Draw English "Online help"
+    // [Julia] Draw English "Online help"
     if (active_window != NULL && active_window->help_url != NULL)
     {
         DrawHelpIndicator();
     }
 
-    // [JN] Draw Russian "Онлайн справка"
+    // [Julia] Draw Russian "Онлайн справка"
     if (active_window != NULL && active_window->help_url_rus != NULL)
     {
         DrawHelpIndicatorRus();

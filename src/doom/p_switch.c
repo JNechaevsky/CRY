@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2018 Julia Nechaevskaya
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,6 +16,7 @@
 
 
 #include <stdio.h>
+
 #include "i_system.h"
 #include "deh_main.h"
 #include "doomdef.h"

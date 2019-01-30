@@ -1,5 +1,6 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -15,16 +16,12 @@
 //       SDL Joystick code.
 //
 
-// Russian Doom (C) 2016-2018 Julian Nechaevsky
-
 
 #include "SDL.h"
 #include "SDL_joystick.h"
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
 #include "doomtype.h"
 #include "d_event.h"
 #include "i_joystick.h"

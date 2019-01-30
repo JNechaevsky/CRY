@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2018-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -441,7 +441,7 @@ void TryRunTics (void)
     int realtics;
     int	availabletics;
     int	counts;
-    // [JN] Ingame variables for additional capping conditions
+    // [Julia] Ingame variables for additional capping conditions
     extern int paused, menuactive, demoplayback, netgame;
     extern int gamestate;
 
@@ -484,7 +484,7 @@ void TryRunTics (void)
 
         // [AM] If we've uncapped the framerate and there are no tics
         //      to run, return early instead of waiting around.
-        // [JN] Also don't interpolate while paused state and active menu,
+        // [Julia] Also don't interpolate while paused state and active menu,
         //      but interpolate in same conditions in demo playback and network game.
         if (counts == 0 && uncapped_fps && gametic && screenvisible &&
             !paused && (!menuactive || demoplayback || netgame) &&

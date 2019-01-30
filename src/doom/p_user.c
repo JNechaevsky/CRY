@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2018-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -29,7 +29,7 @@
 
 #define MAXBOB 0x100000 // 16 pixels of bob
 boolean		onground;
-boolean beneath_door;   // [JN] Player is crushed by closed door
+boolean beneath_door;   // [Julia] Player is crushed by closed door
 
 
 // -----------------------------------------------------------------------------
@@ -250,7 +250,7 @@ void P_DeathThink (player_t *player)
     onground = (player->mo->z <= player->mo->floorz);
     P_CalcHeight (player, false);
 
-    // [JN] Mouselook: smoothed lookdir centering while dying
+    // [Julia] Mouselook: smoothed lookdir centering while dying
     if (player->lookdir >  8 * MLOOKUNIT)
         player->lookdir -= 8 * MLOOKUNIT;
     else 

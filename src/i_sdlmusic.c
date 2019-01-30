@@ -1,6 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,14 +17,11 @@
 //	System interface for music.
 //
 
-// Russian Doom (C) 2016-2018 Julian Nechaevsky
-
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
 #include "SDL.h"
 #include "SDL_mixer.h"
 #include "config.h"
@@ -1081,7 +1079,7 @@ static void *I_SDL_RegisterSong(void *data, int len)
 
     filename = M_TempFile("doom.mid");
 
-    // [JN] Отключен лимит размера файла MID
+    // [Julia] Отключен лимит размера файла MID
     // [crispy] remove MID file size limit
     if (IsMid(data, len) /* && len < MAXMIDLENGTH */)
     {

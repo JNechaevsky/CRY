@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2018-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -13,11 +13,6 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// DESCRIPTION:
-//	System specific interface stuff.
-//
-
-// Russian Doom (C) 2016-2018 Julian Nechaevsky
 
 
 #ifndef __R_MAIN__
@@ -82,7 +77,7 @@ extern int extralight;
 // Number of diminishing brightness levels.
 // There a 0-31, i.e. 32 LUT in the COLORMAP lump.
 //
-// [JN] Jaguar: reduced from 32 to 28, to make a dark areas brighten.
+// [Julia] Jaguar: reduced from 32 to 28, to make a dark areas brighten.
 // Note: there are no COLORMAP in Jaguar version at all, and CRY effect
 // seems to be making some dark areas too well-lit. But seriously, this
 // game and this palette are deserved to have a dark areas, but

@@ -1,6 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -15,13 +16,10 @@
 // DESCRIPTION:
 //
 
-// Russian Doom (C) 2016-2018 Julian Nechaevsky
-
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
 #include <stdarg.h>
 
 #ifdef _WIN32
@@ -49,7 +47,7 @@
 #include "z_zone.h"
 #include "jn.h"
 
-// [JN] Объём необходимой памяти увеличен вдвое
+// [Julia] Объём необходимой памяти увеличен вдвое
 #define DEFAULT_RAM 16*2 /* MiB */
 #define MIN_RAM     4*2  /* MiB */
 
@@ -254,8 +252,8 @@ void I_Error (char *error, ...)
 {
     char msgbuf[512];
 #ifdef _WIN32
-    wchar_t win_error_message[1000];  // [JN] UTF-8 retranslation of error message
-    wchar_t win_error_title[1000];    // [JN] UTF-8 retranslation of window title
+    wchar_t win_error_message[1000];  // [Julia] UTF-8 retranslation of error message
+    wchar_t win_error_title[1000];    // [Julia] UTF-8 retranslation of window title
 #endif
     va_list argptr;
     atexit_listentry_t *entry;
@@ -307,7 +305,7 @@ void I_Error (char *error, ...)
     if (exit_gui_popup && !I_ConsoleStdout())
     {
 #ifdef _WIN32
-    // [JN] For some reason, Russian I_Error messages are cut in SDL message box,
+    // [Julia] For some reason, Russian I_Error messages are cut in SDL message box,
     // and I have not idea why. Here I'm using WINAPI's function MessageBox 
     // which is displaying Russian chars uncut, but requiring byte retranslation.
     MultiByteToWideChar(CP_UTF8, 0, msgbuf, -1, win_error_message, 1000);

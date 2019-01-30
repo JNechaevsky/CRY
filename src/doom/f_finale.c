@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2018-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -159,7 +159,7 @@ void F_Ticker (void)
 
         if (i < MAXPLAYERS)
         {
-            if (gamemap == 23)  // [JN] Jaguar: final level
+            if (gamemap == 23)  // [Julia] Jaguar: final level
             F_StartCast ();
             else
             gameaction = ga_worlddone;

@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2018-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -168,7 +168,7 @@ int wipe_doMelt (int width, int height, int ticks)
             }
             else if (y[i] < height)
             {
-                dy = 13; // [JN] almost identical to original wipe duration
+                dy = 13; // [Julia] Almost identical to original wipe duration
                 y[i] += dy;
 
                 done = false;

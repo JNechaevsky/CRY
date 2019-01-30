@@ -1,5 +1,6 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,8 +18,6 @@
 // Ideally this should work exactly the same as in deutex, but trying to
 // read the deutex source code made my brain hurt.
 //
-
-// Russian Doom (C) 2016-2018 Julian Nechaevsky
 
 
 #ifndef W_MERGE_H

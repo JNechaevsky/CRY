@@ -1,6 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,8 +17,6 @@
 //   Functions and definitions relating to the game type and operational
 //   mode.
 //
-
-// Russian Doom (C) 2016-2018 Julian Nechaevsky
 
 
 #ifndef __D_MODE__
@@ -38,8 +37,8 @@ typedef enum
     heretic,         // Heretic
     hexen,           // Hexen
     strife,          // Strife
-    pack_nerve,      // [JN] Doom 2: No Rest For The Living
-    jaguar,          // [JN] Doom for Atari Jaguar
+    pack_nerve,      // [Julia] Doom 2: No Rest For The Living
+    jaguar,          // [Julia] Doom for Atari Jaguar
 
     none
 } GameMission_t;
@@ -54,7 +53,7 @@ typedef enum
     registered,      // Doom/Heretic registered
     commercial,      // Doom II/Hexen
     retail,          // Ultimate Doom
-    pressbeta,       // [JN] Doom Press Beta
+    pressbeta,       // [Julia] Doom Press Beta
     indetermined     // Unknown.
 } GameMode_t;
 
@@ -89,7 +88,7 @@ typedef enum
     freedoom,   // FreeDoom: Phase 1 + 2
     freedm,     // FreeDM
     bfgedition, // Doom Classic (Doom 3: BFG Edition)
-    old_shareware // [JN] Old Shareware (1.2 and lower)
+    old_shareware // [Julia] Old Shareware (1.2 and lower)
 } GameVariant_t;
 
 // The current state of the game: whether we are

@@ -1,5 +1,6 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,8 +17,6 @@
 //     Once started using OPL_Timer_StartThread, the thread sleeps,
 //     waking up to invoke callbacks set using OPL_Timer_SetCallback.
 //
-
-// Russian Doom (C) 2016-2017 Julian Nechaevsky
 
 
 #include "SDL.h"

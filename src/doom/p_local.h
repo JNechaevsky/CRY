@@ -1,6 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -12,11 +13,6 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// DESCRIPTION:
-//	Play functions, animation, global header.
-//
-
-// Russian Doom (C) 2016-2018 Julian Nechaevsky
 
 
 #ifndef __P_LOCAL__
@@ -27,38 +23,36 @@
 #endif
 
 #define TOCENTER        -8
-#define FLOATSPEED		(FRACUNIT*4)
+#define FLOATSPEED      (FRACUNIT*4)
 
-
-#define MAXHEALTH		100
-#define VIEWHEIGHT		(41*FRACUNIT)
+#define MAXHEALTH       100
+#define VIEWHEIGHT      (41*FRACUNIT)
 
 // mapblocks are used to check movement
 // against lines and things
-#define MAPBLOCKUNITS	128
-#define MAPBLOCKSIZE	(MAPBLOCKUNITS*FRACUNIT)
-#define MAPBLOCKSHIFT	(FRACBITS+7)
-#define MAPBMASK		(MAPBLOCKSIZE-1)
-#define MAPBTOFRAC		(MAPBLOCKSHIFT-FRACBITS)
-
+#define MAPBLOCKUNITS   128
+#define MAPBLOCKSIZE    (MAPBLOCKUNITS*FRACUNIT)
+#define MAPBLOCKSHIFT   (FRACBITS+7)
+#define MAPBMASK        (MAPBLOCKSIZE-1)
+#define MAPBTOFRAC      (MAPBLOCKSHIFT-FRACBITS)
 
 // player radius for movement checking
-#define PLAYERRADIUS	16*FRACUNIT
+#define PLAYERRADIUS    16*FRACUNIT
 
 // MAXRADIUS is for precalculated sector block boxes
 // the spider demon is larger,
 // but we do not have any moving sectors nearby
-#define MAXRADIUS		32*FRACUNIT
+#define MAXRADIUS       32*FRACUNIT
 
-#define GRAVITY		FRACUNIT
-#define MAXMOVE		(30*FRACUNIT)
+#define GRAVITY         FRACUNIT
+#define MAXMOVE         (30*FRACUNIT)
 
-#define USERANGE		(64*FRACUNIT)
-#define MELEERANGE		(64*FRACUNIT)
-#define MISSILERANGE	(32*64*FRACUNIT)
+#define USERANGE        (64*FRACUNIT)
+#define MELEERANGE      (64*FRACUNIT)
+#define MISSILERANGE    (32*64*FRACUNIT)
 
 // follow a player exlusively for 3 seconds
-#define	BASETHRESHOLD	 	100
+#define	BASETHRESHOLD   100
 
 
 
@@ -159,7 +153,7 @@ typedef struct
 
 // Extended MAXINTERCEPTS, to allow for intercepts overrun emulation.
 
-#define MAXINTERCEPTS_ORIGINAL 128*16 // [JN] Лимит шестнадцатикратно умножен
+#define MAXINTERCEPTS_ORIGINAL 128*16 // [Julia] Increased limit
 #define MAXINTERCEPTS          (MAXINTERCEPTS_ORIGINAL + 61)
 
 extern intercept_t	intercepts[MAXINTERCEPTS];

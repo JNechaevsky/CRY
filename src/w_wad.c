@@ -1,6 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,16 +17,12 @@
 //	Handles WAD file header, directory, lump I/O.
 //
 
-// Russian Doom (C) 2016-2018 Julian Nechaevsky
-
 
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include "doomtype.h"
-
 #include "i_swap.h"
 #include "i_system.h"
 #include "i_video.h"
@@ -177,7 +174,6 @@ wad_file_t *W_AddFile (char *filename)
 
 	header.numlumps = LONG(header.numlumps);
 
-        // [JN] Лимит 4046 лампов отключен
         // Vanilla Doom doesn't like WADs with more than 4046 lumps
         // https://www.doomworld.com/vb/post/1010985
         // [crispy] disable PWAD lump number limit
@@ -310,7 +306,7 @@ lumpindex_t W_CheckNumForName(char* name)
 // W_CheckMultipleLumps
 // Check if there's more than one of the same lump.
 //
-// [JN] Adaptaken from Doom Retro, thanks Brad Harding!
+// [Julia] Adaptaken from Doom Retro, thanks Brad Harding!
 //
 int W_CheckMultipleLumps(char *name)
 {

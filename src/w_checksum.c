@@ -1,6 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,18 +17,16 @@
 //       Generate a checksum of the WAD directory.
 //
 
-// Russian Doom (C) 2016-2018 Julian Nechaevsky
-
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include "i_system.h"
 #include "m_misc.h"
 #include "sha1.h"
 #include "w_checksum.h"
 #include "w_wad.h"
+
 
 static wad_file_t **open_wadfiles = NULL;
 static int num_open_wadfiles = 0;

@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2018-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -870,7 +870,7 @@ void R_InitColormaps (void)
     lump  = W_GetNumForName(DEH_String("COLORMAP"));
     colormaps  = W_CacheLumpNum(lump, PU_STATIC);
 
-    // [JN] Load in the brightmaps.
+    // [Julia] Load in the brightmaps.
     // Note: tables as well as it's valuaes are taken from Doom Retro (r_data.c).
     // Many thanks to Brad Harding for his amazing research of brightmap tables and colors!
 

@@ -29,7 +29,7 @@
 #include "p_mobj.h"
 
 
-// [JN] Using exactly Jaguar states and info.
+// [Julia] Using exactly Jaguar states and info.
 // Interestingly, there are small difference between PC version:
 // - Lost Soul have a 60 instead of 100,
 // - Explosive barrel have a 10 HP instead of 20,
@@ -1001,7 +1001,7 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
     S_BFGLAND,                                              // deathstate
     S_NULL,                                                 // xdeathstate
     sfx_rxplod,                                             // deathsound
-    15*FRACUNIT, // [JN] PC: 25                             // speed
+    15*FRACUNIT, // [Julia] PC: 25                          // speed
     13*FRACUNIT,                                            // radius
     8*FRACUNIT,                                             // height
     100,                                                    // mass

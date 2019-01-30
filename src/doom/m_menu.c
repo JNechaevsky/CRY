@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2018-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -564,7 +564,7 @@ menu_t  LoadDef =
     &MainDef,
     LoadMenu,
     M_DrawLoad,
-    67,38,  // [JN] Отцентрированы и скорректированы поля ввода текста
+    67,38,
     0
 };
 
@@ -590,7 +590,7 @@ menu_t  SaveDef =
     &MainDef,
     SaveMenu,
     M_DrawSave,
-    67,38,  // [JN] Отцентрированы и скорректированы поля ввода текста
+    67,38,
     0
 };
 
@@ -1517,7 +1517,7 @@ boolean M_Responder (event_t *ev)
             }
             
             // [crispy] scroll menus with mouse wheel
-            // [JN] it also affecting mouse side buttons (forward/backward)
+            // [Julia] it also affecting mouse side buttons (forward/backward)
             if (mousebprevweapon >= 0 && ev->data1 & (1 << mousebprevweapon))
             {
                 key = key_menu_down;
@@ -1627,7 +1627,7 @@ boolean M_Responder (event_t *ev)
         return true;
     }
 
-    // [JN] Toggling of crosshair
+    // [Julia] Toggling of crosshair
     if (key == key_togglecrosshair)
     {
         static char crosshairmsg[24];

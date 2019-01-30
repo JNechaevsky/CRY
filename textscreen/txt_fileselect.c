@@ -1,5 +1,6 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -14,8 +15,6 @@
 //
 // Routines for selecting files.
 //
-
-// Russian Doom (C) 2016-2018 Julian Nechaevsky
 
 
 #include <stdio.h>
@@ -598,7 +597,7 @@ static void TXT_FileSelectDrawer(TXT_UNCAST_ARG(fileselect))
     fileselect->inputbox->widget.h = fileselect->widget.h;
 
     // Triple bar symbol gives a distinguishing look to the file selector.
-	// [JN] Символ "тройника" переадресован, т.к. по адресу \xf0 теперь русская "р".
+	// [Julia] Символ "тройника" переадресован, т.к. по адресу \xf0 теперь русская "р".
 	//      Структура: \x > символ по вертикали (0-F) > символ по горизонали (0-F)
     TXT_DrawString("\xa0 ");
     TXT_BGColor(TXT_COLOR_BLACK, 0);

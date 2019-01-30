@@ -1,5 +1,6 @@
 //
 // Copyright(C) 2016 Simon Howard
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -11,8 +12,6 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-
-// Russian Doom (C) 2016-2018 Julian Nechaevsky
 
 
 #include <stdlib.h>

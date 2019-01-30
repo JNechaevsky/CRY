@@ -1,6 +1,6 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2018-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -48,7 +48,7 @@ char *snd_dmxoption = "-opl3"; // [crispy] default to OPL3 emulation
 static int numChannels = 8;
 static int sfxVolume = 8;
 static int musicVolume = 8;
-static int snd_monomode = 0; // [JN] Mono SFX
+static int snd_monomode = 0; // [Julia] Mono SFX
 static int use_libsamplerate = 0;
 static float libsamplerate_scale = 0.65;
 

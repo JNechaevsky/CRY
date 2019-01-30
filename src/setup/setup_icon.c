@@ -1,4 +1,4 @@
-// [JN] Purely to shut up GCC compiler warnings
+// [Julia] Purely to shut up GCC compiler warnings
 #pragma GCC diagnostic ignored "-Wunused-variable"
 #pragma GCC diagnostic ignored "-Wunused-const-variable"
 

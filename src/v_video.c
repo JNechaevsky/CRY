@@ -2,7 +2,7 @@
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 1993-2008 Raven Software
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2018-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -450,7 +450,7 @@ void V_DrawPatchUnscaled(int x, int y, patch_t *patch)
 
 
 // -----------------------------------------------------------------------------
-// [JN] V_DrawPatchFinale
+// [Julia] V_DrawPatchFinale
 // Draws pixel-doubled sprite. Used exclusively on casting sequence screen.
 // Written with extensive support of Fabian Greffrath, thanks! (16.01.2019)
 // -----------------------------------------------------------------------------

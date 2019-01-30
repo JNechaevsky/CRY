@@ -11,9 +11,7 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// DESCRIPTION:
-//	Brightmap textures and flats lookup routine.
-//
+
 
 #ifndef __R_BMAPS__
 #define __R_BMAPS__

@@ -1,6 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,16 +17,11 @@
 //	WAD I/O functions.
 //
 
-// Russian Doom (C) 2016-2018 Julian Nechaevsky
-
 
 #include <stdio.h>
-
 #include "config.h"
-
 #include "doomtype.h"
 #include "m_argv.h"
-
 #include "w_file.h"
 
 extern wad_file_class_t stdc_wad_file;

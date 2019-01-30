@@ -1,5 +1,6 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,11 +18,10 @@
 //   mode.
 //
 
-// Russian Doom (C) 2016-2018 Julian Nechaevsky
-
 
 #include "doomtype.h"
 #include "d_mode.h"
+
 
 // Valid game mode/mission combinations, with the number of
 // episodes/maps for each.

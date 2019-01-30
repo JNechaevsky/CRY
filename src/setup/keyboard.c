@@ -1,6 +1,6 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2018-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -353,7 +353,7 @@ void ConfigKeyboard(void)
     TXT_SignalConnect(run_control, "changed", UpdateJoybSpeed, NULL);
 
     //
-    // [JN] Create translated buttons
+    // [Julia] Create translated buttons
     //
 
     TXT_SetWindowAction(window, TXT_HORIZ_LEFT, TXT_NewWindowAbortAction(window));

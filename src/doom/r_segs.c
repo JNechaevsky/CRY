@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2018-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -385,7 +385,7 @@ void R_RenderSegLoop (void)
             dc_source = R_GetColumn(midtexture,texturecolumn,true);
             dc_texheight = textureheight[midtexture]>>FRACBITS;
 
-            // [JN] Account fixed colormap
+            // [Julia] Account fixed colormap
             if (fixedcolormap)
             dc_colormap = fixedcolormap;
             else

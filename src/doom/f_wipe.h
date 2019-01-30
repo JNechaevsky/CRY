@@ -1,6 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -12,19 +13,14 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// DESCRIPTION:
-//	Mission start screen wipe/melt, special effects.
-//	
-
-// Russian Doom (C) 2016-2018 Julian Nechaevsky
 
 
 #ifndef __F_WIPE_H__
 #define __F_WIPE_H__
 
-//
-//                       SCREEN WIPE PACKAGE
-//
+// =============================================================================
+// SCREEN WIPE PACKAGE
+// =============================================================================
 
 enum
 {

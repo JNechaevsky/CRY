@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2018-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -1304,7 +1304,7 @@ void AM_drawThings (int colors, int colorrange)
         t = sectors[i].thinglist;
         while (t)
         {
-            // [JN] Atari Jaguar: use dark green for things drawing
+            // [Julia] Use dark green for things drawing
             AM_drawLineCharacter (thintriangle_guy, arrlen(thintriangle_guy), 
                                   16<<FRACBITS, t->angle, GREEN_JAGUAR, 
                                   t->x, t->y);

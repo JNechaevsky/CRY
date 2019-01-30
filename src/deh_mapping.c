@@ -1,5 +1,6 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,18 +18,16 @@
 // name
 //
 
-// Russian Doom (C) 2016-2018 Julian Nechaevsky
-
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include "doomtype.h"
 #include "i_system.h"
 #include "m_misc.h"
 #include "deh_mapping.h"
 #include "jn.h"
+
 
 static deh_mapping_entry_t *GetMappingEntryByName(deh_context_t *context,
                                                   deh_mapping_t *mapping,

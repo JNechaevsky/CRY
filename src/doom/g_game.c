@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2018-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -138,7 +138,7 @@ fixed_t     forwardmove[2] = {0x19, 0x32};
 fixed_t     sidemove[2] = {0x18, 0x28}; 
 fixed_t     angleturn[3] = {640, 1280, 320};    // + slow turn 
 
-// [JN] If true, activate maximum weapon bobbing
+// [Julia] If true, activate maximum weapon bobbing
 boolean max_bobbing;
 
 static int *weapon_keys[] = {
@@ -1697,7 +1697,7 @@ void G_InitNew (skill_t skill, int episode, int map)
         mobjinfo[MT_HEADSHOT].damage = 7;            // Cacodemon (5)
         mobjinfo[MT_BRUISERSHOT].damage = 10;        // Knight / Baron (8) 
     }
-    // [JN] Fallback to standard values
+    // [Julia] Fallback to standard values
     else
     {
         // Monster's speed                          Who

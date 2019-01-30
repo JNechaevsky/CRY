@@ -1,5 +1,6 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
+// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -12,8 +13,6 @@
 // GNU General Public License for more details.
 //
 
-// Russian Doom (C) 2016-2018 Julian Nechaevsky
-
 
 #include <stdlib.h>
 #include <string.h>
@@ -22,7 +21,7 @@
 #include "txt_gui.h"
 #include "txt_io.h"
 #include "txt_main.h"
-// #include "txt_utf8.h" [JN] UTF-8 более не используется
+// #include "txt_utf8.h" [Julia] UTF-8 более не используется
 #include "txt_window.h"
 
 static void TXT_LabelSizeCalc(TXT_UNCAST_ARG(label))
@@ -88,7 +87,7 @@ static void TXT_LabelDrawer(TXT_UNCAST_ARG(label))
 		TXT_DrawString(label->lines[y]);
 		x += strlen(label->lines[y]);
 		
-		// [JN] Ранее:
+		// [Julia] Ранее:
 		// TXT_DrawUTF8String(label->lines[y]);
         // x += TXT_UTF8_Strlen(label->lines[y]);
 
@@ -170,7 +169,7 @@ void TXT_SetLabel(txt_label_t *label, char *value)
 
         line_len = strlen(label->lines[y]);
 		
-		// [JN] Ранее:
+		// [Julia] Ранее:
 		// line_len = TXT_UTF8_Strlen(label->lines[y]);
 
         if (line_len > label->w)
