@@ -959,8 +959,7 @@ void P_SpawnPlayerMissile (mobj_t *source, mobjtype_t type)
         }
 
         // [Julia] Mouselook: also count vertical angles
-        // TODO: calibrate crosshair aiming
-        if (singleplayer && !linetarget && mlook)
+        if (!linetarget && mlook)
         {
             an = source->angle;
             slope = ((source->player->lookdir / MLOOKUNIT) << FRACBITS) / 
