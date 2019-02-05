@@ -771,11 +771,11 @@ void ST_updateWidgets(void)
                 st_firsttime = true;
             }
             
-            plyr->tryopen[i]--;
+            keyboxes[i] = (--plyr->tryopen[i] & KEYBLINKMASK) ? i + st_keyorskull[i] : -1;
 
-            if (screenblocks < 14)
+            if (!plyr->tryopen[i])
             {
-                keyboxes[i] = (plyr->tryopen[i] & KEYBLINKMASK) ? i + st_keyorskull[i] : -1;
+                w_keyboxes[i].oldinum = -1;
             }
         }
     }
@@ -994,18 +994,12 @@ void ST_Drawer (boolean fullscreen, boolean refresh)
     // Do red-/gold-shifts from damage/items
     ST_doPaletteStuff();
 
-    // [Julia] Doh. Always do a full redraw, necessary for 
-    // a proper HUD update after missing blinking keys.
-    ST_doRefresh();
-
-    /*
     // If just after ST_Start(), refresh all
-    // if (st_firsttime)
-    //     ST_doRefresh();
+    if (st_firsttime)
+    ST_doRefresh();
     // Otherwise, update as little as possible
-    // else 
-    //     ST_diffDraw();
-    */
+    else 
+    ST_diffDraw();
 }
 
 typedef void (*load_callback_t)(char *lumpname, patch_t **variable);

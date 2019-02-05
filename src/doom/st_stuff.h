@@ -49,6 +49,10 @@ void ST_Start (void);
 // Called by startup code.
 void ST_Init (void);
 
+// [Julia] Prototypes for f_wipe.c
+void ST_refreshBackground (void);
+void ST_drawWidgets (boolean refresh);
+
 
 // States for status bar code.
 typedef enum

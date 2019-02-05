@@ -185,6 +185,12 @@ int wipe_exitMelt (int width, int height, int ticks)
     Z_Free(y);
     Z_Free(wipe_scr_start);
     Z_Free(wipe_scr_end);
+    // [Julia] Update classic HUD's background and player's face after loading
+    if (screenblocks <= 10 && gamestate == GS_LEVEL)
+    {
+        ST_refreshBackground();
+        ST_drawWidgets(true);
+    }
     return 0;
 }
 
