@@ -40,6 +40,7 @@
 #include "sounds.h"
 #include "m_menu.h"
 #include "d_englsh.h"
+#include "st_stuff.h"
 #include "jn.h"
 
 
@@ -486,6 +487,10 @@ void M_ChangeAspectRatio(int choice)
     choice = 0;
     aspect_ratio_correct = 1 - aspect_ratio_correct;
     I_InitGraphics();
+
+    // [Julia] Also update classic HUD's background and player's face 
+    ST_refreshBackground();
+    ST_drawWidgets(true);
 }
 
 // -----------------------------------------------------------------------------
