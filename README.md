@@ -17,6 +17,7 @@ Project's source code is available under the terms and conditions of [GNU Genera
 
 ##### Download latest version (February 10, 2019)
 
-For Windows (32-bit): [yaguar-doom-1.0-win32.zip](https://sourceforge.net/projects/jnechaevsky/files/Yaguar%20Doom/1.0/yaguar-doom-1.0-win32.zip/download)<br />
+For Windows (32-bit and 64-bit): [yaguar-doom-1.0-win32.zip](https://github.com/JNechaevsky/yaguar-doom/releases/download/1.0/yaguar-doom-1.0-win32.zip)<br />
+Source code: [yaguar-doom-1.0-source.zip](https://github.com/JNechaevsky/yaguar-doom/releases/download/1.0/yaguar-doom-1.0-source.zip)<br />
 
 Please refer to readme.txt file for more information about the project.
