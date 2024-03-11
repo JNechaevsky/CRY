@@ -1846,37 +1846,11 @@ void G_WorldDone (void)
     if (secretexit) 
 	players[consoleplayer].didsecret = true; 
 
-    if ( nerve )
+    switch (gamemap)
     {
-	switch (gamemap)
-	{
-	  case 8:
-	    F_StartFinale ();
-	    break;
-	}
-    }
-    else
-    if ( gamemode == commercial )
-    {
-	switch (gamemap)
-	{
-	  case 15:
-	  case 31:
-	    if (!secretexit)
-		break;
-	  case 6:
-	  case 11:
-	  case 20:
-	  case 30:
-	    F_StartFinale ();
-	    break;
-	}
-    }
-    // [crispy] display tally screen after ExM8
-    else
-    if ( gamemap == 8 || (gameversion == exe_chex && gamemap == 5) )
-    {
-	gameaction = ga_victory;
+        case 23:
+        F_StartFinale ();
+        break;
     }
 } 
  

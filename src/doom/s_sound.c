@@ -164,16 +164,6 @@ void S_Init(int sfxVolume, int musicVolume)
 
     I_AtExit(S_Shutdown, true);
 
-    // [crispy] initialize dedicated music tracks for the 4th episode
-    for (i = mus_e4m1; i <= mus_e6m9; i++)
-    {
-        musicinfo_t *const music = &S_music[i];
-        char namebuf[9];
-
-        M_snprintf(namebuf, sizeof(namebuf), "d_%s", music->name);
-        music->lumpnum = W_CheckNumForName(namebuf);
-    }
-
     // [crispy] handle stereo separation for mono-sfx and flipped levels
     S_UpdateStereoSeparation();
 }
@@ -768,12 +758,13 @@ void S_ChangeMusic(int musicnum, int looping)
 
     // The Doom IWAD file has two versions of the intro music: d_intro
     // and d_introa.  The latter is used for OPL playback.
-
+    /*
     if (musicnum == mus_intro && (snd_musicdevice == SNDDEVICE_ADLIB
                                || snd_musicdevice == SNDDEVICE_SB))
     {
         musicnum = mus_introa;
     }
+    */
 
     if (musicnum <= mus_None || musicnum >= NUMMUSIC)
     {

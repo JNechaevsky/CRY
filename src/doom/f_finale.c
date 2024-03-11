@@ -41,17 +41,32 @@
 
 #include "id_func.h"
 
+
+#define	TEXTSPEED	4
+#define	TEXTWAIT	250
+#define	TEXTEND		25
+
+#define JAGENDING               \
+	"     id software\n"        \
+	"     salutes you!\n"       \
+	"\n"                        \
+	"  the horrors of hell\n"   \
+	"  could not kill you.\n"   \
+	"  their most cunning\n"    \
+	"  traps were no match\n"   \
+	"  for you. you have\n"     \
+	"  proven yourself the\n"   \
+	"  best of all!\n"          \
+	"\n"                        \
+	"  congratulations!"
+
+
 typedef enum
 {
-    F_STAGE_TEXT,
-    F_STAGE_ARTSCREEN,
-    F_STAGE_CAST,
+	F_STAGE_TEXT,
+	F_STAGE_ARTSCREEN,
+	F_STAGE_CAST,
 } finalestage_t;
-
-// ?
-//#include "doomstat.h"
-//#include "r_local.h"
-//#include "f_finale.h"
 
 // Stage of animation:
 finalestage_t finalestage;
@@ -61,10 +76,6 @@ unsigned int finaleendcount;
 
 // [JN] Do screen wipe only once after text skipping.
 static boolean finale_wipe_done;
-
-#define	TEXTSPEED	3
-#define	TEXTWAIT	250
-#define	TEXTEND		25
 
 typedef struct
 {
@@ -76,34 +87,7 @@ typedef struct
 
 static textscreen_t textscreens[] =
 {
-    { doom,      1, 8,  "FLOOR4_8",  E1TEXT},
-    { doom,      2, 8,  "SFLR6_1",   E2TEXT},
-    { doom,      3, 8,  "MFLR8_4",   E3TEXT},
-    { doom,      4, 8,  "MFLR8_3",   E4TEXT},
-    { doom,      5, 8,  "FLOOR7_2",  E5TEXT}, // [crispy] Sigil
-    { doom,      6, 8,  "FLOOR7_2",  E6TEXT}, // [crispy] Sigil II
-
-    { doom2,     1, 6,  "SLIME16",   C1TEXT},
-    { doom2,     1, 8,  "SLIME16",   N1TEXT}, // [JN] NERVE
-    { doom2,     1, 11, "RROCK14",   C2TEXT},
-    { doom2,     1, 20, "RROCK07",   C3TEXT},
-    { doom2,     1, 30, "RROCK17",   C4TEXT},
-    { doom2,     1, 15, "RROCK13",   C5TEXT},
-    { doom2,     1, 31, "RROCK19",   C6TEXT},
-
-    { pack_tnt,  1, 6,  "SLIME16",   T1TEXT},
-    { pack_tnt,  1, 11, "RROCK14",   T2TEXT},
-    { pack_tnt,  1, 20, "RROCK07",   T3TEXT},
-    { pack_tnt,  1, 30, "RROCK17",   T4TEXT},
-    { pack_tnt,  1, 15, "RROCK13",   T5TEXT},
-    { pack_tnt,  1, 31, "RROCK19",   T6TEXT},
-
-    { pack_plut, 1, 6,  "SLIME16",   P1TEXT},
-    { pack_plut, 1, 11, "RROCK14",   P2TEXT},
-    { pack_plut, 1, 20, "RROCK07",   P3TEXT},
-    { pack_plut, 1, 30, "RROCK17",   P4TEXT},
-    { pack_plut, 1, 15, "RROCK13",   P5TEXT},
-    { pack_plut, 1, 31, "RROCK19",   P6TEXT},
+	{ doom2, 1, 23, "ROCKS", JAGENDING},
 };
 
 const char *finaletext;
@@ -115,9 +99,12 @@ void	F_CastTicker (void);
 boolean F_CastResponder (event_t *ev);
 void	F_CastDrawer (void);
 
-//
+
+
+// -----------------------------------------------------------------------------
 // F_StartFinale
-//
+// -----------------------------------------------------------------------------
+
 void F_StartFinale (void)
 {
     size_t i;
@@ -132,36 +119,22 @@ void F_StartFinale (void)
     players[consoleplayer].messageCenteredTics = 1;
     players[consoleplayer].messageCentered = NULL;
 
-    if (logical_gamemission == doom)
-    {
-        S_ChangeMusic(mus_victor, true);
-    }
-    else
-    {
-        S_ChangeMusic(mus_read_m, true);
-    }
+    S_ChangeMusic(mus_ending, true);
 
     // Find the right screen and set the text and background
 
-    for (i=0; i<arrlen(textscreens); ++i)
+    for (i = 0 ; i < arrlen(textscreens) ; ++i)
     {
-        textscreen_t *screen = &textscreens[i];
+		textscreen_t *screen = &textscreens[i];
 
-        // Hack for Chex Quest
-
-        if (gameversion == exe_chex && screen->mission == doom)
-        {
-            screen->level = 5;
-        }
-
-        if (logical_gamemission == screen->mission
-         && (logical_gamemission != doom || gameepisode == screen->episode)
-         && gamemap == screen->level)
-        {
-            finaletext = screen->text;
-            finaleflat = screen->background;
-        }
-    }
+		if (logical_gamemission == screen->mission
+		&& (logical_gamemission != doom || gameepisode == screen->episode)
+		&& gamemap == screen->level)
+		{
+			finaletext = screen->text;
+			finaleflat = screen->background;
+		}
+	}
 
     // [JN] Count intermission/finale text lenght. Once it's fully printed, 
     // no extra "attack/use" button pressing is needed for skipping.
@@ -179,24 +152,26 @@ void F_StartFinale (void)
 	
 }
 
-
+// -----------------------------------------------------------------------------
+// F_Responder
+// -----------------------------------------------------------------------------
 
 boolean F_Responder (event_t *event)
 {
-    if (finalestage == F_STAGE_CAST)
+	if (finalestage == F_STAGE_CAST)
 	return F_CastResponder (event);
-	
-    return false;
+
+	return false;
 }
 
-
-//
+// -----------------------------------------------------------------------------
 // F_Ticker
-//
+// -----------------------------------------------------------------------------
+
 void F_Ticker (void)
 {
-    size_t		i;
-    
+	size_t i;
+
     //
     // [JN] If we are in single player mode, allow double skipping for 
     // intermission text. First skip printing all intermission text,
@@ -273,16 +248,10 @@ void F_Ticker (void)
                         wipegamestate = -1; // force a wipe
                     }
 
-                    if (gameepisode == 3)
-                    {
-                        finalecount = 0;
-                        S_StartMusic (mus_bunny);
-                    }
-                
                     return;
                 }
     
-                if (gamemap == 30 || (nerve && gamemap == 8))  // [JN] NERVE
+                if (gamemap == 23)  // [JN] Jaguar: final level
                 {
                     F_StartCast ();
                 }
@@ -343,37 +312,14 @@ void F_Ticker (void)
 	finalecount = 0;
 	finalestage = F_STAGE_ARTSCREEN;
 	wipegamestate = -1;		// force a wipe
-	if (gameepisode == 3)
-	    S_StartMusic (mus_bunny);
     }
     }
 }
 
-
-
-//
+// -----------------------------------------------------------------------------
 // F_TextWrite
-//
+// -----------------------------------------------------------------------------
 
-// [crispy] add line breaks for lines exceeding screenwidth
-static inline boolean F_AddLineBreak (char *c)
-{
-    while (c-- > finaletext_rw)
-    {
-	if (*c == '\n')
-	{
-	    return false;
-	}
-	else
-	if (*c == ' ')
-	{
-	    *c = '\n';
-	    return true;
-	}
-    }
-
-    return false;
-}
 void F_TextWrite (void)
 {
     byte*	src;
@@ -394,15 +340,23 @@ void F_TextWrite (void)
     V_FillFlat(0, SCREENHEIGHT, 0, SCREENWIDTH, src, dest);
 	
     V_MarkRect (0, 0, SCREENWIDTH, SCREENHEIGHT);
-    
-    // draw some of the text onto the screen
-    cx = 10;
-    cy = 10;
-    ch = finaletext_rw;
-	
-    count = ((signed int) finalecount - 10) / TEXTSPEED;
-    if (count < 0)
-	count = 0;
+
+	// [JN] Draw special background
+	if (gamemap == 23)
+	{
+		V_DrawPatch(0, 0, W_CacheLumpName ("ENDPIC1", PU_CACHE));
+	}
+
+	// draw some of the text onto the screen
+	cx = 10;
+	cy = 10;
+	ch = finaletext;
+
+	count = ((signed int) finalecount - 10) / TEXTSPEED;
+
+	if (count < 0)
+		count = 0;
+
     for ( ; count ; count-- )
     {
 	c = *ch++;
@@ -411,44 +365,34 @@ void F_TextWrite (void)
 	if (c == '\n')
 	{
 	    cx = 10;
-	    cy += 11;
+	    cy += 14;
 	    continue;
 	}
 		
-	c = toupper(c) - HU_FONTSTART;
-	if (c < 0 || c >= HU_FONTSIZE_S)
+	c = c - HU_FONTSTART2;
+	if (c < 0 || c > HU_FONTSIZE_B)
 	{
-	    cx += 4;
+	    cx += 7;
 	    continue;
 	}
 		
-	w = SHORT (hu_font_s[c]->width);
+	w = SHORT (hu_font_b[c]->width);
+
 	if (cx+w > ORIGWIDTH)
-	{
-	    // [crispy] add line breaks for lines exceeding screenwidth
-	    if (F_AddLineBreak(ch))
-	    {
-		continue;
-	    }
-	    else
-	    break;
-	}
-	// [cispy] prevent text from being drawn off-screen vertically
-	if (cy + SHORT(hu_font_s[c]->height) > ORIGHEIGHT)
-	{
-	    break;
-	}
-	V_DrawShadowedPatchOptional(cx, cy, 0, hu_font_s[c]);
+	break;
+
+	V_DrawShadowedPatchOptional(cx, cy, 0, hu_font_b[c]);
 	cx+=w;
     }
 	
 }
 
-//
+// =============================================================================
 // Final DOOM 2 animation
 // Casting by id Software.
 //   in order of appearance
-//
+// =============================================================================
+
 typedef struct
 {
     const char	*name;
@@ -456,25 +400,15 @@ typedef struct
 } castinfo_t;
 
 castinfo_t	castorder[] = {
-    {CC_ZOMBIE, MT_POSSESSED},
-    {CC_SHOTGUN, MT_SHOTGUY},
-    {CC_HEAVY, MT_CHAINGUY},
-    {CC_IMP, MT_TROOP},
-    {CC_DEMON, MT_SERGEANT},
-    {CC_LOST, MT_SKULL},
-    {CC_CACO, MT_HEAD},
-    {CC_HELL, MT_KNIGHT},
-    {CC_BARON, MT_BRUISER},
-    {CC_ARACH, MT_BABY},
-    {CC_PAIN, MT_PAIN},
-    {CC_REVEN, MT_UNDEAD},
-    {CC_MANCU, MT_FATSO},
-    {CC_ARCH, MT_VILE},
-    {CC_SPIDER, MT_SPIDER},
-    {CC_CYBER, MT_CYBORG},
-    {CC_HERO, MT_PLAYER},
-
-    {NULL,0}
+	{"zombieman",		MT_POSSESSED},
+	{"shotgun guy",		MT_SHOTGUY},
+	{"imp",				MT_TROOP},
+	{"demon",			MT_SERGEANT},
+	{"lost soul",       MT_SKULL},
+	{"cacodemon",       MT_HEAD},
+	{"baron of hell",	MT_BRUISER},
+	{"our hero",		MT_PLAYER},
+	{NULL,          	0}
 };
 
 int		castnum;
@@ -485,10 +419,10 @@ int		castframes;
 int		castonmelee;
 boolean		castattacking;
 
-
-//
+// -----------------------------------------------------------------------------
 // F_StartCast
-//
+// -----------------------------------------------------------------------------
+
 void F_StartCast (void)
 {
     wipegamestate = -1;		// force a screen wipe
@@ -500,7 +434,7 @@ void F_StartCast (void)
     castframes = 0;
     castonmelee = 0;
     castattacking = false;
-    S_ChangeMusic(mus_evil, true);
+    S_ChangeMusic(mus_extra, true);
 }
 
 
@@ -539,33 +473,15 @@ void F_CastTicker (void)
 	// sound hacks....
 	switch (st)
 	{
-	  case S_PLAY_ATK1:	sfx = sfx_dshtgn; break;
-	  case S_POSS_ATK2:	sfx = sfx_pistol; break;
-	  case S_SPOS_ATK2:	sfx = sfx_shotgn; break;
-	  case S_VILE_ATK2:	sfx = sfx_vilatk; break;
-	  case S_SKEL_FIST2:	sfx = sfx_skeswg; break;
-	  case S_SKEL_FIST4:	sfx = sfx_skepch; break;
-	  case S_SKEL_MISS2:	sfx = sfx_skeatk; break;
-	  case S_FATT_ATK8:
-	  case S_FATT_ATK5:
-	  case S_FATT_ATK2:	sfx = sfx_firsht; break;
-	  case S_CPOS_ATK2:
-	  case S_CPOS_ATK3:
-	  case S_CPOS_ATK4:	sfx = sfx_shotgn; break;
-	  case S_TROO_ATK3:	sfx = sfx_claw; break;
-	  case S_SARG_ATK2:	sfx = sfx_sgtatk; break;
-	  case S_BOSS_ATK2:
-	  case S_BOS2_ATK2:
-	  case S_HEAD_ATK2:	sfx = sfx_firsht; break;
-	  case S_SKULL_ATK2:	sfx = sfx_sklatk; break;
-	  case S_SPID_ATK2:
-	  case S_SPID_ATK3:	sfx = sfx_shotgn; break;
-	  case S_BSPI_ATK2:	sfx = sfx_plasma; break;
-	  case S_CYBER_ATK2:
-	  case S_CYBER_ATK4:
-	  case S_CYBER_ATK6:	sfx = sfx_rlaunc; break;
-	  case S_PAIN_ATK3:	sfx = sfx_sklatk; break;
-	  default: sfx = 0; break;
+		case S_PLAY_ATK1:	sfx = sfx_pistol; break;
+		case S_POSS_ATK2:	sfx = sfx_pistol; break;
+		case S_SPOS_ATK2:	sfx = sfx_shotgn; break;
+		case S_TROO_ATK3:	sfx = sfx_claw;   break;
+		case S_SARG_ATK2:	sfx = sfx_sgtatk; break;
+		case S_BOSS_ATK2:
+		case S_HEAD_ATK2:	sfx = sfx_firsht; break;
+		case S_SKULL_ATK2:	sfx = sfx_sklatk; break;
+		default: sfx = 0; break;
 	}
 		
 	if (sfx)
@@ -648,10 +564,10 @@ void F_CastDrawer (void)
     patch_t*		patch;
     
     // erase the entire screen to a background
-    V_DrawPatchFullScreen(W_CacheLumpName("BOSSBACK", PU_CACHE), false);
+    V_DrawPatchFullScreen(W_CacheLumpName("ENDPIC2", PU_CACHE), false);
 
     // [JN] Simplify to use common text drawing function.
-    M_WriteTextCentered(180, castorder[castnum].name, NULL);
+    M_WriteTextBigCentered(15, castorder[castnum].name, NULL);
     
     // draw the current frame in the middle of the screen
     sprdef = &sprites[caststate->sprite];
@@ -660,9 +576,7 @@ void F_CastDrawer (void)
     flip = (boolean)sprframe->flip[0];
 			
     patch = W_CacheLumpNum (lump+firstspritelump, PU_CACHE);
-    if (flip)
-	V_DrawPatchFlipped(ORIGWIDTH/2, 170, patch);
-    else
+	
 	V_DrawPatch(ORIGWIDTH/2, 170, patch);
 }
 
@@ -697,11 +611,7 @@ F_DrawPatchCol
 		
 	while (count--)
 	{
-#ifndef CRISPY_TRUECOLOR
-	    *dest = source[srccol >> FRACBITS];
-#else
 	    *dest = pal_color[source[srccol >> FRACBITS]];
-#endif
 	    srccol += dyi;
 	    dest += SCREENWIDTH;
 	}
@@ -709,175 +619,23 @@ F_DrawPatchCol
     }
 }
 
-
-//
-// F_BunnyScroll
-//
-void F_BunnyScroll (void)
-{
-    signed int  scrolled;
-    int		x;
-    patch_t*	p1;
-    patch_t*	p2;
-    char	name[10];
-    int		stage;
-    static int	laststage;
-    int         p2offset, p1offset, pillar_width;
-		
-    dxi = (ORIGWIDTH << FRACBITS) / NONWIDEWIDTH;
-    dy = (SCREENHEIGHT << FRACBITS) / ORIGHEIGHT;
-    dyi = (ORIGHEIGHT << FRACBITS) / SCREENHEIGHT;
-
-    p1 = W_CacheLumpName ("PFUB2", PU_LEVEL);
-    p2 = W_CacheLumpName ("PFUB1", PU_LEVEL);
-
-    // [crispy] fill pillarboxes in widescreen mode
-    pillar_width = (SCREENWIDTH - (SHORT(p1->width) << FRACBITS) / dxi) / 2;
-
-    if (pillar_width > 0)
-    {
-        V_DrawFilledBox(0, 0, pillar_width, SCREENHEIGHT, 0);
-        V_DrawFilledBox(SCREENWIDTH - pillar_width, 0, pillar_width, SCREENHEIGHT, 0);
-    }
-    else
-    {
-        pillar_width = 0;
-    }
-
-    // Calculate the portion of PFUB2 that would be offscreen at original res.
-    p1offset = (ORIGWIDTH - SHORT(p1->width)) / 2;
-
-    if (SHORT(p2->width) == ORIGWIDTH)
-    {
-        // Unity or original PFUBs.
-        // PFUB1 only contains the pixels that scroll off.
-        p2offset = ORIGWIDTH - p1offset;
-    }
-    else
-    {
-        // Widescreen mod PFUBs.
-        // Right side of PFUB2 and left side of PFUB1 are identical.
-        p2offset = ORIGWIDTH + p1offset;
-    }
-
-    V_MarkRect (0, 0, SCREENWIDTH, SCREENHEIGHT);
-	
-    scrolled = (ORIGWIDTH - ((signed int) finalecount-230)/2);
-    if (scrolled > ORIGWIDTH)
-	scrolled = ORIGWIDTH;
-    if (scrolled < 0)
-	scrolled = 0;
-
-    for (x = pillar_width; x < SCREENWIDTH - pillar_width; x++)
-    {
-        int x2 = ((x * dxi) >> FRACBITS) - WIDESCREENDELTA + scrolled;
-
-        if (x2 < p2offset)
-            F_DrawPatchCol (x, p1, x2 - p1offset);
-        else
-            F_DrawPatchCol (x, p2, x2 - p2offset);
-    }
-	
-    if (finalecount < 1130)
-	return;
-    if (finalecount < 1180)
-    {
-        V_DrawPatch((ORIGWIDTH - 13 * 8) / 2,
-                    (ORIGHEIGHT - 8 * 8) / 2,
-                    W_CacheLumpName("END0", PU_CACHE));
-	laststage = 0;
-	return;
-    }
-	
-    stage = (finalecount-1180) / 5;
-    if (stage > 6)
-	stage = 6;
-    if (stage > laststage)
-    {
-	S_StartSound (NULL, sfx_pistol);
-	laststage = stage;
-    }
-	
-    snprintf(name, 10, "END%i", stage);
-    V_DrawPatch((ORIGWIDTH - 13 * 8) / 2,
-                (ORIGHEIGHT - 8 * 8) / 2,
-                W_CacheLumpName (name,PU_CACHE));
-}
-
-static void F_ArtScreenDrawer(void)
-{
-    const char *lumpname;
-    
-    if (gameepisode == 3)
-    {
-        F_BunnyScroll();
-    }
-    else
-    {
-        switch (gameepisode)
-        {
-            case 1:
-                if (gameversion >= exe_ultimate)
-                {
-                    lumpname = "CREDIT";
-                }
-                else
-                {
-                    lumpname = "HELP2";
-                }
-                break;
-            case 2:
-                lumpname = "VICTORY2";
-                break;
-            case 4:
-                lumpname = "ENDPIC";
-                break;
-            // [crispy] Sigil
-            case 5:
-                lumpname = "SIGILEND";
-                if (W_CheckNumForName(lumpname) == -1)
-                {
-                    return;
-                }
-                break;
-            // [crispy] Sigil II
-            case 6:
-                lumpname = "SGL2END";
-                if (W_CheckNumForName(lumpname) == -1)
-                {
-                    lumpname = "SIGILEND";
-
-                    if (W_CheckNumForName(lumpname) == -1)
-                    {
-                        return;
-                    }
-                }
-                break;
-            default:
-                return;
-        }
-
-        V_DrawPatchFullScreen (W_CacheLumpName(lumpname, PU_CACHE), false);
-    }
-}
-
-//
+// -----------------------------------------------------------------------------
 // F_Drawer
-//
+// -----------------------------------------------------------------------------
+
 void F_Drawer (void)
 {
-    switch (finalestage)
-    {
-        case F_STAGE_CAST:
-            F_CastDrawer();
-            break;
-        case F_STAGE_TEXT:
-            F_TextWrite();
-            break;
-        case F_STAGE_ARTSCREEN:
-            F_ArtScreenDrawer();
-            break;
-    }
+	switch (finalestage)
+	{
+		case F_STAGE_CAST:
+		F_CastDrawer();
+		break;
+
+		case F_STAGE_TEXT:
+		F_TextWrite();
+		break;
+
+		case F_STAGE_ARTSCREEN:
+		break;
+	}
 }
-
-
