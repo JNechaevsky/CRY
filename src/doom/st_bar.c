@@ -67,7 +67,8 @@
 
 #define ST_FACESTRIDE       (ST_NUMSTRAIGHTFACES+ST_NUMTURNFACES+ST_NUMSPECIALFACES)
 #define ST_NUMEXTRAFACES    2
-#define ST_NUMFACES         (ST_FACESTRIDE*ST_NUMPAINFACES+ST_NUMEXTRAFACES)
+// [JN] Additional faces (Jaguar: +6 (exploded), PSX: +1 (squished))
+#define ST_NUMFACES         (ST_FACESTRIDE*ST_NUMPAINFACES+ST_NUMEXTRAFACES+7)
 
 #define ST_TURNOFFSET       (ST_NUMSTRAIGHTFACES)
 #define ST_OUCHOFFSET       (ST_TURNOFFSET + ST_NUMTURNFACES)
@@ -75,6 +76,13 @@
 #define ST_RAMPAGEOFFSET    (ST_EVILGRINOFFSET + 1)
 #define ST_GODFACE          (ST_NUMPAINFACES*ST_FACESTRIDE)
 #define ST_DEADFACE         (ST_GODFACE+1)
+#define ST_EXPLFACE0        (ST_DEADFACE+1)
+#define ST_EXPLFACE1        (ST_EXPLFACE0+1)
+#define ST_EXPLFACE2        (ST_EXPLFACE1+1)
+#define ST_EXPLFACE3        (ST_EXPLFACE2+1)
+#define ST_EXPLFACE4        (ST_EXPLFACE3+1)
+#define ST_EXPLFACE5        (ST_EXPLFACE4+1)
+#define ST_CRSHFACE0        (ST_EXPLFACE5+1)
 
 #define ST_EVILGRINCOUNT        (TICRATE*2)
 #define ST_STRAIGHTFACECOUNT    (TICRATE/2)
@@ -97,7 +105,6 @@ int st_palette = 0;
 static int oldweaponsowned[NUMWEAPONS]; 
 
 static patch_t *sbar;                // main bar background
-static patch_t *sbarr;               // main bar right, for doom 1.0
 static patch_t *tallnum[10];         // 0-9, tall numbers
 static patch_t *tallpercent;         // tall % sign
 static patch_t *tallminus;           // [JN] "minus" symbol
@@ -713,6 +720,34 @@ static void ST_updateFaceWidget (void)
             painoffset = 0;
             faceindex = ST_DEADFACE;
             st_facecount = 1;
+        }
+
+        // [JN] Exploded and squished faces
+        if (plyr->health <= 0 
+        &&  plyr->mo->state - states >= mobjinfo[plyr->mo->type].xdeathstate)
+        {
+            priority = 9;
+            painoffset = 0;
+
+            // Sync with actual player state:
+            if (plyr->mo->state == &states[S_PLAY_XDIE1])
+                faceindex = ST_EXPLFACE0;
+            if (plyr->mo->state == &states[S_PLAY_XDIE2])
+                faceindex = ST_EXPLFACE1;
+            if (plyr->mo->state == &states[S_PLAY_XDIE3])
+                faceindex = ST_EXPLFACE2;
+            if (plyr->mo->state == &states[S_PLAY_XDIE4])
+                faceindex = ST_EXPLFACE3;
+            if (plyr->mo->state == &states[S_PLAY_XDIE5])
+                faceindex = ST_EXPLFACE4;
+            if ((plyr->mo->state == &states[S_PLAY_XDIE6])
+            ||  (plyr->mo->state == &states[S_PLAY_XDIE7])
+            ||  (plyr->mo->state == &states[S_PLAY_XDIE8])
+            ||  (plyr->mo->state == &states[S_PLAY_XDIE9]))
+                faceindex = ST_EXPLFACE5;
+
+            if (plyr->mo->state == &states[S_GIBS])
+                faceindex = ST_CRSHFACE0;
         }
     }
 
@@ -1345,12 +1380,6 @@ void ST_Drawer (boolean force)
             V_DrawPatch(0, 0, sbar);
         }
 
-        // draw right side of bar if needed (Doom 1.0)
-        if (sbarr)
-        {
-            V_DrawPatch(104 /*- ST_WIDESCREENDELTA*/, 0, sbarr);
-        }
-
         V_RestoreBuffer();
 
         V_CopyRect(0, 0, st_backing_screen, SCREENWIDTH, ST_HEIGHT * vid_resolution, 0, ST_Y * vid_resolution);
@@ -1500,16 +1529,7 @@ static void ST_loadUnloadGraphics(load_callback_t callback)
     callback("STPBG", &faceback);
 
     // status bar background bits
-    if (W_CheckNumForName("STBAR") >= 0)
-    {
-        callback("STBAR", &sbar);
-        sbarr = NULL;
-    }
-    else
-    {
-        callback("STMBARL", &sbar);
-        callback("STMBARR", &sbarr);
-    }
+    callback("STBAR", &sbar);
 
     // face states
     facenum = 0;
@@ -1538,10 +1558,15 @@ static void ST_loadUnloadGraphics(load_callback_t callback)
         ++facenum;
     }
 
-    callback("STFGOD0", &faces[facenum]);
-    ++facenum;
-    callback("STFDEAD0", &faces[facenum]);
-    ++facenum;
+    callback("STFGOD0",  &faces[facenum++]);
+    callback("STFDEAD0", &faces[facenum++]);
+    callback("STFEXP0G", &faces[facenum++]);
+    callback("STFEXP1G", &faces[facenum++]);
+    callback("STFEXP2G", &faces[facenum++]);
+    callback("STFEXP3G", &faces[facenum++]);
+    callback("STFEXP4G", &faces[facenum++]);
+    callback("STFEXP5G", &faces[facenum++]);
+    callback("STFCRS0G", &faces[facenum++]);
 }
 
 static void ST_loadCallback(const char *lumpname, patch_t **variable)
