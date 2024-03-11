@@ -1,6 +1,5 @@
 foreach(SUBDIR
-    doom 
-    setup)
+    doom)
     add_subdirectory("${SUBDIR}")
 endforeach()
 
@@ -149,48 +148,4 @@ if(MSVC)
 endif()
 
 set_target_properties("${PROGRAM_PREFIX}doom" PROPERTIES
-                      INTERPROCEDURAL_OPTIMIZATION ${ENABLE_LTO})
-
-# Source files needed for chocolate-setup:
-
-set(SETUP_FILES
-    deh_str.c           deh_str.h
-    d_mode.c            d_mode.h
-    d_iwad.c            d_iwad.h
-    i_timer.c           i_timer.h
-    m_config.c          m_config.h
-    m_controls.c        m_controls.h
-    net_io.c            net_io.h
-    net_packet.c        net_packet.h
-    net_petname.c       net_petname.h
-    net_sdl.c           net_sdl.h
-    net_query.c         net_query.h
-    net_structrw.c      net_structrw.h
-    z_native.c          z_zone.h)
-
-if(WIN32)
-    add_executable("${PROGRAM_PREFIX}setup" WIN32 ${SETUP_FILES} ${COMMON_SOURCE_FILES} "${CMAKE_CURRENT_BINARY_DIR}/setup-res.rc")
-else()
-    add_executable("${PROGRAM_PREFIX}setup" ${SETUP_FILES} ${COMMON_SOURCE_FILES})
-endif()
-
-target_include_directories("${PROGRAM_PREFIX}setup"
-                           PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/../")
-target_link_libraries("${PROGRAM_PREFIX}setup" "$<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>" SDL2::SDL2 setup textscreen)
-if(ENABLE_SDL2_MIXER)
-    target_link_libraries("${PROGRAM_PREFIX}setup" SDL2_mixer::SDL2_mixer)
-endif()
-if(ENABLE_SDL2_NET)
-    target_link_libraries("${PROGRAM_PREFIX}setup" SDL2_net::SDL2_net)
-endif()
-if(WIN32)
-    target_link_libraries("${PROGRAM_PREFIX}setup" winmm)
-endif()
-
-if(MSVC)
-    set_target_properties("${PROGRAM_PREFIX}setup" PROPERTIES
-                          LINK_FLAGS "/MANIFEST:NO")
-endif()
-
-set_target_properties("${PROGRAM_PREFIX}setup" PROPERTIES
                       INTERPROCEDURAL_OPTIMIZATION ${ENABLE_LTO})
