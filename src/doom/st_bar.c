@@ -1067,7 +1067,6 @@ enum
 {
     hudcolor_ammo,
     hudcolor_health,
-    hudcolor_frags,
     hudcolor_armor
 } hudcolor_t;
 
@@ -1119,19 +1118,6 @@ static byte *ST_WidgetColor (const int i)
                 return cr[CR_YELLOW];
             else
                 return cr[CR_RED];
-            break;
-        }
-        case hudcolor_frags:
-        {
-            int frags = st_fragscount;
-
-            if (frags < 0)
-                return cr[CR_RED];
-            else if (frags == 0)
-                return cr[CR_YELLOW];
-            else
-                return cr[CR_GREEN];
-
             break;
         }
         case hudcolor_armor:
@@ -1402,19 +1388,6 @@ void ST_Drawer (boolean force)
         ST_DrawPercent(104 - wide_x, 174, ST_WidgetColor(hudcolor_health));
     }
 
-/*
-    // Frags of Arms
-    if (deathmatch)
-    {
-        st_fragscount = ST_UpdateFragsCounter(displayplayer, false);
-        ST_DrawBigNumber(st_fragscount, 100 - wide_x, 171, ST_WidgetColor(hudcolor_frags));
-    }
-    else
-    {
-
-    }
-*/
-
     // [crispy] blinking key or skull in the status bar
     for (int i = 0, y = 0 ; i < 3 ; i++, y += 10)
     {
@@ -1476,7 +1449,7 @@ void ST_Drawer (boolean force)
     ST_DrawWeaponNumberFunc(7, 269 - wide_x, 185, plyr->weaponowned[6]);
 
     // Current map
-    ST_DrawBigNumber(gamemap, 279 + wide_x, 174, ST_WidgetColor(hudcolor_armor));
+    ST_DrawBigNumber(gamemap, 279 + wide_x, 174, NULL);
     }
 }
 
