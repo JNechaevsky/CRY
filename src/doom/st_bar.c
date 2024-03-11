@@ -105,7 +105,7 @@ static patch_t *shortnum_y[10];      // 0-9, short, yellow numbers
 static patch_t *shortnum_g[10];      // 0-9, short, gray numbers
 static patch_t *keys[NUMCARDS];      // 3 key-cards, 3 skulls
 static patch_t *faces[ST_NUMFACES];  // face status patches
-static patch_t *faceback[MAXPLAYERS];// [JN] killough 3/7/98: make array
+static patch_t *faceback;            // player face background
 
 // [crispy] blinking key or skull in the status bar
 int st_keyorskull[3];
@@ -1351,13 +1351,6 @@ void ST_Drawer (boolean force)
             V_DrawPatch(104 /*- ST_WIDESCREENDELTA*/, 0, sbarr);
         }
 
-        if (netgame)
-        {
-            // Player face background
-            // [JN] killough 3/7/98: make face background change with displayplayer
-            V_DrawPatch(143, 0, faceback[displayplayer]);
-        }
-
         V_RestoreBuffer();
 
         V_CopyRect(0, 0, st_backing_screen, SCREENWIDTH, ST_HEIGHT * vid_resolution, 0, ST_Y * vid_resolution);
@@ -1399,31 +1392,31 @@ void ST_Drawer (boolean force)
             }
             if (plyr->tryopen[i] & KEYBLINKMASK)
             {
-                V_DrawPatch(124 + wide_x, 163 + y, keys[i + st_keyorskull[i]]);
+                V_DrawPatch(124 - wide_x, 163 + y, keys[i + st_keyorskull[i]]);
             }
         }
     }
 
     // Keys (in order of Jaguar Doom)
     if (plyr->cards[it_redskull])
-    V_DrawPatch(124 + wide_x, 163, keys[5]);
+    V_DrawPatch(124 - wide_x, 163, keys[5]);
     else if (plyr->cards[it_redcard])
-    V_DrawPatch(124 + wide_x, 163, keys[2]);
+    V_DrawPatch(124 - wide_x, 163, keys[2]);
 
     if (plyr->cards[it_blueskull])
-    V_DrawPatch(124 + wide_x, 175, keys[3]);
+    V_DrawPatch(124 - wide_x, 175, keys[3]);
     else if (plyr->cards[it_bluecard])
-    V_DrawPatch(124 + wide_x, 175, keys[0]);
+    V_DrawPatch(124 - wide_x, 175, keys[0]);
 
     if (plyr->cards[it_yellowskull])
-    V_DrawPatch(124 + wide_x, 187, keys[4]);
+    V_DrawPatch(124 - wide_x, 187, keys[4]);
     else if (plyr->cards[it_yellowcard])
-    V_DrawPatch(124 + wide_x, 187, keys[1]);
+    V_DrawPatch(124 - wide_x, 187, keys[1]);
 
     // Player face background
     if (dp_screen_size == 11 || dp_screen_size == 13)
     {
-        V_DrawPatch(143, 168, netgame ? faceback[displayplayer] : faceback[1]);
+        V_DrawPatch(143, 163, faceback);
     }
     // Player face
     if (dp_screen_size <= 11 || dp_screen_size == 13 || (automapactive && !automap_overlay))
@@ -1436,17 +1429,17 @@ void ST_Drawer (boolean force)
     ST_DrawPercent(225 + wide_x, 174, ST_WidgetColor(hudcolor_armor));
 
     // Pistol
-    ST_DrawWeaponNumberFunc(2, 245 - wide_x, 175, plyr->weaponowned[1]);
+    ST_DrawWeaponNumberFunc(2, 245 + wide_x, 175, plyr->weaponowned[1]);
     // Shotgun or Super Shotgun
-    ST_DrawWeaponNumberFunc(3, 257 - wide_x, 175, plyr->weaponowned[2] || plyr->weaponowned[8]);
+    ST_DrawWeaponNumberFunc(3, 257 + wide_x, 175, plyr->weaponowned[2] || plyr->weaponowned[8]);
     // Chaingun
-    ST_DrawWeaponNumberFunc(4, 269 - wide_x, 175, plyr->weaponowned[3]);
+    ST_DrawWeaponNumberFunc(4, 269 + wide_x, 175, plyr->weaponowned[3]);
     // Rocket Launcher
-    ST_DrawWeaponNumberFunc(5, 245 - wide_x, 185, plyr->weaponowned[4]);
+    ST_DrawWeaponNumberFunc(5, 245 + wide_x, 185, plyr->weaponowned[4]);
     // Plasma Gun
-    ST_DrawWeaponNumberFunc(6, 257 - wide_x, 185, plyr->weaponowned[5]);
+    ST_DrawWeaponNumberFunc(6, 257 + wide_x, 185, plyr->weaponowned[5]);
     // BFG9000
-    ST_DrawWeaponNumberFunc(7, 269 - wide_x, 185, plyr->weaponowned[6]);
+    ST_DrawWeaponNumberFunc(7, 269 + wide_x, 185, plyr->weaponowned[6]);
 
     // Current map
     ST_DrawBigNumber(gamemap, 279 + wide_x, 174, NULL);
@@ -1503,14 +1496,8 @@ static void ST_loadUnloadGraphics(load_callback_t callback)
         callback(namebuf, &keys[i]);
     }
 
-    // face backgrounds for different color players
-    // [JN] killough 3/7/98: add better support for spy mode by loading
-    // all player face backgrounds and using displayplayer to choose them:
-    for (i=0; i<MAXPLAYERS; i++)
-    {
-    snprintf(namebuf, 9, "STFB%d", i);
-    callback(namebuf, &faceback[i]);
-    }
+    // face background
+    callback("STPBG", &faceback);
 
     // status bar background bits
     if (W_CheckNumForName("STBAR") >= 0)
