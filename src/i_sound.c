@@ -74,7 +74,6 @@ static const sound_module_t *sound_modules[] =
 #ifndef DISABLE_SDL2MIXER
     &sound_sdl_module,
 #endif // DISABLE_SDL2MIXER
-    &sound_pcsound_module,
     NULL,
 };
 
