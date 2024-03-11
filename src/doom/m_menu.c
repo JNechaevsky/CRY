@@ -4686,7 +4686,7 @@ static void M_DrawMainMenu(void)
 static void M_DrawNewGame (void)
 {
 	M_WriteTextBigCentered(14, "New Game", NULL);
-	M_WriteTextBigCentered(38, "Difficulty", NULL);
+	M_WriteTextBigCentered(38, "Difficulty:", NULL);
 	// [JN] Jaguar: draw "Nightmare!" as separated patch.
 	dp_translation = M_Big_Line_Glow(currentMenu->menuitems[4].tics);
 	V_DrawShadowedPatchOptional(69, 127, 0, W_CacheLumpName("M_NMARE", PU_CACHE));
@@ -4701,12 +4701,7 @@ static void M_NewGame(int choice)
 	return;
     }
 	
-    // Chex Quest disabled the episode select screen, as did Doom II.
-
-    if (gamemode == commercial || gameversion == exe_chex)
 	M_SetupNextMenu(&NewDef);
-    else
-	M_SetupNextMenu(&EpiDef);
 }
 
 
