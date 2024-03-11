@@ -1,6 +1,5 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -12,7 +11,6 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-
 
 #include <ctype.h>
 #include <stdio.h>
@@ -28,8 +26,8 @@
 #include "txt_utf8.h"
 #include "txt_window.h"
 
-extern txt_widget_class_t txt_inputbox_class;
-extern txt_widget_class_t txt_int_inputbox_class;
+txt_widget_class_t txt_inputbox_class;
+txt_widget_class_t txt_int_inputbox_class;
 
 static void SetBufferFromValue(txt_inputbox_t *inputbox)
 {
@@ -39,7 +37,7 @@ static void SetBufferFromValue(txt_inputbox_t *inputbox)
 
         if (*value != NULL)
         {
-            TXT_StringCopy(inputbox->buffer, *value, inputbox->size);
+            TXT_StringCopy(inputbox->buffer, *value, strnlen(*value, inputbox->buffer_len) + 1);
         }
         else
         {
@@ -149,15 +147,15 @@ static void TXT_InputBoxDrawer(TXT_UNCAST_ARG(inputbox))
 
     if (TXT_UTF8_Strlen(inputbox->buffer) > w - 1)
     {
-        TXT_DrawString("\xae");
-        TXT_DrawUTF8String(
+        TXT_DrawCodePageString("\xae");
+        TXT_DrawString(
             TXT_UTF8_SkipChars(inputbox->buffer,
                                TXT_UTF8_Strlen(inputbox->buffer) - w + 2));
         chars = w - 1;
     }
     else
     {
-        TXT_DrawUTF8String(inputbox->buffer);
+        TXT_DrawString(inputbox->buffer);
         chars = TXT_UTF8_Strlen(inputbox->buffer);
     }
 
@@ -255,7 +253,7 @@ static int TXT_InputBoxKeyPress(TXT_UNCAST_ARG(inputbox), int key)
     // Add character to the buffer, but only if it's a printable character
     // that we can represent on the screen.
     if (isprint(c)
-     || (c >= 128 && TXT_CanDrawCharacter(c)))
+     || (c >= 128 && TXT_UnicodeCharacter(c) >= 0))
     {
         AddCharacter(inputbox, c);
     }

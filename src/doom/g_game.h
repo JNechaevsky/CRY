@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -13,69 +13,64 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
+// DESCRIPTION:
+//   Duh.
+// 
 
 
-#ifndef __G_GAME__
-#define __G_GAME__
+#pragma once
 
 #include "doomdef.h"
 #include "d_event.h"
 #include "d_ticcmd.h"
 
 
-// =============================================================================
-// GAME
-// =============================================================================
+extern boolean G_CheckDemoStatus (void);
+extern boolean G_Responder (event_t *ev);
 
-void G_DeathMatchSpawnPlayer (int playernum);
+extern char *demoname;
+extern int   demostarttic; // [crispy] fix revenant internal demo
 
-void G_InitNew (skill_t skill, int episode, int map);
+extern fixed_t forwardmove[2];
+extern fixed_t sidemove[2];
 
-// Can be called by the startup code or M_Responder.
-// A normal game starts at map 1,
-// but a warp test can start elsewhere
-void G_DeferedInitNew (skill_t skill, int episode, int map);
+extern int G_VanillaVersionCode(void);
 
-// [Julia] Same as above, used for keeping player_is_cheater flag.
-void G_DeferedInitNewCheated (skill_t skill, int episode, int map);
+extern void G_BeginRecording (void);
+extern void G_BuildTiccmd (ticcmd_t *cmd, int maketic); 
+extern void G_DeathMatchSpawnPlayer (int playernum);
+extern void G_DeferedInitNew (skill_t skill, int episode, int map);
+extern void G_DeferedPlayDemo (const char* name);
+extern void G_DoCompleted (void); 
+extern void G_DoLoadGame (void);
+extern void G_DoLoadLevel (void); 
+extern void G_DoNewGame (void); 
+extern void G_DoSelectiveGame (int choice); 
+extern void G_DoPlayDemo (void); 
+extern void G_DoReborn (int playernum); 
+extern void G_DoSaveGame (void); 
+extern void G_DoVictory (void); 
+extern void G_DoWorldDone (void); 
+extern void G_DrawMouseSpeedBox (void);
+extern void G_ExitLevel (void);
+extern void G_InitNew (skill_t skill, int episode, int map);
+extern void G_LoadGame (char *name);
+extern void G_PlayDemo (char *name);
+extern void G_PlayerReborn (int player);
+extern void G_ReadDemoTiccmd (ticcmd_t *cmd); 
+extern void G_RecordDemo (const char *name);
+extern void G_SaveGame (int slot, char *description);
+extern void G_ScreenShot (void);
+extern void G_SecretExitLevel (void);
+extern void G_Ticker (void);
+extern void G_TimeDemo (char *name);
+extern void G_WorldDone (void);
+extern void G_WriteDemoTiccmd (ticcmd_t *cmd); 
 
-void G_DeferedPlayDemo (char* name);
+// [crispy] holding down the "Run" key may trigger special behavior
+extern boolean speedkeydown (void);
 
-// Can be called by the startup code or M_Responder,
-// calls P_SetupLevel or W_EnterWorld.
-void G_LoadGame (char* name);
-
-void G_DoLoadGame (void);
-
-// Called by M_Responder.
-void G_SaveGame (int slot, char* description);
-
-// Only called by startup code.
-void G_RecordDemo (char* name);
-
-void G_BeginRecording (void);
-
-void G_PlayDemo (char* name);
-void G_TimeDemo (char* name);
-boolean G_CheckDemoStatus (void);
-
-void G_ExitLevel (void);
-void G_SecretExitLevel (void);
-
-void G_WorldDone (void);
-
-// Read current data from inputs and build a player movement command.
-
-void G_BuildTiccmd (ticcmd_t *cmd, int maketic); 
-
-void G_Ticker (void);
-boolean G_Responder (event_t*	ev);
-
-void G_ScreenShot (void);
-
-void G_DrawMouseSpeedBox(void);
-int G_VanillaVersionCode(void);
-
-
-#endif
-
+// [JN] Fast forward to next level while demo playback.
+extern boolean netdemo; 
+extern boolean demo_gotonextlvl;
+extern void G_DemoGoToNextLevel (boolean start);

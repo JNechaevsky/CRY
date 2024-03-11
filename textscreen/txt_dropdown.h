@@ -1,6 +1,5 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -12,7 +11,6 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-
 
 #ifndef TXT_DROPDOWN_H
 #define TXT_DROPDOWN_H
@@ -45,7 +43,7 @@ struct txt_dropdown_list_s
 {
     txt_widget_t widget;
     int *variable;
-    char **values;
+    const char **values;
     int num_values;
 };
 
@@ -59,12 +57,12 @@ struct txt_dropdown_list_s
  * @param variable        Pointer to the variable containing the
  *                        list's value.
  * @param values          Pointer to an array of strings containing
- *                        the labels to use for the list.
+ *                        the labels to use for the list (UTF-8 format).
  * @param num_values      The number of variables in the list.
  */
 
 txt_dropdown_list_t *TXT_NewDropdownList(int *variable, 
-                                         char **values, int num_values);
+                                         const char **values, int num_values);
 
 #endif /* #ifndef TXT_DROPDOWN_H */
 

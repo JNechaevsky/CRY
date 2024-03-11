@@ -1,6 +1,6 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -12,13 +12,17 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-
+//
+// Parses "Frame" sections in dehacked files
+//
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "doomdef.h"
 #include "doomtype.h"
-#include "d_items.h"
 #include "info.h"
+
 #include "deh_defs.h"
 #include "deh_io.h"
 #include "deh_main.h"
@@ -29,8 +33,6 @@ DEH_BEGIN_MAPPING(state_mapping, state_t)
   DEH_MAPPING("Sprite subnumber", frame)
   DEH_MAPPING("Duration",         tics)
   DEH_MAPPING("Next frame",       nextstate)
-  DEH_MAPPING("Unknown 1",        misc1)
-  DEH_MAPPING("Unknown 2",        misc2)
   DEH_UNSUPPORTED_MAPPING("Codep frame")
 DEH_END_MAPPING
 
@@ -124,7 +126,8 @@ static void DEH_FrameParseLine(deh_context_t *context, char *line, void *tag)
 
     ivalue = atoi(value);
     
-    if (state == &states[NUMSTATES - 1])
+    // [crispy] drop the overflow simulation into the frame table
+    if (state == &states[NUMSTATES - 1] && false)
     {
         DEH_FrameOverflow(context, variable_name, ivalue);
     }

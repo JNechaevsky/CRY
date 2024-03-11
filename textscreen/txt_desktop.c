@@ -1,6 +1,5 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -12,7 +11,6 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -191,10 +189,6 @@ static void DrawDesktopBackground(const char *title)
     TXT_Puts(title);
 }
 
-//
-// [Julia] English "F1=Help"
-//
-
 static void DrawHelpIndicator(void)
 {
     char keybuf[10];
@@ -205,7 +199,7 @@ static void DrawHelpIndicator(void)
 
     TXT_GetMousePosition(&x, &y);
 
-    if (y == 0 && x >= TXT_SCREEN_W - 16)
+    if (y == 0 && x >= TXT_SCREEN_W - 9)
     {
         fgcolor = TXT_COLOR_GREY;
         TXT_BGColor(TXT_COLOR_BLACK, 0);
@@ -216,52 +210,17 @@ static void DrawHelpIndicator(void)
         TXT_BGColor(TXT_COLOR_GREY, 0);
     }
 
-    TXT_GotoXY(TXT_SCREEN_W - 16, 0);
+    TXT_GotoXY(TXT_SCREEN_W - 9, 0);
 
     TXT_FGColor(TXT_COLOR_BRIGHT_WHITE);
     TXT_DrawString(" ");
     TXT_DrawString(keybuf);
 
     TXT_FGColor(fgcolor);
-    TXT_DrawString("=Online help ");
+    TXT_DrawString("=Help ");
 }
 
-//
-// [Julia] Russian "F1=Онлайн справка"
-//
-
-static void DrawHelpIndicatorRus(void)
-{
-    char keybuf[10];
-    int fgcolor;
-    int x, y;
-
-    TXT_GetKeyDescription(HELP_KEY, keybuf, sizeof(keybuf));
-
-    TXT_GetMousePosition(&x, &y);
-
-    if (y == 0 && x >= TXT_SCREEN_W - 19)
-        {
-            fgcolor = TXT_COLOR_GREY;
-            TXT_BGColor(TXT_COLOR_BLACK, 0);
-        }
-        else
-        {
-            fgcolor = TXT_COLOR_BLACK;
-            TXT_BGColor(TXT_COLOR_GREY, 0);
-        }
-
-        TXT_GotoXY(TXT_SCREEN_W - 19, 0);
-
-        TXT_FGColor(TXT_COLOR_BRIGHT_WHITE);
-        TXT_DrawString(" ");
-        TXT_DrawString(keybuf);
-
-        TXT_FGColor(fgcolor);
-        TXT_DrawString("=Ћнлайн справка ");
-}
-
-void TXT_SetDesktopTitle(char *title)
+void TXT_SetDesktopTitle(const char *title)
 {
     free(desktop_title);
     desktop_title = strdup(title);
@@ -284,17 +243,9 @@ void TXT_DrawDesktop(void)
     DrawDesktopBackground(title);
 
     active_window = TXT_GetActiveWindow();
-
-    // [Julia] Draw English "Online help"
     if (active_window != NULL && active_window->help_url != NULL)
     {
         DrawHelpIndicator();
-    }
-
-    // [Julia] Draw Russian "Онлайн справка"
-    if (active_window != NULL && active_window->help_url_rus != NULL)
-    {
-        DrawHelpIndicatorRus();
     }
 
     for (i=0; i<num_windows; ++i)
@@ -319,11 +270,10 @@ static void DesktopInputEvent(int c)
 
             // Clicking the top-right of the screen is equivalent
             // to pressing the help key.
-
-                if (y == 0 && x >= TXT_SCREEN_W - 19)
-                {
-                    DesktopInputEvent(HELP_KEY);
-                }
+            if (y == 0 && x >= TXT_SCREEN_W - 9)
+            {
+                DesktopInputEvent(HELP_KEY);
+            }
             break;
 
         case HELP_KEY:

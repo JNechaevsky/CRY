@@ -1,6 +1,5 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -12,7 +11,6 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-
 
 #ifndef TXT_WINDOW_H
 #define TXT_WINDOW_H
@@ -74,7 +72,7 @@ struct txt_window_s
 
     // Actions that appear in the box at the bottom of the window
 
-    txt_window_action_t *actions[3];
+    txt_widget_t *actions[3];
 
     // Callback functions to invoke when keys/mouse buttons are pressed
 
@@ -90,19 +88,19 @@ struct txt_window_s
 
     // URL of a webpage with help about this window. If set, a help key
     // indicator is shown while this window is active.
-    char *help_url;     // [Julia] English "Online help"
-    char *help_url_rus; // [Julia] Russian "Онлайн справка"
+    const char *help_url;
 };
 
 /**
  * Open a new window.
  *
- * @param title        Title to display in the titlebar of the new window.
+ * @param title        Title to display in the titlebar of the new window
+ *                     (UTF-8 format).
  * @return             Pointer to a new @ref txt_window_t structure
  *                     representing the new window.
  */
 
-txt_window_t *TXT_NewWindow(char *title);
+txt_window_t *TXT_NewWindow(const char *title);
 
 /**
  * Close a window.
@@ -161,7 +159,7 @@ void TXT_SetWindowPosition(txt_window_t *window,
  */
 
 void TXT_SetWindowAction(txt_window_t *window, txt_horiz_align_t position,
-                         txt_window_action_t *action);
+                         TXT_UNCAST_ARG(action));
 
 /**
  * Set a callback function to be invoked whenever a key is pressed within
@@ -194,12 +192,12 @@ void TXT_SetMouseListener(txt_window_t *window,
 /**
  * Open a window displaying a message.
  *
- * @param title           Title of the window.
- * @param message         The message to display in the window.
+ * @param title           Title of the window (UTF-8 format).
+ * @param message         The message to display in the window (UTF-8 format).
  * @return                The new window.
  */
 
-txt_window_t *TXT_MessageBox(char *title, char *message, ...);
+txt_window_t *TXT_MessageBox(const char *title, const char *message, ...);
 
 /**
  * Set the help URL for the given window.
@@ -209,8 +207,7 @@ txt_window_t *TXT_MessageBox(char *title, char *message, ...);
  *                        window, or NULL to set no help for this window.
  */
 
-void TXT_SetWindowHelpURL(txt_window_t *window, char *help_url);
-void TXT_SetWindowHelpURL_RUS(txt_window_t *window, char *help_url_rus);
+void TXT_SetWindowHelpURL(txt_window_t *window, const char *help_url);
 
 /**
  * Open the help URL for the given window, if one is set.

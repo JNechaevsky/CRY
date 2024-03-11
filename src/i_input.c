@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,12 +20,21 @@
 
 #include "SDL.h"
 #include "SDL_keycode.h"
+
 #include "doomkeys.h"
 #include "doomtype.h"
 #include "d_event.h"
 #include "i_input.h"
+#include "i_timer.h" // [crispy]
 #include "m_argv.h"
 #include "m_config.h"
+#include "m_fixed.h" // [crispy]
+
+#include "id_vars.h"
+
+
+// [JN] Catch mouse button number to provide into mouse binding menu.
+int SDL_mouseButton;
 
 static const int scancode_translate_table[] = SCANCODE_TO_KEYS_ARRAY;
 
@@ -78,15 +87,13 @@ static boolean text_input_enabled = true;
 // Bit mask of mouse button state.
 static unsigned int mouse_button_state = 0;
 
+// [JN] Defauld mouse sensivity.
+int mouseSensitivity = 5;
+
 // Disallow mouse and joystick movement to cause forward/backward
-// motion.  Specified with the '-novert' command line parameter.
+// motion.  Specified with the '-mouse_novert' command line parameter.
 // This is an int to allow saving to config file
-
-// [Julia] Вертикальное перемещение отключено по умолчанию.
-int novert = 1;
-
-// [Julia] Mouselook: disabled by default.
-int mlook = 0;
+int mouse_novert = 1;
 
 // If true, keyboard mapping is ignored, like in Vanilla Doom.
 // The sensible thing to do is to disable this if you have a non-US
@@ -104,6 +111,8 @@ int vanilla_keyboard_mapping = true;
 // by mouse_acceleration to increase the speed.
 float mouse_acceleration = 2.0;
 int mouse_threshold = 10;
+// [crispy]
+int mouse_y_invert = 0;
 
 // Translates the SDL key to a value of the type found in doomkeys.h
 static int TranslateKey(SDL_Keysym *sym)
@@ -322,6 +331,8 @@ static void UpdateMouseButtonState(unsigned int button, boolean on)
     // Note: button "0" is left, button "1" is right,
     // button "2" is middle for Doom.  This is different
     // to how SDL sees things.
+    // In the end: Left=0, Right=1, Middle=2,
+    // WheelUp=3 WheelDown=4, XButton1=5, XButton2=6
 
     switch (button)
     {
@@ -339,9 +350,13 @@ static void UpdateMouseButtonState(unsigned int button, boolean on)
 
         default:
             // SDL buttons are indexed from 1.
-            --button;
+            // And the wheel is mapped to button 3/4
+            // So we have to increment 2 and decrement 1 => inc 1.
+            button++;
             break;
     }
+
+    SDL_mouseButton = button;
 
     // Turn bit representing this button on or off.
 
@@ -378,6 +393,8 @@ static void MapMouseWheelToButtons(SDL_MouseWheelEvent *wheel)
     {   // scroll up
         button = 3;
     }
+
+    SDL_mouseButton = button;
 
     // post a button down event
     mouse_button_state |= (1 << button);
@@ -430,6 +447,32 @@ static int AccelerateMouse(int val)
     }
 }
 
+// [crispy] Distribute the mouse movement between the current tic and the next
+// based on how far we are into the current tic. Compensates for mouse sampling
+// jitter.
+static void SmoothMouse(int* x, int* y)
+{
+    static int x_remainder_old = 0;
+    static int y_remainder_old = 0;
+    int x_remainder, y_remainder;
+    fixed_t correction_factor;
+    fixed_t fractic;
+
+    *x += x_remainder_old;
+    *y += y_remainder_old;
+
+    fractic = I_GetFracRealTime();
+    correction_factor = FixedDiv(fractic, FRACUNIT + fractic);
+
+    x_remainder = FixedMul(*x, correction_factor);
+    *x -= x_remainder;
+    x_remainder_old = x_remainder;
+
+    y_remainder = FixedMul(*y, correction_factor);
+    *y -= y_remainder;
+    y_remainder_old = y_remainder;
+}
+
 //
 // Read the change in mouse state to generate mouse motion events
 //
@@ -442,16 +485,20 @@ void I_ReadMouse(void)
 
     SDL_GetRelativeMouseState(&x, &y);
 
+    if (vid_uncapped_fps)
+    {
+        SmoothMouse(&x, &y);
+    }
+
     if (x != 0 || y != 0) 
     {
         ev.type = ev_mouse;
         ev.data1 = mouse_button_state;
         ev.data2 = AccelerateMouse(x);
 
-        // [Julia] Mouselook: we need vertical mouse movement for mlook
-        if (!novert || mlook)
+        if (true || !mouse_novert) // [crispy] moved to src/*/g_game.c
         {
-            ev.data3 = -AccelerateMouse(y);
+            ev.data3 = -AccelerateMouse(y); // [crispy]
         }
         else
         {
@@ -467,8 +514,10 @@ void I_ReadMouse(void)
 // Bind all variables controlling input options.
 void I_BindInputVariables(void)
 {
+    M_BindIntVariable("mouse_sensitivity",         &mouseSensitivity);
     M_BindFloatVariable("mouse_acceleration",      &mouse_acceleration);
     M_BindIntVariable("mouse_threshold",           &mouse_threshold);
     M_BindIntVariable("vanilla_keyboard_mapping",  &vanilla_keyboard_mapping);
-    M_BindIntVariable("novert",                    &novert);
+    M_BindIntVariable("mouse_novert",              &mouse_novert);
+    M_BindIntVariable("mouse_y_invert",            &mouse_y_invert); // [crispy]
 }

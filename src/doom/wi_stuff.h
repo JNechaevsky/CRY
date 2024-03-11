@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -14,32 +14,17 @@
 // GNU General Public License for more details.
 //
 
+#pragma once
 
-#ifndef __WI_STUFF__
-#define __WI_STUFF__
-
-
-#include "doomdef.h"
 
 // States for the intermission
-
 typedef enum
 {
-    NoState = -1,
-    StatCount,
+	NoState = -1,
+	StatCount,
 } stateenum_t;
 
-// Called by main loop, animate the intermission.
-void WI_Ticker (void);
-
-// Called by main loop,
-// draws the intermission directly into the screen buffer.
-void WI_Drawer (void);
-
-// Setup for an intermission screen.
-void WI_Start(wbstartstruct_t*	 wbstartstruct);
-
-// Shut down the intermission screen
-void WI_End(void);
-
-#endif
+extern void WI_Drawer (void);
+extern void WI_Init (void);
+extern void WI_Start (wbstartstruct_t *wbstartstruct);
+extern void WI_Ticker (void);

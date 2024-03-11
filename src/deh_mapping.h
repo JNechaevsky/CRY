@@ -1,6 +1,6 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,7 +17,6 @@
 // Allows the fields in structures to be mapped out and accessed by
 // name
 //
-
 
 #ifndef DEH_MAPPING_H
 #define DEH_MAPPING_H
@@ -62,7 +61,7 @@ struct deh_mapping_entry_s
 {
     // field name
    
-    char *name;
+    const char *name;
 
     // location relative to the base in the deh_mapping_t struct
     // If this is NULL, it is an unsupported mapping

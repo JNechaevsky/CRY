@@ -1,6 +1,5 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,7 +15,6 @@
 // Text mode emulation in SDL
 //
 
-
 #ifndef TXT_IO_H
 #define TXT_IO_H
 
@@ -28,6 +26,7 @@ typedef struct
     int fgcolor;
 } txt_saved_colors_t;
 
+void TXT_PutSymbol(int c);
 void TXT_PutChar(int c);
 void TXT_Puts(const char *s);
 void TXT_GotoXY(int x, int y);

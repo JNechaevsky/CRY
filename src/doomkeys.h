@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,7 +16,6 @@
 // DESCRIPTION:
 //       Key definitions
 //
-
 
 #ifndef __DOOMKEYS__
 #define __DOOMKEYS__
@@ -147,9 +146,47 @@
     { 'y', "Y" },   { 'z', "Z" },   { '0', "0" },   { '1', "1" },    \
     { '2', "2" },   { '3', "3" },   { '4', "4" },   { '5', "5" },    \
     { '6', "6" },   { '7', "7" },   { '8', "8" },   { '9', "9" },    \
-    { '[', "[" },   { ']', "]" },   { ';', ";" },   { '`', "`" },    \
+    { '[', "[" },   { ']', "]" },   { ';', ";" },   { '`', "TILDE" },\
     { ',', "," },   { '.', "." },   { '/', "/" },   { '\\', "\\" },  \
-    { '\'', "\'" },                                                  \
+    { '\'', "\'" }, { '*', "*" },   { '+', "+" },                    \
 }
 
-#endif // __DOOMKEYS__
+// [JN] Alas, Raven games don't have some of special characters
+// in small game font, so we have to replace some symbols with names.
+// This table in used only in in-game bindings.
+#define KEY_NAMES_ARRAY_RAVEN {                                      \
+    { KEY_BACKSPACE,  "BACKSP" },   { KEY_TAB,        "TAB" },       \
+    { KEY_INS,        "INS" },      { KEY_DEL,        "DEL" },       \
+    { KEY_PGUP,       "PGUP" },     { KEY_PGDN,       "PGDN" },      \
+    { KEY_ENTER,      "ENTER" },    { KEY_ESCAPE,     "ESC" },       \
+    { KEY_F1,         "F1" },       { KEY_F2,         "F2" },        \
+    { KEY_F3,         "F3" },       { KEY_F4,         "F4" },        \
+    { KEY_F5,         "F5" },       { KEY_F6,         "F6" },        \
+    { KEY_F7,         "F7" },       { KEY_F8,         "F8" },        \
+    { KEY_F9,         "F9" },       { KEY_F10,        "F10" },       \
+    { KEY_F11,        "F11" },      { KEY_F12,        "F12" },       \
+    { KEY_HOME,       "HOME" },     { KEY_END,        "END" },       \
+    { KEY_MINUS,      "-" },        { KEY_EQUALS,     "=" },         \
+    { KEY_NUMLOCK,    "NUMLCK" },   { KEY_SCRLCK,     "SCRLCK" },    \
+    { KEY_PAUSE,      "PAUSE" },    { KEY_PRTSCR,     "PRTSC" },     \
+    { KEY_UPARROW,    "UP" },       { KEY_DOWNARROW,  "DOWN" },      \
+    { KEY_LEFTARROW,  "LEFT" },     { KEY_RIGHTARROW, "RIGHT" },     \
+    { KEY_RALT,       "ALT" },      { KEY_LALT,       "ALT" },       \
+    { KEY_RSHIFT,     "SHIFT" },    { KEY_CAPSLOCK,   "CAPS" },      \
+    { KEY_RCTRL,      "CTRL" },     { ' ',            "SPACE" },     \
+    { 'a', "A" },   { 'b', "B" },   { 'c', "C" },   { 'd', "D" },    \
+    { 'e', "E" },   { 'f', "F" },   { 'g', "G" },   { 'h', "H" },    \
+    { 'i', "I" },   { 'j', "J" },   { 'k', "K" },   { 'l', "L" },    \
+    { 'm', "M" },   { 'n', "N" },   { 'o', "O" },   { 'p', "P" },    \
+    { 'q', "Q" },   { 'r', "R" },   { 's', "S" },   { 't', "T" },    \
+    { 'u', "U" },   { 'v', "V" },   { 'w', "W" },   { 'x', "X" },    \
+    { 'y', "Y" },   { 'z', "Z" },   { '0', "0" },   { '1', "1" },    \
+    { '2', "2" },   { '3', "3" },   { '4', "4" },   { '5', "5" },    \
+    { '6', "6" },   { '7', "7" },   { '8', "8" },   { '9', "9" },    \
+    { '[', "(" },   { ']', ")" },   { ';', ";" },   { '`', "TILDE" }, \
+    { ',', "," },   { '.', "." },   { '/', "/" },   { '\\', "BACKSLASH" }, \
+    { '\'', "\'" }, { '*', "*" },   { '+', "+" },                    \
+}
+
+#endif          // __DOOMKEYS__
+

@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,14 +17,13 @@
 // memory.
 //
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "memio.h"
-#include "z_zone.h"
 
+#include "z_zone.h"
 
 typedef enum {
 	MODE_READ,
@@ -142,6 +141,16 @@ size_t mem_fwrite(const void *ptr, size_t size, size_t nmemb, MEMFILE *stream)
 	return nmemb;
 }
 
+int mem_fputs(const char *str, MEMFILE *stream)
+{
+	if (str == NULL)
+	{
+		return -1;
+	}
+
+	return mem_fwrite(str, sizeof(char), strlen(str), stream);
+}
+
 void mem_get_buf(MEMFILE *stream, void **buf, size_t *buflen)
 {
 	*buf = stream->buf;
@@ -184,14 +193,17 @@ int mem_fseek(MEMFILE *stream, signed long position, mem_rel_t whence)
 			return -1;
 	}
 
-	if (newpos < stream->buflen)
+	// We should allow seeking to the end of a MEMFILE with MEM_SEEK_END to
+	// match stdio.h behavior.
+
+	if (newpos <= stream->buflen)
 	{
 		stream->position = newpos;
 		return 0;
 	}
 	else
 	{
-		printf("Error seeking to %i\n", newpos);
+		printf("Error seeking to %u\n", newpos);
 		return -1;
 	}
 }

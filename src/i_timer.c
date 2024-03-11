@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,11 +17,11 @@
 //      Timer functions.
 //
 
-
 #include "SDL.h"
-#include "i_timer.h"
-#include "doomtype.h"
 
+#include "i_timer.h"
+#include "m_fixed.h" // [crispy]
+#include "doomtype.h"
 
 //
 // I_GetTime
@@ -29,6 +29,8 @@
 //
 
 static Uint32 basetime = 0;
+static uint64_t basecounter = 0; // [crispy]
+static uint64_t basefreq = 0; // [crispy]
 
 int  I_GetTime (void)
 {
@@ -60,6 +62,20 @@ int I_GetTimeMS(void)
     return ticks - basetime;
 }
 
+// [crispy] Get time in microseconds
+
+uint64_t I_GetTimeUS(void)
+{
+    uint64_t counter;
+
+    counter = SDL_GetPerformanceCounter();
+
+    if (basecounter == 0)
+        basecounter = counter;
+
+    return ((counter - basecounter) * 1000000ull) / basefreq;
+}
+
 // Sleep for a specified number of ms
 
 void I_Sleep(int ms)
@@ -77,9 +93,16 @@ void I_InitTimer(void)
 {
     // initialize timer
 
-#if SDL_VERSION_ATLEAST(2, 0, 5)
     SDL_SetHint(SDL_HINT_WINDOWS_DISABLE_THREAD_NAMING, "1");
-#endif
+
     SDL_Init(SDL_INIT_TIMER);
+
+    basefreq = SDL_GetPerformanceFrequency(); // [crispy]
 }
 
+// [crispy]
+
+fixed_t I_GetFracRealTime(void)
+{
+    return (int64_t)I_GetTimeMS() * TICRATE % 1000 * FRACUNIT / 1000;
+}

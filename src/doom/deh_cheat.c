@@ -1,6 +1,6 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -12,20 +12,24 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-
+//
+// Parses "Cheat" sections in dehacked files
+//
 
 #include <stdlib.h>
 #include <string.h>
+
 #include "doomtype.h"
+
 #include "deh_defs.h"
 #include "deh_io.h"
 #include "deh_main.h"
 #include "am_map.h"
-#include "st_stuff.h"
+#include "st_bar.h"
 
 typedef struct 
 {
-    char *name;
+    const char *name;
     cheatseq_t *seq;
 } deh_cheat_t;
 
@@ -36,7 +40,8 @@ static deh_cheat_t allcheats[] =
     {"God mode",            &cheat_god },
     {"Ammo & Keys",         &cheat_ammo },
     {"Ammo",                &cheat_ammonokey },
-    {"No Clipping",         &cheat_noclip },
+    {"No Clipping 1",       &cheat_noclip },
+    {"No Clipping 2",       &cheat_commercial_noclip },
     {"Invincibility",       &cheat_powerup[0] },
     {"Berserk",             &cheat_powerup[1] },
     {"Invisibility",        &cheat_powerup[2] },

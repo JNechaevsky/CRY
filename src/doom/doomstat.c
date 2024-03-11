@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -13,7 +13,9 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-
+// DESCRIPTION:
+//	Put all global tate variables here.
+//
 
 #include <stdio.h>
 
@@ -21,11 +23,14 @@
 
 
 // Game Mode - identify IWAD as shareware, retail etc.
-GameMode_t gamemode       = indetermined;
-GameMission_t gamemission = doom;
-GameVersion_t gameversion = exe_final2;
-GameVariant_t gamevariant = vanilla;
+GameMode_t gamemode = indetermined;
+GameMission_t	gamemission = doom;
+GameVersion_t   gameversion = exe_final2;
+GameVariant_t   gamevariant = vanilla;
 
-char    *gamedescription;
-boolean  modifiedgame;   // Set if homebrew PWAD stuff has been added.
+// Set if homebrew PWAD stuff has been added.
+boolean	modifiedgame;
+
+
+
 

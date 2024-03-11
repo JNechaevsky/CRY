@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -13,74 +13,123 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-
+// DESCRIPTION:  none
+//
 
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "i_sound.h"
 #include "i_system.h"
-#include "doomfeatures.h"
+
+#include "d_main.h"
 #include "deh_str.h"
+
 #include "doomstat.h"
 #include "doomtype.h"
+
 #include "sounds.h"
 #include "s_sound.h"
+
 #include "m_misc.h"
 #include "m_random.h"
 #include "m_argv.h"
+
 #include "p_local.h"
 #include "w_wad.h"
 #include "z_zone.h"
-#include "jn.h"
+#include "g_game.h"  // [JN] demo_gotonextlvl
 
+#include "id_vars.h"
+#include "id_func.h"
 
 // when to clip out sounds
 // Does not fit the large outdoor areas.
+
 #define S_CLIPPING_DIST (1200 * FRACUNIT)
 
 // Distance tp origin when sounds should be maxed out.
 // This should relate to movement clipping resolution
 // (see BLOCKMAP handling).
+// In the source code release: (160*FRACUNIT).  Changed back to the
+// Vanilla value of 200 (why was this changed?)
+
 #define S_CLOSE_DIST (200 * FRACUNIT)
 
 // The range over which sound attenuates
+
 #define S_ATTENUATOR ((S_CLIPPING_DIST - S_CLOSE_DIST) >> FRACBITS)
 
 // Stereo separation
-#define S_STEREO_SWING  (96 * FRACUNIT)
-#define NORM_PRIORITY   64
-#define NORM_SEP        128
+
+#define S_STEREO_SWING (96 * FRACUNIT)
+static int stereo_swing;
+
+#define NORM_PRIORITY 64
+#define NORM_SEP 128
 
 typedef struct
 {
-    sfxinfo_t *sfxinfo; // sound information (if null, channel avail.)
-    mobj_t    *origin;  // origin of sound
-    int        handle;  // handle of the sound being played
-    int        pitch;
+    // sound information (if null, channel avail.)
+    sfxinfo_t *sfxinfo;
+
+    // origin of sound
+    mobj_t *origin;
+
+    // handle of the sound being played
+    int handle;
+
+    int pitch;
+
 } channel_t;
 
+// The set of channels available
 
-static channel_t *channels; // The set of channels available
-int sfxVolume = 8;          // Maximum volume of a sound effect
-int musicVolume = 8;        // Maximum volume of music
-static int snd_SfxVolume;   // Internal volume level, ranging from 0-127
-static boolean mus_paused;              // Whether songs are mus_paused
-static musicinfo_t *mus_playing = NULL; // Music currently being played
-int snd_channels = 8;       // Number of channels to use
+static channel_t *channels;
 
+// Maximum volume of a sound effect.
+// Internal default is max out of 0-15.
 
-// -----------------------------------------------------------------------------
-// S_Init
+int sfxVolume = 8;
+
+// Maximum volume of music.
+
+int musicVolume = 8;
+
+// Internal volume level, ranging from 0-127
+
+static int snd_SfxVolume;
+
+// Whether songs are mus_paused
+
+static boolean mus_paused;
+
+// Music currently being played
+
+static musicinfo_t *mus_playing = NULL;
+
+// [JN] Always allocate 8 SFX channels.
+// No memory reallocation will be needed upon changing of channels number.
+
+#define MAX_SND_CHANNELS 16
+
+// [JN] External music number, used for music playback hot-swapping.
+int current_mus_num;
+
+// [JN] jff 3/17/98 to keep track of last IDMUS specified music num
+int idmusnum;
+
 //
 // Initializes sound stuff, including volume
 // Sets channels, SFX and music volume,
 //  allocates channel buffer, sets S_sfx lookup.
-// -----------------------------------------------------------------------------
+//
 
-void S_Init (int sfxVolume, int musicVolume)
+void S_Init(int sfxVolume, int musicVolume)
 {
     int i;
+
+    idmusnum = -1; // [JN] jff 3/17/98 insure idmus number is blank
 
     I_SetOPLDriverVer(opl_doom_1_9);
     I_PrecacheSounds(S_sfx, NUMSFX);
@@ -91,10 +140,10 @@ void S_Init (int sfxVolume, int musicVolume)
     // Allocating the internal channels for mixing
     // (the maximum numer of sounds rendered
     // simultaneously) within zone memory.
-    channels = Z_Malloc(snd_channels*sizeof(channel_t), PU_STATIC, 0);
+    channels = Z_Malloc(MAX_SND_CHANNELS*sizeof(channel_t), PU_STATIC, 0);
 
     // Free all channels for use
-    for (i=0 ; i<snd_channels ; i++)
+    for (i=0 ; i<MAX_SND_CHANNELS ; i++)
     {
         channels[i].sfxinfo = 0;
     }
@@ -115,12 +164,64 @@ void S_Init (int sfxVolume, int musicVolume)
     }
 
     I_AtExit(S_Shutdown, true);
+
+    // [crispy] initialize dedicated music tracks for the 4th episode
+    for (i = mus_e4m1; i <= mus_e6m9; i++)
+    {
+        musicinfo_t *const music = &S_music[i];
+        char namebuf[9];
+
+        M_snprintf(namebuf, sizeof(namebuf), "d_%s", DEH_String(music->name));
+        music->lumpnum = W_CheckNumForName(namebuf);
+    }
+
+    // [crispy] handle stereo separation for mono-sfx and flipped levels
+    S_UpdateStereoSeparation();
 }
 
+// -----------------------------------------------------------------------------
+// S_ChangeSFXSystem
+// [JN] Routine for sfx device hot-swapping.
+// -----------------------------------------------------------------------------
+
+void S_ChangeSFXSystem (void)
+{
+    int i;
+
+    // Free all channels for use
+    for (i = 0 ; i < MAX_SND_CHANNELS ; i++)
+    {
+        channels[i].sfxinfo = 0;
+    }
+
+    // Reinitialize sfx usefulness
+    for (i = 1 ; i < NUMSFX ; i++)
+    {
+        S_sfx[i].lumpnum = S_sfx[i].usefulness = -1;
+    }
+}
 
 // -----------------------------------------------------------------------------
-// S_Shutdown
+// S_UpdateStereoSeparation
+// [JN] Defines stereo separtion for mono sfx mode and flipped levels.
 // -----------------------------------------------------------------------------
+
+void S_UpdateStereoSeparation (void)
+{
+	// [crispy] play all sound effects in mono
+	if (snd_monosfx)
+	{
+		stereo_swing = 0;
+	}
+	else if (gp_flip_levels)
+	{
+		stereo_swing = -S_STEREO_SWING;
+	}
+	else
+	{
+		stereo_swing = S_STEREO_SWING;
+	}
+}
 
 void S_Shutdown(void)
 {
@@ -128,14 +229,9 @@ void S_Shutdown(void)
     I_ShutdownMusic();
 }
 
-
-// -----------------------------------------------------------------------------
-// S_StopChannel
-// -----------------------------------------------------------------------------
-
 static void S_StopChannel(int cnum)
 {
-    int        i;
+    int i;
     channel_t *c;
 
     c = &channels[cnum];
@@ -167,21 +263,19 @@ static void S_StopChannel(int cnum)
     }
 }
 
-
-// -----------------------------------------------------------------------------
-// S_Start
 //
 // Per level startup code.
 // Kills playing sounds at start of level,
 //  determines music if any, changes music.
-// -----------------------------------------------------------------------------
+//
 
 void S_Start(void)
 {
-    int  cnum;
-    int  mnum;
+    int cnum;
+    int mnum;
 
-    // kill all playing sounds at start of level (trust me - a good idea)
+    // kill all playing sounds at start of level
+    //  (trust me - a good idea)
     for (cnum=0 ; cnum<snd_channels ; cnum++)
     {
         if (channels[cnum].sfxinfo)
@@ -191,18 +285,20 @@ void S_Start(void)
     }
 
     // start new music for the level
+    if (musicVolume) // [crispy] do not reset pause state at zero music volume
     mus_paused = 0;
 
-    // [Julia] Jaguar music number
-    mnum = mus_map01 + gamemap - 1;
+    if (idmusnum != -1)
+    {
+        mnum = idmusnum; //jff 3/17/98 reload IDMUS music if not -1
+    }
+    else
+    {
+        mnum = mus_map01 + gamemap - 1;
+    }
 
     S_ChangeMusic(mnum, true);
 }
-
-
-// -----------------------------------------------------------------------------
-// S_StopSound
-// -----------------------------------------------------------------------------
 
 void S_StopSound(mobj_t *origin)
 {
@@ -218,17 +314,17 @@ void S_StopSound(mobj_t *origin)
     }
 }
 
-
-// -----------------------------------------------------------------------------
+//
 // S_GetChannel :
 //   If none available, return -1.  Otherwise channel #.
-// -----------------------------------------------------------------------------
+//
 
 static int S_GetChannel(mobj_t *origin, sfxinfo_t *sfxinfo)
 {
     // channel number to use
-    int         cnum;
-    channel_t  *c;
+    int                cnum;
+
+    channel_t*        c;
 
     // Find an open channel
     for (cnum=0 ; cnum<snd_channels ; cnum++)
@@ -278,31 +374,61 @@ static int S_GetChannel(mobj_t *origin, sfxinfo_t *sfxinfo)
 }
 
 // -----------------------------------------------------------------------------
-// S_AdjustSoundParams
+// P_ApproxDistanceZ
+// [JN] Gives an estimation of distance using three axises.
+// Adapted from EDGE, converted to fixed point math.
+// -----------------------------------------------------------------------------
+
+static const int64_t S_ApproxDistanceZ (int64_t dx, int64_t dy, int64_t dz)
+{
+	int64_t dxy;
+
+	dx = llabs(dx);
+	dy = llabs(dy);
+	dz = llabs(dz);
+
+	dxy = (dy > dx) ? dy + dx/2 : dx + dy/2;
+
+	return (dz > dxy) ? dz + dxy/2 : dxy + dz/2;
+}
+
 //
 // Changes volume and stereo-separation variables
 //  from the norm of a sound effect to be played.
 // If the sound is not audible, returns a 0.
 // Otherwise, modifies parameters and returns 1.
-// -----------------------------------------------------------------------------
+//
 
 static int S_AdjustSoundParams(mobj_t *listener, mobj_t *source,
                                int *vol, int *sep)
 {
-    fixed_t  approx_dist;
-    fixed_t  adx;
-    fixed_t  ady;
-    angle_t  angle;
+    int64_t        approx_dist;
+    int64_t        adx;
+    int64_t        ady;
+    int64_t        adz; // [JN] Z-axis sfx distance
+    angle_t        angle;
 
-    // calculate the distance to sound origin and clip it if necessary
+    // [crispy] proper sound clipping in Doom 2 MAP08 and The Ultimate Doom E4M8 / Sigil E5M8
+    const boolean doom1map8 = (gamemap == 8 && ((gamemode != commercial && gameepisode < 4)));
+
+    // calculate the distance to sound origin
+    //  and clip it if necessary
     adx = abs(listener->x - source->x);
     ady = abs(listener->y - source->y);
+    adz = abs(listener->z - source->z);
 
-    // From _GG1_ p.428. Appox. eucledian distance fast.
-    approx_dist = adx + ady - ((adx < ady ? adx : ady)>>1);
+    if (aud_z_axis_sfx)
+    {
+        // [JN] Use better precision for distance calculation.
+        approx_dist = S_ApproxDistanceZ(adx, ady, adz);
+    }
+    else
+    {
+        // From _GG1_ p.428. Appox. eucledian distance fast.
+        approx_dist = adx + ady - ((adx < ady ? adx : ady)>>1);
+    }
 
-
-    if (approx_dist > S_CLIPPING_DIST)
+    if (!doom1map8 && approx_dist > S_CLIPPING_DIST)
     {
         return 0;
     }
@@ -325,49 +451,68 @@ static int S_AdjustSoundParams(mobj_t *listener, mobj_t *source,
     angle >>= ANGLETOFINESHIFT;
 
     // stereo separation
-    // [Julia] Support for mono sfx mode
-    *sep = snd_monomode ? 128 : 128 - (FixedMul(S_STEREO_SWING, 
-                                                finesine[angle]) >> FRACBITS);
+    *sep = 128 - (FixedMul(stereo_swing, finesine[angle]) >> FRACBITS);
 
     // volume calculation
     if (approx_dist < S_CLOSE_DIST)
     {
         *vol = snd_SfxVolume;
     }
+    else if (doom1map8)
+    {
+        if (approx_dist > S_CLIPPING_DIST)
+        {
+            approx_dist = S_CLIPPING_DIST;
+        }
+
+        *vol = 15+ ((snd_SfxVolume-15)
+                    *((S_CLIPPING_DIST - approx_dist)>>FRACBITS))
+            / S_ATTENUATOR;
+    }
     else
     {
         // distance effect
-        *vol = (snd_SfxVolume 
+        *vol = (snd_SfxVolume
                 * ((S_CLIPPING_DIST - approx_dist)>>FRACBITS))
-                / S_ATTENUATOR;
+            / S_ATTENUATOR;
     }
 
     return (*vol > 0);
 }
 
+// clamp supplied integer to the range 0 <= x <= 255.
 
-// -----------------------------------------------------------------------------
-// S_StartSound
-// -----------------------------------------------------------------------------
+static int Clamp(int x)
+{
+    if (x < 0)
+    {
+        return 0;
+    }
+    else if (x > 255)
+    {
+        return 255;
+    }
+    return x;
+}
 
 void S_StartSound(void *origin_p, int sfx_id)
 {
-    sfxinfo_t  *sfx;
-    mobj_t     *origin;
-    int         rc;
-    int         sep;
-    int         pitch;
-    int         cnum;
-    int         volume;
+    sfxinfo_t *sfx;
+    mobj_t *origin;
+    int rc;
+    int sep;
+    int pitch;
+    int cnum;
+    int volume;
 
-    origin = (mobj_t *) origin_p;
-    volume = snd_SfxVolume;
-
-    // [crispy] make non-fatal, consider zero volume
-    if (sfx_id == sfx_None || !snd_SfxVolume)
+    // [JN] Do not play sound while demo-warp.
+    if (nodrawers || demowarp || !snd_SfxVolume)
     {
         return;
     }
+
+    origin = (mobj_t *) origin_p;
+    volume = snd_SfxVolume;
 
     // check for bogus sound #
     if (sfx_id < 1 || sfx_id > NUMSFX)
@@ -395,17 +540,18 @@ void S_StartSound(void *origin_p, int sfx_id)
         }
     }
 
+
     // Check to see if it is audible,
     //  and if not, modify the params
-    if (origin && origin != players[consoleplayer].mo)
+    if (origin && origin != players[displayplayer].mo && origin != players[displayplayer].so) // [crispy] weapon sound source
     {
-        rc = S_AdjustSoundParams(players[consoleplayer].mo,
+        rc = S_AdjustSoundParams(players[displayplayer].mo,
                                  origin,
                                  &volume,
                                  &sep);
 
-        if (origin->x == players[consoleplayer].mo->x
-         && origin->y == players[consoleplayer].mo->y)
+        if (origin->x == players[displayplayer].mo->x
+         && origin->y == players[displayplayer].mo->y)
         {
             sep = NORM_SEP;
         }
@@ -420,8 +566,16 @@ void S_StartSound(void *origin_p, int sfx_id)
         sep = NORM_SEP;
     }
 
-    // [Julia] Jaguar: down-pitched sounds, they are not variative.
-    pitch = 122;
+    // hacks to vary the sfx pitches
+    if (sfx_id >= sfx_sawup && sfx_id <= sfx_sawhit)
+    {
+        pitch += 8 - (M_Random()&15);
+    }
+    else if (sfx_id != sfx_itemup && sfx_id != sfx_tink)
+    {
+        pitch += 16 - (M_Random()&31);
+    }
+    pitch = Clamp(pitch);
 
     // kill old sound
     S_StopSound(origin);
@@ -449,11 +603,6 @@ void S_StartSound(void *origin_p, int sfx_id)
     channels[cnum].handle = I_StartSound(sfx, cnum, volume, sep, channels[cnum].pitch);
 }
 
-
-// -----------------------------------------------------------------------------
-// S_StartSoundOnce
-// -----------------------------------------------------------------------------
-
 void S_StartSoundOnce (void *origin_p, int sfx_id)
 {
     int cnum;
@@ -471,12 +620,9 @@ void S_StartSoundOnce (void *origin_p, int sfx_id)
     S_StartSound(origin_p, sfx_id);
 }
 
-
-// -----------------------------------------------------------------------------
-// S_PauseSound
 //
 // Stop and resume music, during game PAUSE.
-// -----------------------------------------------------------------------------
+//
 
 void S_PauseSound(void)
 {
@@ -487,11 +633,6 @@ void S_PauseSound(void)
     }
 }
 
-
-// -----------------------------------------------------------------------------
-// S_ResumeSound
-// -----------------------------------------------------------------------------
-
 void S_ResumeSound(void)
 {
     if (mus_playing && mus_paused)
@@ -501,21 +642,18 @@ void S_ResumeSound(void)
     }
 }
 
-
-// -----------------------------------------------------------------------------
-// S_UpdateSounds
 //
 // Updates music & sounds
-// -----------------------------------------------------------------------------
+//
 
 void S_UpdateSounds(mobj_t *listener)
 {
-    int         audible;
-    int         cnum;
-    int         volume;
-    int         sep;
-    sfxinfo_t  *sfx;
-    channel_t  *c;
+    int                audible;
+    int                cnum;
+    int                volume;
+    int                sep;
+    sfxinfo_t*        sfx;
+    channel_t*        c;
 
     I_UpdateSound();
 
@@ -548,7 +686,7 @@ void S_UpdateSounds(mobj_t *listener)
 
                 // check non-local sounds for distance clipping
                 //  or modify their params
-                if (c->origin && listener != c->origin)
+                if (c->origin && listener != c->origin && c->origin != players[displayplayer].so) // [crispy] weapon sound source
                 {
                     audible = S_AdjustSoundParams(listener,
                                                   c->origin,
@@ -575,35 +713,27 @@ void S_UpdateSounds(mobj_t *listener)
     }
 }
 
-
-// -----------------------------------------------------------------------------
-// S_SetMusicVolume
-// -----------------------------------------------------------------------------
-
 void S_SetMusicVolume(int volume)
 {
     if (volume < 0 || volume > 127)
     {
-        I_Error("Attempt to set music volume at %d", volume);
+        I_Error("Attempt to set music volume at %d",
+                volume);
     }
 
-    // [crispy] & [Julia] Fixed bug when music was hearable with zero volume
-    if (musicVolume == 0)
+    // [crispy] [JN] Fixed bug when music was hearable with zero volume
+    if (!musicVolume)
     {
         S_PauseSound();
     }
-    else if (!paused)
+    else
+    if (!paused)
     {
         S_ResumeSound();
     }
 
     I_SetMusicVolume(volume);
 }
-
-
-// -----------------------------------------------------------------------------
-// S_SetSfxVolume
-// -----------------------------------------------------------------------------
 
 void S_SetSfxVolume(int volume)
 {
@@ -615,28 +745,36 @@ void S_SetSfxVolume(int volume)
     snd_SfxVolume = volume;
 }
 
-
-// -----------------------------------------------------------------------------
-// S_StartMusic
 //
 // Starts some music with the music id found in sounds.h.
-// -----------------------------------------------------------------------------
+//
 
 void S_StartMusic(int m_id)
 {
     S_ChangeMusic(m_id, false);
 }
 
-
-// -----------------------------------------------------------------------------
-// S_ChangeMusic
-// -----------------------------------------------------------------------------
-
 void S_ChangeMusic(int musicnum, int looping)
 {
-    musicinfo_t  *music = NULL;
-    char          namebuf[9];
-    void         *handle;
+    musicinfo_t *music = NULL;
+    char namebuf[9];
+    void *handle;
+
+    // [JN] Do not play music while demo-warp,
+    // but still change while fast forwarding to next level in demo playback.
+    if ((nodrawers || demowarp) && !demo_gotonextlvl)
+    {
+        return;
+    }
+
+    // The Doom IWAD file has two versions of the intro music: d_intro
+    // and d_introa.  The latter is used for OPL playback.
+
+    if (musicnum == mus_intro && (snd_musicdevice == SNDDEVICE_ADLIB
+                               || snd_musicdevice == SNDDEVICE_SB))
+    {
+        musicnum = mus_introa;
+    }
 
     if (musicnum <= mus_None || musicnum >= NUMMUSIC)
     {
@@ -651,6 +789,10 @@ void S_ChangeMusic(int musicnum, int looping)
     {
         return;
     }
+
+    // [JN] After inner muscial number has been set, sync it with
+    // external number, used in M_ID_MusicSystem.
+    current_mus_num = musicnum;
 
     // shutdown old music
     S_StopMusic();
@@ -671,20 +813,10 @@ void S_ChangeMusic(int musicnum, int looping)
     mus_playing = music;
 }
 
-
-// -----------------------------------------------------------------------------
-// S_MusicPlaying
-// -----------------------------------------------------------------------------
-
 boolean S_MusicPlaying(void)
 {
     return I_MusicIsPlaying();
 }
-
-
-// -----------------------------------------------------------------------------
-// S_StopMusic
-// -----------------------------------------------------------------------------
 
 void S_StopMusic(void)
 {
@@ -703,3 +835,33 @@ void S_StopMusic(void)
     }
 }
 
+// -----------------------------------------------------------------------------
+// S_MuteUnmuteSound
+// [JN] Sets sfx and music volume to 0 when window loses 
+//      it's focus and restores back when focus is regained.
+// -----------------------------------------------------------------------------
+
+void S_MuteUnmuteSound (boolean mute)
+{
+    if (mute)
+    {
+        // Stop all sounds and clear sfx channels.
+        for (int i = 0 ; i < snd_channels ; i++)
+        {
+            S_StopChannel(i);
+        }
+
+        // Set volume variables to zero.
+        S_SetMusicVolume(0);
+        S_SetSfxVolume(0);
+    }
+    else
+    {
+        S_SetMusicVolume(musicVolume * 8);
+        S_SetSfxVolume(sfxVolume * 8);
+    }
+
+    // All done, no need to invoke function until next 
+    // minimizing/restoring of game window is happened.
+    volume_needs_update = false;
+}

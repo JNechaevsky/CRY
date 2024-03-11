@@ -1,6 +1,5 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -15,7 +14,6 @@
 //
 // Routines for selecting files, and the txt_fileselect_t widget.
 //
-
 
 #ifndef TXT_FILESELECT_H
 #define TXT_FILESELECT_H
@@ -52,13 +50,13 @@ int TXT_CanSelectFiles(void);
  *                    to select directories.
  */
 
-char *TXT_SelectFile(char *prompt, char **extensions);
+char *TXT_SelectFile(const char *prompt, const char **extensions);
 
 /**
  * Create a new txt_fileselect_t widget.
  *
  * @param variable    Pointer to a char * variable in which the selected
- *                    file should be stored.
+ *                    file should be stored (UTF-8 format).
  * @param size        Width of the file selector widget in characters.
  * @param prompt      Pointer to a string containing a prompt to display
  *                    in the file selection window.
@@ -68,14 +66,14 @@ char *TXT_SelectFile(char *prompt, char **extensions);
  */
 
 txt_fileselect_t *TXT_NewFileSelector(char **variable, int size,
-                                      char *prompt, char **extensions);
+                                      const char *prompt, const char **extensions);
 
 /**
  * Special value to use for 'extensions' that selects a directory
  * instead of a file.
  */
 
-extern char *TXT_DIRECTORY[];
+extern const char *TXT_DIRECTORY[];
 
 #endif /* #ifndef TXT_FILESELECT_H */
 

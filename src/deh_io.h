@@ -1,6 +1,6 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,20 +16,20 @@
 // Dehacked I/O code (does all reads from dehacked files)
 //
 
-
 #ifndef DEH_IO_H
 #define DEH_IO_H
 
 #include "deh_defs.h"
 
-deh_context_t *DEH_OpenFile(char *filename);
+deh_context_t *DEH_OpenFile(const char *filename);
 deh_context_t *DEH_OpenLump(int lumpnum);
 void DEH_CloseFile(deh_context_t *context);
 int DEH_GetChar(deh_context_t *context);
 char *DEH_ReadLine(deh_context_t *context, boolean extended);
-void DEH_Error(deh_context_t *context, char *msg, ...);
-void DEH_Warning(deh_context_t *context, char *msg, ...);
+void DEH_Error(deh_context_t *context, const char *msg, ...) PRINTF_ATTR(2, 3);
+void DEH_Warning(deh_context_t *context, const char *msg, ...) PRINTF_ATTR(2, 3);
 boolean DEH_HadError(deh_context_t *context);
+char *DEH_FileName(deh_context_t *context); // [crispy] returns filename
 
 #endif /* #ifndef DEH_IO_H */
 

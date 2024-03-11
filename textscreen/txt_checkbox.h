@@ -1,6 +1,5 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -12,7 +11,6 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-
 
 #ifndef TXT_CHECKBOX_H
 #define TXT_CHECKBOX_H
@@ -51,13 +49,13 @@ struct txt_checkbox_s
 /**
  * Create a new checkbox.
  *
- * @param label         The label for the new checkbox.
+ * @param label         The label for the new checkbox (UTF-8 format).
  * @param variable      Pointer to the variable containing this checkbox's
  *                      value.
  * @return              Pointer to the new checkbox.
  */
 
-txt_checkbox_t *TXT_NewCheckBox(char *label, int *variable);
+txt_checkbox_t *TXT_NewCheckBox(const char *label, int *variable);
 
 /**
  * Create a new inverted checkbox.
@@ -65,13 +63,13 @@ txt_checkbox_t *TXT_NewCheckBox(char *label, int *variable);
  * An inverted checkbox displays the opposite of a normal checkbox;
  * where it would be checked, it appears unchecked, and vice-versa.
  *
- * @param label         The label for the new checkbox.
+ * @param label         The label for the new checkbox (UTF-8 format).
  * @param variable      Pointer to the variable containing this checkbox's
  *                      value.
  * @return              Pointer to the new checkbox.
  */
 
-txt_checkbox_t *TXT_NewInvertedCheckBox(char *label, int *variable);
+txt_checkbox_t *TXT_NewInvertedCheckBox(const char *label, int *variable);
 
 #endif /* #ifndef TXT_CHECKBOX_H */
 

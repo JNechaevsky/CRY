@@ -1,6 +1,5 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -13,10 +12,10 @@
 // GNU General Public License for more details.
 //
 
-
 #ifndef TESTCONFIG_H
 #define TESTCONFIG_H
 
+#include "doomtype.h"
 #include "textscreen.h"
 
 typedef struct execute_context_s execute_context_t;
@@ -29,10 +28,11 @@ typedef struct execute_context_s execute_context_t;
 #define IWAD_CHEX     (1 << 5)       /* chex.wad */
 
 execute_context_t *NewExecuteContext(void);
-void AddCmdLineParameter(execute_context_t *context, char *s, ...);
+void AddCmdLineParameter(execute_context_t *context, const char *s, ...) PRINTF_ATTR(2, 3);
 void PassThroughArguments(execute_context_t *context);
 int ExecuteDoom(execute_context_t *context);
 int FindInstalledIWADs(void);
+boolean OpenFolder(const char *path);
 
 txt_window_action_t *TestConfigAction(void);
 

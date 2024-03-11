@@ -1,6 +1,5 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -13,7 +12,6 @@
 // GNU General Public License for more details.
 //
 
-
 #ifndef SETUP_MODE_H
 #define SETUP_MODE_H
 
@@ -25,10 +23,9 @@ extern GameMission_t gamemission;
 
 void SetupMission(GameSelectCallback callback);
 void InitBindings(void);
-char *GetExecutableName(void);
-char *GetGameTitle(void);
+const char *GetExecutableName(void);
+const char *GetGameTitle(void);
 const iwad_t **GetIwads(void);
-
 
 #endif /* #ifndef SETUP_MODE_H */
 

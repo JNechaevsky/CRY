@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -13,25 +13,34 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
+// DESCRIPTION:
+//
+//    
 
 
 #ifndef __F_FINALE__
 #define __F_FINALE__
 
+
 #include "doomtype.h"
 #include "d_event.h"
-
-
-// =============================================================================
+//
 // FINALE
-// =============================================================================
+//
+
+// Called by main loop.
+boolean F_Responder (event_t* ev);
+
+// Called by main loop.
+void F_Ticker (void);
+
+// Called by main loop.
+void F_Drawer (void);
 
 
-boolean F_Responder (event_t *ev);  // Called by main loop.
-void F_Ticker (void);               // Called by main loop.
-void F_Drawer (void);               // Called by main loop.
 void F_StartFinale (void);
 
 
-#endif
 
+
+#endif

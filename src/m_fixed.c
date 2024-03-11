@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,10 +18,15 @@
 //
 
 
+
 #include "stdlib.h"
+
 #include "doomtype.h"
 #include "i_system.h"
+
 #include "m_fixed.h"
+
+
 
 
 // Fixme. __USE_C_FIXED__ or something.

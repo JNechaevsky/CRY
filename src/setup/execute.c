@@ -1,6 +1,5 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -13,12 +12,14 @@
 // GNU General Public License for more details.
 //
 
+// Code for invoking Doom
 
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+
 #include <sys/types.h>
 
 #ifdef _WIN32
@@ -26,6 +27,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <process.h>
+#include <shellapi.h>
 
 #else
 
@@ -52,14 +54,14 @@ struct execute_context_s
 // Returns the path to a temporary file of the given name, stored
 // inside the system temporary directory.
 
-static char *TempFile(char *s)
+static char *TempFile(const char *s)
 {
-    char *tempdir;
+    const char *tempdir;
 
 #ifdef _WIN32
     // Check the TEMP environment variable to find the location.
 
-    tempdir = getenv("TEMP");
+    tempdir = M_getenv("TEMP");
 
     if (tempdir == NULL)
     {
@@ -74,9 +76,9 @@ static char *TempFile(char *s)
     return M_StringJoin(tempdir, DIR_SEPARATOR_S, s, NULL);
 }
 
-static int ArgumentNeedsEscape(char *arg)
+static int ArgumentNeedsEscape(const char *arg)
 {
-    char *p;
+    const char *p;
 
     for (p = arg; *p != '\0'; ++p)
     {
@@ -117,18 +119,18 @@ execute_context_t *NewExecuteContext(void)
     result = malloc(sizeof(execute_context_t));
     
     result->response_file = TempFile("chocolat.rsp");
-    result->stream = fopen(result->response_file, "w");
+    result->stream = M_fopen(result->response_file, "w");
 
     if (result->stream == NULL)
     {
         fprintf(stderr, "Error opening response file\n");
         exit(-1);
     }
-
+    
     return result;
 }
 
-void AddCmdLineParameter(execute_context_t *context, char *s, ...)
+void AddCmdLineParameter(execute_context_t *context, const char *s, ...)
 {
     va_list args;
 
@@ -136,12 +138,19 @@ void AddCmdLineParameter(execute_context_t *context, char *s, ...)
 
     vfprintf(context->stream, s, args);
     fprintf(context->stream, "\n");
+
+    va_end(args);
 }
 
 #if defined(_WIN32)
 
-// Wait for the specified process to exit.  Returns the exit code.
+boolean OpenFolder(const char *path)
+{
+    // "If the function succeeds, it returns a value greater than 32."
+    return (intptr_t)ShellExecute(NULL, "open", path, NULL, NULL, SW_SHOWDEFAULT) > 32;
+}
 
+// Wait for the specified process to exit.  Returns the exit code.
 static unsigned int WaitForProcessExit(HANDLE subprocess)
 {
     DWORD exit_code;
@@ -254,6 +263,22 @@ static int ExecuteCommand(const char *program, const char *arg)
 
 #else
 
+boolean OpenFolder(const char *path)
+{
+    char *cmd;
+    int result;
+
+#if defined(__MACOSX__)
+    cmd = M_StringJoin("open \"", path, "\"", NULL);
+#else
+    cmd = M_StringJoin("xdg-open \"", path, "\"", NULL);
+#endif
+    result = system(cmd);
+    free(cmd);
+
+    return result == 0;
+}
+
 // Given the specified program name, get the full path to the program,
 // assuming that it is in the same directory as this program is.
 
@@ -343,7 +368,7 @@ int ExecuteDoom(execute_context_t *context)
     free(response_file_arg);
 
     // Destroy context
-    remove(context->response_file);
+    M_remove(context->response_file);
     free(context->response_file);
     free(context);
 
@@ -354,46 +379,39 @@ static void TestCallback(TXT_UNCAST_ARG(widget), TXT_UNCAST_ARG(data))
 {
     execute_context_t *exec;
     char *main_cfg;
-    char *extra_cfg;
     txt_window_t *testwindow;
 
     testwindow = TXT_MessageBox("Starting Doom",
                                 "Starting Doom to test the\n"
                                 "settings.  Please wait.");
-
     TXT_DrawDesktop();
 
     // Save temporary configuration files with the current configuration
 
     main_cfg = TempFile("tmp.cfg");
-    extra_cfg = TempFile("extratmp.cfg");
 
-    M_SaveDefaultsAlternate(main_cfg, extra_cfg);
+    M_SaveDefaultsAlternate(main_cfg);
 
     // Run with the -testcontrols parameter
 
     exec = NewExecuteContext();
     AddCmdLineParameter(exec, "-testcontrols");
     AddCmdLineParameter(exec, "-config \"%s\"", main_cfg);
-    AddCmdLineParameter(exec, "-extraconfig \"%s\"", extra_cfg);
     ExecuteDoom(exec);
 
     TXT_CloseWindow(testwindow);
 
     // Delete the temporary config files
 
-    remove(main_cfg);
-    remove(extra_cfg);
+    M_remove(main_cfg);
     free(main_cfg);
-    free(extra_cfg);
 }
 
 txt_window_action_t *TestConfigAction(void)
 {
     txt_window_action_t *test_action;
-
+    
     test_action = TXT_NewWindowAction('t', "Test");
-
     TXT_SignalConnect(test_action, "pressed", TestCallback, NULL);
 
     return test_action;

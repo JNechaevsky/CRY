@@ -1,6 +1,6 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -12,19 +12,22 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-
+//
+// Parses Action Pointer entries in dehacked files
+//
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "doomtype.h"
 #include "info.h"
+
 #include "deh_defs.h"
 #include "deh_io.h"
 #include "deh_main.h"
-#include "jn.h"
 
-static actionf_t codeptrs[NUMSTATES];
+actionf_t codeptrs[NUMSTATES]; // [crispy] share with deh_bexptr.c
 
 static int CodePointerIndex(actionf_t *ptr)
 {

@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,22 +17,24 @@
 //
 
 
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
 #include <stdarg.h>
 
 #ifdef _WIN32
-#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
-#endif
 #include <windows.h>
 #else
 #include <unistd.h>
 #endif
 
 #include "SDL.h"
+
 #include "config.h"
+
 #include "deh_str.h"
 #include "doomtype.h"
 #include "m_argv.h"
@@ -42,14 +44,14 @@
 #include "i_sound.h"
 #include "i_timer.h"
 #include "i_video.h"
+
 #include "i_system.h"
+
 #include "w_wad.h"
 #include "z_zone.h"
-#include "jn.h"
 
-// [Julia] Объём необходимой памяти увеличен вдвое
-#define DEFAULT_RAM 16*2 /* MiB */
-#define MIN_RAM     4*2  /* MiB */
+#define DEFAULT_RAM 16*2 /* MiB [crispy] */
+#define MIN_RAM     4*4  /* MiB [crispy] */
 
 
 typedef struct atexit_listentry_s atexit_listentry_t;
@@ -75,12 +77,6 @@ void I_AtExit(atexit_func_t func, boolean run_on_error)
     exit_funcs = entry;
 }
 
-// Tactile feedback function, probably used for the Logitech Cyberman
-
-void I_Tactile(int on, int off, int total)
-{
-}
-
 // Zone memory auto-allocation function that allocates the zone size
 // by trying progressively smaller zone sizes until one is found that
 // works.
@@ -102,8 +98,7 @@ static byte *AutoAllocMemory(int *size, int default_ram, int min_ram)
 
         if (default_ram < min_ram)
         {
-            I_Error("Unable to allocate %i MiB of RAM for zone",
-                    default_ram);
+            I_Error("Unable to allocate %i MiB of RAM for zone", default_ram);
         }
 
         // Try to allocate the zone memory.
@@ -132,6 +127,7 @@ byte *I_ZoneBase (int *size)
     static int i = 1;
 
     //!
+    // @category obscure
     // @arg <mb>
     //
     // Specify the heap size, in MiB (default 16).
@@ -150,17 +146,24 @@ byte *I_ZoneBase (int *size)
         min_ram = MIN_RAM;
     }
 
+    // [crispy] do not allocate new zones ad infinitum
+    if (i > 16)
+    {
+        min_ram = default_ram + 1;
+    }
+
     zonemem = AutoAllocMemory(size, default_ram * i, min_ram * i);
+
     // [crispy] if called again, allocate another zone twice as big
     i *= 2;
 
-    printf("zone memory: %p, %x allocated for zone\n", 
-           zonemem, *size);
+    printf("  zone memory: %p, %x MiB allocated for zone.\n", 
+           (void*)zonemem, *size >> 20); // [crispy] human-understandable zone heap size
 
     return zonemem;
 }
 
-void I_PrintBanner(char *msg)
+void I_PrintBanner(const char *msg)
 {
     int i;
     int spaces = 35 - (strlen(msg) / 2);
@@ -170,52 +173,6 @@ void I_PrintBanner(char *msg)
 
     puts(msg);
 }
-
-void I_PrintDivider(void)
-{
-    int i;
-
-    for (i=0 ; i<80 ; ++i)
-    {
-        putchar('-');
-    }
-
-    putchar('\n');
-}
-
-// 
-// I_ConsoleStdout
-//
-// Returns true if stdout is a real console, false if it is a file
-//
-
-boolean I_ConsoleStdout(void)
-{
-#ifdef _WIN32
-    // SDL "helpfully" always redirects stdout to a file.
-    return false;
-#else
-    return isatty(fileno(stdout));
-#endif
-}
-
-//
-// I_Init
-//
-/*
-void I_Init (void)
-{
-    I_CheckIsScreensaver();
-    I_InitTimer();
-    I_InitJoystick();
-}
-void I_BindVariables(void)
-{
-    I_BindVideoVariables();
-    I_BindJoystickVariables();
-    I_BindSoundVariables();
-}
-*/
 
 //
 // I_Quit
@@ -248,13 +205,14 @@ void I_Quit (void)
 
 static boolean already_quitting = false;
 
-void I_Error (char *error, ...)
+// [JN] Indicates if I_Error is not an error, but infomative message instead.
+// If false, a stop-sign icon appears.
+// If true, an icon consisting of a lowercase letter i in a circle appears.
+boolean i_error_safe = false;
+
+void I_Error (const char *error, ...)
 {
     char msgbuf[512];
-#ifdef _WIN32
-    wchar_t win_error_message[1000];  // [Julia] UTF-8 retranslation of error message
-    wchar_t win_error_title[1000];    // [Julia] UTF-8 retranslation of window title
-#endif
     va_list argptr;
     atexit_listentry_t *entry;
     boolean exit_gui_popup;
@@ -297,23 +255,31 @@ void I_Error (char *error, ...)
         entry = entry->next;
     }
 
+    //!
+    // @category obscure
+    //
+    // If specified, don't show a GUI window for error messages when the
+    // game exits with an error.
+    //
     exit_gui_popup = !M_ParmExists("-nogui");
 
     // Pop up a GUI dialog box to show the error message, if the
     // game was not run from the console (and the user will
     // therefore be unable to otherwise see the message).
-    if (exit_gui_popup && !I_ConsoleStdout())
+    if (exit_gui_popup)
     {
 #ifdef _WIN32
-    // [Julia] For some reason, Russian I_Error messages are cut in SDL message box,
-    // and I have not idea why. Here I'm using WINAPI's function MessageBox 
-    // which is displaying Russian chars uncut, but requiring byte retranslation.
-    MultiByteToWideChar(CP_UTF8, 0, msgbuf, -1, win_error_message, 1000);
-    MultiByteToWideChar(CP_UTF8, 0, PACKAGE_STRING, -1, win_error_title, 1000);
-    MessageBoxW(NULL, win_error_message, win_error_title, MB_ICONSTOP);
+        // [JN] UTF-8 retranslations of error message and window title.
+        wchar_t win_error_message[1024];
+        wchar_t win_error_title[128];
+
+        // [JN] On Windows OS use system, nicer dialog box.
+        MultiByteToWideChar(CP_UTF8, 0, msgbuf, -1, win_error_message, 1024);
+        MultiByteToWideChar(CP_UTF8, 0, PACKAGE_FULLNAME, -1, win_error_title, 128);
+        MessageBoxW(NULL, win_error_message, win_error_title, i_error_safe ? MB_ICONASTERISK : MB_ICONSTOP);
 #else
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
-                                 PACKAGE_STRING, msgbuf, NULL);
+        SDL_ShowSimpleMessageBox(i_error_safe ? SDL_MESSAGEBOX_INFORMATION : SDL_MESSAGEBOX_ERROR,
+                                 PACKAGE_FULLNAME, msgbuf, NULL);
 #endif
     }
 
@@ -336,8 +302,7 @@ void *I_Realloc(void *ptr, size_t size)
 
     if (size != 0 && new_ptr == NULL)
     {
-        I_Error ("I_Realloc: failed on reallocation of %" PRIuPTR " bytes",
-                 size);
+        I_Error ("I_Realloc: failed on reallocation of %llu bytes", (long long unsigned)size);
     }
 
     return new_ptr;

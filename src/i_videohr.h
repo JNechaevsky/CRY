@@ -1,6 +1,5 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,13 +16,12 @@
 //     for Hexen startup loading screen.
 //
 
-
 #ifndef I_VIDEOHR_H
 #define I_VIDEOHR_H
 
 boolean I_SetVideoModeHR(void);
 void I_UnsetVideoModeHR(void);
-void I_SetWindowTitleHR(char *title);
+void I_SetWindowTitleHR(const char *title);
 void I_ClearScreenHR(void);
 void I_SlamBlockHR(int x, int y, int w, int h, const byte *src);
 void I_SlamHR(const byte *buffer);

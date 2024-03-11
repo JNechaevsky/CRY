@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,7 +17,6 @@
 //	WAD I/O functions.
 //
 
-
 #include "config.h"
 
 #ifdef HAVE_MMAP
@@ -31,7 +30,6 @@
 #include "m_misc.h"
 #include "w_file.h"
 #include "z_zone.h"
-#include "jn.h"
 
 typedef struct
 {
@@ -39,9 +37,8 @@ typedef struct
     int handle;
 } posix_wad_file_t;
 
-extern wad_file_class_t posix_wad_file;
 
-static void MapFile(posix_wad_file_t *wad, char *filename)
+static void MapFile(posix_wad_file_t *wad, const char *filename)
 {
     void *result;
     int protection;
@@ -63,12 +60,14 @@ static void MapFile(posix_wad_file_t *wad, char *filename)
                   protection, flags, 
                   wad->handle, 0);
 
-    wad->wad.mapped = result;
-
-    if (result == NULL)
+    if (result == NULL || result == (void *)-1)
     {
         fprintf(stderr, "W_POSIX_OpenFile: Unable to mmap() %s - %s\n",
                         filename, strerror(errno));
+    }
+    else
+    {
+        wad->wad.mapped = result;
     }
 }
 
@@ -77,7 +76,7 @@ unsigned int GetFileLength(int handle)
     return lseek(handle, 0, SEEK_END);
 }
    
-static wad_file_t *W_POSIX_OpenFile(char *path)
+static wad_file_t *W_POSIX_OpenFile(const char *path)
 {
     posix_wad_file_t *result;
     int handle;
@@ -95,6 +94,7 @@ static wad_file_t *W_POSIX_OpenFile(char *path)
     result->wad.file_class = &posix_wad_file;
     result->wad.length = GetFileLength(handle);
     result->wad.path = M_StringDuplicate(path);
+    result->wad.mapped = NULL;
     result->handle = handle;
 
     // Try to map the file into memory with mmap:
@@ -113,7 +113,11 @@ static void W_POSIX_CloseFile(wad_file_t *wad)
     // If mapped, unmap it.
 
     // Close the file
-  
+
+    if (posix_wad->wad.mapped)
+    {
+        munmap(posix_wad->wad.mapped, posix_wad->wad.length);
+    }
     close(posix_wad->handle);
     Z_Free(posix_wad);
 }

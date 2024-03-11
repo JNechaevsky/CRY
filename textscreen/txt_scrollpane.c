@@ -1,6 +1,5 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -12,7 +11,6 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-
 
 #include <ctype.h>
 #include <stdio.h>
@@ -175,9 +173,9 @@ static void TXT_ScrollPaneDrawer(TXT_UNCAST_ARG(scrollpane))
 
     // We set a clipping area of the scroll pane.
 
-    x1 = scrollpane->widget.x,
-    y1 = scrollpane->widget.y,
-    x2 = x1 + scrollpane->w,
+    x1 = scrollpane->widget.x;
+    y1 = scrollpane->widget.y;
+    x2 = x1 + scrollpane->w;
     y2 = y1 + scrollpane->h;
 
     scrollbars = NeedsScrollbars(scrollpane);

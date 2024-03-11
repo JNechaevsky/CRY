@@ -1,6 +1,5 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -13,41 +12,29 @@
 // GNU General Public License for more details.
 //
 
-
 #include <stdlib.h>
 #include <string.h>
-
-#include "doomtype.h"
-#include "config.h"
 #include "textscreen.h"
-#include "doomtype.h"
-#include "d_mode.h"
-#include "d_iwad.h"
 #include "i_system.h"
 #include "m_argv.h"
 #include "m_config.h"
-#include "m_controls.h"
 #include "m_misc.h"
-#include "compatibility.h"
-#include "display.h"
-#include "joystick.h"
-#include "keyboard.h"
-#include "mouse.h"
-#include "sound.h"
+#include "multiplayer.h"
 #include "mode.h"
 
+#include "id_vars.h"
 
 GameMission_t gamemission;
 static const iwad_t **iwads;
 
 typedef struct
 {
-    char *label;
+    const char *label;
     GameMission_t mission;
     int mask;
-    char *name;
-    char *extra_config_file;
-    char *executable;
+    const char *name;
+    const char *config_file;
+    const char *executable;
 } mission_config_t;
 
 // Default mission to fall back on, if no IWADs are found at all:
@@ -63,51 +50,31 @@ static mission_config_t mission_configs[] =
         "doom",
         PROGRAM_PREFIX "doom.ini",
         PROGRAM_PREFIX "doom"
-    }
+    },
+    {
+        "Heretic",
+        heretic,
+        IWAD_MASK_HERETIC,
+        "heretic",
+        PROGRAM_PREFIX "heretic.ini",
+        PROGRAM_PREFIX "heretic"
+    },
+    {
+        "Hexen",
+        hexen,
+        IWAD_MASK_HEXEN,
+        "hexen",
+        PROGRAM_PREFIX "hexen.ini",
+        PROGRAM_PREFIX "hexen"
+    },
 };
 
 static GameSelectCallback game_selected_callback;
 
 // Miscellaneous variables that aren't used in setup.
 
-static int showMessages = 1;
-static int screenblocks = 10;
-static int detailLevel = 0;
 static char *executable = NULL;
-static char *game_title = "Doom";
-
-static void BindMiscVariables(void)
-{
-    M_BindIntVariable("detaillevel",   &detailLevel);
-    M_BindIntVariable("show_messages", &showMessages);
-    M_BindIntVariable("screenblocks",   &screenblocks);
-}
-
-//
-// Initialise all configuration file bindings.
-//
-
-void InitBindings(void)
-{
-    M_ApplyPlatformDefaults();
-
-    // Keyboard, mouse, joystick controls
-
-    M_BindBaseControls();
-    M_BindWeaponControls();
-    M_BindMapControls();
-    M_BindMenuControls();
-
-    // All other variables
-
-    BindCompatibilityVariables();
-    BindDisplayVariables();
-    BindJoystickVariables();
-    BindKeyboardVariables();
-    BindMouseVariables();
-    BindSoundVariables();
-    BindMiscVariables();
-}
+static const char *game_title = "Doom";
 
 // Set the name of the executable program to run the game:
 
@@ -132,37 +99,158 @@ static void SetMission(mission_config_t *config)
     gamemission = config->mission;
     SetExecutable(config);
     game_title = config->label;
-    M_SetConfigFilenames(config->extra_config_file);
+    M_SetConfigFilenames(config->config_file);
+}
+
+static mission_config_t *GetMissionForName(const char *name)
+{
+    int i;
+
+    for (i=0; i<arrlen(mission_configs); ++i)
+    {
+        if (!strcmp(mission_configs[i].name, name))
+        {
+            return &mission_configs[i];
+        }
+    }
+
+    return NULL;
+}
+
+// Check the name of the executable.  If it contains one of the game
+// names (eg. chocolate-hexen-setup.exe) then use that game.
+
+static boolean CheckExecutableName(GameSelectCallback callback)
+{
+    mission_config_t *config;
+    const char *exe_name;
+    int i;
+
+    exe_name = M_GetExecutableName();
+
+    for (i=0; i<arrlen(mission_configs); ++i)
+    {
+        config = &mission_configs[i];
+
+        if (strstr(exe_name, config->name) != NULL)
+        {
+            SetMission(config);
+            callback();
+            return true;
+        }
+    }
+
+    return false;
+}
+
+static void GameSelected(TXT_UNCAST_ARG(widget), TXT_UNCAST_ARG(config))
+{
+    TXT_CAST_ARG(mission_config_t, config);
+
+    SetMission(config);
+    game_selected_callback();
 }
 
 static void OpenGameSelectDialog(GameSelectCallback callback)
 {
+    mission_config_t *mission = NULL;
     txt_window_t *window;
+    const iwad_t **iwads;
+    int num_games;
+    int i;
 
-    window = TXT_NewWindow("Yaguar Doom");
+    window = TXT_NewWindow("Select game");
 
-    TXT_AddWidget(window, TXT_NewLabel(" "));
+    TXT_AddWidget(window, TXT_NewLabel("Select a game to configure:\n"));
+    num_games = 0;
 
-    // [Julia] Don't lookup anything, select Doom as default game
-    TXT_CloseWindow(window);
-    SetMission(DEFAULT_MISSION);
-    callback();
-    return;
+    // Add a button for each game.
+
+    for (i=0; i<arrlen(mission_configs); ++i)
+    {
+        // Do we have any IWADs for this game installed?
+        // If so, add a button.
+
+        iwads = D_FindAllIWADs(mission_configs[i].mask);
+
+        if (iwads[0] != NULL)
+        {
+            mission = &mission_configs[i];
+            TXT_AddWidget(window, TXT_NewButton2(mission_configs[i].label,
+                                                 GameSelected,
+                                                 &mission_configs[i]));
+            ++num_games;
+        }
+
+        free(iwads);
+    }
+
+    TXT_AddWidget(window, TXT_NewStrut(0, 1));
+
+    // No IWADs found at all?  Fall back to doom, then.
+
+    if (num_games == 0)
+    {
+        TXT_CloseWindow(window);
+        SetMission(DEFAULT_MISSION);
+        callback();
+        return;
+    }
+
+    // Only one game? Use that game, and don't bother with a dialog.
+
+    if (num_games == 1)
+    {
+        TXT_CloseWindow(window);
+        SetMission(mission);
+        callback();
+        return;
+    }
 
     game_selected_callback = callback;
 }
 
 void SetupMission(GameSelectCallback callback)
 {
-    OpenGameSelectDialog(callback);
+    mission_config_t *config;
+    const char *mission_name;
+    int p;
+
+    //!
+    // @arg <game>
+    //
+    // Specify the game to configure the settings for.  Valid
+    // values are 'doom', 'heretic', 'hexen' and 'strife'.
+    //
+
+    p = M_CheckParm("-game");
+
+    if (p > 0)
+    {
+        mission_name = myargv[p + 1];
+
+        config = GetMissionForName(mission_name);
+
+        if (config == NULL)
+        {
+            I_Error("Invalid parameter - '%s'", mission_name);
+        }
+
+        SetMission(config);
+        callback();
+    }
+    else if (!CheckExecutableName(callback))
+    {
+        OpenGameSelectDialog(callback);
+    }
 }
 
-char *GetExecutableName(void)
+const char *GetExecutableName(void)
 {
     return executable;
 }
 
-char *GetGameTitle(void)
+const char *GetGameTitle(void)
 {
     return game_title;
 }

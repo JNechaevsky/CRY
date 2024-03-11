@@ -1,6 +1,5 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -12,7 +11,6 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-
 
 #include <stdarg.h>
 #include <stdlib.h>
@@ -904,6 +902,34 @@ txt_table_t *TXT_NewTable(int columns)
     table = malloc(sizeof(txt_table_t));
 
     TXT_InitTable(table, columns);
+
+    return table;
+}
+
+// Alternative to TXT_NewTable() that allows a list of widgets to be
+// provided in its arguments.
+txt_table_t *TXT_MakeTable(int columns, ...)
+{
+    txt_table_t *table;
+    va_list args;
+
+    table = TXT_NewTable(columns);
+    va_start(args, columns);
+
+    for (;;)
+    {
+        txt_widget_t *widget;
+        widget = va_arg(args, txt_widget_t *);
+
+        if (widget == NULL)
+        {
+            break;
+        }
+
+        TXT_AddWidget(table, widget);
+    }
+
+    va_end(args);
 
     return table;
 }

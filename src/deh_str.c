@@ -1,6 +1,6 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,17 +16,16 @@
 // Parses Text substitution sections in dehacked files
 //
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+
 #include "doomtype.h"
 #include "deh_str.h"
 #include "m_misc.h"
-#include "z_zone.h"
-#include "jn.h"
 
+#include "z_zone.h"
 
 typedef struct 
 {
@@ -40,9 +39,9 @@ static int hash_table_length = -1;
 
 // This is the algorithm used by glib
 
-static unsigned int strhash(char *s)
+static unsigned int strhash(const char *s)
 {
-    char *p = s;
+    const char *p = s;
     unsigned int h = *p;
   
     if (h)
@@ -54,7 +53,7 @@ static unsigned int strhash(char *s)
     return h;
 }
 
-static deh_substitution_t *SubstitutionForString(char *s)
+static deh_substitution_t *SubstitutionForString(const char *s)
 {
     int entry;
 
@@ -82,7 +81,7 @@ static deh_substitution_t *SubstitutionForString(char *s)
 // Look up a string to see if it has been replaced with something else
 // This will be used throughout the program to substitute text
 
-char *DEH_String(char *s)
+const char *DEH_String(const char *s)
 {
     deh_substitution_t *subst;
 
@@ -96,6 +95,13 @@ char *DEH_String(char *s)
     {
         return s;
     }
+}
+
+// [crispy] returns true if a string has been substituted
+
+boolean DEH_HasStringReplacement(const char *s)
+{
+    return DEH_String(s) != s;
 }
 
 static void InitHashTable(void)
@@ -167,7 +173,7 @@ static void DEH_AddToHashtable(deh_substitution_t *sub)
     ++hash_table_entries;
 }
 
-void DEH_AddStringReplacement(char *from_text, char *to_text)
+void DEH_AddStringReplacement(const char *from_text, const char *to_text)
 {
     deh_substitution_t *sub;
     size_t len;
@@ -253,7 +259,7 @@ static format_arg_t FormatArgumentType(char c)
 // Given the specified string, get the type of the first format
 // string encountered.
 
-static format_arg_t NextFormatArgument(char **str)
+static format_arg_t NextFormatArgument(const char **str)
 {
     format_arg_t argtype;
 
@@ -328,10 +334,10 @@ static boolean ValidArgumentReplacement(format_arg_t original,
 
 // Return true if the specified string contains no format arguments.
 
-static boolean ValidFormatReplacement(char *original, char *replacement)
+static boolean ValidFormatReplacement(const char *original, const char *replacement)
 {
-    char *rover1;
-    char *rover2;
+    const char *rover1;
+    const char *rover2;
     int argtype1, argtype2;
 
     // Check each argument in turn and compare types.
@@ -368,9 +374,9 @@ static boolean ValidFormatReplacement(char *original, char *replacement)
 
 // Get replacement format string, checking arguments.
 
-static char *FormatStringReplacement(char *s)
+static const char *FormatStringReplacement(const char *s)
 {
-    char *repl;
+    const char *repl;
 
     repl = DEH_String(s);
 
@@ -387,10 +393,10 @@ static char *FormatStringReplacement(char *s)
 
 // printf(), performing a replacement on the format string.
 
-void DEH_printf(char *fmt, ...)
+void DEH_printf(const char *fmt, ...)
 {
     va_list args;
-    char *repl;
+    const char *repl;
 
     repl = FormatStringReplacement(fmt);
 
@@ -403,10 +409,10 @@ void DEH_printf(char *fmt, ...)
 
 // fprintf(), performing a replacement on the format string.
 
-void DEH_fprintf(FILE *fstream, char *fmt, ...)
+void DEH_fprintf(FILE *fstream, const char *fmt, ...)
 {
     va_list args;
-    char *repl;
+    const char *repl;
 
     repl = FormatStringReplacement(fmt);
 
@@ -419,10 +425,10 @@ void DEH_fprintf(FILE *fstream, char *fmt, ...)
 
 // snprintf(), performing a replacement on the format string.
 
-void DEH_snprintf(char *buffer, size_t len, char *fmt, ...)
+void DEH_snprintf(char *buffer, size_t len, const char *fmt, ...)
 {
     va_list args;
-    char *repl;
+    const char *repl;
 
     repl = FormatStringReplacement(fmt);
 

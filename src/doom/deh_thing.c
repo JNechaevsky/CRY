@@ -1,6 +1,6 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -12,17 +12,20 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-
+//
+// Parses "Thing" sections in dehacked files
+//
 
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "doomtype.h"
+
 #include "deh_defs.h"
 #include "deh_main.h"
 #include "deh_mapping.h"
-#include "info.h"
-#include "jn.h"
 
+#include "info.h"
 
 DEH_BEGIN_MAPPING(thing_mapping, mobjinfo_t)
   DEH_MAPPING("ID #",                doomednum)
@@ -47,6 +50,7 @@ DEH_BEGIN_MAPPING(thing_mapping, mobjinfo_t)
   DEH_MAPPING("Missile damage",      damage)
   DEH_MAPPING("Action sound",        activesound)
   DEH_MAPPING("Bits",                flags)
+  DEH_MAPPING("Respawn frame",       raisestate)
 DEH_END_MAPPING
 
 static void *DEH_ThingStart(deh_context_t *context, char *line)

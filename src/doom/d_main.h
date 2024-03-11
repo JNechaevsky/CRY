@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -13,6 +13,9 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
+// DESCRIPTION:
+//	System specific interface stuff.
+//
 
 
 #ifndef __D_MAIN__
@@ -21,30 +24,37 @@
 #include "doomdef.h"
 
 
-// =============================================================================
+
+
 // Read events from all input devices
-// =============================================================================
 
 void D_ProcessEvents (void); 
+	
 
-
-// =============================================================================
+//
 // BASE LEVEL
-// =============================================================================
-
-void D_PageTicker (void);
-void D_PageDrawer (void);
-void D_AdvanceDemo (void);
-void D_DoAdvanceDemo (void);
-void D_StartTitle (void);
-
-
-// =============================================================================
+//
+extern void D_DoomLoop (void);
+extern void D_ConnectNetGame (void);
+extern void D_CheckNetGame (void);
+extern void D_PageTicker (void);
+extern void D_PageDrawer (void);
+extern void D_AdvanceDemo (void);
+extern void D_DoAdvanceDemo (void);
+extern void D_StartTitle (void);
+ 
+//
 // GLOBAL VARIABLES
-// =============================================================================
+//
+
+extern boolean advancedemo;
+extern boolean sigil;
+extern boolean sigil2;
+extern boolean nerve;
+
+extern boolean havessg;
 
 extern gameaction_t gameaction;
-
 
 #endif
 

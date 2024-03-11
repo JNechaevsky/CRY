@@ -1,6 +1,5 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -13,7 +12,6 @@
 // GNU General Public License for more details.
 //
 
-
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -24,6 +22,7 @@
 #include "txt_gui.h"
 #include "txt_io.h"
 #include "txt_main.h"
+#include "txt_utf8.h"
 #include "txt_window.h"
 
 static void TXT_WindowActionSizeCalc(TXT_UNCAST_ARG(action))
@@ -36,7 +35,8 @@ static void TXT_WindowActionSizeCalc(TXT_UNCAST_ARG(action))
     // Width is label length, plus key description length, plus '='
     // and two surrounding spaces.
 
-    action->widget.w = strlen(action->label) + strlen(buf) + 3;
+    action->widget.w = TXT_UTF8_Strlen(action->label)
+                     + TXT_UTF8_Strlen(buf) + 3;
     action->widget.h = 1;
 }
 
@@ -138,8 +138,8 @@ static void WindowSelectCallback(TXT_UNCAST_ARG(widget), TXT_UNCAST_ARG(window))
 txt_window_action_t *TXT_NewWindowEscapeAction(txt_window_t *window)
 {
     txt_window_action_t *action;
-    action = TXT_NewWindowAction(KEY_ESCAPE, "Close");
 
+    action = TXT_NewWindowAction(KEY_ESCAPE, "Close");
     TXT_SignalConnect(action, "pressed", WindowCloseCallback, window);
 
     return action;
@@ -150,8 +150,8 @@ txt_window_action_t *TXT_NewWindowEscapeAction(txt_window_t *window)
 txt_window_action_t *TXT_NewWindowAbortAction(txt_window_t *window)
 {
     txt_window_action_t *action;
-    action = TXT_NewWindowAction(KEY_ESCAPE, "Abort");
 
+    action = TXT_NewWindowAction(KEY_ESCAPE, "Abort");
     TXT_SignalConnect(action, "pressed", WindowCloseCallback, window);
 
     return action;
@@ -160,8 +160,8 @@ txt_window_action_t *TXT_NewWindowAbortAction(txt_window_t *window)
 txt_window_action_t *TXT_NewWindowSelectAction(txt_window_t *window)
 {
     txt_window_action_t *action;
-    action = TXT_NewWindowAction(KEY_ENTER, "Select");
 
+    action = TXT_NewWindowAction(KEY_ENTER, "Select");
     TXT_SignalConnect(action, "pressed", WindowSelectCallback, window);
 
     return action;

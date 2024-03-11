@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -22,22 +22,57 @@
 #define __I_VIDEO__
 
 #include "doomtype.h"
+#include "m_fixed.h"
+
 
 // Screen width and height.
 
-#define hires 1
+#define ORIGWIDTH  320 // [crispy]
+#define ORIGHEIGHT 200 // [crispy]
 
-#define ORIGWIDTH  320
-#define ORIGHEIGHT 200
+// [JN] Allocate enough to support higher rendering resolutions.
+#define MAXWIDTH  (ORIGWIDTH << 5)  // [crispy] 
+#define MAXHEIGHT (ORIGHEIGHT << 4) // [crispy] 
 
-#define SCREENWIDTH  (ORIGWIDTH << hires)
-#define SCREENHEIGHT (ORIGHEIGHT << hires)
+// [JN] Maximum available rendering resolution.
+#define MAXHIRES 6
 
-#define SCREENWIDTH_4_3 (256 << hires)
+extern int SCREENWIDTH;
+extern int SCREENHEIGHT;
+extern int NONWIDEWIDTH; // [crispy] non-widescreen SCREENWIDTH
+extern int WIDESCREENDELTA; // [crispy] horizontal widescreen offset
+extern void (*post_rendering_hook) (void); // [crispy]
+void I_GetScreenDimensions (void); // [crispy] re-calculate WIDESCREENDELTA
+extern void I_ToggleVsync (void);
 
-// Screen height used when aspect_ratio_correct=true.
+enum
+{
+    RATIO_ORIG,
+    RATIO_MATCH_SCREEN,
+    RATIO_16_10,
+    RATIO_16_9,
+    RATIO_21_9,
+    NUM_RATIOS
+};
 
-#define SCREENHEIGHT_4_3 (240 << hires)
+enum
+{
+	REINIT_FRAMEBUFFERS = 1,
+	REINIT_RENDERER = 2,
+	REINIT_TEXTURES = 4,
+	REINIT_ASPECTRATIO = 8,
+};
+
+// Screen height used when vid_aspect_ratio_correct=true.
+
+#define ORIGHEIGHT_4_3 240 // [crispy]
+// [JN] Increase more (+2) to support quad rendering resolution.
+#define MAXHEIGHT_4_3 (ORIGHEIGHT_4_3 << 4) // [crispy]
+
+extern int SCREENHEIGHT_4_3;
+
+void *I_GetSDLWindow(void);
+void *I_GetSDLRenderer(void);
 
 typedef boolean (*grabmouse_callback_t)(void);
 
@@ -45,62 +80,85 @@ typedef boolean (*grabmouse_callback_t)(void);
 // determines the hardware configuration
 // and sets up the video mode
 void I_InitGraphics (void);
+void I_ReInitGraphics (int reinit);
 
 void I_GraphicsCheckCommandLine(void);
 
 void I_ShutdownGraphics(void);
 
+void I_RenderReadPixels (byte **data, int *w, int *h);
+
 // Takes full 8 bit values.
+#ifndef CRISPY_TRUECOLOR
 void I_SetPalette (byte* palette);
 int I_GetPaletteIndex(int r, int g, int b);
-
-// void I_UpdateNoBlit (void);
+#else
+void I_SetPalette (int palette);
+extern const pixel_t I_MapRGB (const uint8_t r, const uint8_t g, const uint8_t b);
+extern const int I_ShadeFactor[];
+extern const float I_SaturationPercent[];
+#endif
 void I_FinishUpdate (void);
 
-void I_ReadScreen (byte* scr);
+void I_ReadScreen (pixel_t* scr);
 
 void I_BeginRead (void);
 
-void I_SetWindowTitle(char *title);
+void I_SetWindowTitle(const char *title);
 
 void I_CheckIsScreensaver(void);
 void I_SetGrabMouseCallback(grabmouse_callback_t func);
+void CenterWindow(int *x, int *y, int w, int h);
 
-void I_DisplayFPSDots(boolean dots_on);
 void I_BindVideoVariables(void);
 
 void I_InitWindowTitle(void);
+void I_RegisterWindowIcon(const unsigned int *icon, int width, int height);
 void I_InitWindowIcon(void);
 
 // Called before processing any tics in a frame (just after displaying a frame).
 // Time consuming syncronous operations are performed here (joystick reading).
 
-// void I_StartFrame (void);
+void I_StartFrame (void);
 
 // Called before processing each tic in a frame.
 // Quick syncronous operations are performed here.
 
 void I_StartTic (void);
 
-// Enable the loading disk image displayed when reading from disk.
 
-void I_EnableLoadingDisk(int xoffs, int yoffs);
-
-extern char *video_driver;
+extern char *vid_video_driver;
 extern boolean screenvisible;
 
 extern int vanilla_keyboard_mapping;
 extern boolean screensaver_mode;
-extern int usegamma;
-extern byte *I_VideoBuffer;
+extern pixel_t *I_VideoBuffer;
 
 extern int screen_width;
 extern int screen_height;
-extern int fullscreen;
-extern int aspect_ratio_correct;
-extern int smoothing;
-extern int vga_porch_flash;
-extern int integer_scaling;
-extern int force_software_renderer;
+extern int vid_fullscreen;
+extern int vid_aspect_ratio_correct;
+extern int vid_smooth_scaling;
+extern int vid_integer_scaling;
+extern int vid_vga_porch_flash;
+extern int vid_force_software_renderer;
+extern int id_fps_value;
+extern int demowarp;
+
+// [AM] Fractional part of the current tic, in the half-open
+//      range of [0.0, 1.0).  Used for interpolation.
+extern fixed_t fractionaltic;
+
+extern char *window_position;
+void I_GetWindowPosition(int *x, int *y, int w, int h);
+
+// Joystic/gamepad hysteresis
+extern unsigned int joywait;
+
+extern int usemouse;
+
+extern boolean endoom_screen_active;
+extern boolean volume_needs_update;
+extern boolean window_focused;
 
 #endif

@@ -1,6 +1,5 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,12 +16,12 @@
 //     for Hexen startup loading screen.
 //
 
-
 #include "SDL.h"
 #include "string.h"
+
 #include "doomtype.h"
 #include "i_timer.h"
-
+#include "i_video.h"
 
 // Palette fade-in takes two seconds
 
@@ -33,19 +32,23 @@
 
 static SDL_Window *hr_screen = NULL;
 static SDL_Surface *hr_surface = NULL;
-static char *window_title = "";
+static const char *window_title = "";
 
 boolean I_SetVideoModeHR(void)
 {
+    int x, y;
+
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         return false;
     }
 
+    // [JN] Use different window centering function.
+    CenterWindow(&x, &y, HR_SCREENWIDTH, HR_SCREENHEIGHT);
+
     // Create screen surface at the native desktop pixel depth (bpp=0),
     // as we cannot trust true 8-bit to reliably work nowadays.
-    hr_screen = SDL_CreateWindow(window_title,
-        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+    hr_screen = SDL_CreateWindow(window_title, x, y,
         HR_SCREENWIDTH, HR_SCREENHEIGHT,
         0);
 
@@ -62,7 +65,7 @@ boolean I_SetVideoModeHR(void)
     return true;
 }
 
-void I_SetWindowTitleHR(char *title)
+void I_SetWindowTitleHR(const char *title)
 {
     window_title = title;
 }

@@ -1,6 +1,5 @@
 //
 // Copyright (C) 2013-2018 Alexey Khokholov (Nuke.YKT)
-// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -26,7 +25,6 @@
 //
 // version: 1.8
 //
-
 
 #ifndef OPL_OPL3_H
 #define OPL_OPL3_H

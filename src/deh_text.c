@@ -1,6 +1,6 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,15 +16,20 @@
 // Parses Text substitution sections in dehacked files
 //
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "doomtype.h"
+
 #include "z_zone.h"
+
 #include "deh_defs.h"
 #include "deh_io.h"
 #include "deh_main.h"
+
+// [crispy] support INCLUDE NOTEXT directive in BEX files
+boolean bex_notext = false;
 
 // Given a string length, find the maximum length of a 
 // string that can replace it.
@@ -87,7 +92,10 @@ static void *DEH_TextStart(deh_context_t *context, char *line)
     }
     to_text[tolen] = '\0';
 
+    if (!bex_notext)
+    {
     DEH_AddStringReplacement(from_text, to_text);
+    }
 
     free(from_text);
     free(to_text);

@@ -1,6 +1,5 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -12,7 +11,6 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-
 
 #include <ctype.h>
 #include <stdio.h>
@@ -26,6 +24,7 @@
 #include "txt_gui.h"
 #include "txt_io.h"
 #include "txt_main.h"
+#include "txt_utf8.h"
 #include "txt_window.h"
 
 // Generate the format string to be used for displaying floats
@@ -145,6 +144,7 @@ static void TXT_SpinControlDrawer(TXT_UNCAST_ARG(spincontrol))
     unsigned int i;
     unsigned int padding;
     txt_saved_colors_t colors;
+    int bw;
     int focused;
 
     focused = spincontrol->widget.focused;
@@ -152,7 +152,7 @@ static void TXT_SpinControlDrawer(TXT_UNCAST_ARG(spincontrol))
     TXT_SaveColors(&colors);
 
     TXT_FGColor(TXT_COLOR_BRIGHT_CYAN);
-    TXT_DrawString("\x1b ");
+    TXT_DrawCodePageString("\x1b ");
 
     TXT_RestoreColors(&colors);
 
@@ -174,7 +174,8 @@ static void TXT_SpinControlDrawer(TXT_UNCAST_ARG(spincontrol))
 
     i = 0;
 
-    padding = spincontrol->widget.w - strlen(spincontrol->buffer) - 4;
+    bw = TXT_UTF8_Strlen(spincontrol->buffer);
+    padding = spincontrol->widget.w - bw - 4;
 
     while (i < padding)
     {
@@ -183,7 +184,7 @@ static void TXT_SpinControlDrawer(TXT_UNCAST_ARG(spincontrol))
     }
 
     TXT_DrawString(spincontrol->buffer);
-    i += strlen(spincontrol->buffer);
+    i += bw;
 
     while (i < spincontrol->widget.w - 4)
     {
@@ -193,7 +194,7 @@ static void TXT_SpinControlDrawer(TXT_UNCAST_ARG(spincontrol))
 
     TXT_RestoreColors(&colors);
     TXT_FGColor(TXT_COLOR_BRIGHT_CYAN);
-    TXT_DrawString(" \x1a");
+    TXT_DrawCodePageString(" \x1a");
 }
 
 static void TXT_SpinControlDestructor(TXT_UNCAST_ARG(spincontrol))
@@ -205,7 +206,8 @@ static void TXT_SpinControlDestructor(TXT_UNCAST_ARG(spincontrol))
 
 static void AddCharacter(txt_spincontrol_t *spincontrol, int key)
 {
-    if (strlen(spincontrol->buffer) < SpinControlWidth(spincontrol))
+    if (TXT_UTF8_Strlen(spincontrol->buffer) < SpinControlWidth(spincontrol)
+     && strlen(spincontrol->buffer) < spincontrol->buffer_len - 2)
     {
         spincontrol->buffer[strlen(spincontrol->buffer) + 1] = '\0';
         spincontrol->buffer[strlen(spincontrol->buffer)] = key;
@@ -214,7 +216,7 @@ static void AddCharacter(txt_spincontrol_t *spincontrol, int key)
 
 static void Backspace(txt_spincontrol_t *spincontrol)
 {
-    if (strlen(spincontrol->buffer) > 0)
+    if (TXT_UTF8_Strlen(spincontrol->buffer) > 0)
     {
         spincontrol->buffer[strlen(spincontrol->buffer) - 1] = '\0';
     }
@@ -402,6 +404,7 @@ txt_spincontrol_t *TXT_NewSpinControl(int *value, int min, int max)
     spincontrol->min.i = min;
     spincontrol->max.i = max;
     spincontrol->step.i = 1;
+    SetBuffer(spincontrol);
 
     return spincontrol;
 }
@@ -416,6 +419,7 @@ txt_spincontrol_t *TXT_NewFloatSpinControl(float *value, float min, float max)
     spincontrol->min.f = min;
     spincontrol->max.f = max;
     spincontrol->step.f = 0.1f;
+    SetBuffer(spincontrol);
 
     return spincontrol;
 }

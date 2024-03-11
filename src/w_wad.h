@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -31,6 +31,22 @@
 // TYPES
 //
 
+typedef PACKED_STRUCT (
+{
+    // Should be "IWAD" or "PWAD".
+    char        identification[4];
+    int         numlumps;
+    int         infotableofs;
+}) wadinfo_t;
+
+
+typedef PACKED_STRUCT (
+{
+    int         filepos;
+    int         size;
+    char        name[8];
+}) filelump_t;
+
 //
 // WADFILE I/O related stuff.
 //
@@ -50,28 +66,34 @@ struct lumpinfo_s
     lumpindex_t next;
 };
 
-int W_CheckMultipleLumps(char *name);
 
 extern lumpinfo_t **lumpinfo;
 extern unsigned int numlumps;
 
-wad_file_t *W_AddFile(char *filename);
+wad_file_t *W_AddFile(const char *filename);
 void W_Reload(void);
 
-lumpindex_t W_CheckNumForName(char *name);
-lumpindex_t W_GetNumForName(char *name);
+int W_CheckMultipleLumps (char *name);
+lumpindex_t W_CheckNumForName(const char *name);
+lumpindex_t W_GetNumForName(const char *name);
+lumpindex_t W_CheckNumForNameFromTo(const char *name, int from, int to);
 
 int W_LumpLength(lumpindex_t lump);
 void W_ReadLump(lumpindex_t lump, void *dest);
 
-void *W_CacheLumpNum(lumpindex_t lumpnum, int tag);
-void *W_CacheLumpName(char *name, int tag);
+void *W_CacheLumpNum(lumpindex_t lump, int tag);
+void *W_CacheLumpName(const char *name, int tag);
 
 void W_GenerateHashTable(void);
 
 extern unsigned int W_LumpNameHash(const char *s);
 
-void W_ReleaseLumpNum(lumpindex_t lumpnum);
-void W_ReleaseLumpName(char *name);
+void W_ReleaseLumpNum(lumpindex_t lump);
+void W_ReleaseLumpName(const char *name);
+
+const char *W_WadNameForLump(const lumpinfo_t *lump);
+boolean W_IsIWADLump(const lumpinfo_t *lump);
+
+char **W_GetWADFileNames(void);
 
 #endif

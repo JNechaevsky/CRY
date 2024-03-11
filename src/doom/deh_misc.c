@@ -1,6 +1,6 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -12,10 +12,13 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-
+//
+// Parses "Misc" sections in dehacked files
+//
 
 #include <stdlib.h>
 #include <string.h>
+
 #include "doomtype.h"
 #include "deh_defs.h"
 #include "deh_io.h"
@@ -35,8 +38,8 @@ int deh_initial_health = DEH_DEFAULT_INITIAL_HEALTH;
 int deh_initial_bullets = DEH_DEFAULT_INITIAL_BULLETS;
 
 // Dehacked: "Max Health"
-// This is the maximum health that can be reached using medikits 
-// alone.  See P_TouchSpecialThing in p_inter.c
+// This is the maximum health that can be reached using health
+// potions. See P_TouchSpecialThing in p_inter.c
 
 int deh_max_health = DEH_DEFAULT_MAX_HEALTH;
 
@@ -130,7 +133,7 @@ int deh_species_infighting = DEH_DEFAULT_SPECIES_INFIGHTING;
 
 static struct
 {
-    char *deh_name;
+    const char *deh_name;
     int *value;
 } misc_settings[] = {
     {"Initial Health",      &deh_initial_health},

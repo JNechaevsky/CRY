@@ -1,6 +1,5 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,7 +15,6 @@
 // Text mode emulation in SDL
 //
 
-
 #ifndef TXT_GUI_H
 #define TXT_GUI_H
 
@@ -27,8 +25,8 @@
 void TXT_DrawDesktopBackground(const char *title);
 void TXT_DrawWindowFrame(const char *title, int x, int y, int w, int h);
 void TXT_DrawSeparator(int x, int y, int w);
+void TXT_DrawCodePageString(const char *s);
 void TXT_DrawString(const char *s);
-void TXT_DrawUTF8String(const char *s);
 int TXT_CanDrawCharacter(unsigned int c);
 
 void TXT_DrawHorizScrollbar(int x, int y, int w, int cursor, int range);

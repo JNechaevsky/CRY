@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,7 +17,6 @@
 //   Functions and definitions relating to the game type and operational
 //   mode.
 //
-
 
 #ifndef __D_MODE__
 #define __D_MODE__
@@ -37,8 +36,7 @@ typedef enum
     heretic,         // Heretic
     hexen,           // Hexen
     strife,          // Strife
-    pack_nerve,      // [Julia] Doom 2: No Rest For The Living
-    jaguar,          // [Julia] Doom for Atari Jaguar
+    doom2f,          // Doom 2: L'Enfer sur Terre
 
     none
 } GameMission_t;
@@ -53,7 +51,6 @@ typedef enum
     registered,      // Doom/Heretic registered
     commercial,      // Doom II/Hexen
     retail,          // Ultimate Doom
-    pressbeta,       // [Julia] Doom Press Beta
     indetermined     // Unknown.
 } GameMode_t;
 
@@ -68,7 +65,6 @@ typedef enum
     exe_doom_1_9,    // Doom 1.9: "
     exe_hacx,        // Hacx
     exe_ultimate,    // Ultimate Doom (retail)
-    exe_doom_se,     // Doom 1.9: Special Edition
     exe_final,       // Final Doom
     exe_final2,      // Final Doom (alternate exe)
     exe_chex,        // Chex Quest executable (based on Final Doom)
@@ -88,20 +84,7 @@ typedef enum
     freedoom,   // FreeDoom: Phase 1 + 2
     freedm,     // FreeDM
     bfgedition, // Doom Classic (Doom 3: BFG Edition)
-    old_shareware // [Julia] Old Shareware (1.2 and lower)
 } GameVariant_t;
-
-// The current state of the game: whether we are
-// playing, gazing at the intermission screen,
-// the game final animation, or a demo. 
-
-typedef enum
-{
-    GS_LEVEL,
-    GS_INTERMISSION,
-    GS_FINALE,
-    GS_DEMOSCREEN,
-} gamestate_t;
 
 // Skill level.
 
@@ -112,8 +95,7 @@ typedef enum
     sk_easy,
     sk_medium,
     sk_hard,
-    sk_nightmare,
-    sk_ultranm
+    sk_nightmare
 } skill_t;
 
 boolean D_ValidGameMode(GameMission_t mission, GameMode_t mode);
@@ -122,7 +104,8 @@ boolean D_ValidEpisodeMap(GameMission_t mission, GameMode_t mode,
                           int episode, int map);
 int D_GetNumEpisodes(GameMission_t mission, GameMode_t mode);
 boolean D_IsEpisodeMap(GameMission_t mission);
-char *D_GameMissionString(GameMission_t mission);
+const char *D_GameMissionString(GameMission_t mission);
+const char *D_GameModeString(GameMode_t mode);
 
 #endif /* #ifndef __D_MODE__ */
 

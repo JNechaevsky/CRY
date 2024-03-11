@@ -1,6 +1,6 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,19 +16,18 @@
 // Dehacked I/O code (does all reads from dehacked files)
 //
 
-
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+
 #include "m_misc.h"
 #include "w_wad.h"
 #include "z_zone.h"
+
 #include "deh_defs.h"
 #include "deh_io.h"
-#include "jn.h"
-
 
 typedef enum
 {
@@ -62,6 +61,9 @@ struct deh_context_s
 
     // Error handling.
     boolean had_error;
+
+    // [crispy] pointer to start of current line
+    long linestart;
 };
 
 static deh_context_t *DEH_NewContext(void)
@@ -78,6 +80,7 @@ static deh_context_t *DEH_NewContext(void)
     context->last_was_newline = true;
 
     context->had_error = false;
+    context->linestart = -1; // [crispy] initialize
 
     return context;
 }
@@ -85,12 +88,12 @@ static deh_context_t *DEH_NewContext(void)
 // Open a dehacked file for reading
 // Returns NULL if open failed
 
-deh_context_t *DEH_OpenFile(char *filename)
+deh_context_t *DEH_OpenFile(const char *filename)
 {
     FILE *fstream;
     deh_context_t *context;
 
-    fstream = fopen(filename, "r");
+    fstream = M_fopen(filename, "r");
 
     if (fstream == NULL)
         return NULL;
@@ -177,9 +180,16 @@ int DEH_GetCharLump(deh_context_t *context)
 int DEH_GetChar(deh_context_t *context)
 {
     int result = 0;
+    boolean last_was_cr = false;
 
-    // Read characters, but ignore carriage returns
-    // Essentially this is a DOS->Unix conversion
+    // Track the current line number
+
+    if (context->last_was_newline)
+    {
+        ++context->linenum;
+    }
+
+    // Read characters, converting CRLF to LF
 
     do
     {
@@ -193,14 +203,27 @@ int DEH_GetChar(deh_context_t *context)
                 result = DEH_GetCharLump(context);
                 break;
         }
-    } while (result == '\r');
 
-    // Track the current line number
+        // Handle \r characters not paired with \n
+        if (last_was_cr && result != '\n')
+        {
+            switch (context->type)
+            {
+                case DEH_INPUT_FILE:
+                    ungetc(result, context->stream);
+                    break;
 
-    if (context->last_was_newline)
-    {
-        ++context->linenum;
-    }
+                case DEH_INPUT_LUMP:
+                    --context->input_buffer_pos;
+                    break;
+            }
+
+            return '\r';
+        }
+
+        last_was_cr = result == '\r';
+
+    } while (last_was_cr);
 
     context->last_was_newline = result == '\n';
 
@@ -223,6 +246,42 @@ static void IncreaseReadBuffer(deh_context_t *context)
 
     context->readbuffer = newbuffer;
     context->readbuffer_size = newbuffer_size;
+}
+
+// [crispy] Save pointer to start of current line ...
+void DEH_SaveLineStart (deh_context_t *context)
+{
+    if (context->type == DEH_INPUT_FILE)
+    {
+	context->linestart = ftell(context->stream);
+    }
+    else
+    if (context->type == DEH_INPUT_LUMP)
+    {
+	context->linestart = context->input_buffer_pos;
+    }
+}
+
+// [crispy] ... and reset context to start of current line
+// to retry with previous line parser in case of a parsing error
+void DEH_RestoreLineStart (deh_context_t *context)
+{
+    // [crispy] never point past the start
+    if (context->linestart < 0)
+	return;
+
+    if (context->type == DEH_INPUT_FILE)
+    {
+	fseek(context->stream, context->linestart, SEEK_SET);
+    }
+    else
+    if (context->type == DEH_INPUT_LUMP)
+    {
+	context->input_buffer_pos = context->linestart;
+    }
+
+    // [crispy] don't count this line twice
+    --context->linenum;
 }
 
 // Read a whole line
@@ -304,21 +363,20 @@ char *DEH_ReadLine(deh_context_t *context, boolean extended)
     return context->readbuffer;
 }
 
-void DEH_Warning(deh_context_t *context, char *msg, ...)
+void DEH_Warning(deh_context_t *context, const char *msg, ...)
 {
     va_list args;
 
     va_start(args, msg);
 
-    fprintf(stderr, "%s:%i: warning: ",
-                    context->filename, context->linenum);
+    fprintf(stderr, "%s:%i: warning: ", context->filename, context->linenum);
     vfprintf(stderr, msg, args);
     fprintf(stderr, "\n");
 
     va_end(args);
 }
 
-void DEH_Error(deh_context_t *context, char *msg, ...)
+void DEH_Error(deh_context_t *context, const char *msg, ...)
 {
     va_list args;
 
@@ -336,5 +394,17 @@ void DEH_Error(deh_context_t *context, char *msg, ...)
 boolean DEH_HadError(deh_context_t *context)
 {
     return context->had_error;
+}
+
+// [crispy] return the filename of the DEHACKED file
+// or NULL if it is a DEHACKED lump loaded from a PWAD
+char *DEH_FileName(deh_context_t *context)
+{
+    if (context->type == DEH_INPUT_FILE)
+    {
+        return context->filename;
+    }
+
+    return NULL;
 }
 

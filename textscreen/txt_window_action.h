@@ -1,6 +1,5 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -12,7 +11,6 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-
 
 #ifndef TXT_WINDOW_ACTION_H
 #define TXT_WINDOW_ACTION_H
@@ -50,12 +48,11 @@ struct txt_window_action_s
  *
  * @param key           The keyboard key that triggers this action.
  * @param label         Label to display for this action in the tray
- *                      at the bottom of the window.
+ *                      at the bottom of the window (UTF-8 format).
  * @return              Pointer to the new window action widget.
  */
 
 txt_window_action_t *TXT_NewWindowAction(int key, const char *label);
-txt_window_action_t *TXT_NewWindowActionY(int key, const char *label);
 
 /**
  * Create a new window action that closes the window when the
@@ -66,7 +63,6 @@ txt_window_action_t *TXT_NewWindowActionY(int key, const char *label);
  */
 
 txt_window_action_t *TXT_NewWindowEscapeAction(txt_window_t *window);
-txt_window_action_t *TXT_NewWindowEscapeAction_Rus(txt_window_t *window);
 
 /**
  * Create a new window action that closes the window when the
@@ -77,7 +73,6 @@ txt_window_action_t *TXT_NewWindowEscapeAction_Rus(txt_window_t *window);
  */
 
 txt_window_action_t *TXT_NewWindowAbortAction(txt_window_t *window);
-txt_window_action_t *TXT_NewWindowAbortAction_Rus(txt_window_t *window);
 
 /**
  * Create a new "select" window action.  This does not really do
@@ -89,7 +84,6 @@ txt_window_action_t *TXT_NewWindowAbortAction_Rus(txt_window_t *window);
  */
 
 txt_window_action_t *TXT_NewWindowSelectAction(txt_window_t *window);
-txt_window_action_t *TXT_NewWindowSelectAction_Rus(txt_window_t *window);
 
 #endif /* #ifndef TXT_WINDOW_ACTION_H */
 

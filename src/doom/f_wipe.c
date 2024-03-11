@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -13,7 +13,9 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-
+// DESCRIPTION:
+//	Mission begin melt/wipe screen special effect.
+//
 
 #include <string.h>
 
@@ -21,155 +23,131 @@
 #include "i_video.h"
 #include "v_video.h"
 #include "m_random.h"
-#include "doomtype.h"
-#include "f_wipe.h"
-#include "w_wad.h"
-#include "doomstat.h"
-#include "st_stuff.h"
 
+#include "id_vars.h"
 
-extern char *DEH_String(char *s);
 
 // =============================================================================
 // SCREEN WIPE PACKAGE
 // =============================================================================
 
-static boolean go = 0; // when zero, stop the wipe
-static byte *wipe_scr_start;
-static byte *wipe_scr_end;
-static byte *wipe_scr;
+static pixel_t *wipe_scr_start;
+static pixel_t *wipe_scr_end;
+static pixel_t *wipe_scr;
+static int     *y;
 
+// -----------------------------------------------------------------------------
+// wipe_shittyColMajorXform
+// -----------------------------------------------------------------------------
 
-void wipe_shittyColMajorXform (short* array, int width, int height)
+static void wipe_shittyColMajorXform (dpixel_t *array)
 {
-    int     x;
-    int     y;
-    short  *dest;
+    const int width = SCREENWIDTH/2;
+    dpixel_t *dest = (dpixel_t*) Z_Malloc(width*SCREENHEIGHT*sizeof(*dest), PU_STATIC, 0);
 
-    dest = (short*) Z_Malloc(width*height*sizeof(*dest), PU_STATIC, 0);
+    for (int y = 0 ; y < SCREENHEIGHT ; y++)
+    {
+        for (int x = 0 ; x < width ; x++)
+        {
+            dest[x*SCREENHEIGHT+y] = array[y*width+x];
+        }
+    }
 
-    for(y=0;y<height;y++)
-        for(x=0;x<width;x++)
-            dest[x*height+y] = array[y*width+x];
-
-    memcpy(array, dest, width*height*sizeof(*dest));
+    memcpy(array, dest, width*SCREENHEIGHT*sizeof(*dest));
 
     Z_Free(dest);
 }
 
+// -----------------------------------------------------------------------------
+// wipe_initMelt
+// -----------------------------------------------------------------------------
 
-int wipe_initColorXForm (int width, int height, int ticks)
+static void wipe_initMelt (void)
 {
-    memcpy(wipe_scr, wipe_scr_start, width*height*sizeof(*wipe_scr));
-    return 0;
-}
-
-
-int wipe_doColorXForm (int width, int height, int ticks)
-{
-    boolean  changed;
-    byte    *w;
-    byte    *e;
-    int      newval;
-
-    changed = false;
-    w = wipe_scr;
-    e = wipe_scr_end;
-
-    while (w!=wipe_scr+width*height)
-    {
-        if (*w != *e)
-        {
-            if (*w > *e)
-            {
-                newval = *w - ticks;
-
-                if (newval < *e)
-                *w = *e;
-                else
-                *w = newval;
-
-                changed = true;
-            }
-            else if (*w < *e)
-            {
-                newval = *w + ticks;
-
-                if (newval > *e)
-                *w = *e;
-
-                else
-                *w = newval;
-
-                changed = true;
-            }
-        }
-
-        w++;
-        e++;
-    }
-
-    return !changed;
-}
-
-int wipe_exitColorXForm (int width, int height, int ticks)
-{
-    return 0;
-}
-
-
-static int*	y;
-
-
-int wipe_initMelt (int width, int height, int ticks)
-{
-    int i, r;
-
     // copy start screen to main screen
-    memcpy(wipe_scr, wipe_scr_start, width*height*sizeof(*wipe_scr));
+    memcpy(wipe_scr, wipe_scr_start, SCREENWIDTH*SCREENHEIGHT*sizeof(*wipe_scr));
 
     // makes this wipe faster (in theory)
     // to have stuff in column-major format
-    wipe_shittyColMajorXform((short*)wipe_scr_start, width/2, height);
-    wipe_shittyColMajorXform((short*)wipe_scr_end, width/2, height);
+    wipe_shittyColMajorXform((dpixel_t*)wipe_scr_start);
+    wipe_shittyColMajorXform((dpixel_t*)wipe_scr_end);
 
     // setup initial column positions
     // (y<0 => not ready to scroll yet)
-    y = (int *) Z_Malloc(width*sizeof(int), PU_STATIC, 0);
-    y[0] = -(M_Random()%16);
-    for (i=1;i<width;i++)
-    {
-        r = (M_Random()%3) - 1;
-        y[i] = y[i-1] + r;
-        if (y[i] > 0) y[i] = 0;
-        else if (y[i] == -16) y[i] = -15;
-    }
+    y = (int *) Z_Malloc(SCREENWIDTH*sizeof(int), PU_STATIC, 0);
+    y[0] = -(ID_RealRandom()%16);
 
-    return 0;
+    for (int i = 1 ; i < SCREENWIDTH ; i++)
+    {
+        int r = (ID_RealRandom()%3) - 1;
+
+        y[i] = y[i-1] + r;
+
+        if (y[i] > 0)
+        {
+            y[i] = 0;
+        }
+        else
+        if (y[i] == -16)
+        {
+            y[i] = -15;
+        }
+    }
 }
 
+// -----------------------------------------------------------------------------
+// wipe_doMelt
+// -----------------------------------------------------------------------------
 
-int wipe_doMelt (int width, int height, int ticks)
+static int wipe_doMelt (int ticks)
 {
-    int     i;
-    int     dy;
+    int j;
+    int dy;
+    int idx;
+    const int width = SCREENWIDTH/2;
 
-    boolean done = true;
-
-    width/=2;
+    dpixel_t *s;
+    dpixel_t *d;
+    boolean	done = true;
 
     while (ticks--)
     {
-        for (i=0;i<width;i++)
+        for (int i = 0 ; i < width ; i++)
         {
             if (y[i]<0)
             {
                 y[i]++; done = false;
             }
-            else if (y[i] < height)
+            else
+            if (y[i] < SCREENHEIGHT)
             {
-                dy = 13; // [Julia] Almost identical to original wipe duration
+                dy = (y[i] < 16) ? y[i]+1 : ((8 * vid_screenwipe) * vid_resolution);
+
+                if (y[i]+dy >= SCREENHEIGHT)
+                {
+                    dy = SCREENHEIGHT - y[i];
+                }
+
+                s = &((dpixel_t *)wipe_scr_end)[i*SCREENHEIGHT+y[i]];
+                d = &((dpixel_t *)wipe_scr)[y[i]*width+i];
+                idx = 0;
+
+                for (j = dy ; j ; j--)
+                {
+                    d[idx] = *(s++);
+                    idx += width;
+                }
+
                 y[i] += dy;
+                s = &((dpixel_t *)wipe_scr_start)[i*SCREENHEIGHT];
+                d = &((dpixel_t *)wipe_scr)[y[i]*width+i];
+                idx = 0;
+
+                for (j=SCREENHEIGHT-y[i];j;j--)
+                {
+                    d[idx] = *(s++);
+                    idx += width;
+                }
 
                 done = false;
             }
@@ -179,73 +157,64 @@ int wipe_doMelt (int width, int height, int ticks)
     return done;
 }
 
+// -----------------------------------------------------------------------------
+// wipe_exitMelt
+// -----------------------------------------------------------------------------
 
-int wipe_exitMelt (int width, int height, int ticks)
+static void wipe_exitMelt (void)
 {
     Z_Free(y);
     Z_Free(wipe_scr_start);
     Z_Free(wipe_scr_end);
-    // [Julia] Update classic HUD's background and player's face after loading
-    if (screenblocks <= 10 && gamestate == GS_LEVEL)
-    {
-        ST_refreshBackground();
-        ST_drawWidgets(true);
-    }
-    return 0;
 }
 
+// -----------------------------------------------------------------------------
+// wipe_StartScreen
+// -----------------------------------------------------------------------------
 
-int wipe_StartScreen (int x, int y, int width, int height)
+void wipe_StartScreen (void)
 {
     wipe_scr_start = Z_Malloc(SCREENWIDTH * SCREENHEIGHT * sizeof(*wipe_scr_start), PU_STATIC, NULL);
     I_ReadScreen(wipe_scr_start);
-    return 0;
 }
 
+// -----------------------------------------------------------------------------
+// wipe_EndScreen
+// -----------------------------------------------------------------------------
 
-int wipe_EndScreen (int x, int y, int width, int height)
+void wipe_EndScreen (void)
 {
     wipe_scr_end = Z_Malloc(SCREENWIDTH * SCREENHEIGHT * sizeof(*wipe_scr_end), PU_STATIC, NULL);
     I_ReadScreen(wipe_scr_end);
-    V_DrawBlock(x, y, width, height, wipe_scr_start); // restore start scr.
-    return 0;
+    V_DrawBlock(0, 0, SCREENWIDTH, SCREENHEIGHT, wipe_scr_start); // restore start scr.
 }
 
+// -----------------------------------------------------------------------------
+// wipe_ScreenWipe
+// -----------------------------------------------------------------------------
 
-int wipe_ScreenWipe (int wipeno, int x, int y, int width, int height, int ticks)
+const int wipe_ScreenWipe (const int ticks)
 {
-    int rc;
-
-    static int (*wipes[])(int, int, int) =
-    {
-        wipe_initColorXForm, wipe_doColorXForm, wipe_exitColorXForm,
-        wipe_initMelt, wipe_doMelt, wipe_exitMelt
-    };
-
-    ticks <<= hires;
+    // when zero, stop the wipe
+    static boolean go = false;
 
     // initial stuff
     if (!go)
     {
-        go = 1;
+        go = true;
         wipe_scr = I_VideoBuffer;
-        (*wipes[wipeno*3])(width, height, ticks);
+        wipe_initMelt();
     }
 
     // do a piece of wipe-in
-    V_MarkRect(0, 0, width, height);
-    rc = (*wipes[wipeno*3+1])(width, height, ticks);
+    V_MarkRect(0, 0, SCREENWIDTH, SCREENHEIGHT);
 
     // final stuff
-    if (rc)
+    if ((*wipe_doMelt)(ticks))
     {
-        go = 0;
-        (*wipes[wipeno*3+2])(width, height, ticks);
+        go = false;
+        wipe_exitMelt();
     }
-
-    // [Julia] Draw "Loading" picture
-    V_DrawShadowedPatch(0, 0, W_CacheLumpName (DEH_String("M_LOADIN"), PU_CACHE));
 
     return !go;
 }
- 

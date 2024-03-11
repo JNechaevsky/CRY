@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,34 +18,22 @@
 //
 
 
+
+
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "doomtype.h"
+
 #include "i_swap.h"
 #include "i_system.h"
 #include "i_video.h"
 #include "m_misc.h"
 #include "z_zone.h"
+
 #include "w_wad.h"
-#include "jn.h"
-
-typedef struct
-{
-    // Should be "IWAD" or "PWAD".
-    char		identification[4];
-    int			numlumps;
-    int			infotableofs;
-} PACKEDATTR wadinfo_t;
-
-
-typedef struct
-{
-    int			filepos;
-    int			size;
-    char		name[8];
-} PACKEDATTR filelump_t;
 
 //
 // GLOBALS
@@ -65,6 +53,22 @@ static wad_file_t *reloadhandle = NULL;
 static lumpinfo_t *reloadlumps = NULL;
 static char *reloadname = NULL;
 static int reloadlump = -1;
+
+static char **wad_filenames;
+
+static void AddWADFileName(const char *filename)
+{
+    static int i;
+
+    wad_filenames = I_Realloc(wad_filenames, (i + 2) * sizeof(*wad_filenames));
+    wad_filenames[i++] = M_StringDuplicate(filename);
+    wad_filenames[i] = NULL;
+}
+
+char **W_GetWADFileNames(void)
+{
+    return wad_filenames;
+}
 
 // Hash function used for lump names.
 unsigned int W_LumpNameHash(const char *s)
@@ -96,7 +100,7 @@ unsigned int W_LumpNameHash(const char *s)
 // Other files are single lumps with the base filename
 //  for the lump name.
 
-wad_file_t *W_AddFile (char *filename)
+wad_file_t *W_AddFile (const char *filename)
 {
     wadinfo_t header;
     lumpindex_t i;
@@ -132,8 +136,8 @@ wad_file_t *W_AddFile (char *filename)
 
     if (wad_file == NULL)
     {
-        printf (" couldn't open %s\n", filename);
-        return NULL;
+	printf (" couldn't open %s\n", filename);
+	return NULL;
     }
 
     if (strcasecmp(filename+strlen(filename)-3 , "wad" ) )
@@ -166,7 +170,8 @@ wad_file_t *W_AddFile (char *filename)
 	    if (strncmp(header.identification,"PWAD",4))
 	    {
 		W_CloseFile(wad_file);
-		I_Error ("Wad file %s doesn't have IWAD or PWAD id\n", filename);
+		I_Error ("Wad file %s doesn't have IWAD "
+			 "or PWAD id\n", filename);
 	    }
 
 	    // ???modifiedgame = true;
@@ -174,15 +179,15 @@ wad_file_t *W_AddFile (char *filename)
 
 	header.numlumps = LONG(header.numlumps);
 
-        // Vanilla Doom doesn't like WADs with more than 4046 lumps
-        // https://www.doomworld.com/vb/post/1010985
-        // [crispy] disable PWAD lump number limit
-        if (!strncmp(header.identification,"PWAD",4) && header.numlumps > 4046 && false)
-        {
-                W_CloseFile(wad_file);
-                I_Error ("Error: Vanilla limit for lumps in a WAD is 4046, PWAD %s has %d", 
-                         filename, header.numlumps);
-        }
+         // Vanilla Doom doesn't like WADs with more than 4046 lumps
+         // https://www.doomworld.com/vb/post/1010985
+         // [crispy] disable PWAD lump number limit
+         if (!strncmp(header.identification,"PWAD",4) && header.numlumps > 4046 && false)
+         {
+                 W_CloseFile(wad_file);
+                 I_Error ("Error: Vanilla limit for lumps in a WAD is 4046, "
+                          "PWAD %s has %d", filename, header.numlumps);
+         }
 
 	header.infotableofs = LONG(header.infotableofs);
 	length = header.numlumps*sizeof(filelump_t);
@@ -202,13 +207,7 @@ wad_file_t *W_AddFile (char *filename)
 
     startlump = numlumps;
     numlumps += numfilelumps;
-    lumpinfo = realloc(lumpinfo, numlumps * sizeof(lumpinfo_t *));
-    if (lumpinfo == NULL)
-    {
-        W_CloseFile(wad_file);
-        I_Error("Failed to allocate array for lumpinfo[]");
-    }
-
+    lumpinfo = I_Realloc(lumpinfo, numlumps * sizeof(lumpinfo_t *));
     filerover = fileinfo;
 
     for (i = startlump; i < numlumps; ++i)
@@ -240,6 +239,8 @@ wad_file_t *W_AddFile (char *filename)
         reloadlumps = filelumps;
     }
 
+    AddWADFileName(filename);
+
     return wad_file;
 }
 
@@ -260,7 +261,7 @@ int W_NumLumps (void)
 // Returns -1 if name not found.
 //
 
-lumpindex_t W_CheckNumForName(char* name)
+lumpindex_t W_CheckNumForName(const char *name)
 {
     lumpindex_t i;
 
@@ -302,29 +303,32 @@ lumpindex_t W_CheckNumForName(char* name)
     return -1;
 }
 
-//
+// -----------------------------------------------------------------------------
 // W_CheckMultipleLumps
 // Check if there's more than one of the same lump.
-//
-// [Julia] Adaptaken from Doom Retro, thanks Brad Harding!
-//
-int W_CheckMultipleLumps(char *name)
+// [JN] Adaptaken from DOOM Retro, thanks Brad Harding!
+// -----------------------------------------------------------------------------
+
+int W_CheckMultipleLumps (char *name)
 {
     int count = 0;
 
     for (lumpindex_t i = numlumps - 1; i >= 0; i--)
+    {
         if (!strncasecmp(lumpinfo[i]->name, name, 8))
+        {
             count++;
+        }
+    }
 
     return count;
 }
-
 
 //
 // W_GetNumForName
 // Calls W_CheckNumForName, but bombs out if not found.
 //
-lumpindex_t W_GetNumForName(char* name)
+lumpindex_t W_GetNumForName(const char *name)
 {
     lumpindex_t i;
 
@@ -338,6 +342,20 @@ lumpindex_t W_GetNumForName(char* name)
     return i;
 }
 
+lumpindex_t W_CheckNumForNameFromTo(const char *name, int from, int to)
+{
+    lumpindex_t i;
+
+    for (i = from; i >= to; i--)
+    {
+        if (!strncasecmp(lumpinfo[i]->name, name, 8))
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
 
 //
 // W_LumpLength
@@ -443,7 +461,7 @@ void *W_CacheLumpNum(lumpindex_t lumpnum, int tag)
 //
 // W_CacheLumpName
 //
-void *W_CacheLumpName(char *name, int tag)
+void *W_CacheLumpName(const char *name, int tag)
 {
     return W_CacheLumpNum(W_GetNumForName(name), tag);
 }
@@ -479,7 +497,7 @@ void W_ReleaseLumpNum(lumpindex_t lumpnum)
     }
 }
 
-void W_ReleaseLumpName(char *name)
+void W_ReleaseLumpName(const char *name)
 {
     W_ReleaseLumpNum(W_GetNumForName(name));
 }
@@ -523,7 +541,7 @@ void W_Profile (void)
     }
     profilecount++;
 	
-    f = fopen ("waddump.txt","w");
+    f = M_fopen ("waddump.txt","w");
     name[8] = 0;
 
     for (i=0 ; i<numlumps ; i++)
@@ -633,3 +651,46 @@ void W_Reload(void)
     W_GenerateHashTable();
 }
 
+const char *W_WadNameForLump(const lumpinfo_t *lump)
+{
+	return M_BaseName(lump->wad_file->path);
+}
+
+boolean W_IsIWADLump(const lumpinfo_t *lump)
+{
+	return lump->wad_file == lumpinfo[0]->wad_file;
+}
+
+// [crispy] dump lump data into a new LMP file
+int W_LumpDump (const char *lumpname)
+{
+    FILE *fp;
+    char *filename, *lump_p;
+    int i;
+
+    i = W_CheckNumForName(lumpname);
+
+    if (i < 0 || !lumpinfo[i]->size)
+    {
+	return -1;
+    }
+
+    // [crispy] open file for writing
+    filename = M_StringJoin(lumpname, ".lmp", NULL);
+    M_ForceLowercase(filename);
+    fp = fopen(filename, "wb");
+    if (!fp)
+    {
+	I_Error("W_LumpDump: Failed writing to file '%s'!", filename);
+    }
+    free(filename);
+
+    lump_p = malloc(lumpinfo[i]->size);
+    W_ReadLump(i, lump_p);
+    fwrite(lump_p, 1, lumpinfo[i]->size, fp);
+    free(lump_p);
+
+    fclose(fp);
+
+    return i;
+}

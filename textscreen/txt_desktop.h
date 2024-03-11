@@ -1,6 +1,5 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -12,7 +11,6 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-
 
 #ifndef TXT_DESKTOP_H
 #define TXT_DESKTOP_H
@@ -38,10 +36,10 @@ int TXT_WindowKeyPress(txt_window_t *window, int c);
 /**
  * Set the title displayed at the top of the screen.
  *
- * @param title         The title to display.
+ * @param title         The title to display (UTF-8 format).
  */
 
-void TXT_SetDesktopTitle(char *title);
+void TXT_SetDesktopTitle(const char *title);
 
 /**
  * Exit the currently-running main loop and return from the

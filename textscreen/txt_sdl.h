@@ -1,6 +1,5 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -15,7 +14,6 @@
 //
 // Text mode emulation in SDL
 //
-
 
 #ifndef TXT_SDL_H
 #define TXT_SDL_H
@@ -38,6 +36,11 @@ typedef int (*TxtSDLEventCallbackFunc)(SDL_Event *event, void *user_data);
 // user_data is a void pointer to be passed to the callback function.
 
 void TXT_SDL_SetEventCallback(TxtSDLEventCallbackFunc callback, void *user_data);
+
+void TXT_PreInit(SDL_Window *preset_window, SDL_Renderer *preset_renderer);
+
+extern SDL_Window *TXT_SDLWindow;
+
 
 #endif /* #ifndef TXT_SDL_H */
 

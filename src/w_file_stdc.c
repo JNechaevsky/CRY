@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,12 +17,11 @@
 //	WAD I/O functions.
 //
 
-
 #include <stdio.h>
+
 #include "m_misc.h"
 #include "w_file.h"
 #include "z_zone.h"
-
 
 typedef struct
 {
@@ -30,14 +29,13 @@ typedef struct
     FILE *fstream;
 } stdc_wad_file_t;
 
-extern wad_file_class_t stdc_wad_file;
 
-static wad_file_t *W_StdC_OpenFile(char *path)
+static wad_file_t *W_StdC_OpenFile(const char *path)
 {
     stdc_wad_file_t *result;
     FILE *fstream;
 
-    fstream = fopen(path, "rb");
+    fstream = M_fopen(path, "rb");
 
     if (fstream == NULL)
     {
