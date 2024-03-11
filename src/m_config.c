@@ -129,7 +129,6 @@ static default_t	doom_defaults_list[] =
     //
 
     CONFIG_VARIABLE_STRING(autoload_path),
-    CONFIG_VARIABLE_STRING(music_pack_path),
     CONFIG_VARIABLE_STRING(savedir),
 
     //
@@ -1126,56 +1125,6 @@ void M_SetConfigDir(const char *dir)
     // Make the directory if it doesn't already exist:
 
     M_MakeDirectory(configdir);
-}
-
-#define MUSIC_PACK_README \
-"Extract music packs into this directory in .flac or .ogg format;\n"   \
-"they will be automatically loaded based on filename to replace the\n" \
-"in-game music with high quality versions.\n\n" \
-"For more information check here:\n\n" \
-"  <https://www.chocolate-doom.org/wiki/index.php/Digital_music_packs>\n\n"
-
-// Set the value of music_pack_path if it is currently empty, and create
-// the directory if necessary.
-void M_SetMusicPackDir(void)
-{
-    const char *current_path;
-    char *prefdir, *music_pack_path, *readme_path;
-
-    current_path = M_GetStringVariable("music_pack_path");
-
-    if (current_path != NULL && strlen(current_path) > 0)
-    {
-        return;
-    }
-
-#ifdef _WIN32
-    // [JN] On Windows, create "music-packs" directory in program folder.
-    prefdir = M_StringDuplicate(exedir);
-#else
-    // [JN] On other OSes use system home folder.    
-    prefdir = SDL_GetPrefPath("", PACKAGE_TARNAME);
-#endif
-    if (prefdir == NULL)
-    {
-        printf("M_SetMusicPackDir: SDL_GetPrefPath failed, music pack directory not set\n");
-        return;
-    }
-    music_pack_path = M_StringJoin(prefdir, "music-packs", NULL);
-
-    M_MakeDirectory(prefdir);
-    M_MakeDirectory(music_pack_path);
-    M_SetVariable("music_pack_path", music_pack_path);
-
-    // We write a README file with some basic instructions on how to use
-    // the directory.
-    readme_path = M_StringJoin(music_pack_path, DIR_SEPARATOR_S,
-                               "README.txt", NULL);
-    M_WriteFile(readme_path, MUSIC_PACK_README, strlen(MUSIC_PACK_README));
-
-    free(readme_path);
-    free(music_pack_path);
-    SDL_free(prefdir);
 }
 
 //
