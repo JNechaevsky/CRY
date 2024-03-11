@@ -21,7 +21,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "deh_main.h"
 #include "doomdef.h"
 #include "i_swap.h"
 #include "i_system.h"
@@ -214,7 +213,7 @@ static void R_InitSpriteDefs(const char **namelist)
     // Just compare 4 characters as ints
     for (i = 0 ; i < numsprites ; i++)
     {
-        spritename = DEH_String(namelist[i]);
+        spritename = namelist[i];
         memset(sprtemp, -1, sizeof(sprtemp));
 
         maxframe = -1;

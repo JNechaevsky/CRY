@@ -135,9 +135,9 @@ if(WIN32)
 endif()
 
 if(WIN32)
-    add_executable("${PROGRAM_PREFIX}doom" WIN32 ${SOURCE_FILES_WITH_DEH} "${CMAKE_CURRENT_BINARY_DIR}/doom-res.rc")
+    add_executable("${PROGRAM_PREFIX}doom" WIN32 ${SOURCE_FILES} "${CMAKE_CURRENT_BINARY_DIR}/doom-res.rc")
 else()
-    add_executable("${PROGRAM_PREFIX}doom" ${SOURCE_FILES_WITH_DEH})
+    add_executable("${PROGRAM_PREFIX}doom" ${SOURCE_FILES})
 endif()
 
 target_include_directories("${PROGRAM_PREFIX}doom" PRIVATE ${GAME_INCLUDE_DIRS})

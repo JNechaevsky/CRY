@@ -18,7 +18,6 @@
 
 
 #include "z_zone.h"
-#include "deh_main.h"
 #include "p_local.h"
 #include "i_system.h"
 #include "s_sound.h"
@@ -195,7 +194,7 @@ EV_DoLockedDoor
       case 133:
 	if (!p->cards[it_bluecard] && !p->cards[it_blueskull])
 	{
-	    CT_SetMessage(p, DEH_String(PD_BLUEO), false, NULL);
+	    CT_SetMessage(p, PD_BLUEO, false, NULL);
 	    // [crispy] blinking key or skull in the status bar
 	    p->tryopen[it_bluecard] = KEYBLINKTICS;
 	    if (PTR_NoWayAudible(line))
@@ -208,7 +207,7 @@ EV_DoLockedDoor
       case 135:
 	if (!p->cards[it_redcard] && !p->cards[it_redskull])
 	{
-	    CT_SetMessage(p, DEH_String(PD_REDO), false, NULL);
+	    CT_SetMessage(p, PD_REDO, false, NULL);
 	    // [crispy] blinking key or skull in the status bar
 	    p->tryopen[it_redcard] = KEYBLINKTICS;
 	    if (PTR_NoWayAudible(line))
@@ -222,7 +221,7 @@ EV_DoLockedDoor
 	if (!p->cards[it_yellowcard] &&
 	    !p->cards[it_yellowskull])
 	{
-	    CT_SetMessage(p, DEH_String(PD_YELLOWO), false, NULL);
+	    CT_SetMessage(p, PD_YELLOWO, false, NULL);
 	    // [crispy] blinking key or skull in the status bar
 	    p->tryopen[it_yellowcard] = KEYBLINKTICS;
 	    if (PTR_NoWayAudible(line))
@@ -345,7 +344,7 @@ EV_VerticalDoor
 	
 	if (!player->cards[it_bluecard] && !player->cards[it_blueskull])
 	{
-	    CT_SetMessage(player, DEH_String(PD_BLUEK), false, NULL);
+	    CT_SetMessage(player, PD_BLUEK, false, NULL);
 	    // [crispy] blinking key or skull in the status bar
 	    player->tryopen[it_bluecard] = KEYBLINKTICS;
 	    if (PTR_NoWayAudible(line))
@@ -362,7 +361,7 @@ EV_VerticalDoor
 	if (!player->cards[it_yellowcard] &&
 	    !player->cards[it_yellowskull])
 	{
-	    CT_SetMessage(player, DEH_String(PD_YELLOWK), false, NULL);
+	    CT_SetMessage(player, PD_YELLOWK, false, NULL);
 	    // [crispy] blinking key or skull in the status bar
 	    player->tryopen[it_yellowcard] = KEYBLINKTICS;
 	    if (PTR_NoWayAudible(line))
@@ -378,7 +377,7 @@ EV_VerticalDoor
 	
 	if (!player->cards[it_redcard] && !player->cards[it_redskull])
 	{
-	    CT_SetMessage(player, DEH_String(PD_REDK), false, NULL);
+	    CT_SetMessage(player, PD_REDK, false, NULL);
 	    // [crispy] blinking key or skull in the status bar
 	    player->tryopen[it_redcard] = KEYBLINKTICS;
 	    if (PTR_NoWayAudible(line))

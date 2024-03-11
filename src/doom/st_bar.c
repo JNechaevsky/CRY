@@ -32,8 +32,6 @@
 #include "m_random.h"
 #include "w_wad.h"
 #include "d_main.h"
-#include "deh_main.h"
-#include "deh_misc.h"
 #include "g_game.h"
 #include "p_local.h"
 #include "m_menu.h"
@@ -317,9 +315,9 @@ boolean ST_Responder (event_t *ev)
                     // [crispy] fix reviving as "zombie" if god mode was already enabled
                     if (plyr->mo)
                     {
-                        plyr->mo->health = deh_god_mode_health;
+                        plyr->mo->health = 100;
                     }
-                    plyr->health = deh_god_mode_health;
+                    plyr->health = 100;
                 }
 
                 plyr->cheats ^= CF_GODMODE;
@@ -329,20 +327,20 @@ boolean ST_Responder (event_t *ev)
                     {
                         plyr->mo->health = 100;
                     }
-                    plyr->health = deh_god_mode_health;
-                    CT_SetMessage(plyr, DEH_String(STSTR_DQDON), false, NULL);
+                    plyr->health = 100;
+                    CT_SetMessage(plyr, STSTR_DQDON, false, NULL);
                 }
                 else 
                 {
-                    CT_SetMessage(plyr, DEH_String(STSTR_DQDOFF), false, NULL);
+                    CT_SetMessage(plyr, STSTR_DQDOFF, false, NULL);
                 }
                 plyr->cheatTics = 1;
             }
             // 'fa' cheat for killer fucking arsenal
             else if (cht_CheckCheatSP(&cheat_ammonokey, ev->data2))
             {
-                plyr->armorpoints = deh_idfa_armor;
-                plyr->armortype = deh_idfa_armor_class;
+                plyr->armorpoints = 200;
+                plyr->armortype = 2;
 
                 // [crispy] give backpack
                 GiveBackpack(true);
@@ -361,13 +359,13 @@ boolean ST_Responder (event_t *ev)
                 }
 
                 plyr->cheatTics = 1;
-                CT_SetMessage(plyr, DEH_String(STSTR_FAADDED), false, NULL);
+                CT_SetMessage(plyr, STSTR_FAADDED, false, NULL);
             }
             // 'kfa' cheat for key full ammo
             else if (cht_CheckCheatSP(&cheat_ammo, ev->data2))
             {
-                plyr->armorpoints = deh_idkfa_armor;
-                plyr->armortype = deh_idkfa_armor_class;
+                plyr->armorpoints = 200;
+                plyr->armortype = 2;
 
                 // [crispy] give backpack
                 GiveBackpack(true);
@@ -390,7 +388,7 @@ boolean ST_Responder (event_t *ev)
                 }
 
                 plyr->cheatTics = 1;
-                CT_SetMessage(plyr, DEH_String(STSTR_KFAADDED), false, NULL);
+                CT_SetMessage(plyr, STSTR_KFAADDED, false, NULL);
             }
             // [JN] 'ka' for keys only
             else if (cht_CheckCheatSP(&cheat_keys, ev->data2))
@@ -401,7 +399,7 @@ boolean ST_Responder (event_t *ev)
                 }
 
                 plyr->cheatTics = 1;
-                CT_SetMessage(plyr, DEH_String(STSTR_KAADDED), false, NULL);
+                CT_SetMessage(plyr, STSTR_KAADDED, false, NULL);
             }
             // 'mus' cheat for changing music
             else if (cht_CheckCheat(&cheat_mus, ev->data2))
@@ -409,7 +407,7 @@ boolean ST_Responder (event_t *ev)
                 char buf[3];
                 int  musnum;
 
-                CT_SetMessage(plyr, DEH_String(STSTR_MUS), false, NULL);
+                CT_SetMessage(plyr, STSTR_MUS, false, NULL);
                 cht_GetParam(&cheat_mus, buf);
 
                 // Note: The original v1.9 had a bug that tried to play back
@@ -424,7 +422,7 @@ boolean ST_Responder (event_t *ev)
                     // [crispy] prevent crash with IDMUS00
                     if (musnum < mus_map01 || musnum >= NUMMUSIC)
                     {
-                        CT_SetMessage(plyr, DEH_String(STSTR_NOMUS), false, NULL);
+                        CT_SetMessage(plyr, STSTR_NOMUS, false, NULL);
                     }
                     else
                     {
@@ -448,12 +446,12 @@ boolean ST_Responder (event_t *ev)
                 if (plyr->cheats & CF_NOCLIP)
                 {
                     plyr->mo->flags |= MF_NOCLIP;
-                    CT_SetMessage(plyr, DEH_String(STSTR_NCON), false, NULL);
+                    CT_SetMessage(plyr, STSTR_NCON, false, NULL);
                 }
                 else
                 {
                     plyr->mo->flags &= ~MF_NOCLIP;
-                    CT_SetMessage(plyr, DEH_String(STSTR_NCOFF), false, NULL);
+                    CT_SetMessage(plyr, STSTR_NCOFF, false, NULL);
                 }
 
                 plyr->cheatTics = 1;
@@ -478,13 +476,13 @@ boolean ST_Responder (event_t *ev)
                     }
 
                     plyr->cheatTics = 1;
-                    CT_SetMessage(plyr, DEH_String(STSTR_BEHOLDX), false, NULL);
+                    CT_SetMessage(plyr, STSTR_BEHOLDX, false, NULL);
                 }
             }
             // 'behold' power-up menu
             if (cht_CheckCheatSP(&cheat_powerup[6], ev->data2))
             {
-                CT_SetMessage(plyr, DEH_String(STSTR_BEHOLD), false, NULL);
+                CT_SetMessage(plyr, STSTR_BEHOLD, false, NULL);
             }
             // 'choppers' invulnerability & chainsaw
             else if (cht_CheckCheatSP(&cheat_choppers, ev->data2))
@@ -492,7 +490,7 @@ boolean ST_Responder (event_t *ev)
                 plyr->weaponowned[wp_chainsaw] = true;
                 plyr->powers[pw_invulnerability] = true;
                 plyr->cheatTics = 1;
-                CT_SetMessage(plyr, DEH_String(STSTR_CHOPPERS), false, NULL);
+                CT_SetMessage(plyr, STSTR_CHOPPERS, false, NULL);
             }
             // 'mypos' for player position
             else if (cht_CheckCheat(&cheat_mypos, ev->data2))
@@ -655,7 +653,7 @@ boolean ST_Responder (event_t *ev)
             else
             {
                 plyr->cheatTics = 1;
-                CT_SetMessage(plyr, DEH_String(STSTR_CLEV), false, NULL);
+                CT_SetMessage(plyr, STSTR_CLEV, false, NULL);
                 G_DeferedInitNew(gameskill, epsd, map);
             }
         }
@@ -1341,7 +1339,7 @@ void ST_Drawer (boolean force)
             if (scaledviewwidth == SCREENWIDTH)
             {
                 int x;
-                patch_t *patch = W_CacheLumpName(DEH_String("brdr_b"), PU_CACHE);
+                patch_t *patch = W_CacheLumpName("brdr_b", PU_CACHE);
 
                 for (x = 0 ; x < WIDESCREENDELTA ; x += 8)
                 {
@@ -1499,25 +1497,25 @@ static void ST_loadUnloadGraphics(load_callback_t callback)
     // Load the numbers, tall and short
     for (i=0;i<10;i++)
     {
-	DEH_snprintf(namebuf, 9, "STTNUM%d", i);
+	snprintf(namebuf, 9, "STTNUM%d", i);
         callback(namebuf, &tallnum[i]);
 
-	DEH_snprintf(namebuf, 9, "STYSNUM%d", i);
+	snprintf(namebuf, 9, "STYSNUM%d", i);
         callback(namebuf, &shortnum_y[i]);
 
-	DEH_snprintf(namebuf, 9, "STGNUM%d", i);
+	snprintf(namebuf, 9, "STGNUM%d", i);
         callback(namebuf, &shortnum_g[i]);
     }
 
     // Load percent key.
-    callback(DEH_String("STTPRCNT"), &tallpercent);
+    callback("STTPRCNT", &tallpercent);
 
     // [JN] Load minus symbol.
     // Versions prior 1.4 does not have STTMINUS patch.
     // If case of using such versions, drawing negative health is not possible.
     if (W_CheckNumForName("STTMINUS") >= 0)
     {
-        callback(DEH_String("STTMINUS"), &tallminus);
+        callback("STTMINUS", &tallminus);
     }
     else
     {
@@ -1528,7 +1526,7 @@ static void ST_loadUnloadGraphics(load_callback_t callback)
     // key cards
     for (i=0;i<NUMCARDS;i++)
     {
-	DEH_snprintf(namebuf, 9, "STKEYS%d", i);
+	snprintf(namebuf, 9, "STKEYS%d", i);
         callback(namebuf, &keys[i]);
     }
 
@@ -1537,21 +1535,20 @@ static void ST_loadUnloadGraphics(load_callback_t callback)
     // all player face backgrounds and using displayplayer to choose them:
     for (i=0; i<MAXPLAYERS; i++)
     {
-    DEH_snprintf(namebuf, 9, "STFB%d", i);
+    snprintf(namebuf, 9, "STFB%d", i);
     callback(namebuf, &faceback[i]);
     }
 
     // status bar background bits
-    //callback(DEH_String("STBAR"), &sbar);
     if (W_CheckNumForName("STBAR") >= 0)
     {
-        callback(DEH_String("STBAR"), &sbar);
+        callback("STBAR", &sbar);
         sbarr = NULL;
     }
     else
     {
-        callback(DEH_String("STMBARL"), &sbar);
-        callback(DEH_String("STMBARR"), &sbarr);
+        callback("STMBARL", &sbar);
+        callback("STMBARR", &sbarr);
     }
 
     // face states
@@ -1560,30 +1557,30 @@ static void ST_loadUnloadGraphics(load_callback_t callback)
     {
 	for (j=0; j<ST_NUMSTRAIGHTFACES; j++)
 	{
-	    DEH_snprintf(namebuf, 9, "STFST%d%d", i, j);
+	    snprintf(namebuf, 9, "STFST%d%d", i, j);
             callback(namebuf, &faces[facenum]);
             ++facenum;
 	}
-	DEH_snprintf(namebuf, 9, "STFTR%d0", i);	// turn right
+	snprintf(namebuf, 9, "STFTR%d0", i);	// turn right
         callback(namebuf, &faces[facenum]);
         ++facenum;
-	DEH_snprintf(namebuf, 9, "STFTL%d0", i);	// turn left
+	snprintf(namebuf, 9, "STFTL%d0", i);	// turn left
         callback(namebuf, &faces[facenum]);
         ++facenum;
-	DEH_snprintf(namebuf, 9, "STFOUCH%d", i);	// ouch!
+	snprintf(namebuf, 9, "STFOUCH%d", i);	// ouch!
         callback(namebuf, &faces[facenum]);
         ++facenum;
-	DEH_snprintf(namebuf, 9, "STFEVL%d", i);	// evil grin ;)
+	snprintf(namebuf, 9, "STFEVL%d", i);	// evil grin ;)
         callback(namebuf, &faces[facenum]);
         ++facenum;
-	DEH_snprintf(namebuf, 9, "STFKILL%d", i);	// pissed off
+	snprintf(namebuf, 9, "STFKILL%d", i);	// pissed off
         callback(namebuf, &faces[facenum]);
         ++facenum;
     }
 
-    callback(DEH_String("STFGOD0"), &faces[facenum]);
+    callback("STFGOD0", &faces[facenum]);
     ++facenum;
-    callback(DEH_String("STFDEAD0"), &faces[facenum]);
+    callback("STFDEAD0", &faces[facenum]);
     ++facenum;
 }
 
@@ -1599,7 +1596,7 @@ void ST_loadGraphics(void)
 
 void ST_loadData(void)
 {
-    lu_palette = W_GetNumForName (DEH_String("PLAYPAL"));
+    lu_palette = W_GetNumForName("PLAYPAL");
     ST_loadGraphics();
 }
 

@@ -23,7 +23,6 @@
 
 // Functions.
 #include "ct_chat.h"
-#include "deh_main.h"
 #include "i_system.h"
 #include "i_swap.h"
 #include "z_zone.h"
@@ -164,10 +163,6 @@ void F_StartFinale (void)
         }
     }
 
-    // Do dehacked substitutions of strings
-  
-    finaletext = DEH_String(finaletext);
-    finaleflat = DEH_String(finaleflat);
     // [JN] Count intermission/finale text lenght. Once it's fully printed, 
     // no extra "attack/use" button pressing is needed for skipping.
     finaleendcount = strlen(finaletext) * TEXTSPEED + TEXTEND;
@@ -653,10 +648,10 @@ void F_CastDrawer (void)
     patch_t*		patch;
     
     // erase the entire screen to a background
-    V_DrawPatchFullScreen(W_CacheLumpName(DEH_String("BOSSBACK"), PU_CACHE), false);
+    V_DrawPatchFullScreen(W_CacheLumpName("BOSSBACK", PU_CACHE), false);
 
     // [JN] Simplify to use common text drawing function.
-    M_WriteTextCentered(180, DEH_String(castorder[castnum].name), NULL);
+    M_WriteTextCentered(180, castorder[castnum].name, NULL);
     
     // draw the current frame in the middle of the screen
     sprdef = &sprites[caststate->sprite];
@@ -733,8 +728,8 @@ void F_BunnyScroll (void)
     dy = (SCREENHEIGHT << FRACBITS) / ORIGHEIGHT;
     dyi = (ORIGHEIGHT << FRACBITS) / SCREENHEIGHT;
 
-    p1 = W_CacheLumpName (DEH_String("PFUB2"), PU_LEVEL);
-    p2 = W_CacheLumpName (DEH_String("PFUB1"), PU_LEVEL);
+    p1 = W_CacheLumpName ("PFUB2", PU_LEVEL);
+    p2 = W_CacheLumpName ("PFUB1", PU_LEVEL);
 
     // [crispy] fill pillarboxes in widescreen mode
     pillar_width = (SCREENWIDTH - (SHORT(p1->width) << FRACBITS) / dxi) / 2;
@@ -789,7 +784,7 @@ void F_BunnyScroll (void)
     {
         V_DrawPatch((ORIGWIDTH - 13 * 8) / 2,
                     (ORIGHEIGHT - 8 * 8) / 2,
-                    W_CacheLumpName(DEH_String("END0"), PU_CACHE));
+                    W_CacheLumpName("END0", PU_CACHE));
 	laststage = 0;
 	return;
     }
@@ -803,7 +798,7 @@ void F_BunnyScroll (void)
 	laststage = stage;
     }
 	
-    DEH_snprintf(name, 10, "END%i", stage);
+    snprintf(name, 10, "END%i", stage);
     V_DrawPatch((ORIGWIDTH - 13 * 8) / 2,
                 (ORIGHEIGHT - 8 * 8) / 2,
                 W_CacheLumpName (name,PU_CACHE));
@@ -840,7 +835,7 @@ static void F_ArtScreenDrawer(void)
             // [crispy] Sigil
             case 5:
                 lumpname = "SIGILEND";
-                if (W_CheckNumForName(DEH_String(lumpname)) == -1)
+                if (W_CheckNumForName(lumpname) == -1)
                 {
                     return;
                 }
@@ -848,11 +843,11 @@ static void F_ArtScreenDrawer(void)
             // [crispy] Sigil II
             case 6:
                 lumpname = "SGL2END";
-                if (W_CheckNumForName(DEH_String(lumpname)) == -1)
+                if (W_CheckNumForName(lumpname) == -1)
                 {
                     lumpname = "SIGILEND";
 
-                    if (W_CheckNumForName(DEH_String(lumpname)) == -1)
+                    if (W_CheckNumForName(lumpname) == -1)
                     {
                         return;
                     }
@@ -861,8 +856,6 @@ static void F_ArtScreenDrawer(void)
             default:
                 return;
         }
-
-        lumpname = DEH_String(lumpname);
 
         V_DrawPatchFullScreen (W_CacheLumpName(lumpname, PU_CACHE), false);
     }

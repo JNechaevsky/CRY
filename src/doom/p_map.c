@@ -20,7 +20,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "deh_misc.h"
 #include "m_bbox.h"
 #include "m_random.h"
 #include "i_system.h"
@@ -29,7 +28,6 @@
 #include "p_local.h"
 #include "s_sound.h"
 #include "doomstat.h"
-#include "deh_str.h"
 #include "d_englsh.h"
 
 #include "id_vars.h"
@@ -365,11 +363,7 @@ boolean PIT_CheckThing (mobj_t* thing)
 	    if (thing == tmthing->target)
 		return true;
 
-            // sdh: Add deh_species_infighting here.  We can override the
-            // "monsters of the same species cant hurt each other" behavior
-            // through dehacked patches
-
-	    if (thing->type != MT_PLAYER && !deh_species_infighting)
+	    if (thing->type != MT_PLAYER)
 	    {
 		// Explode, but do no damage.
 		// Let players missile other players.
@@ -1115,7 +1109,7 @@ PTR_AimTraverse (intercept_t* in)
         // Set widget's timer to 1 second.
         player->targetsheathTics = TICRATE;
         // Get target's Dehackedable name.
-        player->targetsname = DEH_String(CRL_GetMobjName(th->type));
+        player->targetsname = CRL_GetMobjName(th->type);
     }
 
     return false;			// don't go any farther

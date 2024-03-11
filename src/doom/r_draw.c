@@ -23,7 +23,6 @@
 
 
 #include "doomdef.h"
-#include "deh_main.h"
 
 #include "i_system.h"
 #include "z_zone.h"
@@ -1095,38 +1094,38 @@ void R_FillBackScreen (void)
     // [crispy] use unified flat filling function
     V_FillFlat(0, SCREENHEIGHT-SBARHEIGHT, 0, SCREENWIDTH, src, dest);
 
-    patch = W_CacheLumpName(DEH_String("brdr_t"),PU_CACHE);
+    patch = W_CacheLumpName("brdr_t",PU_CACHE);
     for (x=0 ; x<(scaledviewwidth / vid_resolution) ; x+=8)
 	V_DrawPatch((viewwindowx / vid_resolution)+x-WIDESCREENDELTA, (viewwindowy / vid_resolution)-8, patch);
 
-    patch = W_CacheLumpName(DEH_String("brdr_b"),PU_CACHE);
+    patch = W_CacheLumpName("brdr_b",PU_CACHE);
     for (x=0 ; x<(scaledviewwidth / vid_resolution) ; x+=8)
 	V_DrawPatch((viewwindowx / vid_resolution)+x-WIDESCREENDELTA, (viewwindowy / vid_resolution)+(viewheight / vid_resolution), patch);
 
-    patch = W_CacheLumpName(DEH_String("brdr_l"),PU_CACHE);
+    patch = W_CacheLumpName("brdr_l",PU_CACHE);
     for (y=0 ; y<(viewheight / vid_resolution) ; y+=8)
 	V_DrawPatch((viewwindowx / vid_resolution)-8-WIDESCREENDELTA, (viewwindowy / vid_resolution)+y, patch);
 
-    patch = W_CacheLumpName(DEH_String("brdr_r"),PU_CACHE);
+    patch = W_CacheLumpName("brdr_r",PU_CACHE);
     for (y=0 ; y<(viewheight / vid_resolution) ; y+=8)
 	V_DrawPatch((viewwindowx / vid_resolution)+(scaledviewwidth / vid_resolution)-WIDESCREENDELTA, (viewwindowy / vid_resolution)+y, patch);
 
     // Draw beveled edge. 
     V_DrawPatch((viewwindowx / vid_resolution)-8-WIDESCREENDELTA,
                 (viewwindowy / vid_resolution)-8,
-                W_CacheLumpName(DEH_String("brdr_tl"),PU_CACHE));
+                W_CacheLumpName("brdr_tl",PU_CACHE));
     
     V_DrawPatch((viewwindowx / vid_resolution)+(scaledviewwidth / vid_resolution)-WIDESCREENDELTA,
                 (viewwindowy / vid_resolution)-8,
-                W_CacheLumpName(DEH_String("brdr_tr"),PU_CACHE));
+                W_CacheLumpName("brdr_tr",PU_CACHE));
     
     V_DrawPatch((viewwindowx / vid_resolution)-8-WIDESCREENDELTA,
                 (viewwindowy / vid_resolution)+(viewheight / vid_resolution),
-                W_CacheLumpName(DEH_String("brdr_bl"),PU_CACHE));
+                W_CacheLumpName("brdr_bl",PU_CACHE));
     
     V_DrawPatch((viewwindowx / vid_resolution)+(scaledviewwidth / vid_resolution)-WIDESCREENDELTA,
                 (viewwindowy / vid_resolution)+(viewheight / vid_resolution),
-                W_CacheLumpName(DEH_String("brdr_br"),PU_CACHE));
+                W_CacheLumpName("brdr_br",PU_CACHE));
 
     V_RestoreBuffer();
 } 

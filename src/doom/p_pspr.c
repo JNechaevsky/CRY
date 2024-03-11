@@ -20,7 +20,6 @@
 
 
 #include "d_event.h"
-#include "deh_misc.h"
 #include "m_random.h"
 #include "p_local.h"
 #include "s_sound.h"
@@ -34,6 +33,8 @@
 #define LOWERSPEED		FRACUNIT*6
 #define RAISESPEED		FRACUNIT*6
 
+// plasma cells for a bfg attack
+#define	BFGCELLS		40			
 
 //
 // P_SetPsprite
@@ -235,7 +236,7 @@ boolean P_CheckAmmo (player_t* player)
 
     // Minimal amount for one shot varies.
     if (player->readyweapon == wp_bfg)
-	count = deh_bfg_cells_per_shot;
+	count = BFGCELLS;
     else if (player->readyweapon == wp_supershotgun)
 	count = 2;	// Double barrel.
     else
@@ -628,12 +629,6 @@ A_Saw
     player->mo->flags |= MF_JUSTATTACKED;
 }
 
-// Doom does not check the bounds of the ammo array.  As a result,
-// it is possible to use an ammo type > 4 that overflows into the
-// maxammo array and affects that instead.  Through dehacked, for
-// example, it is possible to make a weapon that decreases the max
-// number of ammo for another weapon.  Emulate this.
-
 static void DecreaseAmmo(player_t *player, int ammonum, int amount)
 {
     if (ammonum < NUMAMMO)
@@ -677,8 +672,7 @@ A_FireBFG
   pspdef_t*	psp ) 
 {
     if (!player) return; // [crispy] let pspr action pointers get called from mobj states
-    DecreaseAmmo(player, weaponinfo[player->readyweapon].ammo, 
-                 deh_bfg_cells_per_shot);
+    DecreaseAmmo(player, weaponinfo[player->readyweapon].ammo, BFGCELLS);
     P_SpawnPlayerMissile (player->mo, MT_BFG);
 }
 

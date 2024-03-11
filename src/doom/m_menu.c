@@ -26,7 +26,6 @@
 #include "doomkeys.h"
 #include "dstrings.h"
 #include "d_main.h"
-#include "deh_main.h"
 #include "gusconf.h"
 #include "i_input.h"
 #include "i_swap.h"
@@ -1597,14 +1596,10 @@ static void M_ID_Gamma (int choice)
     shade_wait = I_GetTime() + TICRATE;
     vid_gamma = M_INT_Slider(vid_gamma, 0, 14, choice, true);
 
-#ifndef CRISPY_TRUECOLOR
-    I_SetPalette ((byte *)W_CacheLumpName(DEH_String("PLAYPAL"), PU_CACHE) + st_palette * 768);
-#else
-    I_SetPalette (st_palette);
+    I_SetPalette(st_palette);
     R_InitColormaps();
     R_FillBackScreen();
     st_fullupdate = true;
-#endif
 }
 
 static void M_ID_FOV (int choice)
@@ -1637,14 +1632,10 @@ static void M_ID_Saturation (int choice)
     shade_wait = I_GetTime() + TICRATE;
     vid_saturation = M_INT_Slider(vid_saturation, 0, 100, choice, true);
 
-#ifndef CRISPY_TRUECOLOR
-    I_SetPalette ((byte *)W_CacheLumpName(DEH_String("PLAYPAL"), PU_CACHE) + st_palette * 768);
-#else
     R_InitColormaps();
     R_FillBackScreen();
     AM_Init();
     st_fullupdate = true;
-#endif
 }
 
 static void M_ID_R_Intensity (int choice)
@@ -1652,14 +1643,10 @@ static void M_ID_R_Intensity (int choice)
     shade_wait = I_GetTime() + TICRATE;
     vid_r_intensity = M_FLOAT_Slider(vid_r_intensity, 0, 1.000000f, 0.025000f, choice, true);
 
-#ifndef CRISPY_TRUECOLOR
-    I_SetPalette ((byte *)W_CacheLumpName(DEH_String("PLAYPAL"), PU_CACHE) + st_palette * 768);
-#else
     R_InitColormaps();
     R_FillBackScreen();
     AM_Init();
     st_fullupdate = true;
-#endif
 }
 
 static void M_ID_G_Intensity (int choice)
@@ -1667,14 +1654,10 @@ static void M_ID_G_Intensity (int choice)
     shade_wait = I_GetTime() + TICRATE;
     vid_g_intensity = M_FLOAT_Slider(vid_g_intensity, 0, 1.000000f, 0.025000f, choice, true);
 
-#ifndef CRISPY_TRUECOLOR
-    I_SetPalette ((byte *)W_CacheLumpName(DEH_String("PLAYPAL"), PU_CACHE) + st_palette * 768);
-#else
     R_InitColormaps();
     R_FillBackScreen();
     AM_Init();
     st_fullupdate = true;
-#endif
 }
 
 static void M_ID_B_Intensity (int choice)
@@ -1682,14 +1665,10 @@ static void M_ID_B_Intensity (int choice)
     shade_wait = I_GetTime() + TICRATE;
     vid_b_intensity = M_FLOAT_Slider(vid_b_intensity, 0, 1.000000f, 0.025000f, choice, true);
 
-#ifndef CRISPY_TRUECOLOR
-    I_SetPalette ((byte *)W_CacheLumpName(DEH_String("PLAYPAL"), PU_CACHE) + st_palette * 768);
-#else
     R_InitColormaps();
     R_FillBackScreen();
     AM_Init();
     st_fullupdate = true;
-#endif
 }
 
 // -----------------------------------------------------------------------------
@@ -3522,7 +3501,7 @@ static void M_Draw_ID_Gameplay_3 (void)
     M_WriteTextCentered(9, "GAMEPLAY", cr[CR_YELLOW]);
 
     // Default skill level
-    DEH_snprintf(str, sizeof(str), "%s", DefSkillName[gp_default_skill]);
+    snprintf(str, sizeof(str), "%s", DefSkillName[gp_default_skill]);
     M_WriteText (M_ItemRightAlign(str), 18, str, 
                  M_Item_Glow(0, DefSkillColor(gp_default_skill)));
 
@@ -4235,11 +4214,7 @@ static void M_ID_ApplyResetHook (void)
     R_SetViewSize(dp_screen_size, dp_detail_level);
     R_ExecuteSetViewSize();
     I_ToggleVsync();
-#ifndef CRISPY_TRUECOLOR
-    I_SetPalette ((byte *)W_CacheLumpName(DEH_String("PLAYPAL"), PU_CACHE) + st_palette * 768);
-#else
     I_SetPalette(st_palette);
-#endif
     R_InitColormaps();
     R_FillBackScreen();
     ST_InitElementsBackground();
@@ -4282,7 +4257,7 @@ static void M_ID_ApplyReset (int key)
 
 static void M_Choose_ID_Reset (int choice)
 {
-	M_StartMessage(DEH_String(ID_RESET), M_ID_ApplyReset, true);
+	M_StartMessage(ID_RESET, M_ID_ApplyReset, true);
 }
 
 
@@ -4368,15 +4343,15 @@ static void M_DrawSaveLoadBorder(int x,int y)
 {
     int             i;
 	
-    V_DrawShadowedPatchOptional(x - 8, y, 0, W_CacheLumpName(DEH_String("M_LSLEFT"), PU_CACHE));
+    V_DrawShadowedPatchOptional(x - 8, y, 0, W_CacheLumpName("M_LSLEFT", PU_CACHE));
 	
     for (i = 0;i < 24;i++)
     {
-	V_DrawShadowedPatchOptional(x, y, 0, W_CacheLumpName(DEH_String("M_LSCNTR"), PU_CACHE));
+	V_DrawShadowedPatchOptional(x, y, 0, W_CacheLumpName("M_LSCNTR", PU_CACHE));
 	x += 8;
     }
 
-    V_DrawShadowedPatchOptional(x, y, 0, W_CacheLumpName(DEH_String("M_LSRGHT"), PU_CACHE));
+    V_DrawShadowedPatchOptional(x, y, 0, W_CacheLumpName("M_LSRGHT", PU_CACHE));
 }
 
 
@@ -4402,7 +4377,7 @@ static void M_LoadGame (int choice)
     // [crispy] allow loading game while multiplayer demo playback
     if (netgame && !demoplayback)
     {
-	M_StartMessage(DEH_String(LOADNET),NULL,false);
+	M_StartMessage(LOADNET,NULL,false);
 	return;
     }
 	
@@ -4536,7 +4511,7 @@ static void M_SaveGame (int choice)
 {
     if (!usergame)
     {
-	M_StartMessage(DEH_String(SAVEDEAD),NULL,false);
+	M_StartMessage(SAVEDEAD,NULL,false);
 	return;
     }
 	
@@ -4587,13 +4562,13 @@ static void M_QuickLoad(void)
     // [crispy] allow quickloading game while multiplayer demo playback
     if (netgame && !demoplayback)
     {
-	M_StartMessage(DEH_String(QLOADNET),NULL,false);
+	M_StartMessage(QLOADNET,NULL,false);
 	return;
     }
 	
     if (quickSaveSlot < 0)
     {
-	M_StartMessage(DEH_String(QSAVESPOT),NULL,false);
+	M_StartMessage(QSAVESPOT,NULL,false);
 	return;
     }
 
@@ -4613,7 +4588,7 @@ static void M_DrawReadThis1(void)
 {
     st_fullupdate = true;
 
-    V_DrawPatchFullScreen(W_CacheLumpName(DEH_String("HELP2"), PU_CACHE), false);
+    V_DrawPatchFullScreen(W_CacheLumpName("HELP2", PU_CACHE), false);
 }
 
 
@@ -4628,14 +4603,14 @@ static void M_DrawReadThis2(void)
     // We only ever draw the second page if this is 
     // gameversion == exe_doom_1_9 and gamemode == registered
 
-    V_DrawPatchFullScreen(W_CacheLumpName(DEH_String("HELP1"), PU_CACHE), false);
+    V_DrawPatchFullScreen(W_CacheLumpName("HELP1", PU_CACHE), false);
 }
 
 static void M_DrawReadThisCommercial(void)
 {
     st_fullupdate = true;
 
-    V_DrawPatchFullScreen(W_CacheLumpName(DEH_String("HELP"), PU_CACHE), false);
+    V_DrawPatchFullScreen(W_CacheLumpName("HELP", PU_CACHE), false);
 }
 
 
@@ -4699,7 +4674,7 @@ static void M_MusicVol(int choice)
 //
 static void M_DrawMainMenu(void)
 {
-    V_DrawPatch(94, 2, W_CacheLumpName(DEH_String("M_DOOM"), PU_CACHE));
+    V_DrawPatch(94, 2, W_CacheLumpName("M_DOOM", PU_CACHE));
 }
 
 
@@ -4722,7 +4697,7 @@ static void M_NewGame(int choice)
 {
     if (netgame && !demoplayback)
     {
-	M_StartMessage(DEH_String(NEWGAME),NULL,false);
+	M_StartMessage(NEWGAME,NULL,false);
 	return;
     }
 	
@@ -4742,7 +4717,7 @@ static int epi;
 
 static void M_DrawEpisode(void)
 {
-    V_DrawShadowedPatchOptional(54, 38, 0, W_CacheLumpName(DEH_String("M_EPISOD"), PU_CACHE));
+    V_DrawShadowedPatchOptional(54, 38, 0, W_CacheLumpName("M_EPISOD", PU_CACHE));
 }
 
 static void M_ChooseSkill (int choice)
@@ -4756,7 +4731,7 @@ static void M_Episode(int choice)
     if ( (gamemode == shareware)
 	 && choice)
     {
-	M_StartMessage(DEH_String(SWSTRING),NULL,false);
+	M_StartMessage(SWSTRING,NULL,false);
 	M_SetupNextMenu(&ReadDef1);
 	return;
     }
@@ -4776,8 +4751,7 @@ static void M_ChangeMessages(int choice)
 {
     msg_show ^= 1;
 	
-	CT_SetMessage(&players[consoleplayer],
-                   DEH_String(msg_show ? MSGON : MSGOFF), true, NULL);
+	CT_SetMessage(&players[consoleplayer], (msg_show ? MSGON : MSGOFF), true, NULL);
 }
 
 
@@ -4809,11 +4783,11 @@ static void M_EndGame(int choice)
 	
     if (netgame)
     {
-	M_StartMessage(DEH_String(NETEND),NULL,false);
+	M_StartMessage(NETEND,NULL,false);
 	return;
     }
 	
-    M_StartMessage(DEH_String(ENDGAME),M_EndGameResponse,true);
+    M_StartMessage(ENDGAME,M_EndGameResponse,true);
 }
 
 
@@ -4910,8 +4884,7 @@ static const char *M_SelectEndMessage(void)
 
 static void M_QuitDOOM(int choice)
 {
-    DEH_snprintf(endstring, sizeof(endstring), "%s\n\n" DOSY,
-                 DEH_String(M_SelectEndMessage()));
+    snprintf(endstring, sizeof(endstring), "%s\n\n" DOSY, M_SelectEndMessage());
 
     M_StartMessage(endstring,M_QuitResponse,true);
 }
@@ -4927,9 +4900,9 @@ static void M_ChangeDetail(int choice)
     R_SetViewSize (dp_screen_size, dp_detail_level);
 
     if (!dp_detail_level)
-	CT_SetMessage(&players[consoleplayer], DEH_String(DETAILHI), false, NULL);
+	CT_SetMessage(&players[consoleplayer], DETAILHI, false, NULL);
     else
-	CT_SetMessage(&players[consoleplayer], DEH_String(DETAILLO), false, NULL);
+	CT_SetMessage(&players[consoleplayer], DETAILLO, false, NULL);
 }
 
 
@@ -4993,14 +4966,14 @@ M_DrawThermo
     }
 
     xx = x;
-    V_DrawShadowedPatchOptional(xx, y, 0, W_CacheLumpName(DEH_String("M_THERML"), PU_CACHE));
+    V_DrawShadowedPatchOptional(xx, y, 0, W_CacheLumpName("M_THERML", PU_CACHE));
     xx += 8;
     for (i=0;i<thermWidth;i++)
     {
-	V_DrawShadowedPatchOptional(xx, y, 0, W_CacheLumpName(DEH_String("M_THERMM"), PU_CACHE));
+	V_DrawShadowedPatchOptional(xx, y, 0, W_CacheLumpName("M_THERMM", PU_CACHE));
 	xx += 8;
     }
-    V_DrawShadowedPatchOptional(xx, y, 0, W_CacheLumpName(DEH_String("M_THERMR"), PU_CACHE));
+    V_DrawShadowedPatchOptional(xx, y, 0, W_CacheLumpName("M_THERMR", PU_CACHE));
 
     // [crispy] do not crash anymore if value exceeds thermometer range
     if (thermDot >= thermWidth)
@@ -5008,7 +4981,7 @@ M_DrawThermo
         thermDot = thermWidth - 1;
     }
 
-    V_DrawPatch((x + 8) + thermDot * 8, y, W_CacheLumpName(DEH_String("M_THERMO"), PU_CACHE));
+    V_DrawPatch((x + 8) + thermDot * 8, y, W_CacheLumpName("M_THERMO", PU_CACHE));
 
     dp_translation = NULL;
 }
@@ -5974,17 +5947,11 @@ boolean M_Responder (event_t* ev)
     if (key == key_menu_gamma)    // gamma toggle
     {
         vid_gamma = M_INT_Slider(vid_gamma, 0, 14, 1 /*right*/, false);
-        CT_SetMessage(&players[consoleplayer], DEH_String(gammalvls[vid_gamma][0]), false, NULL);
-#ifndef CRISPY_TRUECOLOR
-        I_SetPalette ((byte *)W_CacheLumpName(DEH_String("PLAYPAL"), PU_CACHE) + st_palette * 768);
-#else
-        {
-            I_SetPalette (st_palette);
-            R_InitColormaps();
-            R_FillBackScreen();
-            st_fullupdate = true;
-        }
-#endif
+        CT_SetMessage(&players[consoleplayer], gammalvls[vid_gamma][0], false, NULL);
+        I_SetPalette (st_palette);
+        R_InitColormaps();
+        R_FillBackScreen();
+        st_fullupdate = true;
         return true;
     }
 
@@ -6305,11 +6272,11 @@ void M_Drawer (void)
     {
         // DRAW SKULL
         V_DrawShadowedPatchOptional(x + SKULLXOFF, y - 5 + itemOn * LINEHEIGHT, 0,
-                                    W_CacheLumpName(DEH_String(skullName[whichSkull]), PU_CACHE));
+                                    W_CacheLumpName(skullName[whichSkull], PU_CACHE));
 
         for (i = 0 ; i < max ; i++)
         {
-            name = DEH_String(currentMenu->menuitems[i].name);
+            name = currentMenu->menuitems[i].name;
 
             if (name[0])
             {

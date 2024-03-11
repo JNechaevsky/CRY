@@ -24,7 +24,6 @@
 #include "ct_chat.h"
 #include "d_englsh.h"
 #include "d_main.h"
-#include "deh_main.h"
 #include "doomstat.h"
 #include "g_game.h"
 #include "i_swap.h"

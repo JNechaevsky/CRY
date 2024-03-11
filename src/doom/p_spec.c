@@ -24,7 +24,6 @@
 
 #include <stdlib.h>
 #include "doomstat.h"
-#include "deh_main.h"
 #include "i_system.h"
 #include "i_swap.h" // [crispy] LONG()
 #include "z_zone.h"
@@ -205,8 +204,8 @@ void P_InitPicAnims (void)
 	    maxanims = newmax;
 	}
 
-        startname = DEH_String(animdefs[i].startname);
-        endname = DEH_String(animdefs[i].endname);
+        startname = animdefs[i].startname;
+        endname = animdefs[i].endname;
 
 	if (animdefs[i].istexture)
 	{
@@ -1185,12 +1184,12 @@ void P_PlayerInSpecialSector (player_t* player)
 
         if (gp_revealed_secrets == 1)  // [JN] Top
         {
-            CT_SetMessage(player, DEH_String(ID_SECRET_FOUND),true, cr[CR_YELLOW]);
+            CT_SetMessage(player, ID_SECRET_FOUND, true, cr[CR_YELLOW]);
         }
         else
         if (gp_revealed_secrets == 2)  // [JN] Centered
         {
-            CT_SetMessageCentered(player, DEH_String(ID_SECRET_FOUND), cr[CR_YELLOW]);
+            CT_SetMessageCentered(player, ID_SECRET_FOUND, cr[CR_YELLOW]);
         }
 
 	    if (sfx_id != -1)

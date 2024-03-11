@@ -19,8 +19,6 @@
 
 
 #include "dstrings.h"
-#include "deh_main.h"
-#include "deh_misc.h"
 #include "doomstat.h"
 #include "m_random.h"
 #include "i_system.h"
@@ -186,7 +184,7 @@ P_GiveWeapon
 	    P_GiveAmmo (player, weaponinfo[weapon].ammo, 2);
 	player->pendingweapon = weapon;
 	// [crispy] show weapon pickup messages in multiplayer games
-	CT_SetMessage(player, DEH_String(WeaponPickupMessages[weapon]), false, NULL);
+	CT_SetMessage(player, WeaponPickupMessages[weapon], false, NULL);
 
 	if (player == &players[displayplayer])
 	    S_StartSound (NULL, sfx_wpnup);
@@ -360,13 +358,13 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
     {
         // armor
         case SPR_ARM1:
-        if (!P_GiveArmor (player, deh_green_armor_class))
+        if (!P_GiveArmor (player, 1))
             return;
         CT_SetMessage(player, "You pick up the armor.", false, NULL);
         break;
 
         case SPR_ARM2:
-        if (!P_GiveArmor (player, deh_blue_armor_class))
+        if (!P_GiveArmor (player, 2))
             return;
         CT_SetMessage(player, "You got the MegaArmor!", false, NULL);
         break;

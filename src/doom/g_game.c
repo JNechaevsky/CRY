@@ -27,10 +27,6 @@
 #include "doomkeys.h"
 #include "doomstat.h"
 
-#include "deh_main.h"
-#include "deh_misc.h"
-#include "deh_bexpars.h" // [crispy] bex_pars[]
-
 #include "z_zone.h"
 #include "f_finale.h"
 #include "m_argv.h"
@@ -74,7 +70,6 @@
 
 
 
-#include "deh_main.h" // [crispy] for demo footer
 #include "memio.h"
 
 #define SAVEGAMESIZE	0x2c000
@@ -1524,11 +1519,11 @@ void G_PlayerReborn (int player)
  
     p->usedown = p->attackdown = true;	// don't do anything immediately 
     p->playerstate = PST_LIVE;       
-    p->health = deh_initial_health;     // Use dehacked value
+    p->health = MAXHEALTH;
     p->readyweapon = p->pendingweapon = wp_pistol; 
     p->weaponowned[wp_fist] = true; 
     p->weaponowned[wp_pistol] = true; 
-    p->ammo[am_clip] = deh_initial_bullets; 
+    p->ammo[am_clip] = 50; 
     p->messageTics = 0;
     p->messageCenteredTics = 0;
     p->targetsheathTics = 0;
@@ -2069,7 +2064,7 @@ void G_DoSaveGame (void)
     M_StringCopy(savedescription, "", sizeof(savedescription));
     M_StringCopy(savename, savegame_file, sizeof(savename));
 
-    CT_SetMessage(&players[consoleplayer], DEH_String(GGSAVED), false, NULL);
+    CT_SetMessage(&players[consoleplayer], GGSAVED, false, NULL);
 
     // draw the pattern into the back screen
     R_FillBackScreen ();
@@ -2856,6 +2851,7 @@ static size_t WriteCmdLineLump(MEMFILE *stream)
         }
     }
 
+/*
     filenames = DEH_GetFileNames();
 
     if (filenames)
@@ -2869,6 +2865,7 @@ static size_t WriteCmdLineLump(MEMFILE *stream)
             free(tmp);
         }
     }
+*/
 
     switch (gameversion)
     {

@@ -19,7 +19,6 @@
 //
 
 #include <stdio.h>
-#include "deh_main.h"
 #include "i_swap.h"
 #include "i_system.h"
 #include "z_zone.h"
@@ -795,8 +794,8 @@ void R_InitTextures (void)
 
     // [crispy] make sure the first available TEXTURE1/2 lumps
     // are always processed first
-    texturelumps[numtexturelumps++].lumpnum = W_GetNumForName(DEH_String("TEXTURE1"));
-    if ((i = W_CheckNumForName(DEH_String("TEXTURE2"))) != -1)
+    texturelumps[numtexturelumps++].lumpnum = W_GetNumForName("TEXTURE1");
+    if ((i = W_CheckNumForName("TEXTURE2")) != -1)
 	texturelumps[numtexturelumps++].lumpnum = i;
     else
 	texturelumps[numtexturelumps].lumpnum = -1;
@@ -806,7 +805,7 @@ void R_InitTextures (void)
     nummappatches = 0;
     for (i = numlumps - 1; i >= 0; i--)
     {
-	if (!strncasecmp(lumpinfo[i]->name, DEH_String("PNAMES"), 6))
+	if (!strncasecmp(lumpinfo[i]->name, "PNAMES", 6))
 	{
 	    if (numpnameslumps == maxpnameslumps)
 	    {
@@ -828,7 +827,7 @@ void R_InitTextures (void)
 	    numpnameslumps++;
 	}
 	else
-	if (!strncasecmp(lumpinfo[i]->name, DEH_String("TEXTURE"), 7))
+	if (!strncasecmp(lumpinfo[i]->name, "TEXTURE", 7))
 	{
 	    // [crispy] support only TEXTURE1/2 lumps, not TEXTURE3 etc.
 	    if (lumpinfo[i]->name[7] != '1' &&
@@ -922,36 +921,6 @@ void R_InitTextures (void)
     textureheight = Z_Malloc (numtextures * sizeof(*textureheight), PU_STATIC, 0);
     texturebrightmap = Z_Malloc (numtextures * sizeof(*texturebrightmap), PU_STATIC, 0);
 
-/*
-    //	Really complex printing shit...
-    temp1 = W_GetNumForName (DEH_String("S_START"));  // P_???????
-    temp2 = W_GetNumForName (DEH_String("S_END")) - 1;
-    temp3 = ((temp2-temp1+63)/64) + ((numtextures+63)/64);
-
-    // If stdout is a real console, use the classic vanilla "filling
-    // up the box" effect, which uses backspace to "step back" inside
-    // the box.  If stdout is a file, don't draw the box.
-
-    if (I_ConsoleStdout())
-    {
-
-        printf("[");
-#ifndef CRISPY_TRUECOLOR
-        for (i = 0; i < temp3 + 9 + 1; i++) // [crispy] one more for R_InitTintMap()
-#else
-        for (i = 0; i < temp3 + 9; i++)
-#endif
-            printf(" ");
-        printf("]");
-#ifndef CRISPY_TRUECOLOR
-        for (i = 0; i < temp3 + 10 + 1; i++) // [crispy] one more for R_InitTintMap()
-#else
-        for (i = 0; i < temp3 + 10; i++)
-#endif
-            printf("\b");
-    }
-*/
-	
     for (i=0 ; i<numtextures ; i++, directory++)
     {
 	if (!(i&63))
@@ -1060,8 +1029,8 @@ void R_InitFlats (void)
 {
     int		i;
 	
-    firstflat = W_GetNumForName (DEH_String("F_START")) + 1;
-    lastflat = W_GetNumForName (DEH_String("F_END")) - 1;
+    firstflat = W_GetNumForName ("F_START") + 1;
+    lastflat = W_GetNumForName ("F_END") - 1;
     numflats = lastflat - firstflat + 1;
 	
     // Create translation table for global animation.
@@ -1083,8 +1052,8 @@ void R_InitSpriteLumps (void)
     int		i;
     patch_t	*patch;
 	
-    firstspritelump = W_GetNumForName (DEH_String("S_START")) + 1;
-    lastspritelump = W_GetNumForName (DEH_String("S_END")) - 1;
+    firstspritelump = W_GetNumForName ("S_START") + 1;
+    lastspritelump = W_GetNumForName ("S_END") - 1;
     
     numspritelumps = lastspritelump - firstspritelump + 1;
     spritewidth = Z_Malloc (numspritelumps*sizeof(*spritewidth), PU_STATIC, 0);
@@ -1188,7 +1157,7 @@ static void R_InitHSVColors (void)
 	    crstr = I_Realloc(NULL, CRMAX * sizeof(*crstr));
 
 	// [crispy] check for status bar graphics replacements
-	i = W_CheckNumForName(DEH_String("sttnum0")); // [crispy] Status Bar '0'
+	i = W_CheckNumForName("sttnum0"); // [crispy] Status Bar '0'
     keepgray = W_CheckMultipleLumps("sttnum0") < 2;
 
 	// [crispy] CRMAX - 2: don't override the original GREN and BLUE2 Boom tables
@@ -1205,15 +1174,15 @@ static void R_InitHSVColors (void)
 
 	W_ReleaseLumpName("PLAYPAL");
 
-	i = W_CheckNumForName(DEH_String("CRGREEN"));
+	i = W_CheckNumForName("CRGREEN");
 	if (i >= 0)
 	{
 	    cr[CR_RED2GREEN] = W_CacheLumpNum(i, PU_STATIC);
 	}
 
-	i = W_CheckNumForName(DEH_String("CRBLUE2"));
+	i = W_CheckNumForName("CRBLUE2");
 	if (i == -1)
-	    i = W_CheckNumForName(DEH_String("CRBLUE"));
+	    i = W_CheckNumForName("CRBLUE");
 	if (i >= 0)
 	{
 	    cr[CR_RED2BLUE] = W_CacheLumpNum(i, PU_STATIC);

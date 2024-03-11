@@ -27,7 +27,6 @@
 #include <windows.h>
 #endif
 
-#include "deh_main.h"
 #include "doomkeys.h"
 #include "doomstat.h"
 #include "dstrings.h"
@@ -263,11 +262,7 @@ static void D_Display (void)
 
     // clean up border stuff
     if (gamestate != oldgamestate && gamestate != GS_LEVEL)
-#ifndef CRISPY_TRUECOLOR
-	I_SetPalette (W_CacheLumpName (DEH_String("PLAYPAL"),PU_CACHE));
-#else
 	I_SetPalette (0);
-#endif
 
     // see if the border needs to be initially drawn
     if (gamestate == GS_LEVEL && oldgamestate != GS_LEVEL)
@@ -310,7 +305,7 @@ static void D_Display (void)
 	else
 	    y = (viewwindowy / vid_resolution)+4;
 	V_DrawShadowedPatchOptional((viewwindowx / vid_resolution) + ((scaledviewwidth / vid_resolution) - 68) / 2 - WIDESCREENDELTA, y, 0,
-                          W_CacheLumpName (DEH_String("M_PAUSE"), PU_CACHE));
+                          W_CacheLumpName ("M_PAUSE", PU_CACHE));
     }
 
     // [JN] Do not draw any widgets if not in game level.
@@ -649,7 +644,7 @@ void D_DoomMain (void)
     I_PrintBanner(PACKAGE_FULLNAME);
 #endif
 
-    DEH_printf("Z_Init: Init zone memory allocation daemon. \n");
+    printf("Z_Init: Init zone memory allocation daemon. \n");
     Z_Init ();
     
     // Call I_ShutdownGraphics on quit
@@ -821,7 +816,7 @@ void D_DoomMain (void)
 	    scale = 10;
 	if (scale > 400)
 	    scale = 400;
-        DEH_printf("turbo scale: %i%%\n", scale);
+        printf("turbo scale: %i%%\n", scale);
 	forwardmove[0] = forwardmove[0]*scale/100;
 	forwardmove[1] = forwardmove[1]*scale/100;
 	sidemove[0] = sidemove[0]*scale/100;
@@ -829,7 +824,7 @@ void D_DoomMain (void)
     }
     
     // Load configuration files before initialising other subsystems.
-    DEH_printf("M_LoadDefaults: Load system defaults.\n");
+    printf("M_LoadDefaults: Load system defaults.\n");
     M_SetConfigFilenames(PROGRAM_PREFIX "doom.ini");
     D_BindVariables();
     M_LoadDefaults();
@@ -871,7 +866,7 @@ void D_DoomMain (void)
 
     modifiedgame = false;
 
-    DEH_printf("W_Init: Init WADfiles.\n");
+    printf("W_Init: Init WADfiles.\n");
     D_AddFile(iwadfile);
 
     W_CheckCorrectIWAD(doom);
@@ -924,7 +919,7 @@ void D_DoomMain (void)
         }
         else
         {
-            DEH_snprintf(file, sizeof(file), "%s.lmp", myargv[p+1]);
+            snprintf(file, sizeof(file), "%s.lmp", myargv[p+1]);
         }
 
         free(uc_filename);
@@ -953,7 +948,7 @@ void D_DoomMain (void)
 
     savegamedir = M_GetSaveGameDir(D_SaveGameIWADName(gamemission, gamevariant));
 
-    DEH_printf("I_Init: Setting up machine state.\n");
+    printf("I_Init: Setting up machine state.\n");
     I_CheckIsScreensaver();
     I_InitTimer();
     I_InitJoystick();
@@ -1088,28 +1083,28 @@ void D_DoomMain (void)
         startloadgame = -1;
     }
 
-    DEH_printf("M_Init: Init miscellaneous info.\n");
+    printf("M_Init: Init miscellaneous info.\n");
     M_Init ();
 
-    DEH_printf("R_Init: Init DOOM refresh daemon - [");
+    printf("R_Init: Init DOOM refresh daemon - [");
     R_Init ();
 
-    DEH_printf("\nP_Init: Init Playloop state.\n");
+    printf("\nP_Init: Init Playloop state.\n");
     P_Init ();
 
-    DEH_printf("S_Init: Setting up sound.\n");
+    printf("S_Init: Setting up sound.\n");
     S_Init (sfxVolume * 8, musicVolume * 8);
 
-    DEH_printf("D_CheckNetGame: Checking network game status.\n");
+    printf("D_CheckNetGame: Checking network game status.\n");
     D_CheckNetGame ();
 
-    DEH_printf("CT_Init: Setting up messages system.\n");
+    printf("CT_Init: Setting up messages system.\n");
     CT_Init ();
 
-    DEH_printf("ST_Init: Init status bar.\n");
+    printf("ST_Init: Init status bar.\n");
     ST_Init ();
 
-    DEH_printf("WI_Init: Init intermission screen data.\n");
+    printf("WI_Init: Init intermission screen data.\n");
     WI_Init ();
 
     // [JN] Predefine some automap variables at program startup.

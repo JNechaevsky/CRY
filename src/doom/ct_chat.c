@@ -22,7 +22,6 @@
 #include "ct_chat.h"
 #include "d_englsh.h"
 #include "d_event.h"
-#include "deh_str.h"
 #include "i_input.h"
 #include "m_controls.h"
 #include "m_misc.h"
@@ -119,16 +118,16 @@ void CT_Init (void)
 
     for (i = 0 ; i < HU_FONTSIZE_S ; i++)
     {
-        DEH_snprintf(buffer, 9, "STCFN%.3d", j++);
+        snprintf(buffer, 9, "STCFN%.3d", j++);
         hu_font_s[i] = (patch_t *) W_CacheLumpName(buffer, PU_STATIC);
     }
     for (i = 0 ; i < HU_FONTSIZE_B ; i++)
     {
-        DEH_snprintf(buffer, 9, "STCFB%.3d", n++);
+        snprintf(buffer, 9, "STCFB%.3d", n++);
         hu_font_b[i] = (patch_t *) W_CacheLumpName(buffer, PU_STATIC);
     }
 
-    ChatFontBaseLump = W_GetNumForName(DEH_String("STCFN033"));
+    ChatFontBaseLump = W_GetNumForName("STCFN033");
 }
 
 // -----------------------------------------------------------------------------
@@ -306,7 +305,7 @@ void CT_Ticker (void)
                 CT_AddChar(i, 0);  // Set the end of message character.
 
                 // [JN] Always consolidate player name with message.
-                M_StringCopy(plr_lastmsg[i], DEH_String(player_names[i]), sizeof(plr_lastmsg[i]));
+                M_StringCopy(plr_lastmsg[i], player_names[i], sizeof(plr_lastmsg[i]));
                 M_StringConcat(plr_lastmsg[i], chat_msg[i], sizeof(plr_lastmsg[i]));
 
                 if (i != consoleplayer && (chat_dest[i] == consoleplayer + 1
@@ -367,7 +366,7 @@ void CT_Drawer (void)
         }
     }
 
-    V_DrawShadowedPatchOptional(x - WIDESCREENDELTA, 10, 0, W_CacheLumpName (DEH_String("STCFN095"), PU_STATIC));
+    V_DrawShadowedPatchOptional(x - WIDESCREENDELTA, 10, 0, W_CacheLumpName (("STCFN095"), PU_STATIC));
 }
 
 // -----------------------------------------------------------------------------
