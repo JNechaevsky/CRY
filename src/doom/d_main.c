@@ -183,7 +183,6 @@ static void D_Display (void)
     int      nowtime;
     int      tics;
     int      wipestart;
-    int      y;
     boolean  done;
     boolean  wipe;
     static   gamestate_t oldgamestate = -1;
@@ -300,12 +299,7 @@ static void D_Display (void)
     // draw pause pic
     if (paused)
     {
-	if (automapactive && !automap_overlay)
-	    y = 4;
-	else
-	    y = (viewwindowy / vid_resolution)+4;
-	V_DrawShadowedPatchOptional((viewwindowx / vid_resolution) + ((scaledviewwidth / vid_resolution) - 68) / 2 - WIDESCREENDELTA, y, 0,
-                          W_CacheLumpName ("M_PAUSE", PU_CACHE));
+		V_DrawShadowedPatchOptional(136, 72, 0, W_CacheLumpName ("M_PAUSE", PU_CACHE));
     }
 
     // [JN] Do not draw any widgets if not in game level.
