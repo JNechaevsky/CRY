@@ -59,6 +59,7 @@ endif()
 option(CMAKE_FIND_PACKAGE_PREFER_CONFIG
        "Lookup package config files before using find modules" On)
 
+option(ENABLE_SDL2_NET "Enable SDL2_net" Off)
 option(ENABLE_SDL2_MIXER "Enable SDL2_mixer" On)
 
 find_package(SDL2 2.0.18)
@@ -66,6 +67,12 @@ if(ENABLE_SDL2_MIXER)
     find_package(SDL2_mixer 2.0.2)
 else()
     add_compile_definitions(DISABLE_SDL2MIXER=1)
+endif()
+
+if(ENABLE_SDL2_NET)
+    find_package(SDL2_net 2.0.0)
+else()
+    add_compile_definitions(DISABLE_SDL2NET=1)
 endif()
 
 option(CRISPY_TRUECOLOR "True color rendering" ON)
