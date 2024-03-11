@@ -1582,7 +1582,7 @@ static void AM_drawWalls (void)
                     // [JN] Highlight secret sectors
                     if (automap_secrets && lines[i].frontsector->special == 9)
                     {
-                        AM_drawMline(&l, 252);
+                        AM_drawMline(&l, 114);
                     }
                     else
                     {
@@ -1601,12 +1601,33 @@ static void AM_drawWalls (void)
                     {
                         AM_drawMline(&l, 32);
                     }
+					// [JN] RED Key-locked doors
+					else
+					if (lines[i].special == 28  || lines[i].special == 33
+					||  lines[i].special == 134 || lines[i].special == 135)
+					{
+						AM_drawMline(&l, 176);
+					}
+					// [JN] BLUE Key-locked doors
+					else
+					if (lines[i].special == 26  || lines[i].special == 32
+					||  lines[i].special == 99  || lines[i].special == 133)
+					{
+						AM_drawMline(&l, 200);
+					}
+					// [JN] YELLOW Key-locked doors
+					else
+					if (lines[i].special == 27  || lines[i].special == 34
+					||  lines[i].special == 136 || lines[i].special == 137)
+					{
+						AM_drawMline(&l, 228);
+					}
                     // [JN] Highlight secret sectors
                     else if (automap_secrets
                     && (lines[i].frontsector->special == 9
                     ||  lines[i].backsector->special == 9))
                     {
-                        AM_drawMline(&l, 252);
+                        AM_drawMline(&l, 114);
                     }
                     // Any special linedef
                     else if (lines[i].special)
