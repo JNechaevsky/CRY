@@ -2243,7 +2243,9 @@ G_InitNew
 
 	M_ClearRandom ();
 
-	if (skill == sk_nightmare || respawnparm)
+	// [JN] Jaguar: no respawning on Nightmare,
+	// but keep command line parameter.
+	if (/*skill == sk_nightmare ||*/ respawnparm)
 	respawnmonsters = true;
 	else
 	respawnmonsters = false;

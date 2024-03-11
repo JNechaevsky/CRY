@@ -762,7 +762,8 @@ P_SpawnMobjSafe
     mobj->bmap_flick = 0;
     mobj->bmap_glow = 0;
 
-    if (gameskill != sk_nightmare)
+    // [JN] Jaguar: monsters doesn't attack imideatelly in Nightmare.
+    // if (gameskill != sk_nightmare)
 	mobj->reactiontime = info->reactiontime;
     
     mobj->lastlook = safe ? ID_Random () % MAXPLAYERS : P_Random () % MAXPLAYERS;

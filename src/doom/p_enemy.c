@@ -750,7 +750,9 @@ void A_Chase (mobj_t*	actor)
     if (actor->flags & MF_JUSTATTACKED)
     {
 	actor->flags &= ~MF_JUSTATTACKED;
-	if (gameskill != sk_nightmare && !fastparm)
+	// [JN] Jaguar: monsters doesn't attacks twice in a row in Nightmare,
+	// but keep command line parameter.
+	if (/*gameskill != sk_nightmare &&*/ !fastparm)
 	    P_NewChaseDir (actor);
 	return;
     }

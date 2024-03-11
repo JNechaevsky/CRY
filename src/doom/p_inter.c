@@ -72,8 +72,9 @@ P_GiveAmmo
     else
 	num = clipammo[ammo]/2;
     
+    // [JN] Jaguar: no double ammo in Nightmare.
     if (gameskill == sk_baby
-	|| gameskill == sk_nightmare)
+	/*|| gameskill == sk_nightmare*/)
     {
 	// give double ammo in trainer mode,
 	// you'll need in nightmare
