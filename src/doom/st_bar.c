@@ -1411,7 +1411,7 @@ void ST_Drawer (boolean force)
     }
 
     // [crispy] blinking key or skull in the status bar
-    for (int i = 0, y = 0 ; i < 3 ; i++, y += 10)
+    for (int i = 0 ; i < 3 ; i++)
     {
         if (st_blinking_keys && plyr->tryopen[i])
         {
@@ -1421,7 +1421,10 @@ void ST_Drawer (boolean force)
             }
             if (plyr->tryopen[i] & KEYBLINKMASK)
             {
-                V_DrawPatch(124 - wide_x, 163 + y, keys[i + st_keyorskull[i]]);
+                const int yy = plyr->tryopen[2] ? 163 :  // red key
+                               plyr->tryopen[0] ? 175 :  // blue key
+                                                  187 ;  // yellow key
+                V_DrawPatch(124 - wide_x, yy, keys[i + st_keyorskull[i]]);
             }
         }
     }
