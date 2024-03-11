@@ -669,6 +669,65 @@ void V_DrawPatchFlipped(int x, int y, patch_t *patch)
     }
 }
 
+// -----------------------------------------------------------------------------
+// [JN] V_DrawPatchFinale
+// Draws pixel-doubled sprite. Used exclusively on casting sequence screen.
+// Written with extensive support of Fabian Greffrath, thanks! (2019-01-16)
+// Adapted for quad resolution by Roman Fomin, thanks as well! (2023-01-10)
+// And finally, resolution independent implemenation! :-)      (2024-03-11)
+// -----------------------------------------------------------------------------
+
+void V_DrawPatchFinale (int x, int y, patch_t *patch)
+{
+	int       count, col, w, f;
+	column_t *column;
+	pixel_t  *desttop;
+	pixel_t  *dest;
+	byte     *source;
+
+	// [JN] Resolution independent multipler:
+	const int m = vid_resolution * 2;
+	
+	y -= SHORT(patch->topoffset);
+	x -= SHORT(patch->leftoffset);
+
+	V_MarkRect(x, y, SHORT(patch->width), SHORT(patch->height));
+
+	col = 0;
+	desttop = dest_screen  + (y * m) * SCREENWIDTH + x;
+	w = SHORT(patch->width);
+
+	for ( ; col<w ; x++, col++, desttop++)
+	{
+		column = (column_t *)((byte *)patch + LONG(patch->columnofs[col]));
+
+		// step through the posts in a column
+		while (column->topdelta != 0xff)
+		{
+			for (f = 0; f < m; f++)
+			{
+				source = (byte *)column + 3;
+
+				dest = desttop + column->topdelta * (SCREENWIDTH * m)
+					 + (x * (m - 1)) + f;
+
+				count = column->length;
+
+				while (count--)
+				{
+					for (int g = 0; g < m; g++)
+					{
+						*dest = pal_color[*source];
+						dest += SCREENWIDTH;
+					}
+					source++;
+				}
+			}
+			column = (column_t *)((byte *)column + column->length + 4);
+		}
+	}
+}
+
 //
 // V_DrawTLPatch
 //
