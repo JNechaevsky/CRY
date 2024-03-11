@@ -137,7 +137,6 @@ sfxinfo_t S_sfx[] =
   SOUND("claw",   70),
   SOUND("skeswg", 70),
   SOUND("pldeth", 32),
-  SOUND("pdiehi", 32),
   SOUND("podth1", 70),
   SOUND("podth2", 70),
   SOUND("podth3", 70),

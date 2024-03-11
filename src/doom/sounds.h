@@ -133,7 +133,6 @@ typedef enum
     sfx_claw,
     sfx_skeswg,
     sfx_pldeth,
-    sfx_pdiehi,
     sfx_podth1,
     sfx_podth2,
     sfx_podth3,

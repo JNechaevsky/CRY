@@ -2074,18 +2074,10 @@ void A_SpawnFly (mobj_t* mo)
 
 
 
-void A_PlayerScream (mobj_t* mo)
+void A_PlayerScream (mobj_t *mo)
 {
-    // Default death sound.
-    int		sound = sfx_pldeth;
-	
-    if ( (gamemode == commercial)
-	&& 	(mo->health < -50))
-    {
-	// IF THE PLAYER DIES
-	// LESS THAN -50% WITHOUT GIBBING
-	sound = sfx_pdiehi;
-    }
-    
-    S_StartSound (mo, sound);
+	// Default death sound.
+	int sound = sfx_pldeth;
+
+	S_StartSound (mo, sound);
 }
