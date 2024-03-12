@@ -1669,66 +1669,6 @@ void A_Explode (mobj_t* thingy)
     P_RadiusAttack(thingy, thingy->target, 128);
 }
 
-// Check whether the death of the specified monster type is allowed
-// to trigger the end of episode special action.
-//
-// This behavior changed in v1.9, the most notable effect of which
-// was to break uac_dead.wad
-
-static boolean CheckBossEnd(mobjtype_t motype)
-{
-    if (gameversion < exe_ultimate)
-    {
-        if (gamemap != 8)
-        {
-            return false;
-        }
-
-        // Baron death on later episodes is nothing special.
-
-        if (motype == MT_BRUISER && gameepisode != 1)
-        {
-            return false;
-        }
-
-        return true;
-    }
-    else
-    {
-        // New logic that appeared in Ultimate Doom.
-        // Looks like the logic was overhauled while adding in the
-        // episode 4 support.  Now bosses only trigger on their
-        // specific episode.
-
-	switch(gameepisode)
-	{
-            case 1:
-                return gamemap == 8 && motype == MT_BRUISER;
-
-            case 2:
-                return gamemap == 8 && motype == MT_CYBORG;
-
-            case 3:
-                return gamemap == 8 && motype == MT_SPIDER;
-
-	    case 4:
-                return (gamemap == 6 && motype == MT_CYBORG)
-                    || (gamemap == 8 && motype == MT_SPIDER);
-
-            // [crispy] no trigger for auto-loaded Sigil E5
-            case 5:
-                return (gamemap == 8 && !sigil);
-
-            // [crispy] no trigger for auto-loaded Sigil II E6
-            case 6:
-                return (gamemap == 8 && !sigil2);
-
-            default:
-                return gamemap == 8;
-	}
-    }
-}
-
 // -----------------------------------------------------------------------------
 // A_BossDeath
 // Possibly trigger special effects if on first boss level
