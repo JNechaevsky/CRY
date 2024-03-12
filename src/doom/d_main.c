@@ -288,12 +288,6 @@ static void D_Display (void)
         AM_LevelNameDrawer();
     }
 
-    if (testcontrols)
-    {
-        // Box showing current mouse speed
-        V_DrawMouseSpeedBox(testcontrols_mousespeed);
-    }
-
     oldgamestate = wipegamestate = gamestate;
 
     // draw pause pic
@@ -499,11 +493,6 @@ void D_DoomLoop (void)
     R_ExecuteSetViewSize();
 
     D_StartGameLoop();
-
-    if (testcontrols)
-    {
-        wipegamestate = gamestate;
-    }
 
     while (1)
     {
@@ -1039,19 +1028,6 @@ void D_DoomMain (void)
         autostart = true;
         // [crispy] if used with -playdemo, fast-forward demo up to the desired map
         demowarp = startmap;
-    }
-
-    // Undocumented:
-    // Invoked by setup to test the controls.
-
-    p = M_CheckParm("-testcontrols");
-
-    if (p > 0)
-    {
-        startepisode = 1;
-        startmap = 1;
-        autostart = true;
-        testcontrols = true;
     }
 
     // Check for load game parameter
