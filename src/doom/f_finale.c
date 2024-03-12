@@ -265,7 +265,7 @@ static void F_TextWrite (void)
 	// [JN] Draw special background
 	if (gamemap == 23)
 	{
-		V_DrawPatchFullScreen(W_CacheLumpName(("ENDPIC1"), PU_CACHE), false);
+		V_DrawPatchFullScreen(W_CacheLumpName(("M_TITLE"), PU_CACHE), false);
 	}
 
 	// draw some of the text onto the screen
@@ -480,7 +480,7 @@ static void F_CastDrawer (void)
 	patch_t       *patch;
 
 	// erase the entire screen to a background
-	V_DrawPatchFullScreen(W_CacheLumpName("ENDPIC2", PU_CACHE), false);
+	V_DrawPatchFullScreen(W_CacheLumpName("M_TITLE", PU_CACHE), false);
 
 	// [JN] Simplify to use common text drawing function.
 	M_WriteTextBigCentered(15, castorder[castnum].name, NULL);
