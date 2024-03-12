@@ -1729,108 +1729,61 @@ static boolean CheckBossEnd(mobjtype_t motype)
     }
 }
 
-//
+// -----------------------------------------------------------------------------
 // A_BossDeath
-// Possibly trigger special effects
-// if on first boss level
-//
-void A_BossDeath (mobj_t* mo)
+// Possibly trigger special effects if on first boss level
+// -----------------------------------------------------------------------------
+
+void A_BossDeath (mobj_t *mo)
 {
-    thinker_t*	th;
-    mobj_t*	mo2;
-    line_t	junk;
-    int		i;
-		
-    if ( gamemode == commercial)
-    {
-	if (gamemap != 7)
-	    return;
-		
-	if ((mo->type != MT_FATSO)
-	    && (mo->type != MT_BABY))
-	    return;
-    }
-    else
-    {
-        if (!CheckBossEnd(mo->type))
-        {
-            return;
-        }
-    }
+    thinker_t *th;
+    mobj_t    *mo2;
+    line_t     junk;
+    int        i;
+
+    // [JN] Jaguar: bruisers may apear on other levels,
+    // so don't check other than MAP08.
+    if (gamemap != 8)
+    return;
+
+    if (mo->type != MT_BRUISER)
+    return;
 
     // make sure there is a player alive for victory
-    for (i=0 ; i<MAXPLAYERS ; i++)
-	if (playeringame[i] && players[i].health > 0)
-	    break;
-    
+    for (i = 0 ; i < MAXPLAYERS ; i++)
+        if (playeringame[i] && players[i].health > 0)
+            break;
+
     if (i==MAXPLAYERS)
-	return;	// no one left alive, so do not end game
-    
+    return;	// no one left alive, so do not end game
+
     // scan the remaining thinkers to see
     // if all bosses are dead
     for (th = thinkercap.next ; th != &thinkercap ; th=th->next)
     {
-	if (th->function.acp1 != (actionf_p1)P_MobjThinker)
-	    continue;
+        if (th->function.acp1 != (actionf_p1)P_MobjThinker)
+            continue;
 	
-	mo2 = (mobj_t *)th;
-	if (mo2 != mo
-	    && mo2->type == mo->type
-	    && mo2->health > 0)
-	{
-	    // other boss not dead
-	    return;
-	}
+        mo2 = (mobj_t *)th;
+
+        if (mo2 != mo && mo2->type == mo->type && mo2->health > 0)
+        {
+            // other boss not dead
+            return;
+        }
     }
-	
+
     // victory!
-    if ( gamemode == commercial)
+    if (gamemap == 8)
     {
-	if (gamemap == 7)
-	{
-	    if (mo->type == MT_FATSO)
-	    {
-		junk.tag = 666;
-		EV_DoFloor(&junk,lowerFloorToLowest);
-		return;
-	    }
-	    
-	    if (mo->type == MT_BABY)
-	    {
-		junk.tag = 667;
-		EV_DoFloor(&junk,raiseToTexture);
-		return;
-	    }
-	}
+        if (mo->type == MT_BRUISER)
+        {
+            junk.tag = 666;
+            EV_DoFloor (&junk, lowerFloorToLowest);
+            return;
+        }
     }
-    else
-    {
-	switch(gameepisode)
-	{
-	  case 1:
-	    junk.tag = 666;
-	    EV_DoFloor (&junk, lowerFloorToLowest);
-	    return;
-	    break;
-	    
-	  case 4:
-	    switch(gamemap)
-	    {
-	      case 6:
-		junk.tag = 666;
-		EV_DoDoor (&junk, vld_blazeOpen);
-		return;
-		break;
-		
-	      case 8:
-		junk.tag = 666;
-		EV_DoFloor (&junk, lowerFloorToLowest);
-		return;
-		break;
-	    }
-	}
-    }
-	
+
     G_ExitLevel ();
 }
 
