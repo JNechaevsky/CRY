@@ -143,6 +143,9 @@ cheatseq_t cheat_clev = CHEAT("idclev", 2);
 cheatseq_t cheat_mypos = CHEAT("idmypos", 0);
 // [JN] IDDT cheat, moved from am_map.c
 cheatseq_t cheat_amap = CHEAT("iddt", 0);
+// [JN] Jaguar: fixed "non-working" cheats:
+cheatseq_t cheat_amap_1 = CHEAT("8002545465", 0); /* allmap cheat */
+cheatseq_t cheat_amap_2 = CHEAT("8005778788", 0); /* show things cheat */
 
 // [crispy] new cheats
 static cheatseq_t cheat_massacre1 = CHEAT("tntem", 0);
@@ -516,6 +519,18 @@ boolean ST_Responder (event_t *ev)
             && cht_CheckCheat(&cheat_amap, ev->data2))
             {
                 iddt_cheating = (iddt_cheating + 1) % 3;
+                plyr->cheatTics = 1;
+            }
+            // [JN] Jaguar cheat: allmap
+            else if (cht_CheckCheat(&cheat_amap_1, ev->data2))
+            {
+                iddt_cheating = 1;
+                plyr->cheatTics = 1;
+            }
+            // [JN] Jaguar cheat: show things
+            else if (cht_CheckCheat(&cheat_amap_2, ev->data2))
+            {
+                iddt_cheating = 2;
                 plyr->cheatTics = 1;
             }
             // [crispy] implement Boom's "tntem" cheat
