@@ -945,9 +945,7 @@ P_DamageMobj
 			
     target->reactiontime = 0;		// we're awake now...	
 
-    if ( (!target->threshold || target->type == MT_VILE)
-	 && source && (source != target || gameversion <= exe_doom_1_2)
-	 && source->type != MT_VILE)
+	if (!target->threshold && source)
     {
 	// if not intent on another player,
 	// chase after this one

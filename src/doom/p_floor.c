@@ -242,7 +242,8 @@ void T_MoveFloor(floormove_t* floor)
 	}
 	P_RemoveThinker(&floor->thinker);
 
-	S_StartSound(&floor->sector->soundorg, sfx_pstop);
+	// [JN] Not existed in Jaguar:
+	// S_StartSound(&floor->sector->soundorg, sfx_pstop);
     }
 
 }
@@ -302,11 +303,8 @@ EV_DoFloor
 	    floor->direction = -1;
 	    floor->sector = sec;
 	    floor->speed = FLOORSPEED * 4;
-	    floor->floordestheight = 
-		P_FindHighestFloorSurrounding(sec);
-	    if (gameversion <= exe_doom_1_2 ||
-	        floor->floordestheight != sec->floorheight)
-		floor->floordestheight += 8*FRACUNIT;
+		floor->floordestheight = (8*FRACUNIT) + 
+				P_FindHighestFloorSurrounding(sec);
 	    break;
 
 	  case raiseFloorCrush:
