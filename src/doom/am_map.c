@@ -81,6 +81,9 @@ static boolean mousewheelzoom;
 #define CXMTOF(x) (f_x + MTOF((x)-m_x))
 #define CYMTOF(y) (f_y + (f_h - MTOF((y)-m_y)))
 
+// [JN] Jaguar: emulate blinking arrow.
+static int blinking_arrow;
+
 // [JN] ReMood-inspired IDDT monster coloring, slightly optimized
 // for uncapped framerate and uses different coloring logics:
 // Active monsters: up-up-up-up
@@ -980,6 +983,12 @@ void AM_Ticker (void)
     prev_m_x = m_x;
     prev_m_y = m_y;
 
+    // [JN] Jaguar: blinking player arrow:
+    if (blinking_arrow++ > 16)
+    {
+        blinking_arrow = 0;
+    }
+
     // [JN] Animate IDDT monster colors:
 
     // Inactive:
@@ -1778,15 +1787,11 @@ static void AM_drawLineCharacter (mline_t *lineguy, int lineguylines,
 
 static void AM_drawPlayers (void)
 {
-    int       i;
-    int       their_colors[] = { 112, 96, 64, 176 };
-    int       their_color = -1;
-    int       color;
-    mpoint_t  pt;
-    player_t *p;
-
-    if (!netgame)
+    // [JN] Jaguar: blinking player arrow:
+    if (blinking_arrow > 3)
     {
+        mpoint_t pt;
+
         // [JN] Smooth player arrow rotation.
         // Keep arrow static in Spectator + rotate mode.
         const angle_t smoothangle = (crl_spectating && automap_rotate) ?
@@ -1809,77 +1814,8 @@ static void AM_drawPlayers (void)
             AM_rotatePoint(&pt);
         }
 
-        // [JN] Jaguar: blinking player arrow.
-        if (realleveltime & 8)
-        {
-            AM_drawLineCharacter(thintriangle_guy, arrlen(thintriangle_guy), 0,
-                                 smoothangle, 112, pt.x, pt.y);
-        }
-
-        return;
-    }
-
-    for (i = 0 ; i < MAXPLAYERS ; i++)
-    {
-        // [JN] Interpolate other player arrows angle.
-        angle_t smoothangle;
-
-        their_color++;
-        p = &players[i];
-
-        if ((deathmatch && !singledemo) && p != plr)
-        {
-            continue;
-        }
-        if (!playeringame[i])
-        {
-            continue;
-        }
-
-        if (p->powers[pw_invisibility])
-        {
-            color = 246; // *close* to black
-        }
-        else
-        {
-            color = their_colors[their_color];
-        }
-
-        // [JN] Interpolate other player arrows.
-        if (vid_uncapped_fps && realleveltime > oldleveltime)
-        {
-            pt.x = (p->mo->oldx + FixedMul(p->mo->x - p->mo->oldx, fractionaltic)) >> FRACTOMAPBITS;
-            pt.y = (p->mo->oldy + FixedMul(p->mo->y - p->mo->oldy, fractionaltic)) >> FRACTOMAPBITS;
-        }
-        else
-        {
-            pt.x = p->mo->x >> FRACTOMAPBITS;
-            pt.y = p->mo->y >> FRACTOMAPBITS;
-        }
-
-        // [JN] Prevent arrow jitter in non-hires mode.
-        if (vid_resolution == 1)
-        {
-            pt.x = FTOM(MTOF(pt.x));
-            pt.y = FTOM(MTOF(pt.y));
-        }
-
-        if (automap_rotate)
-        {
-            AM_rotatePoint(&pt);
-            smoothangle = p->mo->angle;
-        }
-        else
-        {
-            smoothangle = R_InterpolateAngle(p->mo->oldangle, p->mo->angle, fractionaltic);
-        }
-
-        // [JN] Jaguar: blinking player arrow.
-        if (realleveltime & 8)
-        {
-            AM_drawLineCharacter(thintriangle_guy, arrlen(thintriangle_guy), 0,
-                                 smoothangle, color, pt.x, pt.y);
-        }
+        AM_drawLineCharacter(thintriangle_guy, arrlen(thintriangle_guy), 0,
+                             smoothangle, 116, pt.x, pt.y);
     }
 }
 
