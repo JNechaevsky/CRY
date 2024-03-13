@@ -556,7 +556,8 @@ A_Punch
     int		slope;
 	
     if (!player) return; // [crispy] let pspr action pointers get called from mobj states
-    damage = (P_Random ()%10+1)<<1;
+    // [JN] Use exact Jaguar damage formula
+    damage = ((P_Random()&7)+1)*3;    
 
     if (player->powers[pw_strength])	
 	damage *= 10;
@@ -593,7 +594,8 @@ A_Saw
     int		slope;
 
     if (!player) return; // [crispy] let pspr action pointers get called from mobj states
-    damage = 2*(P_Random ()%10+1);
+    // [JN] Use exact Jaguar damage formula
+    damage = ((P_Random ()&7)+1)*3;
     angle = player->mo->angle;
     angle += P_SubRandom() << 18;
     
@@ -752,7 +754,8 @@ P_GunShot
     angle_t	angle;
     int		damage;
 	
-    damage = 5*(P_Random ()%3+1);
+    // [JN] Use exact Jaguar damage formula
+    damage = ((P_Random ()&3)+1)*4;
     angle = mo->angle;
 
     if (!accurate)
