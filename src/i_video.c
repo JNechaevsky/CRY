@@ -115,7 +115,7 @@ static SDL_Texture *palette_07 = NULL;
 static SDL_Texture *palette_08 = NULL;
 static SDL_Texture *palette_09 = NULL;
 
-static SDL_Texture *palette_grn = NULL;
+static SDL_Texture *palette_yel = NULL;
 
 static SDL_Texture *palette_14 = NULL;
 
@@ -1058,10 +1058,10 @@ void I_SetPalette (int palette)
 		case 7:		curpane = palette_08;	break;
 		case 8:		curpane = palette_09;	break;
 		// Yellow palette
-		case 9:		curpane = palette_grn;	pane_alpha = 24;	break;
-		case 10:	curpane = palette_grn;	pane_alpha = 48;	break;
-		case 11:	curpane = palette_grn;	pane_alpha = 72;	break;
-		case 12:	curpane = palette_grn;	pane_alpha = 96;	break;
+		case 9:		curpane = palette_yel;	pane_alpha = 24;	break;
+		case 10:	curpane = palette_yel;	pane_alpha = 48;	break;
+		case 11:	curpane = palette_yel;	pane_alpha = 72;	break;
+		case 12:	curpane = palette_yel;	pane_alpha = 96;	break;
 		// Green palette
 		case 13:	curpane = palette_14;	break;
 
@@ -1554,20 +1554,20 @@ static void SetVideoMode(void)
 
 		// Yellow palette pane_alpha
         SDL_FillRect(argbbuffer, NULL, I_MapRGB(255, 164, 0));
-        palette_grn = SDL_CreateTextureFromSurface(renderer, argbbuffer);
-        SDL_SetTextureBlendMode(palette_grn, SDL_BLENDMODE_ADD);
+        palette_yel = SDL_CreateTextureFromSurface(renderer, argbbuffer);
+        SDL_SetTextureBlendMode(palette_yel, SDL_BLENDMODE_ADD);
 
         SDL_FillRect(argbbuffer, NULL, I_MapRGB(255, 164, 0));
-        palette_grn = SDL_CreateTextureFromSurface(renderer, argbbuffer);
-        SDL_SetTextureBlendMode(palette_grn, SDL_BLENDMODE_ADD);
+        palette_yel = SDL_CreateTextureFromSurface(renderer, argbbuffer);
+        SDL_SetTextureBlendMode(palette_yel, SDL_BLENDMODE_ADD);
 
         SDL_FillRect(argbbuffer, NULL, I_MapRGB(255, 164, 0));
-        palette_grn = SDL_CreateTextureFromSurface(renderer, argbbuffer);
-        SDL_SetTextureBlendMode(palette_grn, SDL_BLENDMODE_ADD);
+        palette_yel = SDL_CreateTextureFromSurface(renderer, argbbuffer);
+        SDL_SetTextureBlendMode(palette_yel, SDL_BLENDMODE_ADD);
 
         SDL_FillRect(argbbuffer, NULL, I_MapRGB(255, 164, 0));
-        palette_grn = SDL_CreateTextureFromSurface(renderer, argbbuffer);
-        SDL_SetTextureBlendMode(palette_grn, SDL_BLENDMODE_ADD);
+        palette_yel = SDL_CreateTextureFromSurface(renderer, argbbuffer);
+        SDL_SetTextureBlendMode(palette_yel, SDL_BLENDMODE_ADD);
 
 		// Green palette
         SDL_FillRect(argbbuffer, NULL, I_MapRGB(96, 255, 64));
