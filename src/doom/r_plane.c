@@ -439,10 +439,9 @@ void R_DrawPlanes (void)
             
             // Sky is allways drawn full bright, i.e. colormaps[0] is used.
             // Because of this hack, sky is not affected by INVUL inverse mapping.
-            // [JN] Make optional, "Invulnerability affects sky" feature.
             // [crispy] no brightmaps for sky
-            dc_colormap[0] = dc_colormap[1] = vis_invul_sky && fixedcolormap ? 
-                                              fixedcolormap : colormaps;
+            // [JN] Jaguar: sky is always colored with invul effect.
+            dc_colormap[0] = dc_colormap[1] = fixedcolormap ? fixedcolormap : colormaps;
             dc_texheight = textureheight[texture]>>FRACBITS;
 
             // [crispy] stretch short skies
