@@ -98,7 +98,6 @@ static pixel_t *st_backing_screen;
 static player_t *plyr; 
 
 // lump number for PLAYPAL
-static int lu_palette;
 int st_palette = 0;
 
 // used for evil grin
@@ -956,12 +955,7 @@ void ST_doPaletteStuff (void)
     if (palette != st_palette)
     {
         st_palette = palette;
-#ifndef CRISPY_TRUECOLOR
-	pal = (byte *) W_CacheLumpNum (lu_palette, PU_CACHE)+palette*768;
-	I_SetPalette (pal);
-#else
-	I_SetPalette (palette);
-#endif
+		I_SetPalette (palette);
     }
 }
 
@@ -1442,139 +1436,9 @@ void ST_Drawer (boolean force)
     }
 }
 
-typedef void (*load_callback_t)(const char *lumpname, patch_t **variable); 
-
-// Iterates through all graphics to be loaded or unloaded, along with
-// the variable they use, invoking the specified callback function.
-
-static void ST_loadUnloadGraphics(load_callback_t callback)
-{
-
-    int		i;
-    int		j;
-    int		facenum;
-    
-    char	namebuf[9];
-
-    // Load the numbers, tall and short
-    for (i=0;i<10;i++)
-    {
-	snprintf(namebuf, 9, "STTNUM%d", i);
-        callback(namebuf, &tallnum[i]);
-
-	snprintf(namebuf, 9, "STYSNUM%d", i);
-        callback(namebuf, &shortnum_y[i]);
-
-	snprintf(namebuf, 9, "STGNUM%d", i);
-        callback(namebuf, &shortnum_g[i]);
-    }
-
-    // Load percent key.
-    callback("STTPRCNT", &tallpercent);
-
-    // [JN] Load minus symbol.
-    // Versions prior 1.4 does not have STTMINUS patch.
-    // If case of using such versions, drawing negative health is not possible.
-    if (W_CheckNumForName("STTMINUS") >= 0)
-    {
-        callback("STTMINUS", &tallminus);
-    }
-    else
-    {
-        tallminus = NULL;
-        no_sttminus = true;
-    }
-
-    // key cards
-    for (i=0;i<NUMCARDS;i++)
-    {
-	snprintf(namebuf, 9, "STKEYS%d", i);
-        callback(namebuf, &keys[i]);
-    }
-
-    // face background
-    callback("STPBG", &faceback);
-
-    // status bar background bits
-    callback("STBAR", &sbar);
-
-    // face states
-    facenum = 0;
-    for (i=0; i<ST_NUMPAINFACES; i++)
-    {
-	for (j=0; j<ST_NUMSTRAIGHTFACES; j++)
-	{
-	    snprintf(namebuf, 9, "STFST%d%d", i, j);
-            callback(namebuf, &faces[facenum]);
-            ++facenum;
-	}
-	snprintf(namebuf, 9, "STFTR%d0", i);	// turn right
-        callback(namebuf, &faces[facenum]);
-        ++facenum;
-	snprintf(namebuf, 9, "STFTL%d0", i);	// turn left
-        callback(namebuf, &faces[facenum]);
-        ++facenum;
-	snprintf(namebuf, 9, "STFOUCH%d", i);	// ouch!
-        callback(namebuf, &faces[facenum]);
-        ++facenum;
-	snprintf(namebuf, 9, "STFEVL%d", i);	// evil grin ;)
-        callback(namebuf, &faces[facenum]);
-        ++facenum;
-	snprintf(namebuf, 9, "STFKILL%d", i);	// pissed off
-        callback(namebuf, &faces[facenum]);
-        ++facenum;
-    }
-
-    callback("STFGOD0",  &faces[facenum++]);
-    callback("STFDEAD0", &faces[facenum++]);
-    callback("STFEXP0G", &faces[facenum++]);
-    callback("STFEXP1G", &faces[facenum++]);
-    callback("STFEXP2G", &faces[facenum++]);
-    callback("STFEXP3G", &faces[facenum++]);
-    callback("STFEXP4G", &faces[facenum++]);
-    callback("STFEXP5G", &faces[facenum++]);
-    callback("STFCRS0G", &faces[facenum++]);
-}
-
-static void ST_loadCallback(const char *lumpname, patch_t **variable)
-{
-    *variable = W_CacheLumpName(lumpname, PU_STATIC);
-}
-
-void ST_loadGraphics(void)
-{
-    ST_loadUnloadGraphics(ST_loadCallback);
-}
-
-void ST_loadData(void)
-{
-    lu_palette = W_GetNumForName("PLAYPAL");
-    ST_loadGraphics();
-}
-
-static void ST_unloadCallback(const char *lumpname, patch_t **variable)
-{
-    W_ReleaseLumpName(lumpname);
-    *variable = NULL;
-}
-
-void ST_unloadGraphics(void)
-{
-    ST_loadUnloadGraphics(ST_unloadCallback);
-}
-
-void ST_unloadData(void)
-{
-    ST_unloadGraphics();
-}
-
 void ST_Start (void)
 {
-#ifndef CRISPY_TRUECOLOR
-    I_SetPalette (W_CacheLumpNum (lu_palette, PU_CACHE));
-#else
     I_SetPalette (0);
-#endif
 
     plyr = &players[displayplayer];
     faceindex = 1; // [crispy] fix status bar face hysteresis across level changes
@@ -1590,9 +1454,83 @@ void ST_Start (void)
 
 void ST_Init (void)
 {
-    ST_loadData();
-    st_backing_screen = (pixel_t *) Z_Malloc(MAXWIDTH * (ST_HEIGHT * MAXHIRES)
-                      * sizeof(*st_backing_screen), PU_STATIC, 0);
+	int  i, j;
+	int  facenum;
+	char name[9];
+
+	// Load the numbers, tall and short
+	for (i = 0 ; i < 10 ; i++)
+	{
+		snprintf(name, 9, "STTNUM%d", i);
+		tallnum[i] = W_CacheLumpName(name, PU_STATIC);
+
+		snprintf(name, 9, "STYSNUM%d", i);
+		shortnum_y[i] = W_CacheLumpName(name, PU_STATIC);
+
+		snprintf(name, 9, "STGNUM%d", i);
+		shortnum_g[i] = W_CacheLumpName(name, PU_STATIC);
+	}
+
+    // Load percent key
+	tallpercent = W_CacheLumpName("STTPRCNT", PU_STATIC);
+
+	// [JN] Minus symbol
+	tallminus = W_CacheLumpName("STTMINUS", PU_STATIC);
+
+	// Key cards
+	for (i=0;i<NUMCARDS;i++)
+	{
+		snprintf(name, 9, "STKEYS%d", i);
+		keys[i] = W_CacheLumpName(name, PU_STATIC);
+	}
+
+    // Face background
+	faceback = W_CacheLumpName("STPBG", PU_STATIC);
+
+    // Main status bar patch
+	sbar = W_CacheLumpName("STBAR", PU_STATIC);
+
+	// Face states
+	facenum = 0;
+	for (i = 0 ; i < ST_NUMPAINFACES ; i++)
+	{
+		for (j = 0 ; j < ST_NUMSTRAIGHTFACES ; j++)
+		{
+			snprintf(name, 9, "STFST%d%d", i, j);
+			faces[facenum++] = W_CacheLumpName(name, PU_STATIC);
+		}
+
+		snprintf(name, 9, "STFTR%d0", i);	// turn right
+		faces[facenum++] = W_CacheLumpName(name, PU_STATIC);
+
+		snprintf(name, 9, "STFTL%d0", i);	// turn left
+		faces[facenum++] = W_CacheLumpName(name, PU_STATIC);
+
+		snprintf(name, 9, "STFOUCH%d", i);	// ouch!
+		faces[facenum++] = W_CacheLumpName(name, PU_STATIC);
+
+		snprintf(name, 9, "STFEVL%d", i);	// evil grin ;)
+		faces[facenum++] = W_CacheLumpName(name, PU_STATIC);
+
+		snprintf(name, 9, "STFKILL%d", i);	// pissed off
+		faces[facenum++] = W_CacheLumpName(name, PU_STATIC);
+	}
+
+	faces[facenum++] = W_CacheLumpName("STFGOD0", PU_STATIC);
+	faces[facenum++] = W_CacheLumpName("STFDEAD0", PU_STATIC);
+	// [JN] Exploded face:
+	faces[facenum++] = W_CacheLumpName("STFEXP0G", PU_STATIC);
+	faces[facenum++] = W_CacheLumpName("STFEXP1G", PU_STATIC);
+	faces[facenum++] = W_CacheLumpName("STFEXP2G", PU_STATIC);
+	faces[facenum++] = W_CacheLumpName("STFEXP3G", PU_STATIC);
+	faces[facenum++] = W_CacheLumpName("STFEXP4G", PU_STATIC);
+	faces[facenum++] = W_CacheLumpName("STFEXP5G", PU_STATIC);
+	// [JN] Squished face:
+	faces[facenum++] = W_CacheLumpName("STFCRS0G", PU_STATIC);
+
+	// Allocate status bar background.
+	st_backing_screen = (pixel_t *) Z_Malloc(MAXWIDTH * (ST_HEIGHT * MAXHIRES)
+					* sizeof(*st_backing_screen), PU_STATIC, 0);
 }
 
 // -----------------------------------------------------------------------------
