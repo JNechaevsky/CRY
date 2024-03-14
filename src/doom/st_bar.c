@@ -1377,7 +1377,7 @@ void ST_Drawer (boolean force)
     // [crispy] blinking key or skull in the status bar
     for (int i = 0 ; i < 3 ; i++)
     {
-        if (st_blinking_keys && plyr->tryopen[i])
+        if (plyr->tryopen[i])
         {
             if (!(plyr->tryopen[i] & (2 * KEYBLINKMASK - 1)))
             {
