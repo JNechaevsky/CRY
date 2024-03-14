@@ -209,6 +209,7 @@ void EV_VerticalDoor (line_t *line, mobj_t *thing)
 		case 32:
 			if ( player && !player->cards[it_bluecard] && !player->cards[it_blueskull])
 			{
+				CT_SetMessage(player, "You need a blue keycard to open this door", false, NULL);
 				S_StartSound(thing,sfx_oof);
 				// [crispy] blinking key or skull in the status bar
 				player->tryopen[it_bluecard] = KEYBLINKTICS;
@@ -219,6 +220,7 @@ void EV_VerticalDoor (line_t *line, mobj_t *thing)
 		case 106:
 			if ( player && !player->cards[it_bluecard] && !player->cards[it_blueskull])
 			{
+				CT_SetMessage(player, "You need a blue skullkey to open this door", false, NULL);
 				S_StartSound(thing,sfx_oof);
 				// [crispy] blinking key or skull in the status bar
 				player->tryopen[it_bluecard] = KEYBLINKTICS;
@@ -229,6 +231,7 @@ void EV_VerticalDoor (line_t *line, mobj_t *thing)
 		case 34:
 			if ( player && !player->cards[it_yellowcard] && !player->cards[it_yellowskull])
 			{
+				CT_SetMessage(player, "You need a yellow keycard to open this door", false, NULL);
 				S_StartSound(thing,sfx_oof);
 				// [crispy] blinking key or skull in the status bar
 				player->tryopen[it_yellowcard] = KEYBLINKTICS;
@@ -239,6 +242,7 @@ void EV_VerticalDoor (line_t *line, mobj_t *thing)
 		case 108:
 			if ( player && !player->cards[it_yellowcard] && !player->cards[it_yellowskull])
 			{
+				CT_SetMessage(player, "You need a yellow skullkey to open this door", false, NULL);
 				S_StartSound(thing,sfx_oof);
 				// [crispy] blinking key or skull in the status bar
 				player->tryopen[it_yellowcard] = KEYBLINKTICS;
@@ -249,6 +253,7 @@ void EV_VerticalDoor (line_t *line, mobj_t *thing)
 		case 33:
 			if ( player && !player->cards[it_redcard] && !player->cards[it_redskull])
 			{
+				CT_SetMessage(player, "You need a red keycard to open this door", false, NULL);
 				S_StartSound(thing,sfx_oof);
 				// [crispy] blinking key or skull in the status bar
 				player->tryopen[it_redcard] = KEYBLINKTICS;
@@ -259,6 +264,7 @@ void EV_VerticalDoor (line_t *line, mobj_t *thing)
 		case 107:
 			if ( player && !player->cards[it_redcard] && !player->cards[it_redskull])
 			{
+				CT_SetMessage(player, "You need a red skullkey to open this door", false, NULL);
 				S_StartSound(thing,sfx_oof);
 				// [crispy] blinking key or skull in the status bar
 				player->tryopen[it_redcard] = KEYBLINKTICS;
