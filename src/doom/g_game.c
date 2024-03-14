@@ -1408,7 +1408,7 @@ void G_Ticker (void)
     // Level / DeathMatch timer
     if (widget_time)
     {
-        const int time = (deathmatch && levelTimer ? levelTimeCount : leveltime) / TICRATE;
+        const int time = leveltime / TICRATE;
     
         M_snprintf(ID_Level_Time, sizeof(ID_Level_Time),
                    "%02d:%02d:%02d", time/3600, (time%3600)/60, time%60);

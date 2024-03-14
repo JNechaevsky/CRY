@@ -428,8 +428,8 @@ boolean P_UseSpecialLine (mobj_t *thing, line_t *line, int side)
         // BlzOpenDoor RED
         case 137:
         // BlzOpenDoor YELLOW
-        if (EV_DoLockedDoor (line,vld_blazeOpen,thing))
-            P_ChangeSwitchTexture(line,0);
+        //if (EV_DoLockedDoor (line,vld_blazeOpen,thing))
+        //    P_ChangeSwitchTexture(line,0);
         break;
 
         case 140:
@@ -559,8 +559,8 @@ boolean P_UseSpecialLine (mobj_t *thing, line_t *line, int side)
         // BlzOpenDoor RED
         case 136:
         // BlzOpenDoor YELLOW
-        if (EV_DoLockedDoor (line,vld_blazeOpen,thing))
-            P_ChangeSwitchTexture(line,1);
+        //if (EV_DoLockedDoor (line,vld_blazeOpen,thing))
+        //    P_ChangeSwitchTexture(line,1);
         break;
 
         case 138:
