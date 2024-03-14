@@ -307,15 +307,15 @@ static void WI_drawStats (void)
 
 	// Kills
 	M_WriteTextBig(71, 51, "Kills", NULL);
-	WI_drawPercent(ORIGWIDTH - SP_STATSX, 54, cnt_kills[0]);
+	WI_drawPercent(ORIGWIDTH - SP_STATSX, 51, cnt_kills[0]);
 
 	// Items
 	M_WriteTextBig(66, 69, "Items", NULL);
-	WI_drawPercent(ORIGWIDTH - SP_STATSX, 72, cnt_items[0]);
+	WI_drawPercent(ORIGWIDTH - SP_STATSX, 69, cnt_items[0]);
 
 	// Secrets
 	M_WriteTextBig(30, 87, "Secrets", NULL);
-	WI_drawPercent(ORIGWIDTH - SP_STATSX, 90, cnt_secret[0]);
+	WI_drawPercent(ORIGWIDTH - SP_STATSX, 87, cnt_secret[0]);
 
 	// Time
 	M_WriteTextBig(74, 111, "Time", NULL);
@@ -482,13 +482,13 @@ void WI_Init (void)
 	// numbers 0-9
     for (int i = 0 ; i < 10 ; i++)
     {
-		snprintf(name, 9, "WINUM%d", i);
+		snprintf(name, 9, "STTNUM%d", i);
 		num[i] = W_CacheLumpName(name, PU_STATIC);
 	}
 
 	// ":"
-	colon = W_CacheLumpName("WICOLON", PU_STATIC);
+	colon = W_CacheLumpName("STTCOLMN", PU_STATIC);
 
 	// percent sign
-	percent = W_CacheLumpName("WIPCNT", PU_STATIC);
+	percent = W_CacheLumpName("STTPRCNT", PU_STATIC);
 }
