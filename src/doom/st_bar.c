@@ -183,10 +183,6 @@ static const inline int cht_CheckCheatSP (cheatseq_t *cht, char key)
     return true;
 }
 
-// [JN] Versions prior 1.4 does not have STTMINUS patch.
-// If case of using such versions, drawing negative health is not possible.
-static boolean no_sttminus = false;
-
 // -----------------------------------------------------------------------------
 // WeaponAvailable
 // [crispy] only give available weapons
@@ -853,23 +849,6 @@ static void ST_updateFaceWidget (void)
         }
     }
 
-    // [JN] Processed above to fix status bar face hysteresis
-    // while getting hurt/ouch face and going into invulnerability state.
-    /*
-    if (priority < 5)
-    {
-        // invulnerability
-        if (invul)
-        {
-            priority = 4;
-
-            painoffset = 0;
-            faceindex = ST_GODFACE;
-            st_facecount = 1;
-        }
-    }
-    */
-
     // look left or look right if the facecount has timed out
     if (!st_facecount)
     {
@@ -939,17 +918,6 @@ void ST_doPaletteStuff (void)
     else
     {
         palette = 0;
-    }
-
-    // In Chex Quest, the player never sees red.  Instead, the
-    // radiation suit palette is used to tint the screen green,
-    // as though the player is being covered in goo by an
-    // attacking flemoid.
-
-    if (gameversion == exe_chex
-    &&  palette >= STARTREDPALS && palette < STARTREDPALS + NUMREDPALS)
-    {
-        palette = RADIATIONPAL;
     }
 
     if (palette != st_palette)
@@ -1361,7 +1329,7 @@ void ST_Drawer (boolean force)
 
     // Health, negative health
     {
-        const boolean neghealth = st_negative_health && plyr->health <= 0 && !no_sttminus;
+        const boolean neghealth = st_negative_health && plyr->health <= 0;
 
         ST_DrawBigNumber(neghealth ? plyr->health_negative : plyr->health,
                          66 - wide_x, 174, ST_WidgetColor(hudcolor_health));
