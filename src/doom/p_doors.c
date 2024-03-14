@@ -321,20 +321,12 @@ void EV_VerticalDoor (line_t *line, mobj_t *thing)
 		case 26:
 		case 27:
 		case 28:
-		// [JN] Jaguar special doors (keycards):
-		case 106:   // Blue Skull door raise
-		case 108:   // Yellow Skull roor raise
-		case 107:   // Red Skull door raise
 			door->type = vld_normal;
 			break;
 		case 31:
 		case 32:
 		case 33:
 		case 34:
-		// [JN]  Jaguar special doors (skull keys):
-		case 99:    // Blue Skull door open
-		case 100:   // Red Skull door open
-		case 105:   // Yellow Skull roor open
 			door->type = vld_open;
 			break;
 	}

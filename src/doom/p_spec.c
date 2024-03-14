@@ -844,7 +844,7 @@ void P_UpdateSpecials (void)
 	/* */
 	/*	DO BUTTONS */
 	/* */
-	for (i = 0; i < maxbuttons; i++)
+	for (i = 0; i < MAXBUTTONS; i++)
 		if (buttonlist[i].btimer)
 		{
 			buttonlist[i].btimer--;
@@ -1178,7 +1178,7 @@ void P_SpawnSpecials (void)
 		activeceilings[i] = NULL;
 	for (i = 0;i < MAXPLATS;i++)
 		activeplats[i] = NULL;
-	for (i = 0;i < maxbuttons;i++)
+	for (i = 0;i < MAXBUTTONS;i++)
 		memset(&buttonlist[i],0,sizeof(button_t));
 	
 }

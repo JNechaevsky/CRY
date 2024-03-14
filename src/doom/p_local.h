@@ -733,8 +733,7 @@ extern void P_ChangeSwitchTexture (line_t *line, int useAgain);
 extern void P_InitSwitchList (void);
 extern void P_StartButton (line_t *line, bwhere_e w, int texture, int time);
 
-extern button_t	*buttonlist; 
-extern int       maxbuttons;
+extern button_t buttonlist[MAXBUTTONS];	
 
 // -----------------------------------------------------------------------------
 // P_TELEPT

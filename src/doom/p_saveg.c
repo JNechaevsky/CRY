@@ -1942,7 +1942,7 @@ void P_ArchiveSpecials (void)
     }
 	
     button_ptr = buttonlist;
-    i = maxbuttons;
+    i = MAXBUTTONS;
     do
     {
         if (button_ptr->btimer != 0)
