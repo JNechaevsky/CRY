@@ -591,67 +591,16 @@ boolean ST_Responder (event_t *ev)
 
             cht_GetParam(&cheat_clev, buf);
 
-            //if (gamemode == commercial)
             {
                 epsd = 0;
                 map = (buf[0] - '0')*10 + buf[1] - '0';
             }
-			/*
-            else
-            {
-                epsd = buf[0] - '0';
-                map = buf[1] - '0';
-
-                // Chex.exe always warps to episode 1.
-
-                if (gameversion == exe_chex)
-                {
-                    if (epsd > 1)
-                    {
-                        epsd = 1;
-                    }
-                    if (map > 5)
-                    {
-                        map = 5;
-                    }
-                }
-            }
-
-            // Catch invalid maps.
-            if (gamemode != commercial)
-            {
-                if (epsd < 1)
-                {
-                    return false;
-                }
-                if (epsd > 4)
-                {
-                    // [crispy] Sigil
-                    if (!(sigil && epsd == 5) &&
-                        !(sigil2 && epsd == 6))
-                    return false;
-                }
-                if (epsd == 4 && gameversion < exe_ultimate)
-                {
-                    return false;
-                }
-                if (map < 1)
-                {
-                    return false;
-                }
-                if (map > 9)
-                {
-                    return false;
-                }
-            }
-            else
-				*/
             {
                 if (map < 1)
                 {
                     return false;
                 }
-                if (map > 40)
+                if (map > 24)
                 {
                     return false;
                 }

@@ -91,14 +91,6 @@ boolean main_loop_started = false;
 // wipegamestate can be set to -1 to force a wipe on the next draw
 gamestate_t wipegamestate = GS_DEMOSCREEN;
 
-// [JN] Semi-official addons.
-// SIGIL
-boolean sigil = false;
-// SIGIL 2
-boolean sigil2 = false;
-// NERVE
-boolean nerve = false;
-
 // [JN] Check for available SSG from Crispy Doom.
 boolean havessg = false;
 
@@ -755,31 +747,9 @@ void D_DoomMain (void)
 
     coop_spawns = M_CheckParm ("-coop_spawns");
 
-    // find which dir to use for config files
+    // Auto-detect the configuration dir.
 
-#ifdef _WIN32
-
-    //!
-    // @platform windows
-    // @vanilla
-    //
-    // Save configuration data and savegames in c:\doomdata,
-    // allowing play from CD.
-    //
-
-    if (M_ParmExists("-cdrom"))
-    {
-        printf(D_CDROM);
-
-        M_SetConfigDir("c:\\doomdata\\");
-    }
-    else
-#endif
-    {
-        // Auto-detect the configuration dir.
-
-        M_SetConfigDir(NULL);
-    }
+    M_SetConfigDir(NULL);
 
     //!
     // @arg <x>

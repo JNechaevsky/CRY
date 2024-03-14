@@ -397,9 +397,6 @@ static int S_AdjustSoundParams(mobj_t *listener, mobj_t *source,
     int64_t        adz; // [JN] Z-axis sfx distance
     angle_t        angle;
 
-    // [crispy] proper sound clipping in Doom 2 MAP08 and The Ultimate Doom E4M8 / Sigil E5M8
-    const boolean doom1map8 = (gamemap == 8 && ((gamemode != commercial && gameepisode < 4)));
-
     // calculate the distance to sound origin
     //  and clip it if necessary
     adx = abs(listener->x - source->x);
@@ -417,7 +414,7 @@ static int S_AdjustSoundParams(mobj_t *listener, mobj_t *source,
         approx_dist = adx + ady - ((adx < ady ? adx : ady)>>1);
     }
 
-    if (!doom1map8 && approx_dist > S_CLIPPING_DIST)
+    if (approx_dist > S_CLIPPING_DIST)
     {
         return 0;
     }
@@ -447,23 +444,12 @@ static int S_AdjustSoundParams(mobj_t *listener, mobj_t *source,
     {
         *vol = snd_SfxVolume;
     }
-    else if (doom1map8)
-    {
-        if (approx_dist > S_CLIPPING_DIST)
-        {
-            approx_dist = S_CLIPPING_DIST;
-        }
-
-        *vol = 15+ ((snd_SfxVolume-15)
-                    *((S_CLIPPING_DIST - approx_dist)>>FRACBITS))
-            / S_ATTENUATOR;
-    }
     else
     {
         // distance effect
-        *vol = (snd_SfxVolume
+        *vol = (snd_SfxVolume 
                 * ((S_CLIPPING_DIST - approx_dist)>>FRACBITS))
-            / S_ATTENUATOR;
+                / S_ATTENUATOR;
     }
 
     return (*vol > 0);

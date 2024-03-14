@@ -266,8 +266,6 @@ enum
     ep2,
     ep3,
     ep4,
-    ep5, // [crispy] Sigil
-    ep6, // [crispy] Sigil II
     ep_end
 } episodes_e;
 
@@ -277,18 +275,6 @@ static menuitem_t EpisodeMenu[]=
     { M_SWTC, "M_EPI2",  M_Episode,  't' },
     { M_SWTC, "M_EPI3",  M_Episode,  'i' },
     { M_SWTC, "M_EPI4",  M_Episode,  't' },
-    { M_SWTC, "M_EPI5",  M_Episode,  's' }, // [crispy] Sigil
-    { M_SWTC, "M_EPI6",  M_Episode,  's' }, // [crispy] Sigil II
-};
-
-// [crispy] have Sigil II but not Sigil
-static menuitem_t EpisodeMenuSII[]=
-{
-    { M_SWTC, "M_EPI1", M_Episode, 'k' },
-    { M_SWTC, "M_EPI2", M_Episode, 't' },
-    { M_SWTC, "M_EPI3", M_Episode, 'i' },
-    { M_SWTC, "M_EPI4", M_Episode, 't' }, 
-    { M_SWTC, "M_EPI6", M_Episode, 's' },  // [crispy] Sigil II
 };
 
 static menu_t EpiDef =
@@ -3794,9 +3780,7 @@ static void M_ID_LevelEpisode (int choice)
         return;
     }
 
-    level_select[1] = M_INT_Slider(level_select[1], 1,
-                                   sigil ? 5 :
-                                   gamemode == retail ? 4 : 3, choice, false);
+    level_select[1] = M_INT_Slider(level_select[1], 1, 3, choice, false);
 }
 
 static void M_ID_LevelMap (int choice)
@@ -4732,9 +4716,7 @@ static void M_Episode(int choice)
     }
 
     epi = choice;
-    // [crispy] have Sigil II loaded but not Sigil
-    if (epi == 4 && sigil2 && !sigil)
-        epi = 5;
+
     M_SetupNextMenu(&NewDef);
 }
 
@@ -5371,25 +5353,6 @@ static int G_GotoNextLevel (void)
         if (gamemode == registered)
         {
             doom_next[2][7] = 11;
-        }
-        
-        if (!sigil && !sigil2)
-        {
-            doom_next[3][7] = 11;
-        }
-        else if (!sigil && sigil2)
-        {
-            doom_next[3][7] = 61;
-        }
-        else if (sigil && !sigil2)
-        {
-            doom_next[4][7] = 11;
-        }
-
-        if (gameversion == exe_chex)
-        {
-            doom_next[0][2] = 14;
-            doom_next[0][4] = 11;
         }
     }
 
@@ -6395,34 +6358,6 @@ void M_Init (void)
         ReadDef1.x = 330;
         ReadDef1.y = 165;
         ReadMenu1[rdthsempty1].routine = M_FinishReadThis;
-    }
-
-    // [crispy] Sigil
-    if (!sigil && !sigil2)
-    {
-        EpiDef.numitems = 4;
-    }
-    else if (sigil != sigil2)
-    {
-        EpiDef.numitems = 5;
-        if (sigil2)
-        {
-            EpiDef.menuitems = EpisodeMenuSII;
-        }
-    }
-
-    // Versions of doom.exe before the Ultimate Doom release only had
-    // three episodes; if we're emulating one of those then don't try
-    // to show episode four. If we are, then do show episode four
-    // (should crash if missing).
-    if (gameversion < exe_ultimate)
-    {
-        EpiDef.numitems--;
-    }
-    // chex.exe shows only one episode.
-    else if (gameversion == exe_chex)
-    {
-        EpiDef.numitems = 1;
     }
 }
 
