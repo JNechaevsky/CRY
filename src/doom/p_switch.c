@@ -267,7 +267,7 @@ boolean P_UseSpecialLine (mobj_t *thing, line_t *line, int side)
 		/*	SWITCHES */
 		/*=============================================== */
 		case 7:			/* Build Stairs */
-			if (EV_BuildStairs(line, build8)) // [JN] TODO - only one type
+			if (EV_BuildStairs(line))
 				P_ChangeSwitchTexture(line,0);
 			break;
 		case 9:			/* Change Donut */

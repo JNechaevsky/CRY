@@ -502,7 +502,7 @@ void P_CrossSpecialLine (int linenum, int side, mobj_t *thing)
 			line->special = 0;
 			break;
 		case 8:			/* Build Stairs */
-			EV_BuildStairs(line,build8);
+			EV_BuildStairs(line);
 			line->special = 0;
 			break;
 		case 10:		/* PlatDownWaitUp */
