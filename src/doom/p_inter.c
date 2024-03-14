@@ -920,17 +920,6 @@ P_DamageMobj
     else
     if (target->health <= 0)
     {
-    // [crispy] the lethal pellet of a point-blank SSG blast
-    // gets an extra damage boost for the occasional gib chance
-    if (singleplayer && phys_ssg_tear_monsters /*&& !strict_mode*/)
-    {
-        if (source && source->player
-        && source->player->readyweapon == wp_supershotgun
-        && target->info->xdeathstate && P_CheckMeleeRange(target) && damage >= 10)
-        {
-            target->health -= target->info->spawnhealth;
-        }
-    }
 	P_KillMobj (source, target);
 	return;
     }
