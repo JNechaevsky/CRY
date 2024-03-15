@@ -705,41 +705,6 @@ void ID_DemoBar (void)
 
 // =============================================================================
 //
-//                           Level Select one variable
-//
-// =============================================================================
-
-int level_select[] = {
-    2,    //  0 - Skill level
-    1,    //  1 - Episode
-    1,    //  2 - Map
-    100,  //  3 - Health
-    0,    //  4 - Armor
-    1,    //  5 - Armor type
-    0,    //  6 - Chainsaw
-    0,    //  7 - Shotgun
-    0,    //  8 - Super Shotgun
-    0,    //  9 - Chaingun
-    0,    // 10 - Rocket Launcher
-    0,    // 11 - Plasma Rifle
-    0,    // 12 - BFG 9000
-    0,    // 13 - Backpack
-    50,   // 14 - Bullets
-    0,    // 15 - Shells
-    0,    // 16 - Rockets
-    0,    // 17 - Cells
-    0,    // 18 - Blue keycard
-    0,    // 19 - Yellow keycard
-    0,    // 20 - Red keycard
-    0,    // 21 - Blue skull key
-    0,    // 22 - Yellow skull key
-    0,    // 23 - Red skull key
-    0,    // 24 - Fast monsters
-    0,    // 25 - Respawning monsters
-};
-
-// =============================================================================
-//
 //                              Spectator Mode
 //
 // =============================================================================

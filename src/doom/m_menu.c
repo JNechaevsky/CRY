@@ -5360,7 +5360,7 @@ void M_Init (void)
     player = &players[consoleplayer];
 
     // [JN] Set cursor position in skill menu to default skill level.
-    NewDef.lastOn = level_select[0] = gp_default_skill;
+    NewDef.lastOn = gp_default_skill;
 
     // Here we could catch other version dependencies,
     //  like HELP1/2, and four episodes.

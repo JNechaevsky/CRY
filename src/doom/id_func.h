@@ -90,12 +90,6 @@ extern void ID_DemoBar (void);
 extern int  defdemotics, deftotaldemotics;
 
 //
-// Level Select one variable
-//
-
-extern int level_select[];
-
-//
 // Spectator Mode
 //
 
