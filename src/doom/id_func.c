@@ -250,24 +250,24 @@ void ID_LeftWidgets (void)
             const int yy1 = widget_coords ? 0 : 34;
 
             // Sprites
-            M_WriteText(0 - WIDESCREENDELTA, 54 + yy1, "SPR:", cr[CR_GRAY]);
+            M_WriteText(0 - WIDESCREENDELTA, 46 + yy1, "SPR:", cr[CR_GRAY]);
             M_snprintf(spr, 16, "%d", IDRender.numsprites);
-            M_WriteText(32 - WIDESCREENDELTA, 54 + yy1, spr, cr[CR_GREEN]);
+            M_WriteText(32 - WIDESCREENDELTA, 46 + yy1, spr, cr[CR_GREEN]);
 
             // Segments (256 max)
-            M_WriteText(0 - WIDESCREENDELTA, 63 + yy1, "SEG:", cr[CR_GRAY]);
+            M_WriteText(0 - WIDESCREENDELTA, 55 + yy1, "SEG:", cr[CR_GRAY]);
             M_snprintf(seg, 16, "%d", IDRender.numsegs);
-            M_WriteText(32 - WIDESCREENDELTA, 63 + yy1, seg, cr[CR_GREEN]);
+            M_WriteText(32 - WIDESCREENDELTA, 55 + yy1, seg, cr[CR_GREEN]);
 
             // Openings
-            M_WriteText(0 - WIDESCREENDELTA, 72 + yy1, "OPN:", cr[CR_GRAY]);
+            M_WriteText(0 - WIDESCREENDELTA, 64 + yy1, "OPN:", cr[CR_GRAY]);
             M_snprintf(opn, 16, "%d", IDRender.numopenings);
-            M_WriteText(32 - WIDESCREENDELTA, 72 + yy1, opn, cr[CR_GREEN]);
+            M_WriteText(32 - WIDESCREENDELTA, 64 + yy1, opn, cr[CR_GREEN]);
 
             // Planes
-            M_WriteText(0 - WIDESCREENDELTA, 81 + yy1, "PLN:", cr[CR_GRAY]);
+            M_WriteText(0 - WIDESCREENDELTA, 73 + yy1, "PLN:", cr[CR_GRAY]);
             M_snprintf(vis, 32, "%d", IDRender.numplanes);
-            M_WriteText(32 - WIDESCREENDELTA, 81 + yy1, vis, cr[CR_GREEN]);
+            M_WriteText(32 - WIDESCREENDELTA, 73 + yy1, vis, cr[CR_GREEN]);
         }
 
         // Player coords
@@ -276,16 +276,16 @@ void ID_LeftWidgets (void)
         {
             char str[128];
 
-            M_WriteText(0 - WIDESCREENDELTA, 97, "X:", cr[CR_GRAY]);
-            M_WriteText(0 - WIDESCREENDELTA, 106, "Y:", cr[CR_GRAY]);
-            M_WriteText(0 - WIDESCREENDELTA, 115, "ANG:", cr[CR_GRAY]);
+            M_WriteText(0 - WIDESCREENDELTA, 89, "X:", cr[CR_GRAY]);
+            M_WriteText(0 - WIDESCREENDELTA, 98, "Y:", cr[CR_GRAY]);
+            M_WriteText(0 - WIDESCREENDELTA, 107, "ANG:", cr[CR_GRAY]);
 
             sprintf(str, "%d", IDWidget.x);
-            M_WriteText(16 - WIDESCREENDELTA, 97, str, cr[CR_GREEN]);
+            M_WriteText(16 - WIDESCREENDELTA, 89, str, cr[CR_GREEN]);
             sprintf(str, "%d", IDWidget.y);
-            M_WriteText(16 - WIDESCREENDELTA, 106, str, cr[CR_GREEN]);
+            M_WriteText(16 - WIDESCREENDELTA, 98, str, cr[CR_GREEN]);
             sprintf(str, "%d", IDWidget.ang);
-            M_WriteText(32 - WIDESCREENDELTA, 115, str, cr[CR_GREEN]);
+            M_WriteText(32 - WIDESCREENDELTA, 107, str, cr[CR_GREEN]);
         }
 
         if (automapactive)
@@ -297,127 +297,46 @@ void ID_LeftWidgets (void)
         if (widget_kis == 1
         || (widget_kis == 2 && automapactive))
         {
-            if (!deathmatch)
+            char str1[8], str2[16];  // kills
+            char str3[8], str4[16];  // items
+            char str5[8], str6[16];  // secret
+    
+            // Kills:
+            sprintf(str1, "K ");
+            M_WriteText(0 - WIDESCREENDELTA, 152 + yy, str1, cr[CR_GRAY]);
+            
+            if (IDWidget.extrakills)
             {
-                char str1[8], str2[16];  // kills
-                char str3[8], str4[16];  // items
-                char str5[8], str6[16];  // secret
-        
-                // Kills:
-                sprintf(str1, "K ");
-                M_WriteText(0 - WIDESCREENDELTA, 160 + yy, str1, cr[CR_GRAY]);
-                
-                if (IDWidget.extrakills)
-                {
-                    sprintf(str2, "%d+%d/%d ", IDWidget.kills, IDWidget.extrakills, IDWidget.totalkills);
-                }
-                else
-                {
-                    sprintf(str2, "%d/%d ", IDWidget.kills, IDWidget.totalkills);
-                }
-                M_WriteText(0 - WIDESCREENDELTA + M_StringWidth(str1), 160 + yy, str2, ID_WidgetColor(widget_kills));
-        
-                // Items:
-                sprintf(str3, "I ");
-                M_WriteText(0 - WIDESCREENDELTA + M_StringWidth(str1) + M_StringWidth(str2), 160 + yy, str3, cr[CR_GRAY]);
-                
-                sprintf(str4, "%d/%d ", IDWidget.items, IDWidget.totalitems);
-                M_WriteText(0 - WIDESCREENDELTA + M_StringWidth(str1) +
-                            M_StringWidth(str2) +
-                            M_StringWidth(str3), 160 + yy, str4, ID_WidgetColor(widget_items));
-        
-                // Secret:
-                sprintf(str5, "S ");
-                M_WriteText(0 - WIDESCREENDELTA + M_StringWidth(str1) +
-                            M_StringWidth(str2) +
-                            M_StringWidth(str3) +
-                            M_StringWidth(str4), 160 + yy, str5, cr[CR_GRAY]);
-        
-                sprintf(str6, "%d/%d ", IDWidget.secrets, IDWidget.totalsecrets);
-                M_WriteText(0 - WIDESCREENDELTA + M_StringWidth(str1) +
-                            M_StringWidth(str2) + 
-                            M_StringWidth(str3) +
-                            M_StringWidth(str4) +
-                            M_StringWidth(str5), 160 + yy, str6, ID_WidgetColor(widget_secret));
+                sprintf(str2, "%d+%d/%d ", IDWidget.kills, IDWidget.extrakills, IDWidget.totalkills);
             }
             else
             {
-                char str1[8] = {0}, str2[16] = {0};  // Green
-                char str3[8] = {0}, str4[16] = {0};  // Indigo
-                char str5[8] = {0}, str6[16] = {0};  // Brown
-                char str7[8] = {0}, str8[16] = {0};  // Red
-
-                // Green
-                if (playeringame[0])
-                {
-                    sprintf(str1, "G ");
-                    M_WriteText(0 - WIDESCREENDELTA, 160 + yy, str1, cr[CR_GREEN]);
-
-                    sprintf(str2, "%d ", IDWidget.frags_g);
-                    M_WriteText(0 - WIDESCREENDELTA +
-                                M_StringWidth(str1), 160 + yy, str2, cr[CR_GREEN]);
-                }
-                // Indigo
-                if (playeringame[1])
-                {
-                    sprintf(str3, "I ");
-                    M_WriteText(0 - WIDESCREENDELTA +
-                                M_StringWidth(str1) +
-                                M_StringWidth(str2),
-                                160 + yy, str3, cr[CR_GRAY]);
-
-                    sprintf(str4, "%d ", IDWidget.frags_i);
-                    M_WriteText(0 - WIDESCREENDELTA +
-                                M_StringWidth(str1) +
-                                M_StringWidth(str2) +
-                                M_StringWidth(str3),
-                                160 + yy, str4, cr[CR_GRAY]);
-                }
-                // Brown
-                if (playeringame[2])
-                {
-                    sprintf(str5, "B ");
-                    M_WriteText(0 - WIDESCREENDELTA +
-                                M_StringWidth(str1) +
-                                M_StringWidth(str2) +
-                                M_StringWidth(str3) +
-                                M_StringWidth(str4),
-                                160 + yy, str5, cr[CR_BROWN]);
-
-                    sprintf(str6, "%d ", IDWidget.frags_b);
-                    M_WriteText(0 - WIDESCREENDELTA +
-                                M_StringWidth(str1) +
-                                M_StringWidth(str2) +
-                                M_StringWidth(str3) +
-                                M_StringWidth(str4) +
-                                M_StringWidth(str5),
-                                160 + yy, str6, cr[CR_BROWN]);
-                }
-                // Red
-                if (playeringame[3])
-                {
-                    sprintf(str7, "R ");
-                    M_WriteText(0 - WIDESCREENDELTA +
-                                M_StringWidth(str1) +
-                                M_StringWidth(str2) +
-                                M_StringWidth(str3) +
-                                M_StringWidth(str4) +
-                                M_StringWidth(str5) +
-                                M_StringWidth(str6),
-                                160 + yy, str7, cr[CR_RED]);
-
-                    sprintf(str8, "%d ", IDWidget.frags_r);
-                    M_WriteText(0 - WIDESCREENDELTA +
-                                M_StringWidth(str1) +
-                                M_StringWidth(str2) +
-                                M_StringWidth(str3) +
-                                M_StringWidth(str4) +
-                                M_StringWidth(str5) +
-                                M_StringWidth(str6) +
-                                M_StringWidth(str7),
-                                160 + yy, str8, cr[CR_RED]);
-                }
+                sprintf(str2, "%d/%d ", IDWidget.kills, IDWidget.totalkills);
             }
+            M_WriteText(0 - WIDESCREENDELTA + M_StringWidth(str1), 152 + yy, str2, ID_WidgetColor(widget_kills));
+    
+            // Items:
+            sprintf(str3, "I ");
+            M_WriteText(0 - WIDESCREENDELTA + M_StringWidth(str1) + M_StringWidth(str2), 152 + yy, str3, cr[CR_GRAY]);
+            
+            sprintf(str4, "%d/%d ", IDWidget.items, IDWidget.totalitems);
+            M_WriteText(0 - WIDESCREENDELTA + M_StringWidth(str1) +
+                        M_StringWidth(str2) +
+                        M_StringWidth(str3), 152 + yy, str4, ID_WidgetColor(widget_items));
+    
+            // Secret:
+            sprintf(str5, "S ");
+            M_WriteText(0 - WIDESCREENDELTA + M_StringWidth(str1) +
+                        M_StringWidth(str2) +
+                        M_StringWidth(str3) +
+                        M_StringWidth(str4), 152 + yy, str5, cr[CR_GRAY]);
+    
+            sprintf(str6, "%d/%d ", IDWidget.secrets, IDWidget.totalsecrets);
+            M_WriteText(0 - WIDESCREENDELTA + M_StringWidth(str1) +
+                        M_StringWidth(str2) + 
+                        M_StringWidth(str3) +
+                        M_StringWidth(str4) +
+                        M_StringWidth(str5), 152 + yy, str6, ID_WidgetColor(widget_secret));
         }
 
         if (widget_kis)
@@ -432,8 +351,8 @@ void ID_LeftWidgets (void)
             char stra[8];
 
             sprintf(stra, "TOTAL ");
-            M_WriteText(0 - WIDESCREENDELTA, 160 + yy, stra, cr[CR_GRAY]);
-            M_WriteText(0 - WIDESCREENDELTA + M_StringWidth(stra), 160 + yy, ID_Total_Time, cr[CR_LIGHTGRAY]);
+            M_WriteText(0 - WIDESCREENDELTA, 152 + yy, stra, cr[CR_GRAY]);
+            M_WriteText(0 - WIDESCREENDELTA + M_StringWidth(stra), 152 + yy, ID_Total_Time, cr[CR_LIGHTGRAY]);
         }
 
         if (widget_totaltime)
@@ -448,8 +367,8 @@ void ID_LeftWidgets (void)
             char stra[8];
 
             sprintf(stra, "TIME ");
-            M_WriteText(0 - WIDESCREENDELTA, 160 + yy, stra, cr[CR_GRAY]);
-            M_WriteText(0 - WIDESCREENDELTA + M_StringWidth(stra), 160 + yy, ID_Level_Time, cr[CR_LIGHTGRAY]);
+            M_WriteText(0 - WIDESCREENDELTA, 152 + yy, stra, cr[CR_GRAY]);
+            M_WriteText(0 - WIDESCREENDELTA + M_StringWidth(stra), 152 + yy, ID_Level_Time, cr[CR_LIGHTGRAY]);
         }
     }
 }
