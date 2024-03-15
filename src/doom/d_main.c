@@ -822,8 +822,6 @@ void D_DoomMain (void)
     printf("W_Init: Init WADfiles.\n");
     D_AddFile(iwadfile);
 
-    W_CheckCorrectIWAD(doom);
-
     // Now that we've loaded the IWAD, we can figure out what gamemission
     // we're playing and which version of Vanilla Doom we need to emulate.
     //D_IdentifyVersion();
