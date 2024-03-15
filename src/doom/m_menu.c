@@ -495,7 +495,6 @@ static void M_Draw_ID_Main (void);
 
 static void M_Choose_ID_Video (int choice);
 static void M_Draw_ID_Video (void);
-static void M_ID_TrueColor (int choice);
 static void M_ID_RenderingRes (int choice);
 static void M_ID_Widescreen (int choice);
 
@@ -505,21 +504,10 @@ static void M_ID_VSync (int choice);
 static void M_ID_ShowFPS (int choice);
 static void M_ID_PixelScaling (int choice);
 static void M_ID_ScreenWipe (int choice);
-static void M_ID_ShowENDOOM (int choice);
-
-static void M_Choose_ID_Display (int choice);
-static void M_Draw_ID_Display (void);
 static void M_ID_Gamma (int choice);
 static void M_ID_FOV (int choice);
-static void M_ID_MenuShading (int choice);
-static void M_ID_LevelBrightness (int choice);
-static void M_ID_MessagesAlignment (int choice);
 static void M_ID_TextShadows (int choice);
 static void M_ID_LocalTime (int choice);
-static void M_ID_Saturation (int choice);
-static void M_ID_R_Intensity (int choice);
-static void M_ID_G_Intensity (int choice);
-static void M_ID_B_Intensity (int choice);
 
 static void M_Choose_ID_Sound (int choice);
 static void M_Draw_ID_Sound (void);
@@ -689,38 +677,6 @@ static void M_ID_InternalDemos (int choice);
 static void M_ID_BlockmapFix (int choice);
 static void M_ID_VerticalAiming (int choice);
 
-static void M_Choose_ID_Level_1 (int choice);
-static void M_Draw_ID_Level_1 (void);
-static void M_ID_LevelSkill (int choice);
-static void M_ID_LevelEpisode (int choice);
-static void M_ID_LevelMap (int choice);
-static void M_ID_LevelHealth (int choice);
-static void M_ID_LevelArmor (int choice);
-static void M_ID_LevelArmorType (int choice);
-static void M_ID_LevelChainsaw (int choice);
-static void M_ID_LevelShotgun (int choice);
-static void M_ID_LevelSSG (int choice);
-static void M_ID_LevelChaingun (int choice);
-static void M_ID_LevelRLauncher (int choice);
-static void M_ID_LevelPlasmagun (int choice);
-static void M_ID_LevelBFG9000 (int choice);
-
-static void M_Choose_ID_Level_2 (int choice);
-static void M_Draw_ID_Level_2 (void);
-static void M_ID_LevelBackpack (int choice);
-static void M_ID_LevelBullets (int choice);
-static void M_ID_LevelShells (int choice);
-static void M_ID_LevelRockets (int choice);
-static void M_ID_LevelCells (int choice);
-static void M_ID_LevelBlueKeycard (int choice);
-static void M_ID_LevelYellowKeycard (int choice);
-static void M_ID_LevelRedKeycard (int choice);
-static void M_ID_LevelBlueSkull (int choice);
-static void M_ID_LevelYellowSkull (int choice);
-static void M_ID_LevelRedSkull (int choice);
-static void M_ID_LevelFastMonsters (int choice);
-static void M_ID_LevelRespMonsters (int choice);
-
 static void M_Choose_ID_Reset (int choice);
 
 // Keyboard binding prototypes
@@ -760,8 +716,6 @@ static menu_t ID_Def_Keybinds_6;
 static menu_t ID_Def_Gameplay_1;
 static menu_t ID_Def_Gameplay_2;
 static menu_t ID_Def_Gameplay_3;
-static menu_t ID_Def_Level_1;
-static menu_t ID_Def_Level_2;
 
 // Remember last keybindings page.
 static int Keybinds_Cur;
@@ -839,10 +793,6 @@ static void M_ScrollPages (boolean direction)
     else if (currentMenu == &ID_Def_Gameplay_2) M_SetupNextMenu(direction ? &ID_Def_Gameplay_3 : &ID_Def_Gameplay_1);
     else if (currentMenu == &ID_Def_Gameplay_3) M_SetupNextMenu(direction ? &ID_Def_Gameplay_1 : &ID_Def_Gameplay_2);
 
-    // Level select:
-    else if (currentMenu == &ID_Def_Level_1) M_SetupNextMenu(&ID_Def_Level_2);
-    else if (currentMenu == &ID_Def_Level_2) M_SetupNextMenu(&ID_Def_Level_1);
-
     // Play sound.
     S_StartSound(NULL, sfx_pstop);
 }
@@ -868,6 +818,7 @@ static void M_ShadeBackground (void)
     }
 }
 
+/*
 static void M_FillBackground (void)
 {
     const byte *src = W_CacheLumpName("FLOOR4_8", PU_CACHE);
@@ -875,6 +826,7 @@ static void M_FillBackground (void)
 
     V_FillFlat(0, SCREENHEIGHT, 0, SCREENWIDTH, src, dest);
 }
+*/
 
 enum
 {
@@ -1126,15 +1078,15 @@ static char *const DefSkillName[5] =
 
 static menuitem_t ID_Menu_Main[]=
 {
-    { M_SWTC, "VIDEO OPTIONS",       M_Choose_ID_Video,    'v' },
-    { M_SWTC, "DISPLAY OPTIONS",     M_Choose_ID_Display,  'd' },
-    { M_SWTC, "SOUND OPTIONS",       M_Choose_ID_Sound,    's' },
-    { M_SWTC, "CONTROL SETTINGS",    M_Choose_ID_Controls, 'c' },
-    { M_SWTC, "WIDGETS AND AUTOMAP", M_Choose_ID_Widgets,  'w' },
-    { M_SWTC, "GAMEPLAY FEATURES",   M_Choose_ID_Gameplay, 'g' },
-    { M_SWTC, "LEVEL SELECT",        M_Choose_ID_Level_1,  'l' },
-    { M_SWTC, "END GAME",            M_EndGame,            'e' },
-    { M_SWTC, "RESET SETTINGS",      M_Choose_ID_Reset,    'r' },
+    { M_SWTC, "Video",    M_Choose_ID_Video,    'v' },
+    { M_SWTC, "Audio",    M_Choose_ID_Sound,    'a' },
+    { M_SWTC, "Controls", M_Choose_ID_Controls, 'c' },
+    { M_SWTC, "Widgets",  M_Choose_ID_Widgets,  'w' },
+    { M_SWTC, "Gameplay", M_Choose_ID_Gameplay, 'g' },
+    { M_SWTC, "End Game", M_EndGame,            'e' },
+    { M_SWTC, "Reset",    M_Choose_ID_Reset,    'r' },
+    { M_SKIP, "", 0, '\0' },
+    { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
@@ -1150,9 +1102,9 @@ static menu_t ID_Def_Main =
     &MainDef,
     ID_Menu_Main,
     M_Draw_ID_Main,
-    ID_MENU_LEFTOFFSET_SML, ID_MENU_TOPOFFSET,
+    97, 24/*ID_MENU_TOPOFFSET*/,
     0,
-    true, false, false,
+    false, false, false,
 };
 
 static void M_Choose_ID_Main (int choice)
@@ -1162,7 +1114,7 @@ static void M_Choose_ID_Main (int choice)
 
 static void M_Draw_ID_Main (void)
 {
-    M_WriteTextCentered(18, "OPTIONS", cr[CR_YELLOW]);
+    M_WriteTextBigCentered(6, "Options", cr[CR_YELLOW]);
 }
 
 // -----------------------------------------------------------------------------
@@ -1171,7 +1123,6 @@ static void M_Draw_ID_Main (void)
 
 static menuitem_t ID_Menu_Video[]=
 {
-    { M_LFRT, "TRUECOLOR RENDERING",  M_ID_TrueColor,    't' },
     { M_LFRT, "RENDERING RESOLUTION", M_ID_RenderingRes, 'r' },
     { M_LFRT, "WIDESCREEN MODE",      M_ID_Widescreen,   'w' },
     { M_LFRT, "UNCAPPED FRAMERATE",   M_ID_UncappedFPS,  'u' },
@@ -1179,11 +1130,13 @@ static menuitem_t ID_Menu_Video[]=
     { M_LFRT, "ENABLE VSYNC",         M_ID_VSync,        'e' },
     { M_LFRT, "SHOW FPS COUNTER",     M_ID_ShowFPS,      's' },
     { M_LFRT, "PIXEL SCALING",        M_ID_PixelScaling, 'p' },
-    { M_SKIP, "", 0, '\0' },
     { M_LFRT, "SCREEN WIPE EFFECT",   M_ID_ScreenWipe,   's' },
-    { M_LFRT, "SHOW ENDOOM SCREEN",   M_ID_ShowENDOOM,   's' },
     { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
+    { M_LFRT, "GAMMA-CORRECTION",     M_ID_Gamma,        'g' },
+    { M_LFRT, "FIELD OF VIEW",        M_ID_FOV,          'f' },
+    { M_LFRT, "MESSAGES ENABLED",     M_ChangeMessages,  'm' },
+    { M_LFRT, "TEXT CASTS SHADOWS",   M_ID_TextShadows,  't' },
+    { M_LFRT, "LOCAL TIME",           M_ID_LocalTime,    'l' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
 };
@@ -1194,7 +1147,7 @@ static menu_t ID_Def_Video =
     &ID_Def_Main,
     ID_Menu_Video,
     M_Draw_ID_Video,
-    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET,
+    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET_SML,
     0,
     true, false, false,
 };
@@ -1208,17 +1161,7 @@ static void M_Draw_ID_Video (void)
 {
     char str[32];
 
-    M_WriteTextCentered(18, "VIDEO OPTIONS", cr[CR_YELLOW]);
-
-#ifndef CRISPY_TRUECOLOR
-    sprintf(str, "N/A");
-    M_WriteText (M_ItemRightAlign(str), 27, str, 
-                 M_Item_Glow(0, GLOW_DARKRED));
-#else
-    sprintf(str, vid_truecolor ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 27, str, 
-                 M_Item_Glow(0, vid_truecolor ? GLOW_GREEN : GLOW_DARKRED));
-#endif
+    M_WriteTextCentered(9, "VIDEO OPTIONS", cr[CR_YELLOW]);
 
     // Rendering resolution
     sprintf(str, vid_resolution == 1 ? "1X (200P)"  :
@@ -1228,8 +1171,8 @@ static void M_Draw_ID_Video (void)
                  vid_resolution == 5 ? "5X (1000P)" :
                  vid_resolution == 6 ? "6X (1200P)" :
                                        "CUSTOM");
-    M_WriteText (M_ItemRightAlign(str), 36, str, 
-                 M_Item_Glow(1, vid_resolution == 1 ? GLOW_DARKRED :
+    M_WriteText (M_ItemRightAlign(str), 18, str, 
+                 M_Item_Glow(0, vid_resolution == 1 ? GLOW_DARKRED :
                                 vid_resolution == 2 ||
                                 vid_resolution == 3 ? GLOW_GREEN :
                                 vid_resolution == 4 ||
@@ -1241,52 +1184,75 @@ static void M_Draw_ID_Video (void)
                  vid_widescreen == 2 ? "16:10" :
                  vid_widescreen == 3 ? "16:9" :
                  vid_widescreen == 4 ? "21:9" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 45, str, 
-                 M_Item_Glow(2, vid_widescreen ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 27, str, 
+                 M_Item_Glow(1, vid_widescreen ? GLOW_GREEN : GLOW_DARKRED));
 
     // Uncapped framerate
     sprintf(str, vid_uncapped_fps ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 54, str, 
-                 M_Item_Glow(3, vid_uncapped_fps ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 36, str, 
+                 M_Item_Glow(2, vid_uncapped_fps ? GLOW_GREEN : GLOW_DARKRED));
 
     // Framerate limit
     sprintf(str, !vid_uncapped_fps ? "35" :
                  vid_fpslimit ? "%d" : "NONE", vid_fpslimit);
-    M_WriteText (M_ItemRightAlign(str), 63, str, 
+    M_WriteText (M_ItemRightAlign(str), 45, str, 
                  !vid_uncapped_fps ? cr[CR_DARKRED] :
-                 M_Item_Glow(4, vid_fpslimit == 0 ? GLOW_RED :
+                 M_Item_Glow(3, vid_fpslimit == 0 ? GLOW_RED :
                                 vid_fpslimit >= 500 ? GLOW_YELLOW : GLOW_GREEN));
 
     // Enable vsync
     sprintf(str, vid_vsync ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 72, str, 
-                 M_Item_Glow(5, vid_vsync ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 54, str, 
+                 M_Item_Glow(4, vid_vsync ? GLOW_GREEN : GLOW_DARKRED));
 
     // Show FPS counter
     sprintf(str, vid_showfps ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 81, str, 
-                 M_Item_Glow(6, vid_showfps ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 63, str, 
+                 M_Item_Glow(5, vid_showfps ? GLOW_GREEN : GLOW_DARKRED));
 
     // Pixel scaling
     sprintf(str, vid_smooth_scaling ? "SMOOTH" : "SHARP");
-    M_WriteText (M_ItemRightAlign(str), 90, str, 
-                 M_Item_Glow(7, vid_smooth_scaling ? GLOW_GREEN : GLOW_DARKRED));
-
-    M_WriteTextCentered(99, "MISCELLANEOUS", cr[CR_YELLOW]);
+    M_WriteText (M_ItemRightAlign(str), 72, str, 
+                 M_Item_Glow(6, vid_smooth_scaling ? GLOW_GREEN : GLOW_DARKRED));
 
     // Screen wipe effect
     sprintf(str, vid_screenwipe == 1 ? "ORIGINAL" :
                  vid_screenwipe == 2 ? "FAST" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 108, str,
-                 M_Item_Glow(9, vid_screenwipe == 1 ? GLOW_DARKRED : GLOW_GREEN));
+    M_WriteText (M_ItemRightAlign(str), 81, str,
+                 M_Item_Glow(7, vid_screenwipe == 1 ? GLOW_DARKRED : GLOW_GREEN));
 
-    // Show ENDOOM screen
-    sprintf(str, vid_endoom ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 115, str, 
-                 M_Item_Glow(10, vid_endoom ? GLOW_DARKRED : GLOW_GREEN));
+    M_WriteTextCentered(90, "DISPLAY OPTIONS", cr[CR_YELLOW]);
+
+    // Gamma-correction slider and num
+    sprintf(str, gammalvls[vid_gamma][1]);
+    M_WriteText (M_ItemRightAlign(str), 99, str,
+                          M_Item_Glow(9, vid_gamma  > 10 ? GLOW_GREEN :
+                                         vid_gamma == 10 ? GLOW_DARKRED : GLOW_RED));
+
+    // Field of View
+    sprintf(str, "%d", vid_fov);
+    M_WriteText (M_ItemRightAlign(str), 108, str,
+                 M_Item_Glow(10, vid_fov == 135 || vid_fov == 108 ? GLOW_YELLOW :
+                                vid_fov == 90 ? GLOW_DARKRED : GLOW_GREEN));
+
+    // Messages enabled
+    sprintf(str, msg_show ? "ON" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 117, str,
+                 M_Item_Glow(11, msg_show ? GLOW_DARKRED : GLOW_GREEN));
+
+    // Text casts shadows
+    sprintf(str, msg_text_shadows ? "ON" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 126, str, 
+                 M_Item_Glow(12, msg_text_shadows ? GLOW_GREEN : GLOW_DARKRED));
+
+    // Local time
+    sprintf(str, msg_local_time == 1 ? "12-HOUR FORMAT" :
+                 msg_local_time == 2 ? "24-HOUR FORMAT" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 135, str, 
+                 M_Item_Glow(13, msg_local_time ? GLOW_GREEN : GLOW_DARKRED));
 
     // [JN] Print current resolution. Shamelessly taken from Nugget Doom!
-    if (itemOn == 1 || itemOn == 2)
+    if (itemOn == 0 || itemOn == 1)
     {
         char  width[8];
         char  height[8];
@@ -1296,27 +1262,8 @@ static void M_Draw_ID_Video (void)
         M_snprintf(height, 8, "%d", (vid_aspect_ratio_correct == 1 ? ORIGHEIGHT_4_3 : ORIGHEIGHT) * vid_resolution);
         resolution = M_StringJoin("CURRENT RESOLUTION: ", width, "x", height, NULL);
 
-        M_WriteTextCentered(144, resolution, cr[CR_LIGHTGRAY_DARK1]);
+        M_WriteTextCentered(147, resolution, cr[CR_LIGHTGRAY_DARK1]);
     }
-}
-
-#ifdef CRISPY_TRUECOLOR
-static void M_ID_TrueColorHook (void)
-{
-    I_SetPalette (st_palette);
-    R_InitColormaps();
-    R_FillBackScreen();
-}
-#endif
-
-static void M_ID_TrueColor (int choice)
-{
-#ifndef CRISPY_TRUECOLOR
-    return;
-#else
-    vid_truecolor ^= 1;
-    post_rendering_hook = M_ID_TrueColorHook;
-#endif
 }
 
 static void M_ID_RenderingResHook (void)
@@ -1446,137 +1393,6 @@ static void M_ID_ScreenWipe (int choice)
     vid_screenwipe = M_INT_Slider(vid_screenwipe, 0, 2, choice, false);
 }
 
-static void M_ID_ShowENDOOM (int choice)
-{
-    vid_endoom ^= 1;
-}
-
-// -----------------------------------------------------------------------------
-// Display options
-// -----------------------------------------------------------------------------
-
-static menuitem_t ID_Menu_Display[]=
-{
-    { M_LFRT, "GAMMA-CORRECTION",        M_ID_Gamma,             'g' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
-    { M_LFRT, "FIELD OF VIEW",           M_ID_FOV,               'f' },
-    { M_LFRT, "MENU BACKGROUND SHADING", M_ID_MenuShading,       'm' },
-    { M_LFRT, "EXTRA LEVEL BRIGHTNESS",  M_ID_LevelBrightness,   'e' },
-    { M_SKIP, "", 0, '\0' },
-    { M_LFRT, "SATURATION",              M_ID_Saturation,        's' },
-    { M_LFRT, "RED INTENSITY",           M_ID_R_Intensity,       'r' },
-    { M_LFRT, "GREEN INTENSITY",         M_ID_G_Intensity,       'g' },
-    { M_LFRT, "BLUE INTENSITY",          M_ID_B_Intensity,       'b' },
-    { M_SKIP, "", 0, '\0' },
-    { M_LFRT, "MESSAGES ENABLED",        M_ChangeMessages,       'm' },
-    { M_LFRT, "MESSAGES ALIGNMENT",      M_ID_MessagesAlignment, 'm' },
-    { M_LFRT, "TEXT CASTS SHADOWS",      M_ID_TextShadows,       't' },
-    { M_LFRT, "LOCAL TIME",              M_ID_LocalTime,         'l' },
-};
-
-static menu_t ID_Def_Display =
-{
-    m_id_end,
-    &ID_Def_Main,
-    ID_Menu_Display,
-    M_Draw_ID_Display,
-    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET - 9, // [JN] This menu is one line higher.
-    0,
-    true, false, false,
-};
-
-static void M_Choose_ID_Display (int choice)
-{
-    M_SetupNextMenu (&ID_Def_Display);
-}
-
-static void M_Draw_ID_Display (void)
-{
-    char str[32];
-
-    M_WriteTextCentered(9, "DISPLAY OPTIONS", cr[CR_YELLOW]);
-
-    // Gamma-correction slider and num
-    M_DrawThermo(46, 27, 15, vid_gamma, 0);
-    M_WriteText (184, 30, gammalvls[vid_gamma][1],
-                          M_Item_Glow(0, GLOW_UNCOLORED));
-
-    // Field of View
-    sprintf(str, "%d", vid_fov);
-    M_WriteText (M_ItemRightAlign(str), 45, str,
-                 M_Item_Glow(3, vid_fov == 135 || vid_fov == 45 ? GLOW_YELLOW :
-                                vid_fov == 90 ? GLOW_DARKRED : GLOW_GREEN));
-
-    // Background shading
-    sprintf(str, dp_menu_shading ? "%d" : "OFF", dp_menu_shading);
-    M_WriteText (M_ItemRightAlign(str), 54, str,
-                 M_Item_Glow(4, dp_menu_shading == 12 ? GLOW_YELLOW :
-                                dp_menu_shading  >  0 ? GLOW_GREEN  : GLOW_DARKRED));
-
-    // Extra level brightness
-    sprintf(str, dp_level_brightness ? "%d" : "OFF", dp_level_brightness);
-    M_WriteText (M_ItemRightAlign(str), 63, str,
-                 M_Item_Glow(5, dp_level_brightness == 8 ? GLOW_YELLOW :
-                                dp_level_brightness >  0 ? GLOW_GREEN  : GLOW_DARKRED));
-
-    M_WriteTextCentered(72, "COLOR SETTINGS", cr[CR_YELLOW]);
-
-    // Saturation
-    M_snprintf(str, 6, "%d%%", vid_saturation);
-    M_WriteText (M_ItemRightAlign(str), 81, str,
-                 M_Item_Glow(7, GLOW_LIGHTGRAY));
-
-    // RED intensity
-    M_snprintf(str, 6, "%3f", vid_r_intensity);
-    M_WriteText (M_ItemRightAlign(str), 90, str,
-                 M_Item_Glow(8, GLOW_RED));
-
-    // GREEN intensity
-    M_snprintf(str, 6, "%3f", vid_g_intensity);
-    M_WriteText (M_ItemRightAlign(str), 99, str,
-                 M_Item_Glow(9, GLOW_GREEN));
-
-    // BLUE intensity
-    M_snprintf(str, 6, "%3f", vid_b_intensity);
-    M_WriteText (M_ItemRightAlign(str), 108, str,
-                 M_Item_Glow(10, GLOW_BLUE));
-
-    M_WriteTextCentered(117, "MESSAGES SETTINGS", cr[CR_YELLOW]);
-
-    // Messages enabled
-    sprintf(str, msg_show ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 126, str,
-                 M_Item_Glow(12, msg_show ? GLOW_DARKRED : GLOW_GREEN));
-
-    // Messages alignment
-    sprintf(str, msg_alignment == 1 ? "STATUS BAR" :
-                 msg_alignment == 2 ? "CENTERED" : "LEFT");
-    M_WriteText (M_ItemRightAlign(str), 135, str,
-                 M_Item_Glow(13, msg_alignment ? GLOW_GREEN : GLOW_DARKRED));
-
-    // Text casts shadows
-    sprintf(str, msg_text_shadows ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 144, str, 
-                 M_Item_Glow(14, msg_text_shadows ? GLOW_GREEN : GLOW_DARKRED));
-
-    // Local time
-    sprintf(str, msg_local_time == 1 ? "12-HOUR FORMAT" :
-                 msg_local_time == 2 ? "24-HOUR FORMAT" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 153, str, 
-                 M_Item_Glow(15, msg_local_time ? GLOW_GREEN : GLOW_DARKRED));
-}
-
-static void M_ID_MenuShading (int choice)
-{
-    dp_menu_shading = M_INT_Slider(dp_menu_shading, 0, 12, choice, true);
-}
-
-static void M_ID_LevelBrightness (int choice)
-{
-    dp_level_brightness = M_INT_Slider(dp_level_brightness, 0, 8, choice, true);
-}
-
 static void M_ID_Gamma (int choice)
 {
     shade_wait = I_GetTime() + TICRATE;
@@ -1598,11 +1414,6 @@ static void M_ID_FOV (int choice)
     R_ExecuteSetViewSize();
 }
 
-static void M_ID_MessagesAlignment (int choice)
-{
-    msg_alignment = M_INT_Slider(msg_alignment, 0, 2, choice, false);
-}
-
 static void M_ID_TextShadows (int choice)
 {
     msg_text_shadows ^= 1;
@@ -1611,50 +1422,6 @@ static void M_ID_TextShadows (int choice)
 static void M_ID_LocalTime (int choice)
 {
     msg_local_time = M_INT_Slider(msg_local_time, 0, 2, choice, false);
-}
-
-static void M_ID_Saturation (int choice)
-{
-    shade_wait = I_GetTime() + TICRATE;
-    vid_saturation = M_INT_Slider(vid_saturation, 0, 100, choice, true);
-
-    R_InitColormaps();
-    R_FillBackScreen();
-    AM_Init();
-    st_fullupdate = true;
-}
-
-static void M_ID_R_Intensity (int choice)
-{
-    shade_wait = I_GetTime() + TICRATE;
-    vid_r_intensity = M_FLOAT_Slider(vid_r_intensity, 0, 1.000000f, 0.025000f, choice, true);
-
-    R_InitColormaps();
-    R_FillBackScreen();
-    AM_Init();
-    st_fullupdate = true;
-}
-
-static void M_ID_G_Intensity (int choice)
-{
-    shade_wait = I_GetTime() + TICRATE;
-    vid_g_intensity = M_FLOAT_Slider(vid_g_intensity, 0, 1.000000f, 0.025000f, choice, true);
-
-    R_InitColormaps();
-    R_FillBackScreen();
-    AM_Init();
-    st_fullupdate = true;
-}
-
-static void M_ID_B_Intensity (int choice)
-{
-    shade_wait = I_GetTime() + TICRATE;
-    vid_b_intensity = M_FLOAT_Slider(vid_b_intensity, 0, 1.000000f, 0.025000f, choice, true);
-
-    R_InitColormaps();
-    R_FillBackScreen();
-    AM_Init();
-    st_fullupdate = true;
 }
 
 // -----------------------------------------------------------------------------
@@ -3625,437 +3392,6 @@ static void M_ID_BlockmapFix (int choice)
 static void M_ID_VerticalAiming (int choice)
 {
     compat_vertical_aiming = M_INT_Slider(compat_vertical_aiming, 0, 2, choice, false);
-}
-
-// -----------------------------------------------------------------------------
-// Level select 1
-// -----------------------------------------------------------------------------
-
-static menuitem_t ID_Menu_Level_1[]=
-{
-    { M_LFRT, "SKILL LEVEL",        M_ID_LevelSkill,     's' },
-    { M_LFRT, "EPISODE",            M_ID_LevelEpisode,   'e' },
-    { M_LFRT, "MAP",                M_ID_LevelMap,       'm' },
-    { M_SKIP, "", 0, '\0' },  // PLAYER
-    { M_LFRT, "HEALTH",             M_ID_LevelHealth,    'h' },
-    { M_LFRT, "ARMOR",              M_ID_LevelArmor,     'a' },
-    { M_LFRT, "ARMOR TYPE",         M_ID_LevelArmorType, 'a' },
-    { M_SKIP, "", 0, '\0' },  // WEAPONS
-    { M_LFRT, "CHAINSAW",           M_ID_LevelChainsaw,  'c' },
-    { M_LFRT, "SHOTGUN",            M_ID_LevelShotgun,   's' },
-    { M_LFRT, "SUPER SHOTGUN",      M_ID_LevelSSG,       's' },
-    { M_LFRT, "CHAINGUN",           M_ID_LevelChaingun,  'c' },
-    { M_LFRT, "ROCKET LAUNCHER",    M_ID_LevelRLauncher, 'r' },
-    { M_LFRT, "PLASMA RIFLE",       M_ID_LevelPlasmagun, 'p' },
-    { M_LFRT, "BFG 9000",           M_ID_LevelBFG9000,   'b' },
-    { M_SKIP, "", 0, '\0' },  // WEAPONS
-    { M_SWTC, "", /* NEXT PAGE > */ M_Choose_ID_Level_2, 'n' },
-    { M_SWTC, "", /* START GAME  */ G_DoSelectiveGame,   's' }
-};
-
-
-static menu_t ID_Def_Level_1 =
-{
-    m_id_end + 2,
-    &ID_Def_Main,
-    ID_Menu_Level_1,
-    M_Draw_ID_Level_1,
-    ID_MENU_LEFTOFFSET_LEVEL, 25,
-    0,
-    true, false, true,
-};
-
-static void M_Choose_ID_Level_1 (int choice)
-{
-    M_SetupNextMenu(&ID_Def_Level_1);
-}
-
-static void M_Draw_ID_Level_1 (void)
-{
-    char str[32];
-
-    st_fullupdate = true;
-
-    M_FillBackground();
-    
-    M_WriteTextCentered(16, "LEVEL SELECT", cr[CR_YELLOW]);
-
-    // Skill level
-    sprintf(str, "%s", DefSkillName[level_select[0]]);
-    M_WriteText (M_ItemRightAlign(str), 25, str,
-                 M_Item_Glow(0, DefSkillColor(level_select[0])));
-
-    // Episode
-    sprintf(str, gamemode == shareware ? "1" :
-                 gamemode == commercial ? "N/A" : "%d",
-                 level_select[1]);
-    M_WriteText (M_ItemRightAlign(str), 34, str,
-                 M_Item_Glow(1, gamemode == shareware || gamemode == commercial ?
-                             GLOW_DARKRED : GLOW_RED));
-
-    // Map
-    sprintf(str, "%d", level_select[2]);
-    M_WriteText (M_ItemRightAlign(str), 43, str,
-                 M_Item_Glow(2, GLOW_RED));
-
-    M_WriteTextCentered(52, "PLAYER", cr[CR_YELLOW]);
-
-    // Health
-    sprintf(str, "%d", level_select[3]);
-    M_WriteText (M_ItemRightAlign(str), 61, str,
-                 M_Item_Glow(4, level_select[3] >  100 ? GLOW_BLUE   :
-                                level_select[3] >=  67 ? GLOW_GREEN  : 
-                                level_select[3] >=  34 ? GLOW_YELLOW : 
-                                                         GLOW_RED));
-
-    // Armor
-    sprintf(str, "%d", level_select[4]);
-    M_WriteText (M_ItemRightAlign(str), 70, str,
-                 M_Item_Glow(5, level_select[4] == 0 ? GLOW_RED :
-                                level_select[5] == 1 ? GLOW_GREEN : GLOW_BLUE));
-
-    // Armor type
-    sprintf(str, "%d", level_select[5]);
-    M_WriteText (M_ItemRightAlign(str), 79, str,
-                 M_Item_Glow(6, level_select[5] == 1 ? GLOW_GREEN : GLOW_BLUE));
-
-    M_WriteTextCentered(88, "WEAPONS", cr[CR_YELLOW]);
-
-    // Chainsaw
-    sprintf(str, level_select[6] ? "YES" : "NO");
-    M_WriteText (M_ItemRightAlign(str), 97, str,
-                 M_Item_Glow(8, level_select[6] ? GLOW_GREEN : GLOW_RED));
-
-    // Shotgun
-    sprintf(str, level_select[7] ? "YES" : "NO");
-    M_WriteText (M_ItemRightAlign(str), 106, str,
-                 M_Item_Glow(9, level_select[7] ? GLOW_GREEN : GLOW_RED));
-
-    // Super Shotgun
-    sprintf(str, gamemode != commercial ? "N/A" : 
-                 level_select[8] ? "YES" : "NO");
-    M_WriteText (M_ItemRightAlign(str), 115, str,
-                 M_Item_Glow(10, gamemode != commercial ? GLOW_DARKRED :
-                                 level_select[8] ? GLOW_GREEN : GLOW_RED));
-
-    // Chaingun
-    sprintf(str, level_select[9] ? "YES" : "NO");
-    M_WriteText (M_ItemRightAlign(str), 124, str,
-                 M_Item_Glow(11, level_select[9] ? GLOW_GREEN : GLOW_RED));
-
-    // Rocket Launcher
-    sprintf(str, level_select[10] ? "YES" : "NO");
-    M_WriteText (M_ItemRightAlign(str), 133, str,
-                 M_Item_Glow(12, level_select[10] ? GLOW_GREEN : GLOW_RED));
-
-    // Plasma Rifle
-    sprintf(str, gamemode == shareware ? "N/A" :
-                 level_select[11] ? "YES" : "NO");
-    M_WriteText (M_ItemRightAlign(str), 142, str,
-                 M_Item_Glow(13, gamemode == shareware ? GLOW_DARKRED :
-                                 level_select[11] ? GLOW_GREEN : GLOW_RED));
-
-    // BFG 9000
-    sprintf(str, gamemode == shareware ? "N/A" :
-                 level_select[12] ? "YES" : "NO");
-    M_WriteText (M_ItemRightAlign(str), 151, str,
-                 M_Item_Glow(14, gamemode == shareware ? GLOW_DARKRED :
-                                 level_select[12] ? GLOW_GREEN : GLOW_RED));
-
-    M_WriteText (ID_MENU_LEFTOFFSET_LEVEL, 169, "NEXT PAGE >",
-                 M_Item_Glow(16, GLOW_LIGHTGRAY));
-    M_WriteText (ID_MENU_LEFTOFFSET_LEVEL, 178, "START GAME",
-                 M_Item_Glow(17, GLOW_LIGHTGRAY));
-}
-
-static void M_ID_LevelSkill (int choice)
-{
-    level_select[0] = M_INT_Slider(level_select[0], 0, 4, choice, false);
-}
-
-static void M_ID_LevelEpisode (int choice)
-{
-    if (gamemode == shareware || gamemode == commercial)
-    {
-        return;
-    }
-
-    level_select[1] = M_INT_Slider(level_select[1], 1, 3, choice, false);
-}
-
-static void M_ID_LevelMap (int choice)
-{
-    level_select[2] = M_INT_Slider(level_select[2], 1,
-                                   gamemode == commercial ? 32 : 9, choice, false);
-}
-
-static void M_ID_LevelHealth (int choice)
-{
-    level_select[3] = M_INT_Slider(level_select[3], 1, 200, choice, false);
-}
-
-static void M_ID_LevelArmor (int choice)
-{
-    level_select[4] = M_INT_Slider(level_select[4], 0, 200, choice, false);
-}
-
-static void M_ID_LevelArmorType (int choice)
-{
-    level_select[5] = M_INT_Slider(level_select[5], 1, 2, choice, false);
-}
-
-static void M_ID_LevelChainsaw (int choice)
-{
-    level_select[6] ^= 1;
-}
-
-static void M_ID_LevelShotgun (int choice)
-{
-    level_select[7] ^= 1;
-}
-
-static void M_ID_LevelSSG (int choice)
-{
-    if (gamemode != commercial)
-    {
-        return;
-    }
-    level_select[8] ^= 1;
-}
-
-static void M_ID_LevelChaingun (int choice)
-{
-    level_select[9] ^= 1;
-}
-
-static void M_ID_LevelRLauncher (int choice)
-{
-    level_select[10] ^= 1;
-}
-
-static void M_ID_LevelPlasmagun (int choice)
-{
-    level_select[11] ^= 1;
-}
-
-static void M_ID_LevelBFG9000 (int choice)
-{
-    level_select[12] ^= 1;
-}
-
-// -----------------------------------------------------------------------------
-// Level select 2
-// -----------------------------------------------------------------------------
-
-static menuitem_t ID_Menu_Level_2[]=
-{
-    { M_LFRT, "BACKPACK",            M_ID_LevelBackpack,      'b' },
-    { M_LFRT, "BULLETS",             M_ID_LevelBullets,       'b' },
-    { M_LFRT, "SHELLS",              M_ID_LevelShells,        's' },
-    { M_LFRT, "ROCKETS",             M_ID_LevelRockets,       'r' },
-    { M_LFRT, "CELLS",               M_ID_LevelCells,         'c' },
-    { M_SKIP, "", 0, '\0' },  // KEYS
-    { M_LFRT, "BLUE KEYCARD",        M_ID_LevelBlueKeycard,   'b' },
-    { M_LFRT, "YELLOW KEYCARD",      M_ID_LevelYellowKeycard, 'y' },
-    { M_LFRT, "RED KEYCARD",         M_ID_LevelRedKeycard,    'r' },
-    { M_LFRT, "BLUE SKULL KEY",      M_ID_LevelBlueSkull,     'b' },
-    { M_LFRT, "YELLOW SKULL KEY",    M_ID_LevelYellowSkull,   'y' },
-    { M_LFRT, "RED SKULL KEY",       M_ID_LevelRedSkull,      'r' },
-    { M_SKIP, "", 0, '\0' },  // EXTRA
-    { M_LFRT, "FAST MONSTERS",       M_ID_LevelFastMonsters,  'f' },
-    { M_LFRT, "RESPAWNING MONSTERS", M_ID_LevelRespMonsters,  'r' },
-    { M_SKIP, "", 0, '\0' },  // WEAPONS
-    { M_SWTC, "", /* < PREV PAGE */  M_Choose_ID_Level_1,     'p' },
-    { M_SWTC, "", /* START GAME  */  G_DoSelectiveGame,       's' }
-};
-
-
-static menu_t ID_Def_Level_2 =
-{
-    m_id_end + 2,
-    &ID_Def_Main,
-    ID_Menu_Level_2,
-    M_Draw_ID_Level_2,
-    ID_MENU_LEFTOFFSET_LEVEL, 25,
-    0,
-    true, false, true,
-};
-
-static void M_Choose_ID_Level_2 (int choice)
-{
-    M_SetupNextMenu(&ID_Def_Level_2);
-}
-
-static void M_Draw_ID_Level_2 (void)
-{
-    char str[32];
-
-    st_fullupdate = true;
-
-    M_FillBackground();
-    
-    M_WriteTextCentered(16, "AMMO", cr[CR_YELLOW]);
-
-    // Backpack
-    sprintf(str, level_select[13] ? "YES" : "NO");
-    M_WriteText (M_ItemRightAlign(str), 25, str,
-                 M_Item_Glow(0, level_select[13] ? GLOW_GREEN : GLOW_RED));
-
-    // Bullets
-    sprintf(str, "%d", level_select[14]);
-    M_WriteText (M_ItemRightAlign(str), 34, str,
-                 M_Item_Glow(1, level_select[14]  < 200 / 4 ? GLOW_RED    :
-                                level_select[14]  < 200 / 2 ? GLOW_YELLOW :
-                                level_select[14] <= 200     ? GLOW_GREEN  : GLOW_BLUE));
-
-    // Shells
-    sprintf(str, "%d", level_select[15]);
-    M_WriteText (M_ItemRightAlign(str), 43, str,
-                 M_Item_Glow(2, level_select[15]  < 50 / 4 ? GLOW_RED    :
-                                level_select[15]  < 50 / 2 ? GLOW_YELLOW :
-                                level_select[15] <= 50     ? GLOW_GREEN  : GLOW_BLUE));
-
-    // Rockets
-    sprintf(str, "%d", level_select[16]);
-    M_WriteText (M_ItemRightAlign(str), 52, str,
-                 M_Item_Glow(3, level_select[16]  < 50 / 4 ? GLOW_RED    :
-                                level_select[16]  < 50 / 2 ? GLOW_YELLOW :
-                                level_select[16] <= 50     ? GLOW_GREEN  : GLOW_BLUE));
-
-    // Cells
-    sprintf(str, "%d", level_select[17]);
-    M_WriteText (M_ItemRightAlign(str), 61, str,
-                 M_Item_Glow(4, level_select[17]  < 300 / 4 ? GLOW_RED    :
-                                level_select[17]  < 300 / 2 ? GLOW_YELLOW :
-                                level_select[17] <= 300     ? GLOW_GREEN  : GLOW_BLUE));
-
-    M_WriteTextCentered(70, "KEYS", cr[CR_YELLOW]);
-
-    // Blue keycard
-    sprintf(str, level_select[18] ? "YES" : "NO");
-    M_WriteText (M_ItemRightAlign(str), 79, str,
-                 M_Item_Glow(6, level_select[18] ? GLOW_GREEN : GLOW_RED));
-
-    // Yellow keycard
-    sprintf(str, level_select[19] ? "YES" : "NO");
-    M_WriteText (M_ItemRightAlign(str), 88, str,
-                 M_Item_Glow(7, level_select[19] ? GLOW_GREEN : GLOW_RED));
-
-    // Red keycard
-    sprintf(str, level_select[20] ? "YES" : "NO");
-    M_WriteText (M_ItemRightAlign(str), 97, str,
-                 M_Item_Glow(8, level_select[20] ? GLOW_GREEN : GLOW_RED));
-
-    // Blue skull key
-    sprintf(str, level_select[21] ? "YES" : "NO");
-    M_WriteText (M_ItemRightAlign(str), 106, str,
-                 M_Item_Glow(9, level_select[21] ? GLOW_GREEN : GLOW_RED));
-
-    // Yellow skull key
-    sprintf(str, level_select[22] ? "YES" : "NO");
-    M_WriteText (M_ItemRightAlign(str), 115, str,
-                 M_Item_Glow(10, level_select[22] ? GLOW_GREEN : GLOW_RED));
-
-    // Red skull key
-    sprintf(str, level_select[23] ? "YES" : "NO");
-    M_WriteText (M_ItemRightAlign(str), 124, str,
-                 M_Item_Glow(11, level_select[23] ? GLOW_GREEN : GLOW_RED));
-
-    M_WriteTextCentered(133, "EXTRA", cr[CR_YELLOW]);
-
-    // Fast monsters
-    sprintf(str, level_select[24] ? "YES" : "NO");
-    M_WriteText (M_ItemRightAlign(str), 142, str,
-                 M_Item_Glow(13, level_select[24] ? GLOW_GREEN : GLOW_RED));
-
-    // Respawning monsters
-    sprintf(str, level_select[25] ? "YES" : "NO");
-    M_WriteText (M_ItemRightAlign(str), 151, str,
-                 M_Item_Glow(14, level_select[25] ? GLOW_GREEN : GLOW_RED));
-
-    M_WriteText (ID_MENU_LEFTOFFSET_LEVEL, 169, "< PREV PAGE",
-                 M_Item_Glow(16, GLOW_LIGHTGRAY));
-    M_WriteText (ID_MENU_LEFTOFFSET_LEVEL, 178, "START GAME",
-                 M_Item_Glow(17, GLOW_LIGHTGRAY));
-}
-
-static void M_ID_LevelBackpack (int choice)
-{
-    level_select[13] ^= 1;
-
-    // Possibly reduce ammo if no backpack is given.
-    if (level_select[13] == 0)
-    {
-        if (level_select[14] > 200) level_select[14] = 200;
-        if (level_select[15] > 50) level_select[15] = 50;
-        if (level_select[16] > 50) level_select[16] = 50;
-        if (level_select[17] > 300) level_select[17] = 300;
-    }
-
-}
-
-static void M_ID_LevelBullets (int choice)
-{
-    level_select[14] = M_INT_Slider(level_select[14], 0,
-                                    level_select[13] ? 400 : 200, choice, false);
-}
-
-static void M_ID_LevelShells (int choice)
-{
-    level_select[15] = M_INT_Slider(level_select[15], 0,
-                                    level_select[13] ? 100 : 50, choice, false);
-}
-
-static void M_ID_LevelRockets (int choice)
-{
-    level_select[16] = M_INT_Slider(level_select[16], 0,
-                                    level_select[13] ? 100 : 50, choice, false);
-}
-
-static void M_ID_LevelCells (int choice)
-{
-    level_select[17] = M_INT_Slider(level_select[17], 0,
-                                    level_select[13] ? 600 : 300, choice, false);
-}
-
-static void M_ID_LevelBlueKeycard (int choice)
-{
-    level_select[18] ^= 1;
-}
-
-static void M_ID_LevelYellowKeycard (int choice)
-{
-    level_select[19] ^= 1;
-}
-
-static void M_ID_LevelRedKeycard (int choice)
-{
-    level_select[20] ^= 1;
-}
-
-static void M_ID_LevelBlueSkull (int choice)
-{
-    level_select[21] ^= 1;
-}
-
-static void M_ID_LevelYellowSkull (int choice)
-{
-    level_select[22] ^= 1;
-}
-
-static void M_ID_LevelRedSkull (int choice)
-{
-    level_select[23] ^= 1;
-}
-
-static void M_ID_LevelFastMonsters (int choice)
-{
-    level_select[24] ^= 1;
-}
-
-static void M_ID_LevelRespMonsters (int choice)
-{
-    level_select[25] ^= 1;
 }
 
 // -----------------------------------------------------------------------------
