@@ -32,7 +32,6 @@
 #include "mus2mid.h"
 
 #include "deh_str.h"
-#include "gusconf.h"
 #include "i_sound.h"
 #include "i_system.h"
 #include "i_swap.h"
@@ -93,14 +92,7 @@ void I_InitTimidityConfig(void)
 
     temp_timidity_cfg = M_TempFile("timidity.cfg");
 
-    if (snd_musicdevice == SNDDEVICE_GUS)
-    {
-        success = GUS_WriteConfig(temp_timidity_cfg);
-    }
-    else
-    {
-        success = WriteWrapperTimidityConfig(temp_timidity_cfg);
-    }
+    success = WriteWrapperTimidityConfig(temp_timidity_cfg);
 
     // Set the TIMIDITY_CFG environment variable to point to the temporary
     // config file.

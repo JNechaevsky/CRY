@@ -23,7 +23,6 @@ set(GAME_SOURCE_FILES
     d_mode.c            d_mode.h
                         d_ticcmd.h
     deh_str.c           deh_str.h
-    gusconf.c           gusconf.h
     i_flmusic.c
     i_glob.c            i_glob.h
     i_input.c           i_input.h

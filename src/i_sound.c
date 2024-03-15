@@ -24,7 +24,6 @@
 #include "config.h"
 #include "doomtype.h"
 
-#include "gusconf.h"
 #include "i_sound.h"
 #include "i_video.h"
 #include "m_argv.h"
@@ -499,8 +498,6 @@ void I_BindSoundVariables(void)
     M_BindIntVariable("snd_pitchshift",          &snd_pitchshift);
 
     M_BindStringVariable("timidity_cfg_path",    &timidity_cfg_path);
-    M_BindStringVariable("gus_patch_path",       &gus_patch_path);
-    M_BindIntVariable("gus_ram_kb",              &gus_ram_kb);
 #ifdef _WIN32
     M_BindStringVariable("winmm_midi_device",    &winmm_midi_device);
     M_BindIntVariable("winmm_complevel",         &winmm_complevel);

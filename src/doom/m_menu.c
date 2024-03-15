@@ -26,7 +26,6 @@
 #include "doomkeys.h"
 #include "dstrings.h"
 #include "d_main.h"
-#include "gusconf.h"
 #include "i_input.h"
 #include "i_swap.h"
 #include "i_system.h"
@@ -525,7 +524,6 @@ static void M_ID_Controls_Acceleration (int choice);
 static void M_ID_Controls_Threshold (int choice);
 static void M_ID_Controls_MLook (int choice);
 static void M_ID_Controls_NoVert (int choice);
-static void M_ID_Controls_DblClck (int choice);
 static void M_ID_Controls_InvertY (int choice);
 
 static void M_Draw_ID_Keybinds_1 (void);
@@ -1454,7 +1452,7 @@ static menu_t ID_Def_Sound =
     &ID_Def_Main,
     ID_Menu_Sound,
     M_Draw_ID_Sound,
-    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET,
+    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET_SML,
     0,
     true, false, false,
 };
@@ -1468,58 +1466,56 @@ static void M_Draw_ID_Sound (void)
 {
     char str[16];
 
-    M_WriteTextCentered(18, "VOLUME", cr[CR_YELLOW]);
+    M_WriteTextCentered(9, "VOLUME", cr[CR_YELLOW]);
 
-    M_DrawThermo(46, 36, 16, sfxVolume, 0);
+    M_DrawThermo(46, 27, 16, sfxVolume, 0);
     sprintf(str,"%d", sfxVolume);
-    M_WriteText (192, 39, str, M_Item_Glow(0, GLOW_UNCOLORED));
+    M_WriteText (192, 30, str, M_Item_Glow(0, GLOW_UNCOLORED));
 
-    M_DrawThermo(46, 63, 16, musicVolume, 3);
+    M_DrawThermo(46, 54, 16, musicVolume, 3);
     sprintf(str,"%d", musicVolume);
-    M_WriteText (192, 66, str, M_Item_Glow(3, GLOW_UNCOLORED));
+    M_WriteText (192, 57, str, M_Item_Glow(3, GLOW_UNCOLORED));
 
-    M_WriteTextCentered(81, "SOUND SYSTEM", cr[CR_YELLOW]);
+    M_WriteTextCentered(72, "SOUND SYSTEM", cr[CR_YELLOW]);
 
     // SFX playback
     sprintf(str, snd_sfxdevice == 0 ? "DISABLED"    :
-                 snd_sfxdevice == 1 ? "PC SPEAKER"  :
                  snd_sfxdevice == 3 ? "DIGITAL SFX" :
                                       "UNKNOWN");
-    M_WriteText (M_ItemRightAlign(str), 90, str,
+    M_WriteText (M_ItemRightAlign(str), 81, str,
                  M_Item_Glow(7, snd_sfxdevice ? GLOW_GREEN : GLOW_RED));
 
     // Music playback
     sprintf(str, snd_musicdevice == 0 ? "DISABLED" :
                 (snd_musicdevice == 3 && !strcmp(snd_dmxoption, "")) ? "OPL2 SYNTH" : 
                 (snd_musicdevice == 3 && !strcmp(snd_dmxoption, "-opl3")) ? "OPL3 SYNTH" : 
-                 snd_musicdevice == 5 ? "GUS (EMULATED)" :
                  snd_musicdevice == 8 ? "NATIVE MIDI" :
-                 snd_musicdevice == 11 ? "FLUIDSYNTH" :
                                         "UNKNOWN");
-    M_WriteText (M_ItemRightAlign(str), 99, str,
+    M_WriteText (M_ItemRightAlign(str), 90, str,
                  M_Item_Glow(8, snd_musicdevice ? GLOW_GREEN : GLOW_RED));
 
     // Sound effects mode
     sprintf(str, snd_monosfx ? "MONO" : "STEREO");
-    M_WriteText (M_ItemRightAlign(str), 108, str,
+    M_WriteText (M_ItemRightAlign(str), 99, str,
                  M_Item_Glow(9, snd_monosfx ? GLOW_RED : GLOW_GREEN));
 
     // Pitch-shifted sounds
     sprintf(str, snd_pitchshift ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 117, str,
+    M_WriteText (M_ItemRightAlign(str), 108, str,
                  M_Item_Glow(10, snd_pitchshift ? GLOW_GREEN : GLOW_RED));
 
     // Number of SFX to mix
     sprintf(str, "%i", snd_channels);
-    M_WriteText (M_ItemRightAlign(str), 126, str,
+    M_WriteText (M_ItemRightAlign(str), 117, str,
                  M_Item_Glow(11, snd_channels == 8 ? GLOW_DARKRED :
                                  snd_channels == 1 || snd_channels == 16 ? GLOW_YELLOW : GLOW_GREEN));
 
     // Pitch-shifted sounds
     sprintf(str, snd_mute_inactive ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 135, str,
+    M_WriteText (M_ItemRightAlign(str), 125, str,
                  M_Item_Glow(12, snd_mute_inactive ? GLOW_GREEN : GLOW_RED));
 
+/*
     // Inform if FSYNTH/GUS paths anen't set.
     if (itemOn == 8)
     {
@@ -1534,26 +1530,13 @@ static void M_Draw_ID_Sound (void)
         }
 #endif // HAVE_FLUIDSYNTH
     }
+*/
 }
 
 static void M_ID_SFXSystem (int choice)
 {
-    switch (choice)
-    {
-        case 0:
-            snd_sfxdevice =
-                snd_sfxdevice == 0 ? 1 :
-                snd_sfxdevice == 1 ? 3 :
-                                     0 ;
-            break;
-        case 1:
-            snd_sfxdevice =
-                snd_sfxdevice == 0 ? 3 :
-                snd_sfxdevice == 3 ? 1 :
-                                     0 ;
-        default:
-            break;
-    }
+    // Select between "disabled" and "digital sfx"
+    snd_sfxdevice = snd_sfxdevice == 0 ? 3 : 0;
 
     // Shut down current music
     S_StopMusic();
@@ -1586,16 +1569,6 @@ static void M_ID_MusicSystem (int choice)
     {
         case 0:
             if (snd_musicdevice == 0)
-            {
-                snd_musicdevice = 5;    // Set to SDL Mixer
-            }
-            else if (snd_musicdevice == 5)
-#ifdef HAVE_FLUIDSYNTH
-            {
-                snd_musicdevice = 11;    // Set to FluidSynth
-            }
-            else if (snd_musicdevice == 11)
-#endif // HAVE_FLUIDSYNTH
             {
                 snd_musicdevice = 8;    // Set to Native MIDI
             }
@@ -1630,24 +1603,11 @@ static void M_ID_MusicSystem (int choice)
                 snd_musicdevice  = 8;   // Set to Native MIDI
             }
             else if (snd_musicdevice == 8)
-#ifdef HAVE_FLUIDSYNTH
-            {
-                snd_musicdevice  = 11;   // Set to FluidSynth
-            }
-            else if (snd_musicdevice == 11)
-#endif // HAVE_FLUIDSYNTH
-            {
-                snd_musicdevice  = 5;   // Set to SDL Mixer
-            }
-            else if (snd_musicdevice == 5)
             {
                 snd_musicdevice  = 0;   // Disable
             }
-            break;
         default:
-            {
-                break;
-            }
+            break;
     }
 
     // Shut down current music
@@ -1710,7 +1670,6 @@ static menuitem_t ID_Menu_Controls[]=
     { M_LFRT, "MOUSE LOOK",                   M_ID_Controls_MLook,        'm' },
     { M_LFRT, "VERTICAL MOUSE MOVEMENT",      M_ID_Controls_NoVert,       'v' },
     { M_LFRT, "INVERT VERTICAL AXIS",         M_ID_Controls_InvertY,      'v' },
-    { M_LFRT, "DOUBLE CLICK ACTS AS \"USE\"", M_ID_Controls_DblClck,      'd' },
     { M_SKIP, "", 0, '\0' },
 };
 
@@ -1765,12 +1724,6 @@ static void M_Draw_ID_Controls (void)
     sprintf(str, mouse_y_invert ? "ON" : "OFF");
     M_WriteText (M_ItemRightAlign(str), 144, str,
                  M_Item_Glow(14, mouse_y_invert ? GLOW_GREEN : GLOW_RED));
-
-    // Double click acts as "use"
-    sprintf(str, mouse_dclick_use ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 153, str,
-                 M_Item_Glow(15, mouse_dclick_use ? GLOW_GREEN : GLOW_RED));
-
 }
 
 static void M_ID_Controls_Sensivity (int choice)
@@ -1802,11 +1755,6 @@ static void M_ID_Controls_MLook (int choice)
 static void M_ID_Controls_NoVert (int choice)
 {
     mouse_novert ^= 1;
-}
-
-static void M_ID_Controls_DblClck (int choice)
-{
-    mouse_dclick_use ^= 1;
 }
 
 static void M_ID_Controls_InvertY (int choice)
