@@ -636,8 +636,6 @@ static void M_Choose_ID_Gameplay_1 (int choice);
 static void M_Draw_ID_Gameplay_1 (void);
 static void M_ID_Brightmaps (int choice);
 static void M_ID_Translucency (int choice);
-static void M_ID_FakeContrast (int choice);
-static void M_ID_SmoothLighting (int choice);
 static void M_ID_ImprovedFuzz (int choice);
 static void M_ID_ColoredBlood (int choice);
 static void M_ID_SwirlingLiquids (int choice);
@@ -1076,27 +1074,18 @@ static char *const DefSkillName[5] =
 
 static menuitem_t ID_Menu_Main[]=
 {
-    { M_SWTC, "Video",    M_Choose_ID_Video,    'v' },
-    { M_SWTC, "Audio",    M_Choose_ID_Sound,    'a' },
-    { M_SWTC, "Controls", M_Choose_ID_Controls, 'c' },
-    { M_SWTC, "Widgets",  M_Choose_ID_Widgets,  'w' },
-    { M_SWTC, "Gameplay", M_Choose_ID_Gameplay, 'g' },
-    { M_SWTC, "End Game", M_EndGame,            'e' },
-    { M_SWTC, "Reset",    M_Choose_ID_Reset,    'r' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
+    { M_SWTC, "Video",       M_Choose_ID_Video,    'v' },
+    { M_SWTC, "Audio",       M_Choose_ID_Sound,    'a' },
+    { M_SWTC, "Controls",    M_Choose_ID_Controls, 'c' },
+    { M_SWTC, "Widgets",     M_Choose_ID_Widgets,  'w' },
+    { M_SWTC, "Gameplay",    M_Choose_ID_Gameplay, 'g' },
+    { M_SWTC, "End Game",    M_EndGame,            'e' },
+    { M_SWTC, "Reset",       M_Choose_ID_Reset,    'r' },
 };
 
 static menu_t ID_Def_Main =
 {
-    m_id_end,
+    7,
     &MainDef,
     ID_Menu_Main,
     M_Draw_ID_Main,
@@ -1135,13 +1124,11 @@ static menuitem_t ID_Menu_Video[]=
     { M_LFRT, "MESSAGES ENABLED",     M_ChangeMessages,  'm' },
     { M_LFRT, "TEXT CASTS SHADOWS",   M_ID_TextShadows,  't' },
     { M_LFRT, "LOCAL TIME",           M_ID_LocalTime,    'l' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
 };
 
 static menu_t ID_Def_Video =
 {
-    m_id_end,
+    14,
     &ID_Def_Main,
     ID_Menu_Video,
     M_Draw_ID_Video,
@@ -1441,14 +1428,11 @@ static menuitem_t ID_Menu_Sound[]=
     { M_LFRT, "PITCH-SHIFTED SOUNDS", M_ID_PitchShift,   'p' },
     { M_LFRT, "NUMBER OF SFX TO MIX", M_ID_SFXChannels,  'n' },
     { M_LFRT, "MUTE INACTIVE WINDOW", M_ID_MuteInactive, 'm' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
 };
 
 static menu_t ID_Def_Sound =
 {
-    m_id_end,
+    13,
     &ID_Def_Main,
     ID_Menu_Sound,
     M_Draw_ID_Sound,
@@ -1514,23 +1498,6 @@ static void M_Draw_ID_Sound (void)
     sprintf(str, snd_mute_inactive ? "ON" : "OFF");
     M_WriteText (M_ItemRightAlign(str), 125, str,
                  M_Item_Glow(12, snd_mute_inactive ? GLOW_GREEN : GLOW_RED));
-
-/*
-    // Inform if FSYNTH/GUS paths anen't set.
-    if (itemOn == 8)
-    {
-        if (snd_musicdevice == 5 && strcmp(gus_patch_path, "") == 0)
-        {
-            M_WriteTextCentered(147, "\"GUS_PATCH_PATH\" VARIABLE IS NOT SET", cr[CR_GRAY]);
-        }
-#ifdef HAVE_FLUIDSYNTH
-        if (snd_musicdevice == 11 && strcmp(fsynth_sf_path, "") == 0)
-        {
-            M_WriteTextCentered(147, "\"FSYNTH_SF_PATH\" VARIABLE IS NOT SET", cr[CR_GRAY]);
-        }
-#endif // HAVE_FLUIDSYNTH
-    }
-*/
 }
 
 static void M_ID_SFXSystem (int choice)
@@ -1670,12 +1637,11 @@ static menuitem_t ID_Menu_Controls[]=
     { M_LFRT, "MOUSE LOOK",                   M_ID_Controls_MLook,        'm' },
     { M_LFRT, "VERTICAL MOUSE MOVEMENT",      M_ID_Controls_NoVert,       'v' },
     { M_LFRT, "INVERT VERTICAL AXIS",         M_ID_Controls_InvertY,      'v' },
-    { M_SKIP, "", 0, '\0' },
 };
 
 static menu_t ID_Def_Controls =
 {
-    m_id_end,
+    15,
     &ID_Def_Main,
     ID_Menu_Controls,
     M_Draw_ID_Controls,
@@ -2595,7 +2561,7 @@ static menu_t ID_Def_Widgets =
     &ID_Def_Main,
     ID_Menu_Widgets,
     M_Draw_ID_Widgets,
-    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET,
+    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET_SML,
     0,
     true, false, false,
 };
@@ -2609,45 +2575,45 @@ static void M_Draw_ID_Widgets (void)
 {
     char str[32];
 
-    M_WriteTextCentered(18, "WIDGETS", cr[CR_YELLOW]);
+    M_WriteTextCentered(9, "WIDGETS", cr[CR_YELLOW]);
 
     // Widgets location
     sprintf(str, widget_location ? "TOP" : "BOTTOM");
-    M_WriteText (M_ItemRightAlign(str), 27, str,
+    M_WriteText (M_ItemRightAlign(str), 18, str,
                  M_Item_Glow(0, GLOW_GREEN));
 
     // K/I/S stats
     sprintf(str, widget_kis == 1 ? "ALWAYS"  :
                  widget_kis == 2 ? "AUTOMAP" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 36, str,
+    M_WriteText (M_ItemRightAlign(str), 27, str,
                  M_Item_Glow(1, widget_kis ? GLOW_GREEN : GLOW_DARKRED));
 
     // Level time
     sprintf(str, widget_time == 1 ? "ALWAYS"  :
                  widget_time == 2 ? "AUTOMAP" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 45, str,
+    M_WriteText (M_ItemRightAlign(str), 36, str,
                  M_Item_Glow(2, widget_time ? GLOW_GREEN : GLOW_DARKRED));
 
     // Total time
     sprintf(str, widget_totaltime == 1 ? "ALWAYS"  :
                  widget_totaltime == 2 ? "AUTOMAP" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 54, str,
+    M_WriteText (M_ItemRightAlign(str), 45, str,
                  M_Item_Glow(3, widget_totaltime ? GLOW_GREEN : GLOW_DARKRED));
 
     // Level name
     sprintf(str, widget_levelname ? "ALWAYS" : "AUTOMAP");
-    M_WriteText (M_ItemRightAlign(str), 63, str,
+    M_WriteText (M_ItemRightAlign(str), 54, str,
                  M_Item_Glow(4, widget_levelname ? GLOW_GREEN : GLOW_DARKRED));
 
     // Player coords
     sprintf(str, widget_coords == 1 ? "ALWAYS"  :
                  widget_coords == 2 ? "AUTOMAP" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 72, str,
+    M_WriteText (M_ItemRightAlign(str), 63, str,
                  M_Item_Glow(5, widget_coords ? GLOW_GREEN : GLOW_DARKRED));
 
     // Rendering counters
     sprintf(str, widget_render ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 81, str,
+    M_WriteText (M_ItemRightAlign(str), 72, str,
                  M_Item_Glow(6, widget_render ? GLOW_GREEN : GLOW_DARKRED));
 
     // Target's health
@@ -2655,42 +2621,42 @@ static void M_Draw_ID_Widgets (void)
                  widget_health == 2 ? "TOP+NAME" :
                  widget_health == 3 ? "BOTTOM" :
                  widget_health == 4 ? "BOTTOM+NAME" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 90, str,
+    M_WriteText (M_ItemRightAlign(str), 81, str,
                  M_Item_Glow(7, widget_health ? GLOW_GREEN : GLOW_DARKRED));
 
-    M_WriteTextCentered(99, "AUTOMAP", cr[CR_YELLOW]);
+    M_WriteTextCentered(90, "AUTOMAP", cr[CR_YELLOW]);
 
     // Color scheme
     sprintf(str, automap_scheme == 1 ? "BOOM" :
                  automap_scheme == 2 ? "UNITY" :
                  automap_scheme == 3 ? "JAGUAR" :
                                        "ORIGINAL");
-    M_WriteText (M_ItemRightAlign(str), 108, str,
+    M_WriteText (M_ItemRightAlign(str), 99, str,
                  M_Item_Glow(9, automap_scheme ? GLOW_GREEN : GLOW_DARKRED));
 
     // Smooth lines
     sprintf(str, automap_smooth ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 117, str,
+    M_WriteText (M_ItemRightAlign(str), 108, str,
                  M_Item_Glow(10, automap_smooth ? GLOW_GREEN : GLOW_DARKRED));
 
     // Mark secret sectors
     sprintf(str, automap_secrets ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 126, str,
+    M_WriteText (M_ItemRightAlign(str), 117, str,
                  M_Item_Glow(11, automap_secrets ? GLOW_GREEN : GLOW_DARKRED));
 
     // Rotate mode
     sprintf(str, automap_rotate ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 135, str,
+    M_WriteText (M_ItemRightAlign(str), 125, str,
                  M_Item_Glow(12, automap_rotate ? GLOW_GREEN : GLOW_DARKRED));
 
     // Overlay mode
     sprintf(str, automap_overlay ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 144, str,
+    M_WriteText (M_ItemRightAlign(str), 136, str,
                  M_Item_Glow(13, automap_overlay ? GLOW_GREEN : GLOW_DARKRED));
 
     // Overlay shading level
     sprintf(str,"%d", automap_shading);
-    M_WriteText (M_ItemRightAlign(str), 153, str,
+    M_WriteText (M_ItemRightAlign(str), 145, str,
                  M_Item_Glow(14, !automap_overlay ? GLOW_DARKRED :
                                   automap_shading ==  0 ? GLOW_RED :
                                   automap_shading == 12 ? GLOW_YELLOW : GLOW_GREEN));
@@ -2775,8 +2741,6 @@ static menuitem_t ID_Menu_Gameplay_1[]=
 {
     { M_LFRT, "BRIGHTMAPS",                  M_ID_Brightmaps,        'b' },
     { M_LFRT, "TRANSLUCENCY",                M_ID_Translucency,      't' },
-    { M_LFRT, "FAKE CONTRAST",               M_ID_FakeContrast,      'f' },
-    { M_LFRT, "DIMINISHED LIGHTING",         M_ID_SmoothLighting,    'd' },
     { M_LFRT, "FUZZ EFFECT",                 M_ID_ImprovedFuzz,      'f' },
     { M_LFRT, "COLORED BLOOD AND CORPSES",   M_ID_ColoredBlood,      'c' },
     { M_LFRT, "LIQUIDS ANIMATION",           M_ID_SwirlingLiquids,   'l' },
@@ -2904,27 +2868,6 @@ static void M_ID_Brightmaps (int choice)
 static void M_ID_Translucency (int choice)
 {
     vis_translucency = M_INT_Slider(vis_translucency, 0, 2, choice, false);
-}
-
-static void M_ID_FakeContrast (int choice)
-{
-    vis_fake_contrast ^= 1;
-}
-
-static void M_ID_SmoothLightingHook (void)
-{
-    // [crispy] re-calculate the zlight[][] array
-    R_InitLightTables();
-    // [crispy] re-calculate the scalelight[][] array
-    R_ExecuteSetViewSize();
-    // [crispy] re-calculate fake contrast
-    P_SegLengths(true);
-}
-
-static void M_ID_SmoothLighting (int choice)
-{
-    vis_smooth_light ^= 1;
-    post_rendering_hook = M_ID_SmoothLightingHook;
 }
 
 static void M_ID_ImprovedFuzz (int choice)
