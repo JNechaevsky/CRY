@@ -1232,8 +1232,8 @@ static void M_Draw_ID_Video (void)
     // Field of View
     sprintf(str, "%d", vid_fov);
     M_WriteText (M_ItemRightAlign(str), 108, str,
-                 M_Item_Glow(10, vid_fov == 135 || vid_fov == 108 ? GLOW_YELLOW :
-                                vid_fov == 90 ? GLOW_DARKRED : GLOW_GREEN));
+                 M_Item_Glow(10, vid_fov == 135 || vid_fov == 45 ? GLOW_YELLOW :
+                                 vid_fov == 90 ? GLOW_DARKRED : GLOW_GREEN));
 
     // Messages enabled
     sprintf(str, msg_show ? "ON" : "OFF");
