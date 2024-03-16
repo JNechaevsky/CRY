@@ -272,7 +272,29 @@ void P_XYMovement (mobj_t* mo)
 	    // blocked move
 	    if (mo->player)
 	    {	// try to slide along it
-		P_SlideMove (mo);
+            // [JN] Jaguar: emulate momentum dropping on collision with mobjs.
+            if (BlockingMobj == NULL)
+            {   
+                // [JN] Slide against wall.
+                P_SlideMove(mo);
+            }
+            else
+            {
+                // [JN] Slide against mobj.
+                // Remove X/Y momentum while moving on solid things.
+                if (P_TryMove(mo, mo->x, ptryy))
+                {
+                    mo->momx = 0;
+                }
+                else if (P_TryMove(mo, ptryx, mo->y))
+                {
+                    mo->momy = 0;
+                }
+                else
+                {
+                    mo->momx = mo->momy = 0;
+                }
+            }
 	    }
 	    else if (mo->flags & MF_MISSILE)
 	    {
@@ -605,6 +627,7 @@ void P_MobjThinker (mobj_t* mobj)
     }
 
     // momentum movement
+    BlockingMobj = NULL;
     if (mobj->momx
 	|| mobj->momy
 	|| (mobj->flags&MF_SKULLFLY) )
@@ -647,7 +670,7 @@ void P_MobjThinker (mobj_t* mobj)
     }
 
     if ( (mobj->z != mobj->floorz)
-	 || mobj->momz )
+	 || mobj->momz || BlockingMobj)
     {
 	P_ZMovement (mobj);
 	

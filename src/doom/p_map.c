@@ -1,5 +1,6 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
+// Copyright(C) 1993-2008 Raven Software
 // Copyright(C) 2005-2014 Simon Howard, Andrey Budko
 // Copyright(C) 2016-2024 Julia Nechaevskaya
 //
@@ -80,6 +81,10 @@ line_t**	spechit; // [crispy] remove SPECHIT limit
 int		numspechit;
 static int spechit_max; // [crispy] remove SPECHIT limit
 
+// [JN] Jaguar: emulate momentum dropping on collision with mobjs.
+// Adapted from Hexen, this is not exact Jaguar Doom code.
+
+mobj_t *BlockingMobj;
 
 
 //
@@ -331,6 +336,8 @@ boolean PIT_CheckThing (mobj_t* thing)
     if (thing == tmthing)
 	return true;
     
+    BlockingMobj = thing;
+    
     // check for skulls slamming into things
     if (tmthing->flags & MF_SKULLFLY)
     {
@@ -430,6 +437,8 @@ boolean PIT_CheckThing (mobj_t* thing)
 //   (monsters won't move to a dropoff)
 //  speciallines[]
 //  numspeciallines
+//  mobj_t *BlockingMobj = pointer to thing that blocked position (NULL if not
+//  blocked, or blocked by a line).
 //
 boolean
 P_CheckPosition
@@ -482,12 +491,14 @@ P_CheckPosition
     yl = (tmbbox[BOXBOTTOM] - bmaporgy - MAXRADIUS)>>MAPBLOCKSHIFT;
     yh = (tmbbox[BOXTOP] - bmaporgy + MAXRADIUS)>>MAPBLOCKSHIFT;
 
+    BlockingMobj = NULL;
     for (bx=xl ; bx<=xh ; bx++)
 	for (by=yl ; by<=yh ; by++)
 	    if (!P_BlockThingsIterator(bx,by,PIT_CheckThing))
 		return false;
     
     // check lines
+    BlockingMobj = NULL;
     xl = (tmbbox[BOXLEFT] - bmaporgx)>>MAPBLOCKSHIFT;
     xh = (tmbbox[BOXRIGHT] - bmaporgx)>>MAPBLOCKSHIFT;
     yl = (tmbbox[BOXBOTTOM] - bmaporgy)>>MAPBLOCKSHIFT;
