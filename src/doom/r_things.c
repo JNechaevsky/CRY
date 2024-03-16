@@ -768,10 +768,7 @@ static void R_ProjectSprite (mobj_t* thing)
         else
         if (thing->sprite == SPR_CAND   // Candestick
         ||  thing->sprite == SPR_CBRA   // Candelabra
-        ||  thing->sprite == SPR_COLU   // Floor Lamp
-        ||  thing->sprite == SPR_FCAN   // Flaming Barrel
-        ||  thing->sprite == SPR_TLMP   // Tall Tech Lamp
-        ||  thing->sprite == SPR_TLP2)  // Short Tech Lamp
+        ||  thing->sprite == SPR_COLU)  // Floor Lamp
         {
             const int demi_bright = MIN(index*2, MAXDIMINDEX);
 
@@ -784,25 +781,9 @@ static void R_ProjectSprite (mobj_t* thing)
                 vis->colormap[1] = &colormaps[thing->bmap_flick*256];
             }
             else
-            if (thing->sprite == SPR_FCAN)  // Flaming Barrel
-            {
-                vis->colormap[1] = &colormaps[thing->bmap_glow*256];
-            }
-            else
             {
                 vis->colormap[1] = colormaps;
             }
-        }
-        // Hemi-brigths:
-        else
-        if (thing->sprite == SPR_TBLU   // Tall Blue Torch
-        ||  thing->sprite == SPR_TGRN   // Tall Green Torch
-        ||  thing->sprite == SPR_TRED)  // Tall Red Torch
-        {
-            const int hemi_bright = MIN(index*4, MAXDIMINDEX);
-
-            vis->colormap[0] = spritelights[hemi_bright];
-            vis->colormap[1] = &colormaps[thing->bmap_flick/3*256];
         }
         // Just animated:
         else
@@ -814,8 +795,7 @@ static void R_ProjectSprite (mobj_t* thing)
                              = &colormaps[thing->bmap_flick/4*256];
         }
         else
-        if (thing->sprite == SPR_CEYE   // Evil Eye
-        ||  thing->sprite == SPR_FSKU)  // Floating Skull Rock
+        if (thing->sprite == SPR_FSKU)  // Floating Skull Rock
         {
             vis->colormap[0] = vis->colormap[1]
                              = &colormaps[thing->bmap_glow*256];

@@ -285,28 +285,30 @@ const byte *R_BrightmapForSprite (const int type)
                 return greenonly1;
                 break;
             }
+
             // Cell Charge
             case SPR_CELL:
             {
                 return greenonly2;
                 break;
             }
+
             // Barrel
             case SPR_BAR1:
             {
                 return greenonly3;
                 break;
             }
+
             // Cell Charge Pack
             case SPR_CELP:
             // Floor Lamp
             case SPR_COLU:
-            // Burning Barrel
-            case SPR_FCAN:
             {
                 return yellowonly;
                 break;
             }
+
             // BFG9000
             case SPR_BFUG:
             // Plasmagun
@@ -324,14 +326,7 @@ const byte *R_BrightmapForSprite (const int type)
                 return candle;
                 break;
             }
-            // Tall Blue Torch
-            case SPR_TBLU:
-            // Tall Green Torch
-            case SPR_TGRN:
-            // Tall Red Torch
-            case SPR_TRED:
-            // Short Blue Torch
-            case SPR_SMBT:
+
             // Short Green Torch
             case SPR_SMGT:
             // Short Red Torch
@@ -344,12 +339,7 @@ const byte *R_BrightmapForSprite (const int type)
                 return light_sources;
                 break;
             }
-            // Evil Eye
-            case SPR_CEYE:
-            {
-                return greenonly1;
-                break;
-            }
+
             // Floating Skull Rock
             case SPR_FSKU:
             // Pile of Skulls and Candles
@@ -364,17 +354,10 @@ const byte *R_BrightmapForSprite (const int type)
     {
         switch (type)
         {
-            case SPR_FCAN:
             case SPR_CAND:
-            case SPR_CEYE:
             case SPR_FSKU:
             case SPR_CBRA:
             case SPR_COLU:
-            case SPR_TLMP:
-            case SPR_TLP2:
-            case SPR_TBLU:
-            case SPR_TGRN:
-            case SPR_TRED:
             case SPR_SMBT:
             case SPR_SMGT:
             case SPR_SMRT:
