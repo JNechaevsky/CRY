@@ -59,6 +59,8 @@
 
 
 // Number of status faces.
+#define NUMFACES            49
+
 #define ST_NUMPAINFACES     5
 #define ST_NUMSTRAIGHTFACES 3
 #define ST_NUMTURNFACES     2
@@ -109,7 +111,7 @@ static patch_t *tallpercent;         // tall % sign
 static patch_t *tallminus;           // [JN] "minus" symbol
 static patch_t *shortnum_y[10];      // 0-9, short, yellow numbers
 static patch_t *keys[NUMCARDS];      // 3 key-cards, 3 skulls
-static patch_t *faces[ST_NUMFACES];  // face status patches
+static patch_t *faces[NUMFACES];     // face status patches
 static patch_t *faceback;            // player face background
 
 // [crispy] blinking key or skull in the status bar
@@ -1405,8 +1407,7 @@ void ST_Start (void)
 
 void ST_Init (void)
 {
-	int  i, j;
-	int  facenum;
+	int  i;
 	char name[9];
 
 	// Minus symbol
@@ -1428,7 +1429,7 @@ void ST_Init (void)
 	// Key cards
 	for (i=0;i<NUMCARDS;i++)
 	{
-		snprintf(name, 9, "STKEYS%d", i);
+		snprintf(name, 9, "CS_KEY%d", i);
 		keys[i] = W_CacheLumpName(name, PU_STATIC);
 	}
 
@@ -1439,42 +1440,11 @@ void ST_Init (void)
 	sbar = W_CacheLumpName("STBAR", PU_STATIC);
 
 	// Face states
-	facenum = 0;
-	for (i = 0 ; i < ST_NUMPAINFACES ; i++)
+	for (i = 0 ; i < NUMFACES ; i++)
 	{
-		for (j = 0 ; j < ST_NUMSTRAIGHTFACES ; j++)
-		{
-			snprintf(name, 9, "STFST%d%d", i, j);
-			faces[facenum++] = W_CacheLumpName(name, PU_STATIC);
-		}
-
-		snprintf(name, 9, "STFTR%d0", i);	// turn right
-		faces[facenum++] = W_CacheLumpName(name, PU_STATIC);
-
-		snprintf(name, 9, "STFTL%d0", i);	// turn left
-		faces[facenum++] = W_CacheLumpName(name, PU_STATIC);
-
-		snprintf(name, 9, "STFOUCH%d", i);	// ouch!
-		faces[facenum++] = W_CacheLumpName(name, PU_STATIC);
-
-		snprintf(name, 9, "STFEVL%d", i);	// evil grin ;)
-		faces[facenum++] = W_CacheLumpName(name, PU_STATIC);
-
-		snprintf(name, 9, "STFKILL%d", i);	// pissed off
-		faces[facenum++] = W_CacheLumpName(name, PU_STATIC);
-	}
-
-	faces[facenum++] = W_CacheLumpName("STFGOD0", PU_STATIC);
-	faces[facenum++] = W_CacheLumpName("STFDEAD0", PU_STATIC);
-	// [JN] Exploded face:
-	faces[facenum++] = W_CacheLumpName("STFEXP0G", PU_STATIC);
-	faces[facenum++] = W_CacheLumpName("STFEXP1G", PU_STATIC);
-	faces[facenum++] = W_CacheLumpName("STFEXP2G", PU_STATIC);
-	faces[facenum++] = W_CacheLumpName("STFEXP3G", PU_STATIC);
-	faces[facenum++] = W_CacheLumpName("STFEXP4G", PU_STATIC);
-	faces[facenum++] = W_CacheLumpName("STFEXP5G", PU_STATIC);
-	// [JN] Squished face:
-	faces[facenum++] = W_CacheLumpName("STFCRS0G", PU_STATIC);
+        snprintf(name, 9, "FACE%.2d", i);
+        faces[i] = W_CacheLumpName(name, PU_STATIC);
+    }
 
 	// Allocate status bar background.
 	st_backing_screen = (pixel_t *) Z_Malloc(MAXWIDTH * (ST_HEIGHT * MAXHIRES)

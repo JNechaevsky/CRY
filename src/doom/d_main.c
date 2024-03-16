@@ -285,7 +285,7 @@ static void D_Display (void)
     // draw pause pic
     if (paused)
     {
-		V_DrawShadowedPatchOptional(136, 72, 0, W_CacheLumpName ("M_PAUSE", PU_CACHE));
+		V_DrawShadowedPatchOptional(136, 72, 0, W_CacheLumpName ("PAUSED", PU_CACHE));
     }
 
     // [JN] Do not draw any widgets if not in game level.

@@ -123,7 +123,7 @@ void CT_Init (void)
     }
     for (i = 0 ; i < HU_FONTSIZE_B ; i++)
     {
-        snprintf(buffer, 9, "STCFB%.3d", n++);
+        snprintf(buffer, 9, "CHAR_%.3d", n++);
         hu_font_b[i] = (patch_t *) W_CacheLumpName(buffer, PU_STATIC);
     }
 

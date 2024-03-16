@@ -174,7 +174,7 @@ const int wipe_ScreenWipe (const int ticks)
 
     if (vid_screenwipe)
     {
-        V_DrawPatch(132, 72, W_CacheLumpName("M_LOADIN", PU_CACHE));
+        V_DrawPatch(132, 72, W_CacheLumpName("LOADING", PU_CACHE));
     }
 
     return !go;
