@@ -13,16 +13,13 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// DESCRIPTION:
-//	Mission begin melt/wipe screen special effect.
-//
+
 
 #include <string.h>
-
 #include "z_zone.h"
 #include "i_video.h"
 #include "v_video.h"
-#include "m_random.h"
+#include "st_bar.h"
 
 #include "id_vars.h"
 
@@ -75,23 +72,11 @@ static void wipe_initMelt (void)
     // setup initial column positions
     // (y<0 => not ready to scroll yet)
     y = (int *) Z_Malloc(SCREENWIDTH*sizeof(int), PU_STATIC, 0);
-    y[0] = -(ID_RealRandom()%16);
+    y[0] = -1;
 
     for (int i = 1 ; i < SCREENWIDTH ; i++)
     {
-        int r = (ID_RealRandom()%3) - 1;
-
-        y[i] = y[i-1] + r;
-
-        if (y[i] > 0)
-        {
-            y[i] = 0;
-        }
-        else
-        if (y[i] == -16)
-        {
-            y[i] = -15;
-        }
+        y[i] = y[i-1] + 2;
     }
 }
 
@@ -101,13 +86,9 @@ static void wipe_initMelt (void)
 
 static int wipe_doMelt (int ticks)
 {
-    int j;
-    int dy;
-    int idx;
+    const int delay = vid_screenwipe == 2 ? 32 : 12; // 32 = fast, 12 = slow
     const int width = SCREENWIDTH/2;
 
-    dpixel_t *s;
-    dpixel_t *d;
     boolean	done = true;
 
     while (ticks--)
@@ -121,34 +102,7 @@ static int wipe_doMelt (int ticks)
             else
             if (y[i] < SCREENHEIGHT)
             {
-                dy = (y[i] < 16) ? y[i]+1 : ((8 * vid_screenwipe) * vid_resolution);
-
-                if (y[i]+dy >= SCREENHEIGHT)
-                {
-                    dy = SCREENHEIGHT - y[i];
-                }
-
-                s = &((dpixel_t *)wipe_scr_end)[i*SCREENHEIGHT+y[i]];
-                d = &((dpixel_t *)wipe_scr)[y[i]*width+i];
-                idx = 0;
-
-                for (j = dy ; j ; j--)
-                {
-                    d[idx] = *(s++);
-                    idx += width;
-                }
-
-                y[i] += dy;
-                s = &((dpixel_t *)wipe_scr_start)[i*SCREENHEIGHT];
-                d = &((dpixel_t *)wipe_scr)[y[i]*width+i];
-                idx = 0;
-
-                for (j=SCREENHEIGHT-y[i];j;j--)
-                {
-                    d[idx] = *(s++);
-                    idx += width;
-                }
-
+                y[i] += delay;
                 done = false;
             }
         }
@@ -166,6 +120,8 @@ static void wipe_exitMelt (void)
     Z_Free(y);
     Z_Free(wipe_scr_start);
     Z_Free(wipe_scr_end);
+    // [JN] Refresh status bar background after loading is finished.
+    st_fullupdate = true;
 }
 
 // -----------------------------------------------------------------------------
@@ -214,6 +170,11 @@ const int wipe_ScreenWipe (const int ticks)
     {
         go = false;
         wipe_exitMelt();
+    }
+
+    if (vid_screenwipe)
+    {
+        V_DrawPatch(132, 72, W_CacheLumpName("M_LOADIN", PU_CACHE));
     }
 
     return !go;
