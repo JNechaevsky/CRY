@@ -209,6 +209,14 @@ static void AM_drawCrosshair(boolean force);
 
 void AM_Init (void)
 {
+    char namebuf[9];
+
+    for (int i = 0 ; i < 10 ; i++)
+    {
+        snprintf(namebuf, 9, "MICRO_%d", i);
+        marknums[i] = W_CacheLumpName(namebuf, PU_STATIC);
+    }
+
     for (int color = 0; color < 256; ++color)
     {
 #define REINDEX(I) (color + I * 256)
@@ -449,37 +457,6 @@ void AM_initVariables (void)
 }
 
 // -----------------------------------------------------------------------------
-// AM_loadPics
-// -----------------------------------------------------------------------------
-
-static void AM_loadPics (void)
-{
-    char namebuf[9];
-  
-    for (int i = 0 ; i < 10 ; i++)
-    {
-        snprintf(namebuf, 9, "STGNUM%d", i);
-        marknums[i] = W_CacheLumpName(namebuf, PU_STATIC);
-    }
-
-}
-
-// -----------------------------------------------------------------------------
-// AM_unloadPics
-// -----------------------------------------------------------------------------
-
-static void AM_unloadPics (void)
-{
-    char namebuf[9];
-
-    for (int i = 0 ; i < 10 ; i++)
-    {
-        snprintf(namebuf, 9, "STGNUM%d", i);
-        W_ReleaseLumpName(namebuf);
-    }
-}
-
-// -----------------------------------------------------------------------------
 // AM_clearMarks
 // -----------------------------------------------------------------------------
 
@@ -552,7 +529,6 @@ void AM_LevelInit (boolean reinit)
 
 void AM_Stop (void)
 {
-    AM_unloadPics();
     automapactive = false;
     stopped = true;
 }
@@ -580,7 +556,6 @@ void AM_Start (void)
     }
 
     AM_initVariables();
-    AM_loadPics();
 }
 
 // -----------------------------------------------------------------------------
@@ -1958,7 +1933,11 @@ static void AM_drawMarks (void)
                 if (fx >= f_x && fx <= (f_w / vid_resolution) - 5
                 &&  fy >= f_y && fy <= (f_h / vid_resolution) - 6)
                 {
+                    // [JN] Single there is neither AMMNUM patches in Jaguar,
+                    // nor STGNUM, just use MICRO_* (STYSNUM) colored gray.
+                    dp_translation = cr[CR_GRAY];
                     V_DrawPatch(fx_flip - WIDESCREENDELTA, fy, marknums[d]);
+                    dp_translation = NULL;
                 }
 
                 // killough 2/22/98: 1 space backwards

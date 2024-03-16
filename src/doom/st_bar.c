@@ -108,7 +108,6 @@ static patch_t *tallnum[10];         // 0-9, tall numbers
 static patch_t *tallpercent;         // tall % sign
 static patch_t *tallminus;           // [JN] "minus" symbol
 static patch_t *shortnum_y[10];      // 0-9, short, yellow numbers
-static patch_t *shortnum_g[10];      // 0-9, short, gray numbers
 static patch_t *keys[NUMCARDS];      // 3 key-cards, 3 skulls
 static patch_t *faces[ST_NUMFACES];  // face status patches
 static patch_t *faceback;            // player face background
@@ -1203,33 +1202,17 @@ static void ST_DrawSmallNumberY (int val, const int x, const int y)
 }
 
 // -----------------------------------------------------------------------------
-// ST_DrawSmallNumberG
-// [JN] Draws a one digit gray number using STGNUM* graphics.
-// -----------------------------------------------------------------------------
-
-static void ST_DrawSmallNumberG (int val, const int x, const int y)
-{
-    if (val < 0)
-    {
-        val = 0;
-    }
-    if (val > 9)
-    {
-        val = 9;
-    }
-
-    V_DrawPatch(x + 4, y, shortnum_g[val]);
-}
-
-// -----------------------------------------------------------------------------
 // ST_DrawSmallNumberFunc
-// [JN] Decides which small font drawing function to use: if weapon is owned,
-//      draw using yellow font. Else, draw using gray font.
+// [JN] Jaguar: slightly different logics: if weapon is owned,
+//      draw it's number using a yellow font. Else, don't draw at all.
 // -----------------------------------------------------------------------------
 
 static void ST_DrawWeaponNumberFunc (const int val, const int x, const int y, const boolean have_it)
 {
-    have_it ? ST_DrawSmallNumberY(val, x, y) : ST_DrawSmallNumberG(val, x, y);
+    if (have_it)
+    {
+        ST_DrawSmallNumberY(val, x, y);
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -1388,8 +1371,8 @@ void ST_Drawer (boolean force)
 
     // Pistol
     ST_DrawWeaponNumberFunc(2, 245 + wide_x, 175, plyr->weaponowned[1]);
-    // Shotgun or Super Shotgun
-    ST_DrawWeaponNumberFunc(3, 257 + wide_x, 175, plyr->weaponowned[2] || plyr->weaponowned[8]);
+    // Shotgun
+    ST_DrawWeaponNumberFunc(3, 257 + wide_x, 175, plyr->weaponowned[2]);
     // Chaingun
     ST_DrawWeaponNumberFunc(4, 269 + wide_x, 175, plyr->weaponowned[3]);
     // Rocket Launcher
@@ -1432,11 +1415,8 @@ void ST_Init (void)
 		snprintf(name, 9, "STTNUM%d", i);
 		tallnum[i] = W_CacheLumpName(name, PU_STATIC);
 
-		snprintf(name, 9, "STYSNUM%d", i);
+		snprintf(name, 9, "MICRO_%d", i);
 		shortnum_y[i] = W_CacheLumpName(name, PU_STATIC);
-
-		snprintf(name, 9, "STGNUM%d", i);
-		shortnum_g[i] = W_CacheLumpName(name, PU_STATIC);
 	}
 
     // Load percent key
