@@ -1101,7 +1101,7 @@ static byte *ST_WidgetColor (const int i)
 
 // -----------------------------------------------------------------------------
 // ST_DrawBigNumber
-// [JN] Draws a three digit big red number using STTNUM* graphics.
+// [JN] Draws a three digit big red number using NUM_* graphics.
 // -----------------------------------------------------------------------------
 
 static void ST_DrawBigNumber (int val, const int x, const int y, byte *table)
@@ -1409,10 +1409,13 @@ void ST_Init (void)
 	int  facenum;
 	char name[9];
 
+	// Minus symbol
+	tallminus = W_CacheLumpName("MINUS", PU_STATIC);
+
 	// Load the numbers, tall and short
 	for (i = 0 ; i < 10 ; i++)
 	{
-		snprintf(name, 9, "STTNUM%d", i);
+		snprintf(name, 9, "NUM_%d", i);
 		tallnum[i] = W_CacheLumpName(name, PU_STATIC);
 
 		snprintf(name, 9, "MICRO_%d", i);
@@ -1420,10 +1423,7 @@ void ST_Init (void)
 	}
 
     // Load percent key
-	tallpercent = W_CacheLumpName("STTPRCNT", PU_STATIC);
-
-	// [JN] Minus symbol
-	tallminus = W_CacheLumpName("STTMINUS", PU_STATIC);
+	tallpercent = W_CacheLumpName("PERCENT", PU_STATIC);
 
 	// Key cards
 	for (i=0;i<NUMCARDS;i++)

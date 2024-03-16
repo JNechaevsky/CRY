@@ -482,13 +482,13 @@ void WI_Init (void)
 	// numbers 0-9
     for (int i = 0 ; i < 10 ; i++)
     {
-		snprintf(name, 9, "STTNUM%d", i);
+		snprintf(name, 9, "NUM_%d", i);
 		num[i] = W_CacheLumpName(name, PU_STATIC);
 	}
 
 	// ":"
-	colon = W_CacheLumpName("STTCOLMN", PU_STATIC);
+	colon = W_CacheLumpName("COLUMN", PU_STATIC);
 
 	// percent sign
-	percent = W_CacheLumpName("STTPRCNT", PU_STATIC);
+	percent = W_CacheLumpName("PERCENT", PU_STATIC);
 }
