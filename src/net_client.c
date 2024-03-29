@@ -32,14 +32,12 @@
 #include "net_client.h"
 #include "net_common.h"
 #include "net_defs.h"
-#include "net_gui.h"
 #include "net_io.h"
 #include "net_packet.h"
 #include "net_query.h"
 #include "net_server.h"
 #include "net_structrw.h"
 #include "net_petname.h"
-#include "w_checksum.h"
 #include "w_wad.h"
 
 
@@ -158,11 +156,6 @@ static unsigned int gamedata_recv_time;
 // received. We include this latency in tics we send to the server so
 // that they can adjust to us.
 static int last_latency;
-
-// Hash checksums of our wad directory and dehacked data.
-
-sha1_digest_t net_local_wad_sha1sum;
-sha1_digest_t net_local_deh_sha1sum;
 
 // Are we playing with the freedoom IWAD?
 
@@ -1067,8 +1060,6 @@ boolean NET_CL_Connect(net_addr_t *addr, net_connect_data_t *data)
     server_addr = addr;
     NET_ReferenceAddress(addr);
 
-    memcpy(net_local_wad_sha1sum, data->wad_sha1sum, sizeof(sha1_digest_t));
-    memcpy(net_local_deh_sha1sum, data->deh_sha1sum, sizeof(sha1_digest_t));
     net_local_is_freedoom = data->is_freedoom;
 
     // create a new network I/O context and add just the necessary module

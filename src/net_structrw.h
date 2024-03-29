@@ -16,8 +16,6 @@
 #ifndef NET_STRUCTRW_H
 #define NET_STRUCTRW_H
 
-#include "aes_prng.h"
-#include "sha1.h"
 #include "net_defs.h"
 #include "net_packet.h"
 
@@ -38,14 +36,8 @@ extern void NET_TiccmdPatch(ticcmd_t *src, net_ticdiff_t *diff, ticcmd_t *dest);
 boolean NET_ReadFullTiccmd(net_packet_t *packet, net_full_ticcmd_t *cmd, boolean lowres_turn);
 void NET_WriteFullTiccmd(net_packet_t *packet, net_full_ticcmd_t *cmd, boolean lowres_turn);
 
-boolean NET_ReadSHA1Sum(net_packet_t *packet, sha1_digest_t digest);
-void NET_WriteSHA1Sum(net_packet_t *packet, sha1_digest_t digest);
-
 void NET_WriteWaitData(net_packet_t *packet, net_waitdata_t *data);
 boolean NET_ReadWaitData(net_packet_t *packet, net_waitdata_t *data);
-
-boolean NET_ReadPRNGSeed(net_packet_t *packet, prng_seed_t seed);
-void NET_WritePRNGSeed(net_packet_t *packet, prng_seed_t seed);
 
 // Protocol list exchange.
 net_protocol_t NET_ReadProtocol(net_packet_t *packet);

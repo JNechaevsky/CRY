@@ -117,6 +117,6 @@ configure_file(cmake/config.h.cin config.h)
 
 configure_file(src/doom-res.rc.in src/doom-res.rc)
 
-foreach(SUBDIR textscreen opl src)
+foreach(SUBDIR opl src)
     add_subdirectory("${SUBDIR}")
 endforeach()

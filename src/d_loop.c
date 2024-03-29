@@ -32,7 +32,6 @@
 #include "m_fixed.h"
 
 #include "net_client.h"
-#include "net_gui.h"
 #include "net_io.h"
 #include "net_query.h"
 #include "net_server.h"
@@ -528,7 +527,7 @@ boolean D_InitNetGame(net_connect_data_t *connect_data)
 
         // Wait for launch message received from server.
 
-        NET_WaitForLaunch();
+        // NET_WaitForLaunch();
 
         result = true;
     }

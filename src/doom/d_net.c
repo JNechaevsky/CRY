@@ -30,7 +30,6 @@
 #include "g_game.h"
 #include "doomdef.h"
 #include "doomstat.h"
-#include "w_checksum.h"
 #include "w_wad.h"
 
 #include "d_loop.h"
@@ -211,11 +210,6 @@ static void InitConnectData(net_connect_data_t *connect_data)
     connect_data->lowres_turn = (M_ParmExists("-record")
                              && !M_ParmExists("-longtics"))
                               || shorttics;
-
-    // Read checksums of our WAD directory and dehacked information
-
-    W_Checksum(connect_data->wad_sha1sum);
-    // DEH_Checksum(connect_data->deh_sha1sum);
 
     // Are we playing with the Freedoom IWAD?
 

@@ -43,8 +43,6 @@ void NET_WriteConnectData(net_packet_t *packet, net_connect_data_t *data)
     NET_WriteInt8(packet, data->drone);
     NET_WriteInt8(packet, data->max_players);
     NET_WriteInt8(packet, data->is_freedoom);
-    NET_WriteSHA1Sum(packet, data->wad_sha1sum);
-    NET_WriteSHA1Sum(packet, data->deh_sha1sum);
     NET_WriteInt8(packet, data->player_class);
 }
 
@@ -56,8 +54,6 @@ boolean NET_ReadConnectData(net_packet_t *packet, net_connect_data_t *data)
         && NET_ReadInt8(packet, (unsigned int *) &data->drone)
         && NET_ReadInt8(packet, (unsigned int *) &data->max_players)
         && NET_ReadInt8(packet, (unsigned int *) &data->is_freedoom)
-        && NET_ReadSHA1Sum(packet, data->wad_sha1sum)
-        && NET_ReadSHA1Sum(packet, data->deh_sha1sum)
         && NET_ReadInt8(packet, (unsigned int *) &data->player_class);
 }
 
@@ -475,8 +471,6 @@ void NET_WriteWaitData(net_packet_t *packet, net_waitdata_t *data)
         NET_WriteString(packet, data->player_addrs[i]);
     }
 
-    NET_WriteSHA1Sum(packet, data->wad_sha1sum);
-    NET_WriteSHA1Sum(packet, data->deh_sha1sum);
     NET_WriteInt8(packet, data->is_freedoom);
 }
 
@@ -516,57 +510,7 @@ boolean NET_ReadWaitData(net_packet_t *packet, net_waitdata_t *data)
         M_StringCopy(data->player_addrs[i], s, MAXPLAYERNAME);
     }
 
-    return NET_ReadSHA1Sum(packet, data->wad_sha1sum)
-        && NET_ReadSHA1Sum(packet, data->deh_sha1sum)
-        && NET_ReadInt8(packet, (unsigned int *) &data->is_freedoom);
-}
-
-static boolean NET_ReadBlob(net_packet_t *packet, uint8_t *buf, size_t len)
-{
-    unsigned int b;
-    int i;
-
-    for (i=0; i<len; ++i)
-    {
-        if (!NET_ReadInt8(packet, &b))
-        {
-            return false;
-        }
-
-        buf[i] = b;
-    }
-
-    return true;
-}
-
-static void NET_WriteBlob(net_packet_t *packet, uint8_t *buf, size_t len)
-{
-    int i;
-
-    for (i=0; i<len; ++i)
-    {
-        NET_WriteInt8(packet, buf[i]);
-    }
-}
-
-boolean NET_ReadSHA1Sum(net_packet_t *packet, sha1_digest_t digest)
-{
-    return NET_ReadBlob(packet, digest, sizeof(sha1_digest_t));
-}
-
-void NET_WriteSHA1Sum(net_packet_t *packet, sha1_digest_t digest)
-{
-    NET_WriteBlob(packet, digest, sizeof(sha1_digest_t));
-}
-
-boolean NET_ReadPRNGSeed(net_packet_t *packet, prng_seed_t seed)
-{
-    return NET_ReadBlob(packet, seed, sizeof(prng_seed_t));
-}
-
-void NET_WritePRNGSeed(net_packet_t *packet, prng_seed_t seed)
-{
-    NET_WriteBlob(packet, seed, sizeof(prng_seed_t));
+    return NET_ReadInt8(packet, (unsigned int *) &data->is_freedoom);
 }
 
 static net_protocol_t ParseProtocolName(const char *name)

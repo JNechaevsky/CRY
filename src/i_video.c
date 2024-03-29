@@ -46,7 +46,6 @@
 #include "v_video.h"
 #include "w_wad.h"
 #include "z_zone.h"
-#include "txt_main.h"
 
 #include "id_vars.h"
 
@@ -252,9 +251,6 @@ unsigned int joywait = 0;
 static const unsigned int *icon_data;
 static int icon_w;
 static int icon_h;
-
-// [JN] Used for realtime resizing of ENDOOM screen.
-boolean endoom_screen_active = false;
 
 void *I_GetSDLWindow(void)
 {
@@ -529,16 +525,8 @@ static int HandleWindowResize (void* data, SDL_Event *event)
     if (event->type == SDL_WINDOWEVENT 
     &&  event->window.event == SDL_WINDOWEVENT_RESIZED)
     {
-        // Redraw window contents:
-        if (endoom_screen_active)
-        {
-            TXT_UpdateScreen();
-        }
-        else
-        {
-            I_FinishUpdate();
-        }
-        
+        // Redraw window contents.
+        I_FinishUpdate();
     }
     return 0;
 }

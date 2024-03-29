@@ -14,7 +14,6 @@ set(COMMON_SOURCE_FILES
 # Source files used by the game binaries (chocolate-doom, etc.)
 
 set(GAME_SOURCE_FILES
-    aes_prng.c          aes_prng.h
     d_event.c           d_event.h
                         doomkeys.h
                         doomtype.h
@@ -46,7 +45,6 @@ set(GAME_SOURCE_FILES
     net_common.c        net_common.h
     net_dedicated.c     net_dedicated.h
     net_defs.h
-    net_gui.c           net_gui.h
     net_io.c            net_io.h
     net_loop.c          net_loop.h
     net_packet.c        net_packet.h
@@ -55,13 +53,11 @@ set(GAME_SOURCE_FILES
     net_sdl.c           net_sdl.h
     net_server.c        net_server.h
     net_structrw.c      net_structrw.h
-    sha1.c              sha1.h
     memio.c             memio.h
     tables.c            tables.h
     v_trans.c           v_trans.h
     v_video.c           v_video.h
                         v_patch.h
-    w_checksum.c        w_checksum.h
     w_main.c            w_main.h
     w_wad.c             w_wad.h
     w_file.c            w_file.h
@@ -83,7 +79,7 @@ set(GAME_INCLUDE_DIRS "${CMAKE_CURRENT_BINARY_DIR}/../")
 
 set(SOURCE_FILES ${COMMON_SOURCE_FILES} ${GAME_SOURCE_FILES})
 
-set(EXTRA_LIBS "$<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>" SDL2::SDL2 miniz::miniz textscreen opl)
+set(EXTRA_LIBS "$<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>" SDL2::SDL2 miniz::miniz opl)
 if(ENABLE_SDL2_MIXER)
     list(APPEND EXTRA_LIBS SDL2_mixer::SDL2_mixer)
 endif()
