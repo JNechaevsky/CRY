@@ -21,7 +21,6 @@
 
 #include "doomtype.h"
 
-#include "deh_str.h"
 #include "i_sound.h"
 #include "m_misc.h"
 #include "w_wad.h"

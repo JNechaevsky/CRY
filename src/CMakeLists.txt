@@ -22,7 +22,6 @@ set(GAME_SOURCE_FILES
     d_loop.c            d_loop.h
     d_mode.c            d_mode.h
                         d_ticcmd.h
-    deh_str.c           deh_str.h
     i_flmusic.c
     i_glob.c            i_glob.h
     i_input.c           i_input.h
@@ -82,17 +81,7 @@ endif()
 
 set(GAME_INCLUDE_DIRS "${CMAKE_CURRENT_BINARY_DIR}/../")
 
-set(DEHACKED_SOURCE_FILES
-    deh_defs.h
-    deh_io.c            deh_io.h
-    deh_main.c          deh_main.h
-    deh_mapping.c       deh_mapping.h
-    deh_text.c)
-
-# Some games support dehacked patches, some don't:
-
 set(SOURCE_FILES ${COMMON_SOURCE_FILES} ${GAME_SOURCE_FILES})
-set(SOURCE_FILES_WITH_DEH ${SOURCE_FILES} ${DEHACKED_SOURCE_FILES})
 
 set(EXTRA_LIBS "$<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>" SDL2::SDL2 miniz::miniz textscreen opl)
 if(ENABLE_SDL2_MIXER)

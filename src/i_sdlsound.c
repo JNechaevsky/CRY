@@ -31,7 +31,6 @@
 #include <samplerate.h>
 #endif
 
-#include "deh_str.h"
 #include "i_sound.h"
 #include "i_system.h"
 #include "i_swap.h"
@@ -875,11 +874,11 @@ static void GetSfxLumpName(sfxinfo_t *sfx, char *buf, size_t buf_len)
 
     if (use_sfx_prefix)
     {
-        M_snprintf(buf, buf_len, "ds%s", DEH_String(sfx->name));
+        M_snprintf(buf, buf_len, "ds%s", sfx->name);
     }
     else
     {
-        M_StringCopy(buf, DEH_String(sfx->name), buf_len);
+        M_StringCopy(buf, sfx->name, buf_len);
     }
 }
 

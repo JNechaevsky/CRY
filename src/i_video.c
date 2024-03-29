@@ -33,7 +33,6 @@
 
 #include "config.h"
 #include "d_loop.h"
-#include "deh_str.h"
 #include "doomtype.h"
 #include "i_input.h"
 #include "i_joystick.h"

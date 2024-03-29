@@ -25,7 +25,6 @@
 #include "memio.h"
 #include "mus2mid.h"
 
-#include "deh_main.h"
 #include "i_sound.h"
 #include "i_swap.h"
 #include "m_misc.h"
@@ -365,7 +364,7 @@ static boolean LoadInstrumentTable(void)
 {
     byte *lump;
 
-    lump = W_CacheLumpName(DEH_String("genmidi"), PU_STATIC);
+    lump = W_CacheLumpName("genmidi", PU_STATIC);
 
     // DMX does not check header
 
@@ -1708,7 +1707,7 @@ static void I_OPL_ShutdownMusic(void)
 
         // Release GENMIDI lump
 
-        W_ReleaseLumpName(DEH_String("genmidi"));
+        W_ReleaseLumpName("genmidi");
 
         music_initialized = false;
     }
