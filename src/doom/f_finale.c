@@ -65,21 +65,6 @@ static unsigned int finaleendcount;
 // [JN] Do screen wipe only once after text skipping.
 static boolean finale_wipe_done;
 
-typedef struct
-{
-    int level;
-    const char *background;
-    const char *text;
-} textscreen_t;
-
-static textscreen_t textscreens[] =
-{
-	{ 23, "ROCKS", JAGENDING},
-};
-
-const char *finaletext;
-const char *finaleflat;
-
 static void F_StartCast (void);
 static void F_CastTicker (void);
 static void F_CastDrawer (void);
@@ -92,8 +77,6 @@ static boolean F_CastResponder (event_t *ev);
 
 void F_StartFinale (void)
 {
-	size_t i;
-
 	gameaction = ga_nothing;
 	gamestate = GS_FINALE;
 	automapactive = false;
@@ -106,21 +89,9 @@ void F_StartFinale (void)
 
 	S_ChangeMusic(mus_ending, true);
 
-	// Find the right screen and set the text and background
-	for (i = 0 ; i < arrlen(textscreens) ; ++i)
-	{
-		textscreen_t *screen = &textscreens[i];
-
-		if (gamemap == screen->level)
-		{
-			finaletext = screen->text;
-			finaleflat = screen->background;
-		}
-	}
-
 	// [JN] Count intermission/finale text lenght. Once it's fully printed, 
 	// no extra "attack/use" button pressing is needed for skipping.
-	finaleendcount = strlen(finaletext) * TEXTSPEED + TEXTEND;
+	finaleendcount = strlen(JAGENDING) * TEXTSPEED + TEXTEND;
 	finalestage = F_STAGE_TEXT;
 	finalecount = 0;
 }
@@ -243,9 +214,6 @@ void F_Ticker (void)
 
 static void F_TextWrite (void)
 {
-	byte    *src;
-	pixel_t *dest;
-
 	int         w;
 	int         c;
 	int         cx;
@@ -253,25 +221,12 @@ static void F_TextWrite (void)
 	signed int  count;
 	const char *ch;
 
-	// erase the entire screen to a tiled background
-	src = W_CacheLumpName(finaleflat, PU_CACHE);
-	dest = I_VideoBuffer;
-
-	// [crispy] use unified flat filling function
-	V_FillFlat(0, SCREENHEIGHT, 0, SCREENWIDTH, src, dest);
-
-	V_MarkRect (0, 0, SCREENWIDTH, SCREENHEIGHT);
-
-	// [JN] Draw special background
-	if (gamemap == 23)
-	{
-		V_DrawPatchFullScreen(W_CacheLumpName(("M_TITLE"), PU_CACHE), false);
-	}
+    V_DrawPatchFullScreen(W_CacheLumpName(("M_TITLE"), PU_CACHE), false);
 
 	// draw some of the text onto the screen
 	cx = 10;
 	cy = 10;
-	ch = finaletext;
+	ch = JAGENDING;
 
 	count = ((signed int) finalecount - 10) / TEXTSPEED;
 
