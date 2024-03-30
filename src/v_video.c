@@ -397,6 +397,7 @@ void V_DrawPatchFinale (int x, int y, patch_t *patch)
 	
 	y -= SHORT(patch->topoffset);
 	x -= SHORT(patch->leftoffset);
+	x += (WIDESCREENDELTA/2);
 
 	V_MarkRect(x, y, SHORT(patch->width), SHORT(patch->height));
 
