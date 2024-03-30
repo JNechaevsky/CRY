@@ -1188,7 +1188,7 @@ static void M_Draw_ID_Video (void)
     M_WriteTextCentered(90, "DISPLAY OPTIONS", cr[CR_YELLOW]);
 
     // Gamma-correction slider and num
-    sprintf(str, gammalvls[vid_gamma][1]);
+    strcpy(str, gammalvls[vid_gamma][1]);
     M_WriteText (M_ItemRightAlign(str), 99, str,
                           M_Item_Glow(9, vid_gamma  > 10 ? GLOW_GREEN :
                                          vid_gamma == 10 ? GLOW_DARKRED : GLOW_RED));
