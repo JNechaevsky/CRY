@@ -105,8 +105,6 @@ boolean         playeringame[MAXPLAYERS];
 player_t        players[MAXPLAYERS]; 
 boolean         coop_spawns;            // [JN] Single player game with netgame things spawn
 
-boolean         turbodetected[MAXPLAYERS];
- 
 int             consoleplayer;          // player taking events and displaying 
 int             displayplayer;          // view being displayed 
 int             levelstarttic;          // gametic at level start 
@@ -538,7 +536,6 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
     }
 
     // buttons
-    cmd->chatchar = CT_dequeueChatChar();
 
     if (gamekeydown[key_fire] || mousebuttons[mousebfire] 
 	|| joybuttons[joybfire]) 
@@ -783,7 +780,6 @@ void G_DoLoadLevel (void)
 
     for (i=0 ; i<MAXPLAYERS ; i++) 
     { 
-	turbodetected[i] = false;
 	if (playeringame[i] && players[i].playerstate == PST_DEAD) 
 	    players[i].playerstate = PST_REBORN; 
 	memset (players[i].frags,0,sizeof(players[i].frags)); 
@@ -977,8 +973,6 @@ boolean G_Responder (event_t* ev)
 
     if (gamestate == GS_LEVEL) 
     { 
-	if (CT_Responder (ev)) 
-	    return true;	// chat ate the event 
 	if (ST_Responder (ev)) 
 	    return true;	// status window ate it 
 	if (AM_Responder (ev)) 
@@ -1261,30 +1255,6 @@ void G_Ticker (void)
 	    if (demorecording && !demoplayback)
 		G_WriteDemoTiccmd (cmd);
 	    
-	    // check for turbo cheats
-
-            // check ~ 4 seconds whether to display the turbo message. 
-            // store if the turbo threshold was exceeded in any tics
-            // over the past 4 seconds.  offset the checking period
-            // for each player so messages are not displayed at the
-            // same time.
-
-            if (cmd->forwardmove > TURBOTHRESHOLD)
-            {
-                turbodetected[i] = true;
-            }
-
-            if ((gametic & 31) == 0 
-             && ((gametic >> 5) % MAXPLAYERS) == i
-             && turbodetected[i])
-            {
-                static char turbomessage[80];
-                M_snprintf(turbomessage, sizeof(turbomessage),
-                           "%s is turbo!", player_names[i]);
-                CT_SetMessage(&players[consoleplayer], turbomessage, false, NULL);
-                turbodetected[i] = false;
-            }
-
 	    if (netgame && !netdemo && !(gametic%ticdup) ) 
 	    { 
 		if (gametic > BACKUPTICS 
@@ -1368,11 +1338,7 @@ void G_Ticker (void)
 	P_Ticker (); 
 	ST_Ticker (); 
 	AM_Ticker (); 
-	// [JN] Not really needed in single player game.
-	if (netgame)
-	{
-		CT_Ticker ();
-	}
+
 	// [JN] Gather target's health for widget and/or crosshair.
 	if (widget_health || (xhair_draw && xhair_color > 1))
 	{
@@ -1399,7 +1365,7 @@ void G_Ticker (void)
 
     // [JN] Reduce message tics independently from framerate and game states.
     // Tics can't go negative.
-    MSG_Ticker();
+    CT_Ticker();
 
     //
     // [JN] Query time for time-related widgets:

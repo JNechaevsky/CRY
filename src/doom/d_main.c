@@ -332,12 +332,6 @@ static void D_Display (void)
 
             ST_Drawer(st_forceredraw);
         }
-
-        // [JN] Chat drawer
-        if (netgame && chatmodeon)
-        {
-            CT_Drawer();
-        }
     }
 
     // [JN] Draw right widgets in any states except finale text screens.
@@ -395,8 +389,6 @@ static void D_Display (void)
 
 void D_BindVariables(void)
 {
-    int i;
-
     I_BindInputVariables();
     I_BindVideoVariables();
     I_BindJoystickVariables();
@@ -416,16 +408,6 @@ void D_BindVariables(void)
     M_BindIntVariable("key_message_refresh",    &key_message_refresh);
     M_BindIntVariable("sfx_volume",             &sfxVolume);
     M_BindIntVariable("music_volume",           &musicVolume);
-
-    // Multiplayer chat macros
-
-    for (i=0; i<10; ++i)
-    {
-        char buf[12];
-
-        M_snprintf(buf, sizeof(buf), "chatmacro%i", i);
-        M_BindStringVariable(buf, &chat_macros[i]);
-    }
 
 	// [JN] Bind ID-specific config variables.
 	ID_BindVariables(doom);

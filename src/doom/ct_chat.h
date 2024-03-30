@@ -17,10 +17,7 @@
 
 #pragma once
 
-
-#include "d_event.h"
 #include "d_player.h"
-#include "doomdef.h"
 #include "v_patch.h"
 
 
@@ -37,25 +34,17 @@
 // Message timeout.
 #define MESSAGETICS (TICRATE*4)
 
-extern void CT_Drawer (void);
 extern void CT_Init (void);
 extern void CT_SetMessage (player_t *player, const char *message, boolean ultmsg, byte *table);
 extern void CT_SetMessageCentered (player_t *player, const char *message, byte *table);
 extern void CT_Ticker (void);
-extern void MSG_Ticker (void);
 
 extern boolean ultimatemsg;
 extern boolean chatmodeon;
-extern boolean CT_Responder(event_t * ev);
 
-extern char *chat_macros[10];
-extern char *player_names[];
-extern char  CT_dequeueChatChar (void);
 extern const char *lastmessage;
 
 extern int   showMessages;
 
 extern patch_t *hu_font_s[HU_FONTSIZE_S];
 extern patch_t *hu_font_b[HU_FONTSIZE_B];
-
-

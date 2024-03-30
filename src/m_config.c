@@ -374,16 +374,6 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_KEY(key_multi_msgplayer7),
     CONFIG_VARIABLE_KEY(key_multi_msgplayer8),
     CONFIG_VARIABLE_STRING(player_name),
-    CONFIG_VARIABLE_STRING(chatmacro0),
-    CONFIG_VARIABLE_STRING(chatmacro1),
-    CONFIG_VARIABLE_STRING(chatmacro2),
-    CONFIG_VARIABLE_STRING(chatmacro3),
-    CONFIG_VARIABLE_STRING(chatmacro4),
-    CONFIG_VARIABLE_STRING(chatmacro5),
-    CONFIG_VARIABLE_STRING(chatmacro6),
-    CONFIG_VARIABLE_STRING(chatmacro7),
-    CONFIG_VARIABLE_STRING(chatmacro8),
-    CONFIG_VARIABLE_STRING(chatmacro9),
 
     // Special menu keys, not available for rebinding
     CONFIG_VARIABLE_KEY(key_menu_activate),

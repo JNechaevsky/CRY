@@ -4806,7 +4806,7 @@ boolean M_Responder (event_t* ev)
     }
 
     // F-Keys
-    if (!menuactive && !chatmodeon)
+    if (!menuactive)
     {
 	if (key == key_menu_decscreen)      // Screen size down
         {
