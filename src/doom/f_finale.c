@@ -62,9 +62,6 @@ static finalestage_t finalestage;
 static unsigned int finalecount;
 static unsigned int finaleendcount;
 
-// [JN] Do screen wipe only once after text skipping.
-static boolean finale_wipe_done;
-
 static void F_StartCast (void);
 static void F_CastTicker (void);
 static void F_CastDrawer (void);
@@ -80,14 +77,13 @@ void F_StartFinale (void)
 	gameaction = ga_nothing;
 	gamestate = GS_FINALE;
 	automapactive = false;
-	finale_wipe_done = false;
 	players[consoleplayer].cheatTics = 1;
 	players[consoleplayer].messageTics = 1;
 	players[consoleplayer].message = NULL;
 	players[consoleplayer].messageCenteredTics = 1;
 	players[consoleplayer].messageCentered = NULL;
 
-	S_ChangeMusic(mus_ending, true);
+	S_ChangeMusic(mus_map02, true);
 
 	// [JN] Count intermission/finale text lenght. Once it's fully printed, 
 	// no extra "attack/use" button pressing is needed for skipping.
@@ -174,19 +170,6 @@ void F_Ticker (void)
 
 		if (i < MAXPLAYERS)
 		{
-			if (gamemode != commercial)
-			{
-				finalestage = F_STAGE_ARTSCREEN;
-
-				if (!finale_wipe_done)
-				{
-					finale_wipe_done = true;
-					wipegamestate = -1; // force a wipe
-				}
-
-				return;
-			}
-
 			if (gamemap == 23)  // [JN] Jaguar: final level
 			{
 				F_StartCast ();
@@ -301,7 +284,6 @@ static boolean  castattacking;
 
 static void F_StartCast (void)
 {
-	wipegamestate = -1;		// force a screen wipe
 	castnum = 0;
 	caststate = &states[mobjinfo[castorder[castnum].type].seestate];
 	casttics = caststate->tics;
@@ -310,7 +292,6 @@ static void F_StartCast (void)
 	castframes = 0;
 	castonmelee = 0;
 	castattacking = false;
-	S_ChangeMusic(mus_extra, true);
 }
 
 // -----------------------------------------------------------------------------

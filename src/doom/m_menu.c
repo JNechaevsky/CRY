@@ -3721,6 +3721,7 @@ static void M_EndGameResponse(int key)
     players[consoleplayer].messageCenteredTics = 1;
     players[consoleplayer].messageCentered = NULL;
     st_palette = 0;
+    S_StartMusic(mus_intro);
     D_StartTitle ();
 }
 

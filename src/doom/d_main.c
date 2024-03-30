@@ -535,8 +535,6 @@ void D_DoAdvanceDemo (void)
 
     pagetic = TICRATE * 20;
     gamestate = GS_DEMOSCREEN;
-
-    // S_StartMusic(mus_dm2ttl);
 }
 
 // -----------------------------------------------------------------------------
@@ -1071,6 +1069,7 @@ void D_DoomMain (void)
 			G_InitNew (startskill, startepisode, startmap);
 		else
 		{
+			S_StartMusic(mus_intro);
 			D_StartTitle ();                // start up intro loop
 		}
     }
