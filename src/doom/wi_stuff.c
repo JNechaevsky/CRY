@@ -270,8 +270,6 @@ static void WI_updateStats (void)
 	{
 		if (acceleratestage)
 		{
-			// [JN] feedback sound
-			S_StartSound(0, sfx_sgcock);
 			WI_initNoState();
 		}
 	}
