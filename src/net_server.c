@@ -384,7 +384,6 @@ static void NET_SV_SendWaitingData(net_client_t *client)
     net_waitdata_t wait_data;
     net_packet_t *packet;
     net_client_t *controller;
-    int i;
 
     NET_SV_AssignPlayers();
 
@@ -407,18 +406,6 @@ static void NET_SV_SendWaitingData(net_client_t *client)
     }
 
     wait_data.is_freedoom = controller->is_freedoom;
-
-    // set name and address of each player:
-
-    for (i = 0; i < wait_data.num_players; ++i)
-    {
-        M_StringCopy(wait_data.player_names[i],
-                     sv_players[i]->name,
-                     MAXPLAYERNAME);
-        M_StringCopy(wait_data.player_addrs[i],
-                     NET_AddrToString(sv_players[i]->addr),
-                     MAXPLAYERNAME);
-    }
 
     // Construct packet:
 
@@ -581,7 +568,6 @@ static void NET_SV_ParseSYN(net_packet_t *packet, net_client_t *client,
     net_connect_data_t data;
     net_packet_t *reply;
     net_protocol_t protocol;
-    char *player_name;
     char *client_version;
     int num_players;
     int i;
@@ -653,14 +639,6 @@ static void NET_SV_ParseSYN(net_packet_t *packet, net_client_t *client,
         NET_Log("server: error: invalid connect data, max_players=%d, "
                 "gamemission=%d, gamemode=%d",
                 data.max_players, data.gamemission, data.gamemode);
-        return;
-    }
-
-    // Read the player's name
-    player_name = NET_ReadString(packet);
-    if (player_name == NULL)
-    {
-        NET_Log("server: error: failed to read player name");
         return;
     }
 
@@ -763,7 +741,6 @@ static void NET_SV_ParseSYN(net_packet_t *packet, net_client_t *client,
     // Save the SHA1 checksums and other details.
     client->is_freedoom = data.is_freedoom;
     client->max_players = data.max_players;
-    client->name = M_StringDuplicate(player_name);
     client->recording_lowres = data.lowres_turn;
     client->drone = data.drone;
     client->player_class = data.player_class;

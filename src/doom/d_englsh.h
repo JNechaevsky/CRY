@@ -34,14 +34,6 @@
 "you can't start a new game\n"\
 "while in a network game.\n\n"PRESSKEY
 
-#define NIGHTMARE	\
-"are you sure? this skill level\n"\
-"isn't even remotely fair.\n\n"PRESSYN
-
-#define SWSTRING	\
-"this is the shareware version of doom.\n\n"\
-"you need to order the entire trilogy.\n\n"PRESSKEY
-
 #define MSGOFF	"Messages OFF"
 #define MSGON		"Messages ON"
 #define NETEND	"you can't end a netgame!\n\n"PRESSKEY
@@ -115,10 +107,6 @@
 #define GOTSHOTGUN	"You got the shotgun!"
 #define GOTSHOTGUN2	"You got the super shotgun!"
 
-// [NS] Beta pickups.
-#define BETA_BONUS3	"Picked up an evil sceptre."
-#define BETA_BONUS4	"Picked up an unholy bible."
-
 //
 // P_Doors.C
 //
@@ -133,38 +121,6 @@
 //	G_game.C
 //
 #define GGSAVED	"game saved."
-
-//
-//	HU_stuff.C
-//
-#define HUSTR_MSGU	"[Message unsent]"
-
-
-#define HUSTR_CHATMACRO1	"I'm ready to kick butt!"
-#define HUSTR_CHATMACRO2	"I'm OK."
-#define HUSTR_CHATMACRO3	"I'm not looking too good!"
-#define HUSTR_CHATMACRO4	"Help!"
-#define HUSTR_CHATMACRO5	"You suck!"
-#define HUSTR_CHATMACRO6	"Next time, scumbag..."
-#define HUSTR_CHATMACRO7	"Come here!"
-#define HUSTR_CHATMACRO8	"I'll take care of it."
-#define HUSTR_CHATMACRO9	"Yes"
-#define HUSTR_CHATMACRO0	"No"
-
-#define HUSTR_MESSAGESENT	"[Message Sent]"
-
-// The following should NOT be changed unless it seems
-// just AWFULLY necessary
-
-#define HUSTR_PLRGREEN	"Green: "
-#define HUSTR_PLRINDIGO	"Indigo: "
-#define HUSTR_PLRBROWN	"Brown: "
-#define HUSTR_PLRRED		"Red: "
-
-#define HUSTR_KEYGREEN	'g'
-#define HUSTR_KEYINDIGO	'i'
-#define HUSTR_KEYBROWN	'b'
-#define HUSTR_KEYRED	'r'
 
 //
 //	AM_map.C
@@ -249,5 +205,3 @@ PRESSYN
 #define ID_NOVERT_OFF      "VERTICAL MOUSE MOVEMENT ON"
 
 #define ID_SECRET_FOUND    "A SECRET IS REVEALED!"
-
-#define ID_NOPLAYERS       "THERE ARE NO OTHER PLAYERS IN THE GAME!"

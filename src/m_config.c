@@ -252,24 +252,6 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_KEY(key_fire),
     CONFIG_VARIABLE_KEY(key_use),
 
-    // Heretic: View
-    CONFIG_VARIABLE_KEY(key_lookup),
-    CONFIG_VARIABLE_KEY(key_lookdown),
-    CONFIG_VARIABLE_KEY(key_lookcenter),
-
-    // Heretic: Fly
-    CONFIG_VARIABLE_KEY(key_flyup),
-    CONFIG_VARIABLE_KEY(key_flydown),
-    CONFIG_VARIABLE_KEY(key_flycenter),
-
-    // Heretic: Inventory
-    CONFIG_VARIABLE_KEY(key_invleft),
-    CONFIG_VARIABLE_KEY(key_invright),
-    CONFIG_VARIABLE_KEY(key_useartifact),
-
-    // Hexen: Jump
-    CONFIG_VARIABLE_KEY(key_jump),
-
     // Advanced movement
     CONFIG_VARIABLE_KEY(key_autorun),
     CONFIG_VARIABLE_KEY(key_mouse_look),
@@ -280,34 +262,6 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_KEY(key_nextlevel),
     CONFIG_VARIABLE_KEY(key_demospeed),
     CONFIG_VARIABLE_KEY(key_flip_levels),
-
-    // Heretic: Artifacts
-    CONFIG_VARIABLE_KEY(key_arti_quartz),
-    CONFIG_VARIABLE_KEY(key_arti_urn),
-    CONFIG_VARIABLE_KEY(key_arti_bomb),
-    CONFIG_VARIABLE_KEY(key_arti_tome),
-    CONFIG_VARIABLE_KEY(key_arti_ring),
-    CONFIG_VARIABLE_KEY(key_arti_chaosdevice),
-    CONFIG_VARIABLE_KEY(key_arti_shadowsphere),
-    CONFIG_VARIABLE_KEY(key_arti_wings),
-    CONFIG_VARIABLE_KEY(key_arti_torch),
-    CONFIG_VARIABLE_KEY(key_arti_morph),
-
-    // Hexen: Artifacts
-    CONFIG_VARIABLE_KEY(key_arti_all),
-    CONFIG_VARIABLE_KEY(key_arti_health),
-    CONFIG_VARIABLE_KEY(key_arti_poisonbag),
-    CONFIG_VARIABLE_KEY(key_arti_blastradius),
-    CONFIG_VARIABLE_KEY(key_arti_teleport),
-    CONFIG_VARIABLE_KEY(key_arti_teleportother),
-    CONFIG_VARIABLE_KEY(key_arti_egg),
-    CONFIG_VARIABLE_KEY(key_arti_invulnerability),
-    // Hexen: Artifacts (extra)
-    CONFIG_VARIABLE_KEY(key_arti_servant),
-    CONFIG_VARIABLE_KEY(key_arti_bracers),
-    CONFIG_VARIABLE_KEY(key_arti_boots),
-    CONFIG_VARIABLE_KEY(key_arti_krater),
-    CONFIG_VARIABLE_KEY(key_arti_incant),
 
     // Game modes
     CONFIG_VARIABLE_KEY(key_spectator),  // RestlessRodent -- CRL
@@ -363,18 +317,6 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_KEY(key_message_refresh),
     CONFIG_VARIABLE_KEY(key_demo_quit),
 
-    // Multiplayer
-    CONFIG_VARIABLE_KEY(key_multi_msg),
-    CONFIG_VARIABLE_KEY(key_multi_msgplayer1),
-    CONFIG_VARIABLE_KEY(key_multi_msgplayer2),
-    CONFIG_VARIABLE_KEY(key_multi_msgplayer3),
-    CONFIG_VARIABLE_KEY(key_multi_msgplayer4),
-    CONFIG_VARIABLE_KEY(key_multi_msgplayer5),
-    CONFIG_VARIABLE_KEY(key_multi_msgplayer6),
-    CONFIG_VARIABLE_KEY(key_multi_msgplayer7),
-    CONFIG_VARIABLE_KEY(key_multi_msgplayer8),
-    CONFIG_VARIABLE_STRING(player_name),
-
     // Special menu keys, not available for rebinding
     CONFIG_VARIABLE_KEY(key_menu_activate),
     CONFIG_VARIABLE_KEY(key_menu_up),
@@ -412,15 +354,6 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_INT(mouseb_backward),
     CONFIG_VARIABLE_INT(mouseb_prevweapon),
     CONFIG_VARIABLE_INT(mouseb_nextweapon),
-    CONFIG_VARIABLE_INT(mouseb_jump),
-
-    // Heretic: Inventory
-    CONFIG_VARIABLE_INT(mouseb_invleft),
-    CONFIG_VARIABLE_INT(mouseb_invright),
-    CONFIG_VARIABLE_INT(mouseb_useartifact),
-
-    // Heretic: permanent "noartiskip" mode
-    CONFIG_VARIABLE_INT(ctrl_noartiskip),
 
     //
     // Joystick controls
@@ -462,7 +395,6 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_INT(joyb_strafe),
     CONFIG_VARIABLE_INT(joyb_use),
     CONFIG_VARIABLE_INT(joyb_speed),
-    CONFIG_VARIABLE_INT(joyb_jump),
     CONFIG_VARIABLE_INT(joyb_strafeleft),
     CONFIG_VARIABLE_INT(joyb_straferight),
     CONFIG_VARIABLE_INT(joyb_prevweapon),

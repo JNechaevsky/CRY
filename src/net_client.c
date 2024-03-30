@@ -123,10 +123,6 @@ net_waitdata_t net_client_wait_data;
 
 boolean net_waiting_for_launch = false;
 
-// Name that we send to the server
-
-char *net_player_name = NULL;
-
 // Connected but not participating in the game (observer)
 
 boolean drone = false;
@@ -1045,7 +1041,6 @@ static void NET_CL_SendSYN(net_connect_data_t *data)
     NET_WriteString(packet, PACKAGE_STRING);
     NET_WriteProtocolList(packet);
     NET_WriteConnectData(packet, data);
-    NET_WriteString(packet, net_player_name);
     NET_Conn_SendPacket(&client_connection, packet);
     NET_FreePacket(packet);
 }
@@ -1198,13 +1193,6 @@ void NET_CL_Disconnect(void)
 
 void NET_CL_Init(void)
 {
-    // Try to set from the USER and USERNAME environment variables
-    // Otherwise, fallback to "Player"
-
-    if (net_player_name == NULL)
-    {
-        net_player_name = NET_GetRandomPetName();
-    }
 }
 
 void NET_Init(void)
@@ -1215,5 +1203,4 @@ void NET_Init(void)
 
 void NET_BindVariables(void)
 {
-    M_BindStringVariable("player_name", &net_player_name);
 }

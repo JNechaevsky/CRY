@@ -57,50 +57,6 @@ int key_nextlevel   = 0; // [crispy]
 int key_demospeed   = 0; // [crispy]
 int key_flip_levels = 0; // [crispy]
 
-// Heretic keyboard controls
- 
-int key_flyup = KEY_PGUP;
-int key_flydown = KEY_INS;
-int key_flycenter = KEY_HOME;
-
-int key_lookup = KEY_PGDN;
-int key_lookdown = KEY_DEL;
-int key_lookcenter = KEY_END;
-
-int key_invleft = '[';
-int key_invright = ']';
-int key_useartifact = KEY_ENTER;
-
-int key_arti_quartz = 0;
-int key_arti_urn = 0;
-int key_arti_bomb = 0;
-int key_arti_tome = 127;
-int key_arti_ring = 0;
-int key_arti_chaosdevice = 0;
-int key_arti_shadowsphere = 0;
-int key_arti_wings = 0;
-int key_arti_torch = 0;
-int key_arti_morph = 0;
-
-// Hexen keyboard controls
-
-int key_jump = '/';
-
-int key_arti_all             = KEY_BACKSPACE;
-int key_arti_health          = '\\';
-int key_arti_poisonbag       = '0';
-int key_arti_blastradius     = '9';
-int key_arti_teleport        = '8';
-int key_arti_teleportother   = '7';
-int key_arti_egg             = '6';
-int key_arti_invulnerability = '5';
-// Extra artifacts
-int key_arti_servant = 0;
-int key_arti_bracers = 0;
-int key_arti_boots = 0;
-int key_arti_krater = 0;
-int key_arti_incant = 0;
-
 // Special modes
 
 int key_spectator = 0;
@@ -158,14 +114,7 @@ int key_spy           = KEY_F12;
 int key_pause           = KEY_PAUSE;
 int key_menu_screenshot = KEY_PRTSCR;
 int key_message_refresh = KEY_ENTER;
-// [JN] Heretic using ENTER for afrtifacts activation.
-int key_message_refresh_hr = 0;
 int key_demo_quit       = 'q';
-
-// Multiplayer
-
-int key_multi_msg = 't';
-int key_multi_msgplayer[8];
 
 // Special menu keys, not available for rebinding
 
@@ -195,12 +144,6 @@ int mousebstrafeleft  = -1;
 int mousebstraferight = -1;
 int mousebprevweapon  = 4;
 int mousebnextweapon  = 3;
-int mousebjump        = -1;
-
-// Heretic: Inventory
-int mousebinvleft = -1;
-int mousebinvright = -1;
-int mousebuseartifact = -1;
 
 // Control whether if a mouse button is double clicked,
 // it acts like "use" has been pressed.
@@ -221,13 +164,6 @@ int joybprevweapon = -1;
 int joybnextweapon = -1;
 int joybmenu = -1;
 int joybautomap = -1;
-int joybjump = -1;
-
-//
-// Allow artifacts to be used when the run key is held down.
-//
-
-int ctrl_noartiskip = 0;
 
 
 // 
@@ -372,72 +308,4 @@ void M_BindControls (void)
     M_BindIntVariable("joyb_nextweapon",        &joybnextweapon);
     M_BindIntVariable("joyb_menu_activate",     &joybmenu);
     M_BindIntVariable("joyb_toggle_automap",    &joybautomap);
-}
-
-void M_BindHereticControls (void)
-{
-    M_BindIntVariable("key_lookup",         &key_lookup);
-    M_BindIntVariable("key_lookdown",       &key_lookdown);
-    M_BindIntVariable("key_lookcenter",     &key_lookcenter);
-
-    M_BindIntVariable("key_flyup",          &key_flyup);
-    M_BindIntVariable("key_flydown",        &key_flydown);
-    M_BindIntVariable("key_flycenter",      &key_flycenter);
-
-    M_BindIntVariable("key_invleft",        &key_invleft);
-    M_BindIntVariable("key_invright",       &key_invright);
-    M_BindIntVariable("key_useartifact",    &key_useartifact);
-
-    M_BindIntVariable("key_arti_quartz",        &key_arti_quartz);
-    M_BindIntVariable("key_arti_urn",           &key_arti_urn);
-    M_BindIntVariable("key_arti_bomb",          &key_arti_bomb);
-    M_BindIntVariable("key_arti_tome",          &key_arti_tome);
-    M_BindIntVariable("key_arti_ring",          &key_arti_ring);
-    M_BindIntVariable("key_arti_chaosdevice",   &key_arti_chaosdevice);
-    M_BindIntVariable("key_arti_shadowsphere",  &key_arti_shadowsphere);
-    M_BindIntVariable("key_arti_wings",         &key_arti_wings);
-    M_BindIntVariable("key_arti_torch",         &key_arti_torch);
-    M_BindIntVariable("key_arti_morph",         &key_arti_morph);
-
-    M_BindIntVariable("mouseb_invleft",     &mousebinvleft);
-    M_BindIntVariable("mouseb_invright",    &mousebinvright);
-    M_BindIntVariable("mouseb_useartifact", &mousebuseartifact);
-
-    M_BindIntVariable("ctrl_noartiskip",        &ctrl_noartiskip);
-}
-
-void M_BindHexenControls(void)
-{
-    M_BindIntVariable("key_jump",           &key_jump);
-    M_BindIntVariable("mouseb_jump",        &mousebjump);
-    M_BindIntVariable("joyb_jump",          &joybjump);
-
-    M_BindIntVariable("key_arti_all",             &key_arti_all);
-    M_BindIntVariable("key_arti_health",          &key_arti_health);
-    M_BindIntVariable("key_arti_poisonbag",       &key_arti_poisonbag);
-    M_BindIntVariable("key_arti_blastradius",     &key_arti_blastradius);
-    M_BindIntVariable("key_arti_teleport",        &key_arti_teleport);
-    M_BindIntVariable("key_arti_teleportother",   &key_arti_teleportother);
-    M_BindIntVariable("key_arti_egg",             &key_arti_egg);
-    M_BindIntVariable("key_arti_invulnerability", &key_arti_invulnerability);
-    // Extra artifacts
-    M_BindIntVariable("key_arti_servant",         &key_arti_servant);
-    M_BindIntVariable("key_arti_bracers",         &key_arti_bracers);
-    M_BindIntVariable("key_arti_boots",           &key_arti_boots);
-    M_BindIntVariable("key_arti_krater",          &key_arti_krater);
-    M_BindIntVariable("key_arti_incant",          &key_arti_incant);
-}
-
-void M_BindChatControls (unsigned int num_players)
-{
-    char name[32];  // haleyjd: 20 not large enough - Thank you, come again!
-    unsigned int i; // haleyjd: signedness conflict
-
-    M_BindIntVariable("key_multi_msg",     &key_multi_msg);
-
-    for (i = 0 ; i < num_players ; ++i)
-    {
-        M_snprintf(name, sizeof(name), "key_multi_msgplayer%i", i + 1);
-        M_BindIntVariable(name, &key_multi_msgplayer[i]);
-    }
 }

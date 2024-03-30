@@ -456,20 +456,12 @@ void NET_WriteFullTiccmd(net_packet_t *packet, net_full_ticcmd_t *cmd, boolean l
 
 void NET_WriteWaitData(net_packet_t *packet, net_waitdata_t *data)
 {
-    int i;
-
     NET_WriteInt8(packet, data->num_players);
     NET_WriteInt8(packet, data->num_drones);
     NET_WriteInt8(packet, data->ready_players);
     NET_WriteInt8(packet, data->max_players);
     NET_WriteInt8(packet, data->is_controller);
     NET_WriteInt8(packet, data->consoleplayer);
-
-    for (i = 0; i < data->num_players && i < NET_MAXPLAYERS; ++i)
-    {
-        NET_WriteString(packet, data->player_names[i]);
-        NET_WriteString(packet, data->player_addrs[i]);
-    }
 
     NET_WriteInt8(packet, data->is_freedoom);
 }
@@ -497,8 +489,6 @@ boolean NET_ReadWaitData(net_packet_t *packet, net_waitdata_t *data)
         {
             return false;
         }
-
-        M_StringCopy(data->player_names[i], s, MAXPLAYERNAME);
 
         s = NET_ReadString(packet);
 

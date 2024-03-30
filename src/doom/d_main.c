@@ -395,12 +395,6 @@ void D_BindVariables(void)
     I_BindSoundVariables();
 
     M_BindControls();
-    M_BindChatControls(MAXPLAYERS);
-
-    key_multi_msgplayer[0] = HUSTR_KEYGREEN;
-    key_multi_msgplayer[1] = HUSTR_KEYINDIGO;
-    key_multi_msgplayer[2] = HUSTR_KEYBROWN;
-    key_multi_msgplayer[3] = HUSTR_KEYRED;
 
     NET_BindVariables();
 
