@@ -300,8 +300,8 @@ static void WI_drawStats (void)
     // Finished level stuff
     if (wbs->last < NUMMAPS)
     {
-		sprintf(str, "%s", level_name);
-		M_WriteTextBigCentered(11, level_name, NULL);
+		sprintf(str, "%s", level_names[gamemap-1]);
+		M_WriteTextBigCentered(11, str, NULL);
 		M_WriteTextBigCentered(29, "Finished", NULL);
 	}
 

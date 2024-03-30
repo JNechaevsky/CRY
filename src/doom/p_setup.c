@@ -126,9 +126,6 @@ fixed_t GetOffset(vertex_t *v1, vertex_t *v2)
 //
 // =============================================================================
 
-// Current level name.
-const char *level_name;
-
 // Array holding all level names.
 const char* level_names[] =
 {
@@ -159,12 +156,6 @@ const char* level_names[] =
 	// "Fortress of Mystery",
 	// "Warrens",
 };
-
-static void P_LevelNameInit (void)
-{
-    level_name = (level_names[gamemap-1]);
-}
-
 
 //
 // P_LoadVertexes
@@ -1380,9 +1371,6 @@ P_SetupLevel
     // preload graphics
     if (precache)
 	R_PrecacheLevel ();
-
-    // [JN] Set level name.
-    P_LevelNameInit();
 
     // [JN] Force to disable spectator mode.
     crl_spectating = 0;

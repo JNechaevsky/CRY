@@ -636,7 +636,6 @@ extern fixed_t   bmaporgx;
 extern fixed_t   bmaporgy;      // origin of block map
 extern mobj_t  **blocklinks;    // for thing chains
 
-extern const char *level_name;		// Current level name.
 extern const char *level_names[];	// Array of all level names.
 
 // -----------------------------------------------------------------------------

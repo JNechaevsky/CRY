@@ -1985,7 +1985,7 @@ void AM_LevelNameDrawer (void)
 {
     static char str[128];
 
-    sprintf(str, "%s", level_name);
+    sprintf(str, "%s", level_names[gamemap-1]);
     M_WriteText(0 - WIDESCREENDELTA, 152, str, NULL);
 }
 
