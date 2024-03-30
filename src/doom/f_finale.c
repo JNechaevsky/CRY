@@ -258,7 +258,7 @@ static void F_TextWrite (void)
 	if (cx+w > ORIGWIDTH)
 	break;
 
-	V_DrawShadowedPatchOptional(cx, cy, 0, hu_font_b[c]);
+	V_DrawShadowedPatchOptional(cx, cy, hu_font_b[c]);
 	cx+=w;
 	}
 }

@@ -110,7 +110,7 @@ static const int WI_drawNum (int x, int y, int n, int digits)
 	while (digits--)
 	{
 		x -= fontwidth;
-		V_DrawShadowedPatchOptional(x, y, 0, num[ n % 10 ]);
+		V_DrawShadowedPatchOptional(x, y, num[ n % 10 ]);
 		n /= 10;
 	}
 
@@ -128,7 +128,7 @@ static void WI_drawPercent (int x, int y, int p)
 		return;
 	}
 
-	V_DrawShadowedPatchOptional(x, y, 0, percent);
+	V_DrawShadowedPatchOptional(x, y, percent);
 	WI_drawNum(x, y, p, -1);
 }
 
@@ -158,7 +158,7 @@ static void WI_drawTime (int x, int y, int t, boolean suck)
 			// draw
 			if (div==60 || t / div)
 			{
-				V_DrawShadowedPatchOptional(x, y, 0, colon);
+				V_DrawShadowedPatchOptional(x, y, colon);
 			}
 		} while (t / div);
 	}

@@ -3309,15 +3309,15 @@ static void M_DrawSaveLoadBorder(int x,int y)
 {
     int             i;
 	
-    V_DrawShadowedPatchOptional(x - 8, y, 0, W_CacheLumpName("M_LSLEFT", PU_CACHE));
+    V_DrawShadowedPatchOptional(x - 8, y, W_CacheLumpName("M_LSLEFT", PU_CACHE));
 	
     for (i = 0;i < 24;i++)
     {
-	V_DrawShadowedPatchOptional(x, y, 0, W_CacheLumpName("M_LSCNTR", PU_CACHE));
+	V_DrawShadowedPatchOptional(x, y, W_CacheLumpName("M_LSCNTR", PU_CACHE));
 	x += 8;
     }
 
-    V_DrawShadowedPatchOptional(x, y, 0, W_CacheLumpName("M_LSRGHT", PU_CACHE));
+    V_DrawShadowedPatchOptional(x, y, W_CacheLumpName("M_LSRGHT", PU_CACHE));
 }
 
 
@@ -3655,7 +3655,7 @@ static void M_DrawNewGame (void)
 	M_WriteTextBigCentered(38, "Difficulty:", NULL);
 	// [JN] Jaguar: draw "Nightmare!" as separated patch.
 	dp_translation = M_Big_Line_Glow(currentMenu->menuitems[4].tics);
-	V_DrawShadowedPatchOptional(69, 127, 0, W_CacheLumpName("M_NMARE", PU_CACHE));
+	V_DrawShadowedPatchOptional(69, 127, W_CacheLumpName("M_NMARE", PU_CACHE));
 	dp_translation = NULL;
 }
 
@@ -3678,7 +3678,7 @@ static int epi;
 
 static void M_DrawEpisode(void)
 {
-    V_DrawShadowedPatchOptional(54, 38, 0, W_CacheLumpName("M_EPISOD", PU_CACHE));
+    V_DrawShadowedPatchOptional(54, 38, W_CacheLumpName("M_EPISOD", PU_CACHE));
 }
 
 static void M_ChooseSkill (int choice)
@@ -3917,14 +3917,14 @@ M_DrawThermo
     }
 
     xx = x;
-    V_DrawShadowedPatchOptional(xx, y, 0, W_CacheLumpName("M_THERML", PU_CACHE));
+    V_DrawShadowedPatchOptional(xx, y, W_CacheLumpName("M_THERML", PU_CACHE));
     xx += 8;
     for (i=0;i<thermWidth;i++)
     {
-	V_DrawShadowedPatchOptional(xx, y, 0, W_CacheLumpName("M_THERMM", PU_CACHE));
+	V_DrawShadowedPatchOptional(xx, y, W_CacheLumpName("M_THERMM", PU_CACHE));
 	xx += 8;
     }
-    V_DrawShadowedPatchOptional(xx, y, 0, W_CacheLumpName("M_THERMR", PU_CACHE));
+    V_DrawShadowedPatchOptional(xx, y, W_CacheLumpName("M_THERMR", PU_CACHE));
 
     // [crispy] do not crash anymore if value exceeds thermometer range
     if (thermDot >= thermWidth)
@@ -4038,7 +4038,7 @@ void M_WriteText (int x, int y, const char *string, byte *table)
             break;
         }
 
-        V_DrawShadowedPatchOptional(cx, cy, 0, hu_font_s[c]);
+        V_DrawShadowedPatchOptional(cx, cy, hu_font_s[c]);
         cx+=w;
     }
 
@@ -4110,7 +4110,7 @@ void M_WriteTextCentered (const int y, const char *string, byte *table)
             break;
         }
         
-        V_DrawShadowedPatchOptional(cx, cy, 0, hu_font_s[c]);
+        V_DrawShadowedPatchOptional(cx, cy, hu_font_s[c]);
         cx += w;
     }
     
@@ -4164,7 +4164,7 @@ void M_WriteTextBig (int x, int y, const char *string, byte *table)
             break;
         }
 
-        V_DrawShadowedPatchOptional(cx, cy, 0, hu_font_b[c]);
+        V_DrawShadowedPatchOptional(cx, cy, hu_font_b[c]);
 
         // Place one char to another with one pixel
         cx += w-1;
@@ -4241,7 +4241,7 @@ void M_WriteTextBigCentered (const int y, const char *string, byte *table)
             break;
         }
         
-        V_DrawShadowedPatchOptional(cx, cy, 0, hu_font_b[c]);
+        V_DrawShadowedPatchOptional(cx, cy, hu_font_b[c]);
 
         // Place one char to another with one pixel
         cx += w-1;
@@ -5203,7 +5203,7 @@ void M_Drawer (void)
     else
     {
         // DRAW SKULL
-        V_DrawShadowedPatchOptional(x + SKULLXOFF, y - 5 + itemOn * LINEHEIGHT, 0,
+        V_DrawShadowedPatchOptional(x + SKULLXOFF, y - 5 + itemOn * LINEHEIGHT,
                                     W_CacheLumpName(skullName[whichSkull], PU_CACHE));
 
         for (i = 0 ; i < max ; i++)

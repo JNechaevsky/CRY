@@ -142,9 +142,9 @@ static const inline pixel_t drawpatchpx10 (const pixel_t dest, const pixel_t sou
 static const inline pixel_t drawpatchpx11 (const pixel_t dest, const pixel_t source)
 {return I_BlendOver(dest, pal_color[dp_translation[source]]);}
 
-// [JN] The shadow of the patch rendering functions:
+// [JN] The shadow of the patch rendering function:
 static const inline pixel_t drawshadow_doom (const pixel_t dest, const pixel_t source)
-{return I_BlendDark(dest, 0x80);} // [JN] 128 (50%) of 256 full translucency.
+{return I_BlendDark(dest, 160);} // [JN] 160 of 256 full translucency.
 
 // [crispy] array of function pointers holding the different rendering functions
 typedef const pixel_t drawpatchpx_t (const pixel_t dest, const pixel_t source);
@@ -249,7 +249,7 @@ void V_DrawPatch(int x, int y, patch_t *patch)
 //  dest2 - shadow, drawed first below main patch.
 //
 
-void V_DrawShadowedPatchOptional(int x, int y, int shadow_type, patch_t *patch)
+void V_DrawShadowedPatchOptional(int x, int y, patch_t *patch)
 {
     int count, count2, col;
     column_t *column;
