@@ -342,43 +342,33 @@ static void WI_drawStats (void)
 
 static void WI_checkForAccelerate (void)
 {
-	int		  i;
-	player_t *player;
-
 	// check for button presses to skip delays
-	for (i=0, player = players ; i<MAXPLAYERS ; i++, player++)
+	for (int i = 0 ; i < MAXPLAYERS ; i++)
 	{
-		if (playeringame[i])
+		if (players[i].cmd.buttons & BT_ATTACK)
 		{
-			if (player->cmd.buttons & BT_ATTACK)
+			if (!players[i].attackdown)
+            {
+                acceleratestage = 1;
+            }
+			players[i].attackdown = true;
+		}
+		else
+		{
+			players[i].attackdown = false;
+		}
+
+		if (players[i].cmd.buttons & BT_USE)
+		{
+			if (!players[i].usedown)
 			{
-				if (!player->attackdown)
 				acceleratestage = 1;
-				player->attackdown = true;
 			}
-			else
-			{
-				player->attackdown = false;
-			}
-
-			if (player->cmd.buttons & BT_USE)
-			{
-				if (!player->usedown)
-				{
-					acceleratestage = 1;
-				}
-				player->usedown = true;
-			}
-			else
-			{
-				player->usedown = false;
-			}
-
-			// [JN] Pressing PAUSE should not accelerate intermission screen
-			if (player->cmd.buttons & BTS_PAUSE)
-			{
-				acceleratestage = 0;
-			}
+			players[i].usedown = true;
+		}
+		else
+		{
+			players[i].usedown = false;
 		}
 	}
 }
