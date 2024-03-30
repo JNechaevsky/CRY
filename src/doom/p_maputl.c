@@ -83,8 +83,8 @@ int P_PointOnLineSide (fixed_t x, fixed_t y, line_t *line)
 	dx = (x - line->v1->x);
 	dy = (y - line->v1->y);
 	
-	left = (line->dy>>16) * (dx>>16);
-	right = (dy>>16) * (line->dx>>16);
+	left = FixedMul(line->dy>>FRACBITS, dx);
+	right = FixedMul(dy, line->dx>>FRACBITS);
 	
 	if (right < left)
 		return 0;		/* front side */
