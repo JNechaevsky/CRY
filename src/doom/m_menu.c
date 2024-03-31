@@ -176,13 +176,10 @@ static menu_t *currentMenu;
 // =============================================================================
 
 static void M_NewGame(int choice);
-static void M_Episode(int choice);
 static void M_ChooseSkill(int choice);
 static void M_LoadGame(int choice);
 static void M_SaveGame(int choice);
 static void M_EndGame(int choice);
-static void M_ReadThis(int choice);
-static void M_ReadThis2(int choice);
 static void M_QuitDOOM(int choice);
 
 static void M_Choose_ID_Main (int choice);
@@ -202,10 +199,8 @@ static void M_QuickSave(void);
 static void M_QuickLoad(void);
 
 static void M_DrawMainMenu(void);
-static void M_DrawReadThis1(void);
-static void M_DrawReadThis2(void);
+static void M_DrawHelp(void);
 static void M_DrawNewGame(void);
-static void M_DrawEpisode(void);
 static void M_DrawSound(void);
 static void M_DrawLoad(void);
 static void M_DrawSave(void);
@@ -228,7 +223,6 @@ enum
     options,
     loadgame,
     savegame,
-    readthis,
     quitdoom,
     main_end
 } main_e;
@@ -239,8 +233,6 @@ static menuitem_t MainMenu[]=
 	{ M_SWTC, "Options",    M_Choose_ID_Main, 'o' },
 	{ M_SWTC, "Load game",  M_LoadGame,       'l' },
 	{ M_SWTC, "Save game",  M_SaveGame,       's' },
-	// Another hickup with Special edition.
-	{ M_SWTC, "Read this!", M_ReadThis,       'r' },
 	{ M_SWTC, "Quit game",  M_QuitDOOM,       'q' }
 };
 
@@ -250,40 +242,8 @@ static menu_t MainDef =
     NULL,
     MainMenu,
     M_DrawMainMenu,
-    97,64,
+    97,72,
     0,
-    false, false, false,
-};
-
-//
-// EPISODE SELECT
-//
-
-enum
-{
-    ep1,
-    ep2,
-    ep3,
-    ep4,
-    ep_end
-} episodes_e;
-
-static menuitem_t EpisodeMenu[]=
-{
-    { M_SWTC, "M_EPI1",  M_Episode,  'k' },
-    { M_SWTC, "M_EPI2",  M_Episode,  't' },
-    { M_SWTC, "M_EPI3",  M_Episode,  'i' },
-    { M_SWTC, "M_EPI4",  M_Episode,  't' },
-};
-
-static menu_t EpiDef =
-{
-    ep_end,         // # of menu items
-    &MainDef,       // previous menu
-    EpisodeMenu,    // menuitem_t ->
-    M_DrawEpisode,  // drawing routine ->
-    48,63,          // x,y
-    ep1,            // lastOn
     false, false, false,
 };
 
@@ -313,7 +273,7 @@ static menuitem_t NewGameMenu[]=
 static menu_t NewDef =
 {
     newg_end,       // # of menu items
-    &EpiDef,        // previous menu
+    &MainDef,       // previous menu
     NewGameMenu,    // menuitem_t ->
     M_DrawNewGame,  // drawing routine ->
     69,63,          // x,y
@@ -322,49 +282,27 @@ static menu_t NewDef =
 };
 
 //
-// Read This! MENU 1 & 2
+// HELP Menu
 //
 
 enum
 {
-    rdthsempty1,
-    read1_end
+    helpempty,
+    help_end
 } read_e;
 
-static menuitem_t ReadMenu1[] =
+static menuitem_t HelpMenu[] =
 {
-    { M_SWTC, "",  M_ReadThis2,  0 }
+    { M_SWTC, "", M_FinishReadThis, 0 }
 };
 
-static menu_t ReadDef1 =
+static menu_t HelpDef =
 {
-    read1_end,
+    help_end,
     &MainDef,
-    ReadMenu1,
-    M_DrawReadThis1,
-    280,185,
-    0,
-    false, false, false,
-};
-
-enum
-{
-    rdthsempty2,
-    read2_end
-} read_e2;
-
-static menuitem_t ReadMenu2[]=
-{
-    { M_SWTC, "",  M_FinishReadThis,  0 }
-};
-
-static menu_t ReadDef2 =
-{
-    read2_end,
-    &ReadDef1,
-    ReadMenu2,
-    M_DrawReadThis2,
-    330,175,
+    HelpMenu,
+    M_DrawHelp,
+    330,165,
     0,
     false, false, false,
 };
@@ -3547,36 +3485,15 @@ static void M_QuickLoad(void)
 
 
 //
-// Read This Menus
-// Had a "quick hack to fix romero bug"
+// [JN] HELP Menu
 //
-static void M_DrawReadThis1(void)
+
+static void M_DrawHelp (void)
 {
     st_fullupdate = true;
 
-    V_DrawPatchFullScreen(W_CacheLumpName("HELP2", PU_CACHE), false);
-}
-
-
-
-//
-// Read This Menus - optional second page.
-//
-static void M_DrawReadThis2(void)
-{
-    st_fullupdate = true;
-
-    // We only ever draw the second page if this is 
-    // gameversion == exe_doom_1_9 and gamemode == registered
-
-    V_DrawPatchFullScreen(W_CacheLumpName("HELP1", PU_CACHE), false);
-}
-
-static void M_DrawReadThisCommercial(void)
-{
-    st_fullupdate = true;
-
-    V_DrawPatchFullScreen(W_CacheLumpName("HELP", PU_CACHE), false);
+    V_DrawPatchFullScreen(W_CacheLumpName("M_TITLE", PU_CACHE), false);
+    V_DrawShadowedPatchOptional(0, 0, W_CacheLumpName("HELP", PU_CACHE));
 }
 
 
@@ -3676,24 +3593,11 @@ static void M_NewGame(int choice)
 //
 static int epi;
 
-static void M_DrawEpisode(void)
-{
-    V_DrawShadowedPatchOptional(54, 38, W_CacheLumpName("M_EPISOD", PU_CACHE));
-}
-
 static void M_ChooseSkill (int choice)
 {
 	G_DeferedInitNew(choice, epi + 1, 1);
 	M_ClearMenus();
 }
-
-static void M_Episode(int choice)
-{
-    epi = choice;
-
-    M_SetupNextMenu(&NewDef);
-}
-
 
 //
 //      Toggle messages on/off
@@ -3748,16 +3652,6 @@ static void M_EndGame(int choice)
 //
 // M_ReadThis
 //
-static void M_ReadThis(int choice)
-{
-    M_SetupNextMenu(&ReadDef1);
-}
-
-static void M_ReadThis2(int choice)
-{
-    M_SetupNextMenu(&ReadDef2);
-}
-
 static void M_FinishReadThis(int choice)
 {
     M_SetupNextMenu(&MainDef);
@@ -4773,11 +4667,7 @@ boolean M_Responder (event_t* ev)
         {
 	    M_StartControlPanel ();
 
-	    if (gameversion >= exe_ultimate)
-	      currentMenu = &ReadDef2;
-	    else
-	      currentMenu = &ReadDef1;
-
+	    currentMenu = &HelpDef;
 	    itemOn = 0;
 	    S_StartSound(NULL,sfx_swtchn);
 	    return true;
@@ -5306,34 +5196,6 @@ void M_Init (void)
 
     // [JN] Set cursor position in skill menu to default skill level.
     NewDef.lastOn = gp_default_skill;
-
-    // Here we could catch other version dependencies,
-    //  like HELP1/2, and four episodes.
-
-    // The same hacks were used in the original Doom EXEs.
-
-    if (gameversion >= exe_ultimate)
-    {
-        MainMenu[readthis].routine = M_ReadThis2;
-        ReadDef2.prevMenu = NULL;
-    }
-
-    if (gameversion >= exe_final && gameversion <= exe_final2)
-    {
-        ReadDef2.routine = M_DrawReadThisCommercial;
-    }
-
-    if (gamemode == commercial)
-    {
-        MainMenu[readthis] = MainMenu[quitdoom];
-        MainDef.numitems--;
-        MainDef.y += 8;
-        NewDef.prevMenu = &MainDef;
-        ReadDef1.routine = M_DrawReadThisCommercial;
-        ReadDef1.x = 330;
-        ReadDef1.y = 165;
-        ReadMenu1[rdthsempty1].routine = M_FinishReadThis;
-    }
 }
 
 // [crispy] delete a savegame
