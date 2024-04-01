@@ -1550,7 +1550,7 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	S_SPID_STND,		// spawnstate
 	3000,		// spawnhealth
 	S_SPID_RUN1,		// seestate
-	sfx_spisit,		// seesound
+	S_NULL,		// seesound
 	8,		// reactiontime
 	sfx_shotgn,		// attacksound
 	S_SPID_PAIN,		// painstate
@@ -1602,7 +1602,7 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	S_CYBER_STND,		// spawnstate
 	4000,		// spawnhealth
 	S_CYBER_RUN1,		// seestate
-	sfx_cybsit,		// seesound
+	S_NULL,		// seesound
 	8,		// reactiontime
 	0,		// attacksound
 	S_CYBER_PAIN,		// painstate

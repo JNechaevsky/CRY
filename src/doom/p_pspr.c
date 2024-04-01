@@ -160,15 +160,6 @@ weaponinfo_t	weaponinfo[NUMWEAPONS] =
 	S_SAW1,
 	S_NULL
     },
-    {
-	// super shotgun
-	am_shell,
-	S_DSGUNUP,
-	S_DSGUNDOWN,
-	S_DSGUN,
-	S_DSGUN1,
-	S_DSGUNFLASH1
-    },	
 };
 
 
