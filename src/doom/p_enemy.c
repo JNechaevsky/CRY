@@ -1002,7 +1002,7 @@ void A_BruisAttack (mobj_t *actor)
     int		damage;
 	
     if (!actor->target)
-	return;
+    return;
 		
     // [crispy] face the enemy
     // A_FaceTarget (actor);
