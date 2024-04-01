@@ -169,7 +169,6 @@ static const struct
     { wp_chainsaw,        wp_fist },
     { wp_pistol,          wp_pistol },
     { wp_shotgun,         wp_shotgun },
-    { wp_supershotgun,    wp_shotgun },
     { wp_chaingun,        wp_chaingun },
     { wp_missile,         wp_missile },
     { wp_plasma,          wp_plasma },
@@ -233,21 +232,6 @@ int G_CmdChecksum (ticcmd_t* cmd)
 
 static boolean WeaponSelectable(weapontype_t weapon)
 {
-    // Can't select the super shotgun in Doom 1.
-
-    if (weapon == wp_supershotgun && !havessg)
-    {
-        return false;
-    }
-
-    // These weapons aren't available in shareware.
-
-    if ((weapon == wp_plasma || weapon == wp_bfg)
-     && gamemission == doom && gamemode == shareware)
-    {
-        return false;
-    }
-
     // Can't select a weapon if we don't own it.
 
     if (!players[consoleplayer].weaponowned[weapon])

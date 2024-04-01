@@ -88,9 +88,6 @@ boolean main_loop_started = false;
 // wipegamestate can be set to -1 to force a wipe on the next draw
 gamestate_t wipegamestate = GS_DEMOSCREEN;
 
-// [JN] Check for available SSG from Crispy Doom.
-boolean havessg = false;
-
 
 // -----------------------------------------------------------------------------
 // D_ProcessEvents
@@ -812,21 +809,6 @@ void D_DoomMain (void)
     I_InitJoystick();
     I_InitSound(doom);
     I_InitMusic();
-
-    // [crispy] check for SSG resources
-    havessg = false;
-	/*
-    (
-        gamemode == commercial ||
-        (
-            W_CheckNumForName("sht2a0")         != -1 && // [crispy] wielding/firing sprite sequence
-            I_GetSfxLumpNum(&S_sfx[sfx_dshtgn]) != -1 && // [crispy] firing sound
-            I_GetSfxLumpNum(&S_sfx[sfx_dbopn])  != -1 && // [crispy] opening sound
-            I_GetSfxLumpNum(&S_sfx[sfx_dbload]) != -1 && // [crispy] reloading sound
-            I_GetSfxLumpNum(&S_sfx[sfx_dbcls])  != -1    // [crispy] closing sound
-        )
-    );
-	*/
 
     // Initial netgame startup. Connect to server etc.
     D_ConnectNetGame();

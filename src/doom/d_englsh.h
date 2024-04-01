@@ -105,7 +105,6 @@
 #define GOTLAUNCHER	"You got the rocket launcher!"
 #define GOTPLASMA	"You got the plasma gun!"
 #define GOTSHOTGUN	"You got the shotgun!"
-#define GOTSHOTGUN2	"You got the super shotgun!"
 
 //
 // P_Doors.C

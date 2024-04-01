@@ -48,11 +48,6 @@ extern void D_StartTitle (void);
 //
 
 extern boolean advancedemo;
-extern boolean sigil;
-extern boolean sigil2;
-extern boolean nerve;
-
-extern boolean havessg;
 
 extern gameaction_t gameaction;
 

@@ -254,16 +254,6 @@ static boolean WeaponAvailable (int w)
         return false;
     }
 
-    if (w == wp_supershotgun && !havessg)
-    {
-        return false;
-    }
-
-    if ((w == wp_bfg || w == wp_plasma) && gamemode == shareware)
-    {
-        return false;
-    }
-
     return true;
 }
 

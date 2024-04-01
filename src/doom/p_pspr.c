@@ -237,10 +237,8 @@ boolean P_CheckAmmo (player_t* player)
     // Minimal amount for one shot varies.
     if (player->readyweapon == wp_bfg)
 	count = BFGCELLS;
-    else if (player->readyweapon == wp_supershotgun)
-	count = 2;	// Double barrel.
     else
-	count = 1;	// Regular.
+	count = 1;
 
     // Some do not need ammunition anyway.
     // Return if current ammunition sufficient.
@@ -256,12 +254,6 @@ boolean P_CheckAmmo (player_t* player)
 	    && (gamemode != shareware) )
 	{
 	    player->pendingweapon = wp_plasma;
-	}
-	else if (player->weaponowned[wp_supershotgun] 
-		 && player->ammo[am_shell]>2
-		 && (havessg) )
-	{
-	    player->pendingweapon = wp_supershotgun;
 	}
 	else if (player->weaponowned[wp_chaingun]
 		 && player->ammo[am_clip])
