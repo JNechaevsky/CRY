@@ -162,31 +162,6 @@ static void InitConnectData(net_connect_data_t *connect_data)
     boolean shorttics;
 
     connect_data->max_players = MAXPLAYERS;
-    connect_data->drone = false;
-
-    //!
-    // @category net
-    //
-    // Run as the left screen in three screen mode.
-    //
-
-    if (M_CheckParm("-left") > 0)
-    {
-        viewangleoffset = ANG90;
-        connect_data->drone = true;
-    }
-
-    //! 
-    // @category net
-    //
-    // Run as the right screen in three screen mode.
-    //
-
-    if (M_CheckParm("-right") > 0)
-    {
-        viewangleoffset = ANG270;
-        connect_data->drone = true;
-    }
 
     //
     // Connect data

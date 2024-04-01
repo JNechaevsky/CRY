@@ -51,9 +51,6 @@
 #include "wi_stuff.h"
 #include "st_bar.h"
 #include "am_map.h"
-#include "net_client.h"
-#include "net_dedicated.h"
-#include "net_query.h"
 #include "d_main.h"
 #include "ct_chat.h"
 #include "r_local.h"
@@ -396,8 +393,6 @@ void D_BindVariables(void)
 
     M_BindControls();
 
-    NET_BindVariables();
-
     // [JN] Game-dependent variables:
     M_BindIntVariable("key_message_refresh",    &key_message_refresh);
     M_BindIntVariable("sfx_volume",             &sfxVolume);
@@ -415,11 +410,6 @@ void D_BindVariables(void)
 
 boolean D_GrabMouseCallback(void)
 {
-    // Drone players don't need mouse focus
-
-    if (drone)
-        return false;
-
     // [JN] CRL - always grab mouse in spectator mode.
     // It's supposed to be controlled by hand, even while pause.
     // However, do not grab mouse while active game menu.
@@ -598,63 +588,6 @@ void D_DoomMain (void)
     
     // Call I_ShutdownGraphics on quit
    	I_AtExit(I_ShutdownGraphics, true);
-
-
-    //!
-    // @category net
-    //
-    // Start a dedicated server, routing packets but not participating
-    // in the game itself.
-    //
-
-    if (M_CheckParm("-dedicated") > 0)
-    {
-        printf("Dedicated server mode.\n");
-        NET_DedicatedServer();
-
-        // Never returns
-    }
-
-    //!
-    // @category net
-    //
-    // Query the Internet master server for a global list of active
-    // servers.
-    //
-
-    if (M_CheckParm("-search"))
-    {
-        NET_MasterQuery();
-        exit(0);
-    }
-
-    //!
-    // @arg <address>
-    // @category net
-    //
-    // Query the status of the server running on the given IP
-    // address.
-    //
-
-    p = M_CheckParmWithArgs("-query", 1);
-
-    if (p)
-    {
-        NET_QueryAddress(myargv[p+1]);
-        exit(0);
-    }
-
-    //!
-    // @category net
-    //
-    // Search the local LAN for running servers.
-    //
-
-    if (M_CheckParm("-localsearch"))
-    {
-        NET_LANQuery();
-        exit(0);
-    }
 
     //!
     // @vanilla
@@ -894,9 +827,6 @@ void D_DoomMain (void)
         )
     );
 	*/
-
-    printf ("NET_Init: Init network subsystem.\n");
-    NET_Init ();
 
     // Initial netgame startup. Connect to server etc.
     D_ConnectNetGame();
