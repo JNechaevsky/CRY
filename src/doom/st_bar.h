@@ -24,7 +24,6 @@
 
 #include "doomtype.h"
 #include "d_event.h"
-#include "m_cheat.h"
 
 // Size of statusbar.
 // Now sensitive for scaling.
@@ -55,6 +54,33 @@ void ST_Init (void);
 // [JN] Allocate rectangle sizes for status bar buffered drawing.
 extern void ST_InitElementsBackground (void);
 
+extern int st_palette;
+extern boolean st_fullupdate;
+
+//
+// CHEAT SEQUENCE PACKAGE
+//
+
+#define CHEAT(value, parameters) \
+    { value, sizeof(value) - 1, parameters, 0, 0, "" }
+
+#define MAX_CHEAT_LEN 25
+#define MAX_CHEAT_PARAMS 5
+
+typedef struct
+{
+    // settings for this cheat
+
+    char sequence[MAX_CHEAT_LEN];
+    size_t sequence_len;
+    int parameter_chars;
+
+    // state used during the game
+
+    size_t chars_read;
+    int param_chars_read;
+    char parameter_buf[MAX_CHEAT_PARAMS];
+} cheatseq_t;
 
 extern cheatseq_t cheat_mus;
 extern cheatseq_t cheat_god;
@@ -66,8 +92,5 @@ extern cheatseq_t cheat_powerup[7];
 extern cheatseq_t cheat_choppers;
 extern cheatseq_t cheat_clev;
 extern cheatseq_t cheat_mypos;
-
-extern int st_palette;
-extern boolean st_fullupdate;
 
 #endif

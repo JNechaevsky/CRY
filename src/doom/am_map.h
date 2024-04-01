@@ -18,7 +18,7 @@
 
 
 #include "d_event.h"
-#include "m_cheat.h"
+#include "st_bar.h"
 
 
 typedef struct

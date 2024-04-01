@@ -35,7 +35,6 @@ set(GAME_SOURCE_FILES
     midifile.c          midifile.h
     mus2mid.c           mus2mid.h
     m_bbox.c            m_bbox.h
-    m_cheat.c           m_cheat.h
     m_config.c          m_config.h
     m_controls.c        m_controls.h
     m_fixed.c           m_fixed.h
