@@ -21,6 +21,7 @@
 
 #include <stdlib.h>
 #include <ctype.h>
+#include <time.h>
 
 #include "doomdef.h"
 #include "doomkeys.h"
@@ -3200,20 +3201,15 @@ static void M_ReadSaveStrings(void)
 // [FG] support up to 8 pages of savegames
 static void M_DrawSaveLoadBottomLine (void)
 {
-    char pagestr[16];
-
-    if (savepage > 0)
-    {
-        M_WriteText(LoadDef.x, 152, "< PGUP", cr[CR_MENU_DARK2]);
-    }
-    if (savepage < savepage_max)
-    {
-        M_WriteText(LoadDef.x+(SAVESTRINGSIZE-6)*8, 152, "PGDN >", cr[CR_MENU_DARK2]);
-    }
-
-    M_snprintf(pagestr, sizeof(pagestr), "PAGE %d/%d", savepage + 1, savepage_max + 1);
+    struct stat filestat;
+    char filedate[32];
     
-    M_WriteTextCentered(152, pagestr, cr[CR_MENU_DARK1]);
+    if (LoadMenu[itemOn].status)
+    {
+        stat(P_SaveGameFile(itemOn), &filestat);
+        strftime(filedate, sizeof(filedate), "%F %X", localtime(&filestat.st_mtime));
+        M_WriteTextCentered(151, filedate, cr[CR_YELLOW]);
+    }
 }
 
 
