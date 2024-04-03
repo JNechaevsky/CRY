@@ -3207,8 +3207,8 @@ static void M_DrawSaveLoadBottomLine (void)
     if (LoadMenu[itemOn].status)
     {
         stat(P_SaveGameFile(itemOn), &filestat);
-        strftime(filedate, sizeof(filedate), "%F %X", localtime(&filestat.st_mtime));
-        M_WriteTextCentered(151, filedate, cr[CR_YELLOW]);
+        strftime(filedate, sizeof(filedate), "%Y-%m-%d %X", localtime(&filestat.st_mtime));
+        M_WriteTextCentered(152, filedate, cr[CR_YELLOW]);
     }
 }
 
