@@ -156,7 +156,6 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_INT(vid_window_height),
     CONFIG_VARIABLE_INT(vid_fullscreen_width),
     CONFIG_VARIABLE_INT(vid_fullscreen_height),
-    CONFIG_VARIABLE_INT(vid_window_title_short),
     CONFIG_VARIABLE_INT(vid_force_software_renderer),
     CONFIG_VARIABLE_INT(vid_max_scaling_buffer_pixels),
 

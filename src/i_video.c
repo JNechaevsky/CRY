@@ -69,12 +69,6 @@ static SDL_Renderer *renderer;
 
 static const char *window_title = "";
 
-// [JN] Defines window title composition:
-// 1 - only game name will appear.
-// 0 - game name, port name and version will appear.
-
-static int vid_window_title_short = 1;
-
 // These are (1) the 320x200x8 paletted buffer that we draw to (i.e. the one
 // that holds I_VideoBuffer), (2) the 320x200x32 RGBA intermediate buffer that
 // we blit the former buffer to, (3) the intermediate 320x200 texture that we
@@ -82,27 +76,14 @@ static int vid_window_title_short = 1;
 // is upscaled by an integer factor UPSCALE using "nearest" scaling and which
 // in turn is finally rendered to screen using "linear" scaling.
 
-#ifndef CRISPY_TRUECOLOR
-static SDL_Surface *screenbuffer = NULL;
-#endif
 static SDL_Surface *argbbuffer = NULL;
 static SDL_Texture *texture = NULL;
 static SDL_Texture *texture_upscaled = NULL;
-
-#ifndef CRISPY_TRUECOLOR
-static SDL_Rect blit_rect = {
-    0,
-    0,
-    MAXWIDTH,
-    MAXHEIGHT
-};
-#endif
 
 static uint32_t pixel_format;
 
 // palette
 
-#ifdef CRISPY_TRUECOLOR
 static SDL_Texture *curpane = NULL;
 static SDL_Texture *palette_02 = NULL;
 static SDL_Texture *palette_03 = NULL;
@@ -112,9 +93,7 @@ static SDL_Texture *palette_06 = NULL;
 static SDL_Texture *palette_07 = NULL;
 static SDL_Texture *palette_08 = NULL;
 static SDL_Texture *palette_09 = NULL;
-
 static SDL_Texture *palette_yel = NULL;
-
 static SDL_Texture *palette_14 = NULL;
 
 static int pane_alpha;
@@ -124,9 +103,7 @@ static const uint8_t blend_alpha = 184; // [JN] Increased opacity from 0xa8 (168
 static const uint8_t blend_alpha_tinttab = 0x60; // 96
 static const uint8_t blend_alpha_alttinttab = 0x8E; // 142
 extern pixel_t* pal_color; // [crispy] evil hack to get FPS dots working as in Vanilla
-#else
-static SDL_Color palette[256];
-#endif
+
 static boolean palette_to_set;
 
 // display has been set up?
@@ -391,15 +368,6 @@ void I_RenderReadPixels (byte **data, int *w, int *h)
     *h = rect.h;
 
     SDL_FreeFormat(format);
-}
-
-//
-// I_StartFrame
-//
-void I_StartFrame (void)
-{
-    // er?
-
 }
 
 // Adjust vid_window_width / vid_window_height variables to be an an aspect
@@ -965,13 +933,11 @@ void I_FinishUpdate (void)
 	SDL_RenderCopy(renderer, texture, NULL, NULL);
     }
 
-#ifdef CRISPY_TRUECOLOR
     if (curpane)
     {
 	SDL_SetTextureAlphaMod(curpane, pane_alpha);
 	SDL_RenderCopy(renderer, curpane, NULL, NULL);
     }
-#endif
 
     // Draw!
 
@@ -1077,8 +1043,7 @@ void I_InitWindowTitle(void)
     char *buf;
 
     // [JN] Leave only game name in window title.
-    buf = M_StringJoin(window_title, vid_window_title_short ?
-                       NULL : " - ", PACKAGE_FULLNAME, NULL);
+    buf = M_StringJoin(window_title, NULL);
     SDL_SetWindowTitle(screen, buf);
     free(buf);
 }
@@ -1470,24 +1435,6 @@ static void SetVideoMode(void)
     SDL_RenderClear(renderer);
     SDL_RenderPresent(renderer);
 
-#ifndef CRISPY_TRUECOLOR
-    // Create the 8-bit paletted and the 32-bit RGBA screenbuffer surfaces.
-
-    if (screenbuffer != NULL)
-    {
-        SDL_FreeSurface(screenbuffer);
-        screenbuffer = NULL;
-    }
-
-    if (screenbuffer == NULL)
-    {
-        screenbuffer = SDL_CreateRGBSurface(0,
-                                            SCREENWIDTH, SCREENHEIGHT, 8,
-                                            0, 0, 0, 0);
-        SDL_FillRect(screenbuffer, NULL, 0);
-    }
-#endif
-
     // Format of argbbuffer must match the screen pixel format because we
     // import the surface data into the texture.
 
@@ -1704,11 +1651,6 @@ void I_InitGraphics(void)
     // [crispy] run-time variable high-resolution rendering
     I_GetScreenDimensions();
 
-#ifndef CRISPY_TRUECOLOR
-    blit_rect.w = SCREENWIDTH;
-    blit_rect.h = SCREENHEIGHT;
-#endif
-
     // [crispy] (re-)initialize resolution-agnostic patch drawing
     V_Init();
 
@@ -1725,19 +1667,6 @@ void I_InitGraphics(void)
     // on configuration.
     AdjustWindowSize();
     SetVideoMode();
-
-#ifndef CRISPY_TRUECOLOR
-    // Start with a clear black screen
-    // (screen will be flipped after we set the palette)
-
-    SDL_FillRect(screenbuffer, NULL, 0);
-
-    // Set the palette
-
-    doompal = W_CacheLumpName(DEH_String("PLAYPAL"), PU_CACHE);
-    I_SetPalette(doompal);
-    SDL_SetPaletteColors(screenbuffer->format->palette, palette, 0, 256);
-#endif
 
     // SDL2-TODO UpdateFocus();
     UpdateGrab();
@@ -1757,11 +1686,8 @@ void I_InitGraphics(void)
     // 32-bit RGBA screen buffer that gets loaded into a texture that gets
     // finally rendered into our window or full screen in I_FinishUpdate().
 
-#ifndef CRISPY_TRUECOLOR
-    I_VideoBuffer = screenbuffer->pixels;
-#else
     I_VideoBuffer = argbbuffer->pixels;
-#endif
+
     V_RestoreBuffer();
 
     // Clear the screen to black.
@@ -1787,20 +1713,8 @@ void I_ReInitGraphics (int reinit)
 
 		I_GetScreenDimensions();
 
-#ifndef CRISPY_TRUECOLOR
-		blit_rect.w = SCREENWIDTH;
-		blit_rect.h = SCREENHEIGHT;
-#endif
-
 		// [crispy] re-initialize resolution-agnostic patch drawing
 		V_Init();
-
-#ifndef CRISPY_TRUECOLOR
-		SDL_FreeSurface(screenbuffer);
-		screenbuffer = SDL_CreateRGBSurface(0,
-				                    SCREENWIDTH, SCREENHEIGHT, 8,
-				                    0, 0, 0, 0);
-#endif
 
 		SDL_FreeSurface(argbbuffer);
 		SDL_PixelFormatEnumToMasks(pixel_format, &unused_bpp,
@@ -1808,12 +1722,10 @@ void I_ReInitGraphics (int reinit)
 		argbbuffer = SDL_CreateRGBSurface(0,
 		                                  SCREENWIDTH, SCREENHEIGHT, 32,
 		                                  rmask, gmask, bmask, amask);
-#ifndef CRISPY_TRUECOLOR
+
 		// [crispy] re-set the framebuffer pointer
-		I_VideoBuffer = screenbuffer->pixels;
-#else
 		I_VideoBuffer = argbbuffer->pixels;
-#endif
+
 		V_RestoreBuffer();
 
 		// [crispy] it will get re-created below with the new resolution
@@ -1915,7 +1827,6 @@ void I_BindVideoVariables(void)
     M_BindIntVariable("vid_vga_porch_flash",           &vid_vga_porch_flash);
     M_BindIntVariable("vid_fullscreen_width",          &vid_fullscreen_width);
     M_BindIntVariable("vid_fullscreen_height",         &vid_fullscreen_height);
-    M_BindIntVariable("vid_window_title_short",        &vid_window_title_short);
     M_BindIntVariable("vid_force_software_renderer",   &vid_force_software_renderer);
     M_BindIntVariable("vid_max_scaling_buffer_pixels", &vid_max_scaling_buffer_pixels);
     M_BindIntVariable("vid_window_width",              &vid_window_width);
