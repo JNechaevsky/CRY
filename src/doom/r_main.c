@@ -1076,9 +1076,6 @@ void R_RenderPlayerView (player_t *player)
         return;
     }
 
-    // check for new console commands.
-    NetUpdate ();
-
     // [crispy] smooth texture scrolling
     if (!crl_freeze)
     {
@@ -1088,18 +1085,9 @@ void R_RenderPlayerView (player_t *player)
     // The head node is the last node output.
     R_RenderBSPNode (numnodes-1);
 
-    // Check for new console commands.
-    NetUpdate ();
-
     R_DrawPlanes ();
-
-    // Check for new console commands.
-    NetUpdate ();
 
     // [crispy] draw fuzz effect independent of rendering frame rate
     R_SetFuzzPosDraw();
     R_DrawMasked ();
-
-    // Check for new console commands.
-    NetUpdate ();
 }

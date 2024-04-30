@@ -348,7 +348,6 @@ static void D_Display (void)
 
     // menus go directly to the screen
     M_Drawer ();   // menu is drawn even on top of everything
-    NetUpdate ();  // send out any new accumulation
 
     // normal update
     if (!wipe)
@@ -926,7 +925,7 @@ void D_DoomMain (void)
     printf("S_Init: Setting up sound.\n");
     S_Init (sfxVolume * 8, musicVolume * 8);
 
-    printf("D_CheckNetGame: Checking network game status.\n");
+    //printf("D_CheckNetGame: Checking network game status.\n");
     D_CheckNetGame ();
 
     printf("CT_Init: Setting up messages system.\n");
