@@ -57,7 +57,7 @@
 #include "s_sound.h"
 
 // Data.
-#include "dstrings.h"
+#include "d_englsh.h"
 #include "sounds.h"
 #include "ct_chat.h"
 

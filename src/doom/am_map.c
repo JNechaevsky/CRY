@@ -19,7 +19,7 @@
 #include "am_map.h"
 #include "ct_chat.h"
 #include "doomstat.h"
-#include "dstrings.h"
+#include "d_englsh.h"
 #include "g_game.h"
 #include "i_system.h"
 #include "m_controls.h"

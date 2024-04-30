@@ -29,7 +29,7 @@
 
 #include "doomkeys.h"
 #include "doomstat.h"
-#include "dstrings.h"
+#include "d_englsh.h"
 #include "d_iwad.h"
 #include "z_zone.h"
 #include "w_main.h"

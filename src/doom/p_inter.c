@@ -18,7 +18,7 @@
 //
 
 
-#include "dstrings.h"
+#include "d_englsh.h"
 #include "doomstat.h"
 #include "m_random.h"
 #include "i_system.h"

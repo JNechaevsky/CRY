@@ -25,7 +25,7 @@
 
 #include "doomdef.h"
 #include "doomkeys.h"
-#include "dstrings.h"
+#include "d_englsh.h"
 #include "d_main.h"
 #include "i_input.h"
 #include "i_swap.h"
@@ -3333,17 +3333,9 @@ static void M_DoSave(int slot)
 //
 static void SetDefaultSaveName(int slot)
 {
-    // [JN] Generate save name. ExMx for Doom 1, MAPxx for Doom 2.
-    if (gamemode == commercial)
-    {
-        M_snprintf(savegamestrings[itemOn], SAVESTRINGSIZE - 1,
-                   "MAP%02d", gamemap);
-    }
-    else
-    {
-        M_snprintf(savegamestrings[itemOn], SAVESTRINGSIZE - 1,
-                   "E%dM%d", gameepisode, gamemap);
-    }
+    // [JN] Generate save name.
+    M_snprintf(savegamestrings[itemOn], SAVESTRINGSIZE - 1, "MAP%02d", gamemap);
+
     M_ForceUppercase(savegamestrings[itemOn]);
     joypadSave = false;
 }
@@ -3659,74 +3651,18 @@ static void M_FinishReadThis(int choice)
 //
 // M_QuitDOOM
 //
-static const int quitsounds[8] =
-{
-    sfx_pldeth,
-    sfx_dmpain,
-    sfx_popain,
-    sfx_slop,
-    sfx_telept,
-    sfx_posit1,
-    sfx_posit3,
-    sfx_sgtatk
-};
-
-static const int quitsounds2[8] =
-{
-    sfx_vilact,
-    sfx_getpow,
-    sfx_boscub,
-    sfx_slop,
-    sfx_skeswg,
-    sfx_kntdth,
-    sfx_bspact,
-    sfx_sgtatk
-};
-
-
 
 static void M_QuitResponse(int key)
 {
     if (key != key_menu_confirm && key != key_menu_forward)
 	return;
 
-    // [JN] Play exit sound optionally.
-    if (!netgame && aud_exit_sounds)
-    {
-	if (gamemode == commercial)
-	    S_StartSound(NULL,quitsounds2[(gametic>>2)&7]);
-	else
-	    S_StartSound(NULL,quitsounds[(gametic>>2)&7]);
-	I_WaitVBL(105);
-    }
     I_Quit ();
 }
 
-
-static const char *M_SelectEndMessage(void)
-{
-    const char **endmsg;
-
-    if (logical_gamemission == doom)
-    {
-        // Doom 1
-
-        endmsg = doom1_endmsg;
-    }
-    else
-    {
-        // Doom 2
-        
-        endmsg = doom2_endmsg;
-    }
-
-    return endmsg[gametic % NUM_QUITMESSAGES];
-}
-
-
 static void M_QuitDOOM(int choice)
 {
-    snprintf(endstring, sizeof(endstring), "%s\n\n" DOSY, M_SelectEndMessage());
+    snprintf(endstring, sizeof(endstring), "Are you sure want to quit?\n\n" PRESSYN);
 
     M_StartMessage(endstring,M_QuitResponse,true);
 }
