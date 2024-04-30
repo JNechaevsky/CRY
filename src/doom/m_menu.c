@@ -4096,7 +4096,7 @@ static int G_ReloadLevel (void)
 {
     int result = false;
 
-    if (gamestate == GS_LEVEL)
+    if (gamestate == GS_LEVEL || gamestate == GS_INTERMISSION)
     {
         // [crispy] restart demos from the map they were started
         if (demorecording)
@@ -4112,65 +4112,20 @@ static int G_ReloadLevel (void)
 
 static int G_GotoNextLevel (void)
 {
-    byte doom_next[6][9] = {
-    {12, 13, 19, 15, 16, 17, 18, 21, 14},
-    {22, 23, 24, 25, 29, 27, 28, 31, 26},
-    {32, 33, 34, 35, 36, 39, 38, 41, 37},
-    {42, 49, 44, 45, 46, 47, 48, 51, 43},
-    {52, 53, 54, 55, 56, 59, 58, 11, 57},
-    {62, 63, 69, 65, 66, 67, 68, 11, 64},
-    };
-
-    byte doom2_next[33] = {
-     2,  3,  4,  5,  6,  7,  8,  9, 10, 11,
-    12, 13, 14, 15, 31, 17, 18, 19, 20, 21,
-    22, 23, 24, 25, 26, 27, 28, 29, 30, 1,
-    32, 16, 3
+    byte jaguar_next[] = {
+     2,  3,  4,  5,  6,  7,  8,  9, 10,
+    11, 12, 13, 14, 15, 16, 17, 18, 19,
+    20, 21, 22, 23,
     };
 
     int changed = false;
 
-    if (gamemode == commercial)
-    {
-        if (W_CheckNumForName("map31") < 0)
-        {
-            doom2_next[14] = 16;
-        }
-
-        if (gamemission == pack_hacx)
-        {
-            doom2_next[30] = 16;
-            doom2_next[20] = 1;
-        }
-
-    }
-    else
-    {
-        if (gamemode == shareware)
-        {
-            doom_next[0][7] = 11;
-        }
-
-        if (gamemode == registered)
-        {
-            doom_next[2][7] = 11;
-        }
-    }
-
-    if (gamestate == GS_LEVEL)
+    if (gamestate == GS_LEVEL || gamestate == GS_INTERMISSION)
     {
         int epsd, map;
 
-        if (gamemode == commercial)
-        {
-            epsd = gameepisode;
-            map = doom2_next[gamemap-1];
-        }
-        else
-        {
-            epsd = doom_next[gameepisode-1][gamemap-1] / 10;
-            map = doom_next[gameepisode-1][gamemap-1] % 10;
-        }
+        epsd = gameepisode;
+        map = jaguar_next[gamemap-1];
 
         G_DeferedInitNew(gameskill, epsd, map);
         changed = true;
