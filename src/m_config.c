@@ -160,7 +160,6 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_INT(vid_max_scaling_buffer_pixels),
 
     // Video options
-    CONFIG_VARIABLE_INT(vid_truecolor),
     CONFIG_VARIABLE_INT(vid_resolution),
     CONFIG_VARIABLE_INT(vid_widescreen),
     CONFIG_VARIABLE_INT(vid_uncapped_fps),

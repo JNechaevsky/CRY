@@ -27,7 +27,6 @@
 // -----------------------------------------------------------------------------
 
 // System and video
-extern int vid_truecolor;
 extern int vid_resolution;
 extern int vid_widescreen;
 

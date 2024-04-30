@@ -33,7 +33,6 @@ int crl_freeze = 0;
 // Video options
 //
 
-int vid_truecolor = 0;
 int vid_resolution = 2;
 int vid_widescreen = 0;
 int vid_uncapped_fps = 0;
@@ -174,7 +173,6 @@ void ID_BindVariables (GameMission_t mission)
     // Video options
     //
 
-    M_BindIntVariable("vid_truecolor",                  &vid_truecolor);
     M_BindIntVariable("vid_resolution",                 &vid_resolution);
     M_BindIntVariable("vid_widescreen",                 &vid_widescreen);
     M_BindIntVariable("vid_uncapped_fps",               &vid_uncapped_fps);

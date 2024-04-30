@@ -2989,9 +2989,6 @@ static void M_ID_ApplyResetHook (void)
     // Video options
     //
 
-#ifdef CRISPY_TRUECOLOR
-    vid_truecolor = 0;
-#endif
     vid_resolution = 2;
     vid_widescreen = 0;
     vid_uncapped_fps = 0;
