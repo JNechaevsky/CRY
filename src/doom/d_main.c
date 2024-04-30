@@ -394,6 +394,9 @@ void D_BindVariables(void)
     M_BindIntVariable("key_message_refresh",    &key_message_refresh);
     M_BindIntVariable("sfx_volume",             &sfxVolume);
     M_BindIntVariable("music_volume",           &musicVolume);
+    
+    M_BindStringVariable("savegames_path",      &SavePathConfig);
+    M_BindStringVariable("screenshots_path",    &ShotPathConfig);
 
 	// [JN] Bind ID-specific config variables.
 	ID_BindVariables(doom);
@@ -801,7 +804,11 @@ void D_DoomMain (void)
     // Generate the WAD hash table.  Speed things up a bit.
     W_GenerateHashTable();
 
+    // [JN] Set the default directory where savegames are saved.
     savegamedir = M_GetSaveGameDir(D_SaveGameIWADName(gamemission, gamevariant));
+
+    // [JN] Set the default directory where screenshots are saved.
+    M_SetScreenshotDir();
 
     printf("I_Init: Setting up machine state.\n");
     I_CheckIsScreensaver();

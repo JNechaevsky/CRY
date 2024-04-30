@@ -49,15 +49,21 @@
 
 const char *configdir;
 
-static char *autoload_path = "";
-
 // Default filenames for configuration files.
 
 static const char *default_main_config;
 
+// [JN] "savegames_path" config file variable.
+
+char *SavePathConfig;
+
 // [JN] Location where screenshots are saved.
 
-const char *screenshotdir;
+char *screenshotdir;
+
+// [JN] "screenshots_path" config file variable.
+
+char *ShotPathConfig;
 
 typedef enum 
 {
@@ -128,8 +134,8 @@ static default_t	doom_defaults_list[] =
     // Autoload
     //
 
-    CONFIG_VARIABLE_STRING(autoload_path),
-    CONFIG_VARIABLE_STRING(savedir),
+    CONFIG_VARIABLE_STRING(savegames_path),
+    CONFIG_VARIABLE_STRING(screenshots_path),
 
     //
     // Render
@@ -837,9 +843,6 @@ void M_LoadDefaults (void)
 {
     int i;
 
-    // This variable is a special snowflake for no good reason.
-    M_BindStringVariable("autoload_path", &autoload_path);
-
     // check for a custom default file
 
     //!
@@ -1079,7 +1082,7 @@ char *M_GetSaveGameDir(const char *iwadname)
         // add separator at end just in case
         savegamedir = M_StringJoin(savegamedir, DIR_SEPARATOR_S, NULL);
 
-        printf("Save directory changed to %s.\n", savegamedir);
+        printf("Save directory changed to %s\n", savegamedir);
     }
 #ifdef _WIN32
     // In -cdrom mode, we write savegames to a specific directory
@@ -1095,18 +1098,18 @@ char *M_GetSaveGameDir(const char *iwadname)
     else if (!strcmp(configdir, exedir))
     {
 #ifdef _WIN32
-        // [JN] Check if "savedir" variable is existing in config file.
-        const char *existing_path = M_GetStringVariable("savedir");
+        // [JN] Check if "savegames_path" variable is existing in config file.
+        const char *existing_path = M_GetStringVariable("savegames_path");
 
         if (existing_path != NULL && strlen(existing_path) > 0)
         {
-            // It exist, use it's provided path.
-            savegamedir = M_StringDuplicate("");
+            // Variable existing, use it's path.
+            savegamedir = M_StringDuplicate(SavePathConfig);
         }
         else
         {
-            // Otherwise, create and use "savegames" folder in program folder.
-            savegamedir = M_StringJoin(M_StringDuplicate(exedir), "savegames", DIR_SEPARATOR_S, NULL);
+            // Config file variable not existing or emptry, generate a path.
+            savegamedir = M_StringJoin(M_StringDuplicate(exedir), "savegames", NULL);
         }
         M_MakeDirectory(savegamedir);
 #else
@@ -1130,56 +1133,67 @@ char *M_GetSaveGameDir(const char *iwadname)
         free(topdir);
     }
 
-    return savegamedir;
-}
-
-//
-// Calculate the path to the directory for autoloaded WADs/DEHs.
-// Creates the directory as necessary.
-//
-char *M_GetAutoloadDir(const char *iwadname)
-{
-    char *result;
-
-    if (autoload_path == NULL || strlen(autoload_path) == 0)
+    // Overwrite config file variable only if following command line
+    // parameters are not present:
+    if (!M_ParmExists("-savedir") && !M_ParmExists("-cdrom"))
     {
-        char *prefdir;
-
-#ifdef _WIN32
-        // [JN] On Windows, create "autoload" directory in program folder.
-        prefdir = M_StringDuplicate(exedir);
-#else
-        // [JN] On other OSes use system home folder.
-        prefdir = SDL_GetPrefPath("", PACKAGE_TARNAME);
-#endif
-
-        if (prefdir == NULL)
-        {
-            printf("M_GetAutoloadDir: SDL_GetPrefPath failed\n");
-            return NULL;
-        }
-        autoload_path = M_StringJoin(prefdir, "autoload", NULL);
-        SDL_free(prefdir);
+        SavePathConfig = savegamedir;
+        // add separator at end just in case
+        savegamedir = M_StringJoin(savegamedir, DIR_SEPARATOR_S, NULL);
     }
 
-    M_MakeDirectory(autoload_path);
-
-    result = M_StringJoin(autoload_path, DIR_SEPARATOR_S, iwadname, NULL);
-    M_MakeDirectory(result);
-
-    // TODO: Add README file
-
-    return result;
+    return savegamedir;
 }
 
 void M_SetScreenshotDir (void)
 {
+    int p = M_CheckParmWithArgs("-shotdir", 1);
+
+    if (p)
+    {
+        screenshotdir = myargv[p + 1];
+
+        if (!M_FileExists(screenshotdir))
+        {
+            M_MakeDirectory(screenshotdir);
+        }
+        
+        screenshotdir = M_StringJoin(screenshotdir, DIR_SEPARATOR_S, NULL);
+
+        printf("Screenshot directory changed to %s\n", screenshotdir);
+    }
 #ifdef _WIN32
- 	// [JN] Always use "savegames" folder in program folder.
- 	screenshotdir = M_StringJoin(exedir, "screenshots", DIR_SEPARATOR_S, NULL);
-#else
-    // ~/.local/share/inter-doom/screenshots
-    screenshotdir = M_StringJoin(configdir, "screenshots", DIR_SEPARATOR_S, NULL);
+    // In -cdrom mode, we write screenshots to a specific directory
+    // in addition to configs.
+
+    else if (M_ParmExists("-cdrom"))
+    {
+        screenshotdir = M_StringDuplicate(configdir);
+    }
 #endif
-    M_MakeDirectory(screenshotdir);
+    else
+    {
+        // [JN] Check if "screenshots_path" variable is existing in config file.
+        const char *existing_path = M_GetStringVariable("screenshots_path");
+
+        if (existing_path != NULL && strlen(existing_path) > 0)
+        {
+            // Variable existing, use it's path.
+            screenshotdir = M_StringDuplicate(ShotPathConfig);
+        }
+        else
+        {
+#ifdef _WIN32
+            // [JN] Always use "screenshots" folder in program folder.
+            screenshotdir = M_StringJoin(exedir, "screenshots", NULL);
+#else
+            // ~/.local/share/inter-doom/screenshots
+            screenshotdir = M_StringJoin(configdir, "screenshots", NULL);
+#endif
+        }
+        M_MakeDirectory(screenshotdir);
+        ShotPathConfig = screenshotdir;
+        // add separator at end just in case
+        screenshotdir = M_StringJoin(screenshotdir, DIR_SEPARATOR_S, NULL);
+    }
 }
