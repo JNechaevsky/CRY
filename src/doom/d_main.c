@@ -793,7 +793,7 @@ void D_DoomMain (void)
     W_GenerateHashTable();
 
     // [JN] Set the default directory where savegames are saved.
-    savegamedir = M_GetSaveGameDir(D_SaveGameIWADName(gamemission, gamevariant));
+    savegamedir = M_GetSaveGameDir("yaguar-doom.wad");
 
     // [JN] Set the default directory where screenshots are saved.
     M_SetScreenshotDir();
@@ -804,9 +804,6 @@ void D_DoomMain (void)
     I_InitJoystick();
     I_InitSound(doom);
     I_InitMusic();
-
-    // Initial netgame startup. Connect to server etc.
-    D_ConnectNetGame();
 
     // get skill / episode / map from parms
     // [JN] Use chosen default skill level.

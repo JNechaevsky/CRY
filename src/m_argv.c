@@ -394,7 +394,7 @@ static int GuessFileType(const char *name)
 
     // only ever add one argument to the -iwad parameter
 
-    if (iwad_found == false && D_IsIWADName(lower))
+    if (iwad_found == false /*&& D_IsIWADName(lower)*/)
     {
         ret = FILETYPE_IWAD;
         iwad_found = true;
