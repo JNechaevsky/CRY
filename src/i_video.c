@@ -1595,6 +1595,10 @@ void I_GetScreenDimensions (void)
 				w = 21;
 				h = 9;
 				break;
+			case RATIO_32_9:
+				w = 32;
+				h = 9;
+				break;
 			default:
 				break;
 		}
@@ -1612,7 +1616,7 @@ void I_GetScreenDimensions (void)
 		}
 
 		// [crispy] ... but never exceeds MAXWIDTH (array size!)
-		SCREENWIDTH = MIN(SCREENWIDTH, MAXWIDTH / 3);
+		SCREENWIDTH = MIN(SCREENWIDTH, MAXWIDTH);
 	}
 
 	WIDESCREENDELTA = ((SCREENWIDTH - NONWIDEWIDTH) / vid_resolution) / 2;
