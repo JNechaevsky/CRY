@@ -1007,13 +1007,13 @@ static void R_DrawPSprite (pspdef_t* psp)
     // [JN] Jaguar: weapon placement - 10 px higher above STBAR, not in full screen mode.
     if (dp_screen_size < 11)
     {
-        vis->texturemid = (BASEYCENTER<<FRACBITS) + FRACUNIT / 5
+        vis->texturemid = (BASEYCENTER<<FRACBITS) + FRACUNIT / (1 + vid_resolution)
                         + FRACUNIT * 10
                         - (psp_sy-spritetopoffset[lump]);
     }
     else
     {
-        vis->texturemid = (BASEYCENTER << FRACBITS) + FRACUNIT / 5
+        vis->texturemid = (BASEYCENTER << FRACBITS) + FRACUNIT / (1 + vid_resolution)
                         - (psp_sy-spritetopoffset[lump]);
     }
     vis->x1 = x1 < 0 ? 0 : x1;
