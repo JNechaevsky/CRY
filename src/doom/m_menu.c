@@ -2670,8 +2670,8 @@ static void M_Draw_ID_Gameplay_1 (void)
                  M_Item_Glow(1, vis_translucency ? GLOW_GREEN : GLOW_DARKRED));
 
     // Fuzz effect
-    sprintf(str, vis_improved_fuzz == 1 ? "IMPROVED" :
-                 vis_improved_fuzz == 2 ? "TRANSLUCENT" : "ORIGINAL");
+    sprintf(str, vis_improved_fuzz == 1 ? "FUZZ" :
+                 vis_improved_fuzz == 2 ? "TRANSLUCENT" : "OFF");
     M_WriteText (M_ItemRightAlign(str), 36, str,
                  M_Item_Glow(2, vis_improved_fuzz ? GLOW_GREEN : GLOW_DARKRED));
 

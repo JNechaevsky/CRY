@@ -349,14 +349,8 @@ void R_DrawFuzzColumn (void)
 	// Clamp table lookup index.
 	if (++fuzzpos == FUZZTABLE) 
     {
-	    if (vis_improved_fuzz)
-	    {
-	        fuzzpos = realleveltime > oldleveltime ? ID_Random() % 49 : 0;
-	    }
-	    else
-	    {
-	        fuzzpos = 0;
-	    }
+        // [JN] TODO - make frame rate independent
+        fuzzpos = realleveltime > oldleveltime ? ID_RealRandom() % 49 : 0;
     }
 	
 	dest += SCREENWIDTH;
