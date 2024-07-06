@@ -107,8 +107,8 @@ static boolean joypadSave = false; // was the save action initiated by joypad?
 static char saveOldString[SAVESTRINGSIZE];  
 
 // [FG] support up to 8 pages of savegames
-int savepage = 0;
-static const int savepage_max = 7;
+// int savepage = 0;
+// static const int savepage_max = 7;
 
 static char savegamestrings[10][SAVESTRINGSIZE];
 static char endstring[160];
@@ -375,9 +375,9 @@ static menu_t LoadDef =
     &MainDef,
     LoadMenu,
     M_DrawLoad,
-    67,27,
+    67,28,
     0,
-    false, true, true,
+    false, false, false,
 };
 
 //
@@ -402,9 +402,9 @@ static menu_t SaveDef =
     &MainDef,
     SaveMenu,
     M_DrawSave,
-    67,27,
+    67,28,
     0,
-    false, true, true,
+    false, false, false,
 };
 
 // =============================================================================
@@ -672,6 +672,7 @@ static void M_ScrollPages (boolean direction)
     currentMenu->lastOn = itemOn;
 
     // Save/Load menu:
+    /*
     if (currentMenu == &LoadDef || currentMenu == &SaveDef)
     {
         if (direction)
@@ -694,9 +695,10 @@ static void M_ScrollPages (boolean direction)
         M_ReadSaveStrings();
         return;
     }
+    */
 
     // Keyboard bindings:
-    else if (currentMenu == &ID_Def_Keybinds_1) M_SetupNextMenu(direction ? &ID_Def_Keybinds_2 : &ID_Def_Keybinds_6);
+         if (currentMenu == &ID_Def_Keybinds_1) M_SetupNextMenu(direction ? &ID_Def_Keybinds_2 : &ID_Def_Keybinds_6);
     else if (currentMenu == &ID_Def_Keybinds_2) M_SetupNextMenu(direction ? &ID_Def_Keybinds_3 : &ID_Def_Keybinds_1);
     else if (currentMenu == &ID_Def_Keybinds_3) M_SetupNextMenu(direction ? &ID_Def_Keybinds_4 : &ID_Def_Keybinds_2);
     else if (currentMenu == &ID_Def_Keybinds_4) M_SetupNextMenu(direction ? &ID_Def_Keybinds_5 : &ID_Def_Keybinds_3);
@@ -3200,14 +3202,40 @@ static void M_ReadSaveStrings(void)
 // [FG] support up to 8 pages of savegames
 static void M_DrawSaveLoadBottomLine (void)
 {
-    struct stat filestat;
-    char filedate[32];
+/*
+    char pagestr[16];
+
+    if (savepage > 0)
+    {
+        M_WriteText(LoadDef.x, 151, "< PGUP", cr[CR_MENU_DARK2]);
+    }
+    if (savepage < savepage_max)
+    {
+        M_WriteText(LoadDef.x+(SAVESTRINGSIZE-6)*8, 151, "PGDN >", cr[CR_MENU_DARK2]);
+    }
+
+    M_snprintf(pagestr, sizeof(pagestr), "PAGE %d/%d", savepage + 1, savepage_max + 1);
     
+    M_WriteTextCentered(151, pagestr, cr[CR_MENU_DARK1]);
+*/
+
+    // [JN] Print "modified" (or created initially) time of savegame file.
     if (LoadMenu[itemOn].status)
     {
+        struct stat filestat;
+        char filedate[32];
+
         stat(P_SaveGameFile(itemOn), &filestat);
-        strftime(filedate, sizeof(filedate), "%Y-%m-%d %X", localtime(&filestat.st_mtime));
-        M_WriteTextCentered(152, filedate, cr[CR_YELLOW]);
+// [FG] suppress the most useless compiler warning ever
+#if defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wformat-y2k"
+#endif
+        strftime(filedate, sizeof(filedate), "%x %X", localtime(&filestat.st_mtime));
+#if defined(__GNUC__)
+#  pragma GCC diagnostic pop
+#endif
+        M_WriteTextCentered(152, filedate, cr[CR_MENU_DARK2]);
     }
 }
 
@@ -3219,7 +3247,7 @@ static void M_DrawLoad(void)
 {
     int i;
 
-	M_WriteTextBigCentered(7, "Load game", NULL);
+	M_WriteTextBigCentered(8, "Load game", NULL);
 
 	for (i = 0 ; i < load_end ; i++)
 	{
@@ -3292,7 +3320,7 @@ static void M_DrawSave(void)
 {
 	int i;
 
-	M_WriteTextBigCentered(7, "Save game", NULL);
+	M_WriteTextBigCentered(8, "Save game", NULL);
 
 	for (i = 0 ; i < load_end ; i++)
 	{

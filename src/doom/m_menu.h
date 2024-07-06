@@ -63,6 +63,6 @@ extern void M_WriteTextBig (int x, int y, const char *string, byte *table);
 extern void M_WriteTextBigCentered (const int y, const char *string, byte *table);
 
 // [FG] support up to 8 pages of savegames
-extern int savepage;
+// extern int savepage;
 
 #endif    
