@@ -144,13 +144,15 @@ static mline_t thintriangle_guy[] = {
 boolean automapactive = false;
 
 int iddt_cheating = 0;
-static int   grid = 0;
+static boolean grid = false;
 
 // location of window on screen
-static int  f_x, f_y;
+static int  f_x;
+static int  f_y;
 
 // size of window on screen
-static int  f_w, f_h;
+static int  f_w;
+static int  f_h;
 
 static mpoint_t m_paninc;     // how far the window pans each tic (map coords)
 static fixed_t  mtof_zoommul; // how far the window zooms in each tic (map coords)
@@ -162,11 +164,17 @@ static int64_t  m_x2, m_y2;   // UR x,y where the window is on the map (map coor
 static fixed_t  prev_m_x, prev_m_y; // [JN] Panning interpolation.
 
 // width/height of window on map (map coords)
-static int64_t  m_w, m_h;
+static int64_t  m_w;
+static int64_t  m_h;
 
 // based on level size
-static fixed_t  min_x, min_y, max_x, max_y;
-static fixed_t  max_w, max_h;
+static fixed_t  min_x;
+static fixed_t  min_y; 
+static fixed_t  max_x;
+static fixed_t  max_y;
+
+static fixed_t  max_w; // max_x-min_x,
+static fixed_t  max_h; // max_y-min_y
 
 static fixed_t  min_scale_mtof; // used to tell when to stop zooming out
 static fixed_t  max_scale_mtof; // used to tell when to stop zooming in
@@ -799,9 +807,6 @@ boolean AM_Responder (event_t *ev)
                 M_snprintf(buffer, sizeof(buffer), "%s %d", AMSTR_MARKCLEARED, markpointnum);
                 CT_SetMessage(plr, buffer, false, NULL);
             }
-                
-
-            
         }
         else if (key == key_map_rotate)
         {
@@ -1835,14 +1840,14 @@ static void AM_drawPlayers (void)
 // Draws the things on the automap in double IDDT cheat mode.
 // -----------------------------------------------------------------------------
 
-static void AM_drawThings (int colors)
+static void AM_drawThings (void)
 {
     int       i;
     mpoint_t  pt;
     mobj_t   *t;
     angle_t   actualangle;
     // RestlessRodent -- Carbon copy from ReMooD
-    int       color = colors;
+    int       color = 112;
 
     for (i = 0 ; i < numsectors ; i++)
     {
@@ -2091,7 +2096,7 @@ void AM_Drawer (void)
 
     if (iddt_cheating == 2)
     {
-        AM_drawThings(112);
+        AM_drawThings();
     }
 
     // [JN] Do not draw in following mode.
