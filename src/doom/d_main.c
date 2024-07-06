@@ -217,6 +217,72 @@ static void D_Display (void)
     switch (gamestate)
     {
         case GS_LEVEL:
+            if (!gametic)
+            break;
+
+            // draw the view directly
+            R_RenderPlayerView(&players[displayplayer]);
+
+            // [JN] Fail-safe: return earlier if post rendering hook is still active.
+            if (post_rendering_hook)
+            return;
+
+            // see if the border needs to be initially drawn
+            if (oldgamestate != GS_LEVEL)
+            R_FillBackScreen();  // draw the pattern into the back screen
+
+            // see if the border needs to be updated to the screen
+            if (scaledviewwidth != SCREENWIDTH)
+            R_DrawViewBorder();  // erase old menu stuff
+
+            // [JN] Draw automap on top of player view and view border,
+            // and update while playing. This also needed for widgets update.
+            if (automapactive)
+            AM_Drawer();
+
+            // [JN] Allow to draw level name separately from automap.
+            if (widget_levelname)
+            AM_LevelNameDrawer();
+
+            // [JN] Do not draw any widgets if not in game level.
+            // if (widget_enable) <- TODO
+            {
+                // [JN] Left widgets are available while active game level.
+                if (dp_screen_size < 15)
+                ID_LeftWidgets();
+
+                // [crispy] demo timer widget
+                if (demoplayback && (demo_timer == 1 || demo_timer == 3))
+                {
+                    ID_DemoTimer(demo_timerdir ? (deftotaldemotics - defdemotics) : defdemotics);
+                }
+                else if (demorecording && (demo_timer == 2 || demo_timer == 3))
+                {
+                    ID_DemoTimer(leveltime);
+                }
+
+                // [JN] Target's health widget.
+                // Actual health values are gathered in G_Ticker.
+                if (widget_health)
+                ID_DrawTargetsHealth();
+            }
+
+            // [JN] Draw crosshair.
+            if (xhair_draw && !automapactive)
+            ID_DrawCrosshair();
+
+            // [JN] Main status bar drawing function.
+            if (dp_screen_size < 15 || (automapactive && !automap_overlay))
+            {
+                // [JN] Only forcefully update/redraw on...
+                const boolean st_forceredraw = 
+                                 (oldgametic < gametic  // Every game tic
+                              ||  dp_screen_size > 10   // Crispy HUD (no solid status bar background)
+                              ||  setsizeneeded         // Screen size changing
+                              || (menuactive && dp_menu_shading)); // Menu shading while non-capped game mode
+            
+                ST_Drawer(st_forceredraw);
+            }
         break;
 
         case GS_INTERMISSION:
@@ -240,46 +306,9 @@ static void D_Display (void)
         break;
     }
 
-    // draw the view directly
-    if (gamestate == GS_LEVEL && gametic)
-    {
-        R_RenderPlayerView(&players[displayplayer]);
-    }
-
-    // [JN] Fail-safe: return earlier if post rendering hook is still active.
-    if (post_rendering_hook)
-    {
-        return;
-    }
-
     // clean up border stuff
     if (gamestate != oldgamestate && gamestate != GS_LEVEL)
 	I_SetPalette (0);
-
-    // see if the border needs to be initially drawn
-    if (gamestate == GS_LEVEL && oldgamestate != GS_LEVEL)
-    {
-        R_FillBackScreen();  // draw the pattern into the back screen
-    }
-
-    // see if the border needs to be updated to the screen
-    if (gamestate == GS_LEVEL && scaledviewwidth != SCREENWIDTH)
-    {
-        R_DrawViewBorder();  // erase old menu stuff
-    }
-
-    // [JN] Draw automap on top of player view and view border,
-    // and update while playing. This also needed for widgets update.
-    if (automapactive)
-    {
-        AM_Drawer();
-    }
-
-    // [JN] Allow to draw level name separately from automap.
-    if (gamestate == GS_LEVEL && widget_levelname)
-    {
-        AM_LevelNameDrawer();
-    }
 
     oldgamestate = wipegamestate = gamestate;
 
@@ -289,62 +318,19 @@ static void D_Display (void)
 		V_DrawShadowedPatchOptional(136, 72, W_CacheLumpName ("PAUSED", PU_CACHE));
     }
 
-    // [JN] Do not draw any widgets if not in game level.
-    if (gamestate == GS_LEVEL)
-    {
-        // [JN] Left widgets are available while active game level.
-        if (dp_screen_size < 15)
-        {
-            ID_LeftWidgets();
-        }
-
-        // [crispy] demo timer widget
-        if (demoplayback && (demo_timer == 1 || demo_timer == 3))
-        {
-            ID_DemoTimer(demo_timerdir ? (deftotaldemotics - defdemotics) : defdemotics);
-        }
-        else if (demorecording && (demo_timer == 2 || demo_timer == 3))
-        {
-            ID_DemoTimer(leveltime);
-        }
-
-        // [JN] Target's health widget.
-        // Actual health values are gathered in G_Ticker.
-        if (widget_health)
-        {
-            ID_DrawTargetsHealth();
-        }
-
-        // [JN] Draw crosshair.
-        if (xhair_draw && !automapactive)
-        {
-            ID_DrawCrosshair();
-        }
-
-        // [JN] Main status bar drawing function.
-        if (dp_screen_size < 15 || (automapactive && !automap_overlay))
-        {
-            // [JN] Only forcefully update/redraw on...
-            const boolean st_forceredraw = 
-                             (oldgametic < gametic  // Every game tic
-                          ||  dp_screen_size > 10   // Crispy HUD (no solid status bar background)
-                          ||  setsizeneeded         // Screen size changing
-                          || (menuactive && dp_menu_shading)); // Menu shading while non-capped game mode
-
-            ST_Drawer(st_forceredraw);
-        }
-    }
-
     // [JN] Draw right widgets in any states except finale text screens.
-    if (gamestate != GS_FINALE)
+    // if (widget_enable) <- TODO
     {
-        ID_RightWidgets();
-    }
+        if (gamestate != GS_FINALE)
+        {
+            ID_RightWidgets();
+        }
 
-    // [crispy] Demo Timer widget
-    if (demoplayback && demo_bar)
-    {
-        ID_DemoBar();
+        // [crispy] Demo Timer widget
+        if (demoplayback && demo_bar)
+        {
+            ID_DemoBar();
+        }
     }
 
     // Handle player messages
