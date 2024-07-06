@@ -1112,9 +1112,9 @@ void R_InitColormaps (void)
 	{
 		const byte k = colormap[i];
 
-		r = gammatable[vid_gamma][invulpal[3 * k + 0]]  + gammatable[vid_gamma][0];
-		g = gammatable[vid_gamma][invulpal[3 * k + 1]]  + gammatable[vid_gamma][0];
-		b = gammatable[vid_gamma][invulpal[3 * k + 2]]  + gammatable[vid_gamma][0];
+		r = gammatable[vid_gamma][invulpal[3 * k + 0]];
+		g = gammatable[vid_gamma][invulpal[3 * k + 1]];
+		b = gammatable[vid_gamma][invulpal[3 * k + 2]];
 
 		colormaps[j++] = 0xff000000 | (r << 16) | (g << 8) | b;
 	}
