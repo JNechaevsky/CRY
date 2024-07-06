@@ -34,6 +34,7 @@ set(GAME_SOURCE_FILES
     id_vars.c           id_vars.h
     midifile.c          midifile.h
     mus2mid.c           mus2mid.h
+    m_array.h
     m_bbox.c            m_bbox.h
     m_config.c          m_config.h
     m_controls.c        m_controls.h

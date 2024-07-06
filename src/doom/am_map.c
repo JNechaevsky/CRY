@@ -116,6 +116,17 @@ typedef struct
     mpoint_t a, b;
 } mline_t;
 
+#define M_ARRAY_INIT_CAPACITY 500
+#include "m_array.h"
+
+typedef struct
+{
+    mline_t l;
+    int color;
+} am_line_t;
+
+static am_line_t *lines_1S = NULL;
+
 // -----------------------------------------------------------------------------
 // The vector graphics for the automap.
 // A line drawing of the player pointing right, starting from the middle.
@@ -1564,13 +1575,18 @@ static void AM_drawWalls (void)
                 if (!lines[i].backsector)
                 {
                     // [JN] Highlight secret sectors
-                    if (automap_secrets && lines[i].frontsector->special == 9)
+                    if (automap_secrets > 1 && lines[i].frontsector->special == 9)
                     {
-                        AM_drawMline(&l, 114);
+                        array_push(lines_1S, ((am_line_t){l, 214}));
+                    }
+                    // [plums] show revealed secrets
+                    else if (automap_secrets && lines[i].frontsector->oldspecial == 9)
+                    {
+                        array_push(lines_1S, ((am_line_t){l, 112}));
                     }
                     else
                     {
-                        AM_drawMline(&l, 32);
+                        array_push(lines_1S, ((am_line_t){l, 32}));
                     }
                 }
                 else
@@ -1585,6 +1601,7 @@ static void AM_drawWalls (void)
                     {
                         AM_drawMline(&l, 32);
                     }
+                    
 					// [JN] RED Key-locked doors
 					else
 					if (lines[i].special == 28  || lines[i].special == 33
@@ -1607,11 +1624,18 @@ static void AM_drawWalls (void)
 						AM_drawMline(&l, 228);
 					}
                     // [JN] Highlight secret sectors
-                    else if (automap_secrets
+                    else if (automap_secrets > 1
                     && (lines[i].frontsector->special == 9
                     ||  lines[i].backsector->special == 9))
                     {
-                        AM_drawMline(&l, 114);
+                        AM_drawMline(&l, 214);
+                    }
+                    // [plums] show revealed secrets
+                    else if (automap_secrets
+                    && (lines[i].frontsector->oldspecial == 9
+                    ||  lines[i].backsector->oldspecial == 9))
+                    {
+                        AM_drawMline(&l, 112);
                     }
                     // Any special linedef
                     else if (lines[i].special)
@@ -1634,6 +1658,12 @@ static void AM_drawWalls (void)
                         AM_drawMline(&l, 96);
                     }
                 }
+                // [JN] Exit (can be one-sided or two-sided)
+                if (lines[i].special == 11 || lines[i].special == 51
+                ||  lines[i].special == 52 || lines[i].special == 124)
+                {
+                    array_push(lines_1S, ((am_line_t){l, 195}));
+                }
             }
             else if (plr->powers[pw_allmap])
             {
@@ -1648,6 +1678,12 @@ static void AM_drawWalls (void)
             }
         }
     }
+
+    for (int i = 0; i < array_size(lines_1S); ++i)
+    {
+        AM_drawMline(&lines_1S[i].l, lines_1S[i].color);
+    }
+    array_clear(lines_1S);
 }
 
 // -----------------------------------------------------------------------------
