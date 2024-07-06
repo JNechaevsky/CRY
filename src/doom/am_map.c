@@ -1826,9 +1826,9 @@ static void AM_drawThings (int colors)
             // [JN] Interpolate things if possible.
             if (vid_uncapped_fps && realleveltime > oldleveltime)
             {
-                pt.x = (t->oldx + FixedMul(t->x - t->oldx, fractionaltic)) >> FRACTOMAPBITS;
-                pt.y = (t->oldy + FixedMul(t->y - t->oldy, fractionaltic)) >> FRACTOMAPBITS;
-                actualangle = R_InterpolateAngle(t->oldangle, t->angle, fractionaltic);
+                pt.x = LerpFixed(t->oldx, t->x) >> FRACTOMAPBITS;
+                pt.y = LerpFixed(t->oldy, t->y) >> FRACTOMAPBITS;
+                actualangle = LerpAngle(t->oldangle, t->angle);
             }
             else
             {

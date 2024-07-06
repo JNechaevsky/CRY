@@ -121,6 +121,8 @@ void I_InitWindowIcon(void);
 
 void I_StartTic (void);
 
+void I_StartDisplay (void); // [crispy]
+
 
 extern char *vid_video_driver;
 extern boolean screenvisible;
