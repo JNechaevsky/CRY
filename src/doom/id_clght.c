@@ -153,7 +153,7 @@ void R_ColoredVisplanesIJLevel (int i, int j, int level)
     zlight_D97C45[i][j] = colormaps_D97C45 + level*256;
     zlight_FF7F7F[i][j] = colormaps_FF7F7F + level*256;
     zlight_55B828[i][j] = colormaps_55B828 + level*256;
-    zlight_BBE357[i][j] = colormaps_55B828 + level*256;
+    zlight_BBE357[i][j] = colormaps_BBE357 + level*256;
     zlight_949DB9[i][j] = colormaps_949DB9 + level*256;
     zlight_2A2F6B[i][j] = colormaps_2A2F6B + level*256;
     zlight_50ADAC[i][j] = colormaps_50ADAC + level*256;
@@ -217,7 +217,7 @@ void R_ColoredSegsIJLevel (int i, int j, int level)
     scalelight_D97C45[i][j] = colormaps_EEC06B + level*256;
     scalelight_FF7F7F[i][j] = colormaps_FF7F7F + level*256;
     scalelight_55B828[i][j] = colormaps_55B828 + level*256;
-    scalelight_BBE357[i][j] = colormaps_55B828 + level*256;
+    scalelight_BBE357[i][j] = colormaps_BBE357 + level*256;
     scalelight_949DB9[i][j] = colormaps_949DB9 + level*256;
     scalelight_2A2F6B[i][j] = colormaps_2A2F6B + level*256;
     scalelight_50ADAC[i][j] = colormaps_50ADAC + level*256;
@@ -344,6 +344,19 @@ const sectorcolor_t sectorcolor[] =
     {    1,     72,    0xFF7F7F },
     {    1,     73,    0xFF7F7F },
     {    1,     81,    0x55B828 },
+
+    // Area 2: Nuclear Plant
+    {    2,      1,    0xFF7F7F },
+    {    2,      2,    0xFF7F7F },
+    {    2,     73,    0xBBE357 },
+    {    2,    120,    0x55B828 },
+    {    2,    121,    0xBBE357 },
+    {    2,    122,    0x55B828 },
+    {    2,    124,    0x55B828 },
+    {    2,    181,    0x55B828 },
+    {    2,    182,    0xBBE357 },
+    {    2,    183,    0xBBE357 },
+    {    2,    191,    0xFF7F7F },
 
     {   -1,      0,    0x000000 }
 };
