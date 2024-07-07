@@ -32,6 +32,7 @@
 
 #include "id_vars.h"
 #include "id_func.h"
+#include "id_clght.h"
 
 
 // -----------------------------------------------------------------------------
@@ -263,7 +264,8 @@ visplane_t*
 R_FindPlane
 ( fixed_t	height,
   int		picnum,
-  int		lightlevel)
+  int		lightlevel,
+  int		color)
 {
     visplane_t *check;
     unsigned int hash;
@@ -290,7 +292,7 @@ R_FindPlane
 
     for (check = visplanes[hash]; check; check = check->next)
         if (height == check->height && picnum == check->picnum 
-        && lightlevel == check->lightlevel)
+        && lightlevel == check->lightlevel && color == check->color)
             return check;
 
     check = new_visplane(hash);
@@ -298,6 +300,7 @@ R_FindPlane
     check->height = height;
     check->picnum = picnum;
     check->lightlevel = lightlevel;
+    check->color = color;
     check->minx = SCREENWIDTH;
     check->maxx = -1;
 
@@ -317,6 +320,7 @@ visplane_t *R_DupPlane(const visplane_t *pl, int start, int stop)
     new_pl->height = pl->height;
     new_pl->picnum = pl->picnum;
     new_pl->lightlevel = pl->lightlevel;
+    new_pl->color = pl->color;
     new_pl->minx = start;
     new_pl->maxx = stop;
 
@@ -495,7 +499,17 @@ void R_DrawPlanes (void)
             {
                 light = 0;
             }
-            planezlight = zlight[light];
+
+            // [JN] Colorize visplanes drawing.
+            if (vis_colored_lighting)
+            {
+                planezlight = R_ColoredVisplanesColorize(light, pl->color);
+            }
+            else
+            {
+                planezlight = zlight[light];
+            }
+
             pl->top[pl->minx-1] = pl->top[stop] = USHRT_MAX;
 
             for (int x = pl->minx ; x <= stop ; x++)

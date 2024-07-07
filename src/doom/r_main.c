@@ -33,6 +33,7 @@
 
 #include "id_vars.h"
 #include "id_func.h"
+#include "id_clght.h"
 
 
 // Fineangles in the SCREENWIDTH wide window.
@@ -600,19 +601,27 @@ void R_InitLightTables (void)
 	for (i = 0; i < LIGHTLEVELS; i++)
 	{
 		free(zlight[i]);
+		// [JN] Colored visplanes initialization.
+		R_ColoredVisplanesFreeI(i);
 	}
 	free(zlight);
+	// [JN] Colored visplanes initialization.
+	R_ColoredVisplanesFree();
     }
 
     scalelight = malloc(LIGHTLEVELS * sizeof(*scalelight));
     scalelightfixed = malloc(MAXLIGHTSCALE * sizeof(*scalelightfixed));
     zlight = malloc(LIGHTLEVELS * sizeof(*zlight));
+    // [JN] Colored visplanes initialization.
+    R_ColoredVisplanesMalloc();
 
     // Calculate the light levels to use
     //  for each level / distance combination.
     for (i=0 ; i< LIGHTLEVELS ; i++)
     {
 	zlight[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
+	// [JN] Colored visplanes initialization.
+	R_ColoredVisplanesMAXLIGHTZ(i);
 
 	startmap = ((LIGHTLEVELS-LIGHTBRIGHT-i)*2)*NUMCOLORMAPS/LIGHTLEVELS;
 	for (j=0 ; j<MAXLIGHTZ ; j++)
@@ -628,6 +637,8 @@ void R_InitLightTables (void)
 		level = NUMCOLORMAPS-1;
 
 	    zlight[i][j] = colormaps + level*256;
+	    // [JN] Colored visplanes initialization.
+	    R_ColoredVisplanesIJLevel(i, j, level);
 	}
     }
 }

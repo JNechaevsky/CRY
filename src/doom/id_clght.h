@@ -19,6 +19,30 @@
 #include "r_local.h"
 
 
+// Main colormaps
+extern lighttable_t   *colormaps_EEC06B;
+extern lighttable_t   *colormaps_FF7F7F;
+
+// Visplanes data
+extern lighttable_t ***zlight_EEC06B;
+extern lighttable_t ***zlight_FF7F7F;
+
+
+// Main colormaps
+extern void R_AllocateColoredColormaps (void);
+
+// Colored visplanes initialization
+extern void R_ColoredVisplanesFreeI (int i);
+extern void R_ColoredVisplanesFree (void);
+extern void R_ColoredVisplanesMalloc (void);
+extern void R_ColoredVisplanesMAXLIGHTZ (int i);
+extern void R_ColoredVisplanesIJLevel (int i, int j, int level);
+
+// Visplanes coloring
+extern lighttable_t **R_ColoredVisplanesColorize (int light, int color);
+
+
+// Colored lighting injection data type
 typedef struct
 {
     int map;

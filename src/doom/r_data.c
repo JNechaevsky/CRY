@@ -30,6 +30,7 @@
 #include "v_video.h"
 
 #include "id_vars.h"
+#include "id_clght.h"
 
 
 //
@@ -1086,9 +1087,15 @@ void R_InitColormaps (void)
 	byte *const invulpal = W_CacheLumpName("INVULPAL", PU_STATIC);
 	byte *const colormap = W_CacheLumpName("COLORMAP", PU_STATIC);
 
+	// [JN] Colored sector lighting. TODO - make pregenerated?
+	byte r_c, g_c, b_c;
+	byte *const C_EEC06B = W_CacheLumpName("C_EEC06B", PU_STATIC);
+	byte *const C_FF7F7F = W_CacheLumpName("C_FF7F7F", PU_STATIC);
+
 	if (!colormaps)
 	{
 		colormaps = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
+		R_AllocateColoredColormaps();
 	}
 
 	for (c = 0; c < NUMCOLORMAPS; c++)
@@ -1102,6 +1109,16 @@ void R_InitColormaps (void)
 			r = gammatable[vid_gamma][crypal[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
 			g = gammatable[vid_gamma][crypal[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
 			b = gammatable[vid_gamma][crypal[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+
+			r_c = gammatable[vid_gamma][C_EEC06B[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			g_c = gammatable[vid_gamma][C_EEC06B[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			b_c = gammatable[vid_gamma][C_EEC06B[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			colormaps_EEC06B[j] = 0xff000000 | (r_c << 16) | (g_c << 8) | b_c;
+
+			r_c = gammatable[vid_gamma][C_FF7F7F[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			g_c = gammatable[vid_gamma][C_FF7F7F[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			b_c = gammatable[vid_gamma][C_FF7F7F[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			colormaps_FF7F7F[j] = 0xff000000 | (r_c << 16) | (g_c << 8) | b_c;
 
 			colormaps[j++] = 0xff000000 | (r << 16) | (g << 8) | b;
 		}
@@ -1139,6 +1156,9 @@ void R_InitColormaps (void)
 	W_ReleaseLumpName("PLAYPAL");
 	W_ReleaseLumpName("CRYPAL");
 	W_ReleaseLumpName("INVULPAL");
+
+	W_ReleaseLumpName("C_EEC06B");
+	W_ReleaseLumpName("C_FF7F7F");
 }
 
 
