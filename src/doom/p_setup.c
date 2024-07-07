@@ -38,6 +38,7 @@
 
 #include "id_vars.h"
 #include "id_func.h"
+#include "id_clght.h"
 
 
 //
@@ -443,6 +444,19 @@ void P_LoadSectors (int lump)
         ss->interpceilingheight = ss->ceilingheight;
         // [crispy] inhibit sector interpolation during the 0th gametic
         ss->oldgametic = -1;
+
+        // [JN] Inject color tables into sectors.
+        for (int j = 0; sectorcolor[j].map != -1; j++)
+        {
+            if (i == sectorcolor[j].sector && gamemap == sectorcolor[j].map)
+            {
+                if (sectorcolor[j].color)
+                {
+                    ss->color = sectorcolor[j].color;
+                }
+                break;
+            }
+        }
     }
 	
     W_ReleaseLumpNum(lump);

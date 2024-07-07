@@ -13,6 +13,7 @@ add_library(doom STATIC
             g_game.c        g_game.h
             info.c          info.h
             id_func.c       id_func.h
+            id_clght.c      id_clght.h
             m_menu.c        m_menu.h
             m_random.c      m_random.h
             p_ceilng.c

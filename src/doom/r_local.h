@@ -86,6 +86,9 @@ typedef	struct
     short   special;
     short   tag;
 
+    // [JN] Value that refers to custom sector's colormap table.
+    int     color;
+
     // 0 = untraversed, 1,2 = sndlines -1
     int     soundtraversed;
 
