@@ -823,14 +823,7 @@ R_StoreWallRange
         {
             lightnum = (frontsector->lightlevel >> LIGHTSEGSHIFT) + (extralight * LIGHTBRIGHT);
             // [JN] Colorize segments drawing.
-            if (vis_colored_lighting)
-            {
-                walllights = R_ColoredSegsColorize(lightnum, frontsector->color);
-            }
-            else
-            {
-                walllights = scalelight[BETWEEN(0, LIGHTLEVELS-1, lightnum)];
-            }
+            walllights = R_ColoredSegsColorize(lightnum, frontsector->color);
         }
     }
 

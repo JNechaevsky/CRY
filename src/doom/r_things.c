@@ -885,19 +885,7 @@ void R_AddSprites (sector_t* sec)
     lightnum = (sec->lightlevel >> LIGHTSEGSHIFT)+(extralight * LIGHTBRIGHT);
 
     // [JN] Colorize sprite drawing.
-    if (vis_colored_lighting)
-    {
-        spritelights = R_ColoredSegsColorize(lightnum, sec->color);
-    }
-    else
-    {
-    if (lightnum < 0)		
-	spritelights = scalelight[0];
-    else if (lightnum >= LIGHTLEVELS)
-	spritelights = scalelight[LIGHTLEVELS-1];
-    else
-	spritelights = scalelight[lightnum];
-    }
+	spritelights = R_ColoredSegsColorize(lightnum, sec->color);
 
     // Handle all things in sector.
     for (thing = sec->thinglist ; thing ; thing = thing->snext)
@@ -1162,19 +1150,7 @@ static void R_DrawPlayerSprites (void)
 	+(extralight * LIGHTBRIGHT);
 
     // [JN] Colorize STbar sprite drawing.
-    if (vis_colored_lighting)
-    {
-        spritelights = R_ColoredSegsColorize(lightnum, viewplayer->mo->subsector->sector->color);
-    }
-    else
-    {
-    if (lightnum < 0)		
-	spritelights = scalelight[0];
-    else if (lightnum >= LIGHTLEVELS)
-	spritelights = scalelight[LIGHTLEVELS-1];
-    else
-	spritelights = scalelight[lightnum];
-    }
+    spritelights = R_ColoredSegsColorize(lightnum, viewplayer->mo->subsector->sector->color);
     
     // clip to screen bounds
     mfloorclip = screenheightarray;

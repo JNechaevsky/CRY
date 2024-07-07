@@ -231,18 +231,22 @@ void R_ColoredSegsIJLevel (int i, int j, int level)
 
 lighttable_t **R_ColoredVisplanesColorize (int light, int color)
 {
-    switch (color)
+    if (vis_colored_lighting)
     {
-        case 0xEEC06B:  return zlight_EEC06B[light]; break;
-        case 0xD97C45:  return zlight_D97C45[light]; break;
-        case 0xFF7F7F:  return zlight_FF7F7F[light]; break;
-        case 0x55B828:  return zlight_55B828[light]; break;
-        case 0xBBE357:  return zlight_BBE357[light]; break;
-        case 0x949DB9:  return zlight_949DB9[light]; break;
-        case 0x2A2F6B:  return zlight_2A2F6B[light]; break;
-        case 0x50ADAC:  return zlight_50ADAC[light]; break;
-        default:        return zlight[light];        break;
+        switch (color)
+        {
+            case 0xEEC06B:  return zlight_EEC06B[light]; break;
+            case 0xD97C45:  return zlight_D97C45[light]; break;
+            case 0xFF7F7F:  return zlight_FF7F7F[light]; break;
+            case 0x55B828:  return zlight_55B828[light]; break;
+            case 0xBBE357:  return zlight_BBE357[light]; break;
+            case 0x949DB9:  return zlight_949DB9[light]; break;
+            case 0x2A2F6B:  return zlight_2A2F6B[light]; break;
+            case 0x50ADAC:  return zlight_50ADAC[light]; break;
+        }
     }
+
+    return zlight[light];
 }
 
 // =============================================================================
@@ -255,18 +259,22 @@ lighttable_t **R_ColoredSegsColorize (int lightnum, int color)
 {
     const int l = LIGHTLEVELS - 1;
 
-    switch (color)
+    if (vis_colored_lighting)
     {
-        case 0xEEC06B:  return scalelight_EEC06B[BETWEEN(0, l, lightnum)];  break;
-        case 0xD97C45:  return scalelight_D97C45[BETWEEN(0, l, lightnum)];  break;
-        case 0xFF7F7F:  return scalelight_FF7F7F[BETWEEN(0, l, lightnum)];  break;
-        case 0x55B828:  return scalelight_55B828[BETWEEN(0, l, lightnum)];  break;
-        case 0xBBE357:  return scalelight_BBE357[BETWEEN(0, l, lightnum)];  break;
-        case 0x949DB9:  return scalelight_949DB9[BETWEEN(0, l, lightnum)];  break;
-        case 0x2A2F6B:  return scalelight_2A2F6B[BETWEEN(0, l, lightnum)];  break;
-        case 0x50ADAC:  return scalelight_50ADAC[BETWEEN(0, l, lightnum)];  break;
-        default:        return scalelight[BETWEEN(0, l, lightnum)];         break;
+        switch (color)
+        {
+            case 0xEEC06B:  return scalelight_EEC06B[BETWEEN(0, l, lightnum)];  break;
+            case 0xD97C45:  return scalelight_D97C45[BETWEEN(0, l, lightnum)];  break;
+            case 0xFF7F7F:  return scalelight_FF7F7F[BETWEEN(0, l, lightnum)];  break;
+            case 0x55B828:  return scalelight_55B828[BETWEEN(0, l, lightnum)];  break;
+            case 0xBBE357:  return scalelight_BBE357[BETWEEN(0, l, lightnum)];  break;
+            case 0x949DB9:  return scalelight_949DB9[BETWEEN(0, l, lightnum)];  break;
+            case 0x2A2F6B:  return scalelight_2A2F6B[BETWEEN(0, l, lightnum)];  break;
+            case 0x50ADAC:  return scalelight_50ADAC[BETWEEN(0, l, lightnum)];  break;
+        }
     }
+
+    return scalelight[BETWEEN(0, l, lightnum)]; 
 }
 
 // =============================================================================

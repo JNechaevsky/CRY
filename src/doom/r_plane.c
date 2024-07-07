@@ -499,17 +499,8 @@ void R_DrawPlanes (void)
             {
                 light = 0;
             }
-
             // [JN] Colorize visplanes drawing.
-            if (vis_colored_lighting)
-            {
-                planezlight = R_ColoredVisplanesColorize(light, pl->color);
-            }
-            else
-            {
-                planezlight = zlight[light];
-            }
-
+            planezlight = R_ColoredVisplanesColorize(light, pl->color);
             pl->top[pl->minx-1] = pl->top[stop] = USHRT_MAX;
 
             for (int x = pl->minx ; x <= stop ; x++)
