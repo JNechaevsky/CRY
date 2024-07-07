@@ -35,6 +35,10 @@ lighttable_t   *colormaps_FF7F7F;
 lighttable_t ***zlight_EEC06B = NULL;
 lighttable_t ***zlight_FF7F7F = NULL;
 
+// Segments data
+lighttable_t ***scalelight_EEC06B = NULL;
+lighttable_t ***scalelight_FF7F7F = NULL;
+
 
 // =============================================================================
 //
@@ -86,6 +90,40 @@ void R_ColoredVisplanesIJLevel (int i, int j, int level)
     zlight_FF7F7F[i][j] = colormaps_FF7F7F + level*256;
 }
 
+// -----------------------------------------------------------------------------
+// Colored segments initialization
+// -----------------------------------------------------------------------------
+
+void R_ColoredSegsFreeI (int i)
+{
+    free(scalelight_EEC06B[i]);
+    free(scalelight_FF7F7F[i]);
+}
+
+void R_ColoredSegsFree (void)
+{
+    free(scalelight_EEC06B);
+    free(scalelight_FF7F7F);
+}
+
+void R_ColoredSegsMalloc (void)
+{
+    scalelight_EEC06B = malloc(LIGHTLEVELS * sizeof(*scalelight));
+    scalelight_FF7F7F = malloc(LIGHTLEVELS * sizeof(*scalelight));
+}
+
+void R_ColoredSegsMAXLIGHTSCALE (int i)
+{
+    scalelight_EEC06B[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
+    scalelight_FF7F7F[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
+}
+
+void R_ColoredSegsIJLevel (int i, int j, int level)
+{
+    scalelight_EEC06B[i][j] = colormaps_EEC06B + level*256;
+    scalelight_FF7F7F[i][j] = colormaps_FF7F7F + level*256;
+}
+
 // =============================================================================
 //
 //                             VISPLANES COLORING
@@ -104,16 +142,44 @@ lighttable_t **R_ColoredVisplanesColorize (int light, int color)
 
 // =============================================================================
 //
+//                              SEGMENTS COLORING
+//
+// =============================================================================
+
+lighttable_t **R_ColoredSegsColorize (int lightnum, int color)
+{
+    const int l = LIGHTLEVELS - 1;
+
+    switch (color)
+    {
+        case 0xEEC06B:  return scalelight_EEC06B[BETWEEN(0, l, lightnum)];  break;
+        case 0xFF7F7F:  return scalelight_FF7F7F[BETWEEN(0, l, lightnum)];  break;
+        default:        return scalelight[BETWEEN(0, l, lightnum)];         break;
+    }
+}
+
+// =============================================================================
+//
 //                       COLORED LIGHTING INJECTION TABLE
 //
 // =============================================================================
 
 const sectorcolor_t sectorcolor[] =
 {
-    // map, sector, color table    // RGB color
+    // map, sector, color table
 
-    {    1,     64,    0xEEC06B }, // 238, 192, 107
-    {    1,     67,    0xFF7F7F }, // 255, 127, 127
+    {    1,      0,    0xFF7F7F },
+    {    1,      1,    0xFF7F7F },
+    {    1,      2,    0xFF7F7F },
+    {    1,     64,    0xEEC06B },
+    {    1,     65,    0xEEC06B },
+    {    1,     67,    0xFF7F7F },
+    {    1,     68,    0xFF7F7F },
+    {    1,     69,    0xFF7F7F },
+    {    1,     70,    0xFF7F7F },
+    {    1,     71,    0xFF7F7F },
+    {    1,     72,    0xFF7F7F },
+    {    1,     73,    0xFF7F7F },
 
     {   -1,      0,    0x000000 }
 };

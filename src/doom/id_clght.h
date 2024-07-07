@@ -27,6 +27,10 @@ extern lighttable_t   *colormaps_FF7F7F;
 extern lighttable_t ***zlight_EEC06B;
 extern lighttable_t ***zlight_FF7F7F;
 
+// Segments data
+extern lighttable_t ***scalelight_EEC06B;
+extern lighttable_t ***scalelight_FF7F7F;
+
 
 // Main colormaps
 extern void R_AllocateColoredColormaps (void);
@@ -38,8 +42,19 @@ extern void R_ColoredVisplanesMalloc (void);
 extern void R_ColoredVisplanesMAXLIGHTZ (int i);
 extern void R_ColoredVisplanesIJLevel (int i, int j, int level);
 
+// Colored segments initialization
+extern void R_ColoredSegsFreeI (int i);
+extern void R_ColoredSegsFree (void);
+extern void R_ColoredSegsMalloc (void);
+extern void R_ColoredSegsMAXLIGHTSCALE (int i);
+extern void R_ColoredSegsIJLevel (int i, int j, int level);
+
+
 // Visplanes coloring
 extern lighttable_t **R_ColoredVisplanesColorize (int light, int color);
+
+// Segments coloring
+extern lighttable_t **R_ColoredSegsColorize (int lightnum, int color);
 
 
 // Colored lighting injection data type

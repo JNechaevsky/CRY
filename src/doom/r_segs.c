@@ -26,6 +26,7 @@
 
 #include "id_vars.h"
 #include "id_func.h"
+#include "id_clght.h"
 
 
 // OPTIMIZE: closed two sided lines as single sided
@@ -821,7 +822,15 @@ R_StoreWallRange
         if (!fixedcolormap)
         {
             lightnum = (frontsector->lightlevel >> LIGHTSEGSHIFT) + (extralight * LIGHTBRIGHT);
-            walllights = scalelight[BETWEEN(0, LIGHTLEVELS-1, lightnum)];
+            // [JN] Colorize segments drawing.
+            if (vis_colored_lighting)
+            {
+                walllights = R_ColoredSegsColorize(lightnum, frontsector->color);
+            }
+            else
+            {
+                walllights = scalelight[BETWEEN(0, LIGHTLEVELS-1, lightnum)];
+            }
         }
     }
 

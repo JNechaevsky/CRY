@@ -587,8 +587,12 @@ void R_InitLightTables (void)
 	for (i = 0; i < LIGHTLEVELS; i++)
 	{
 		free(scalelight[i]);
+		// [JN] Colored segments initialization.
+		R_ColoredSegsFreeI(i);
 	}
 	free(scalelight);
+	// [JN] Colored segments initialization.
+	R_ColoredSegsFree();
     }
 
     if (scalelightfixed)
@@ -610,6 +614,8 @@ void R_InitLightTables (void)
     }
 
     scalelight = malloc(LIGHTLEVELS * sizeof(*scalelight));
+    // [JN] Colored segments initialization.
+    R_ColoredSegsMalloc();
     scalelightfixed = malloc(MAXLIGHTSCALE * sizeof(*scalelightfixed));
     zlight = malloc(LIGHTLEVELS * sizeof(*zlight));
     // [JN] Colored visplanes initialization.
@@ -839,6 +845,8 @@ void R_ExecuteSetViewSize (void)
     for (i=0 ; i< LIGHTLEVELS ; i++)
     {
 	scalelight[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
+	// [JN] Colored segments initialization.
+	R_ColoredSegsMAXLIGHTSCALE(i);
 
 	startmap = ((LIGHTLEVELS-LIGHTBRIGHT-i)*2)*NUMCOLORMAPS/LIGHTLEVELS;
 	for (j=0 ; j<MAXLIGHTSCALE ; j++)
@@ -852,6 +860,8 @@ void R_ExecuteSetViewSize (void)
 		level = NUMCOLORMAPS-1;
 
 	    scalelight[i][j] = colormaps + level*256;
+	    // [JN] Colored segments initialization.
+	    R_ColoredSegsIJLevel(i, j, level);
 	}
     }
 
