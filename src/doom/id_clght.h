@@ -52,6 +52,8 @@ extern lighttable_t ***scalelight_50ADAC;
 
 // Main colormaps
 extern void R_AllocateColoredColormaps (void);
+extern void R_InitColoredColormap (byte k, const float scale, const byte *colormap_name);
+extern const int R_CalculateColoredColormap (void);
 
 // Colored visplanes initialization
 extern void R_ColoredVisplanesFreeI (int i);

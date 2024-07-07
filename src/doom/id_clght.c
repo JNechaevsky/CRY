@@ -18,6 +18,7 @@
 
 #include "z_zone.h"
 
+#include "id_vars.h"
 #include "id_clght.h"
 
 
@@ -78,6 +79,20 @@ void R_AllocateColoredColormaps (void)
     colormaps_949DB9 = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
     colormaps_2A2F6B = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
     colormaps_50ADAC = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
+}
+
+static int r_clrmp_color, g_clrmp_color, b_clrmp_color;
+
+void R_InitColoredColormap (byte k, const float scale, const byte *colormap_name)
+{
+    r_clrmp_color = gammatable[vid_gamma][colormap_name[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+    g_clrmp_color = gammatable[vid_gamma][colormap_name[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+    b_clrmp_color = gammatable[vid_gamma][colormap_name[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+}
+
+const int R_CalculateColoredColormap (void)
+{
+    return 0xff000000 | (r_clrmp_color << 16) | (g_clrmp_color << 8) | b_clrmp_color;
 }
 
 // -----------------------------------------------------------------------------

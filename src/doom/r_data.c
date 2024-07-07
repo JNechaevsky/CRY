@@ -1081,8 +1081,6 @@ void R_InitColormaps (void)
 {
 	int c, i, j = 0;
 	byte r, g, b;
-	// [JN] For colored lighting
-	byte r_c, g_c, b_c;
 
 	byte *const playpal = W_CacheLumpName("PLAYPAL", PU_STATIC);
 	byte *const crypal = W_CacheLumpName("CRYPAL", PU_STATIC);
@@ -1107,45 +1105,14 @@ void R_InitColormaps (void)
 			g = gammatable[vid_gamma][crypal[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
 			b = gammatable[vid_gamma][crypal[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
 
-			r_c = gammatable[vid_gamma][C_EEC06B[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			g_c = gammatable[vid_gamma][C_EEC06B[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			b_c = gammatable[vid_gamma][C_EEC06B[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			colormaps_EEC06B[j] = 0xff000000 | (r_c << 16) | (g_c << 8) | b_c;
-
-			r_c = gammatable[vid_gamma][C_D97C45[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			g_c = gammatable[vid_gamma][C_D97C45[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			b_c = gammatable[vid_gamma][C_D97C45[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			colormaps_D97C45[j] = 0xff000000 | (r_c << 16) | (g_c << 8) | b_c;
-
-			r_c = gammatable[vid_gamma][C_FF7F7F[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			g_c = gammatable[vid_gamma][C_FF7F7F[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			b_c = gammatable[vid_gamma][C_FF7F7F[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			colormaps_FF7F7F[j] = 0xff000000 | (r_c << 16) | (g_c << 8) | b_c;
-
-			r_c = gammatable[vid_gamma][C_55B828[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			g_c = gammatable[vid_gamma][C_55B828[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			b_c = gammatable[vid_gamma][C_55B828[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			colormaps_55B828[j] = 0xff000000 | (r_c << 16) | (g_c << 8) | b_c;
-
-			r_c = gammatable[vid_gamma][C_BBE357[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			g_c = gammatable[vid_gamma][C_BBE357[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			b_c = gammatable[vid_gamma][C_BBE357[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			colormaps_BBE357[j] = 0xff000000 | (r_c << 16) | (g_c << 8) | b_c;
-
-			r_c = gammatable[vid_gamma][C_949DB9[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			g_c = gammatable[vid_gamma][C_949DB9[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			b_c = gammatable[vid_gamma][C_949DB9[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			colormaps_949DB9[j] = 0xff000000 | (r_c << 16) | (g_c << 8) | b_c;
-
-			r_c = gammatable[vid_gamma][C_2A2F6B[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			g_c = gammatable[vid_gamma][C_2A2F6B[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			b_c = gammatable[vid_gamma][C_2A2F6B[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			colormaps_2A2F6B[j] = 0xff000000 | (r_c << 16) | (g_c << 8) | b_c;
-
-			r_c = gammatable[vid_gamma][C_50ADAC[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			g_c = gammatable[vid_gamma][C_50ADAC[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			b_c = gammatable[vid_gamma][C_50ADAC[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			colormaps_50ADAC[j] = 0xff000000 | (r_c << 16) | (g_c << 8) | b_c;
+			R_InitColoredColormap(k, scale, C_EEC06B);  colormaps_EEC06B[j] = R_CalculateColoredColormap();
+			R_InitColoredColormap(k, scale, C_D97C45);  colormaps_D97C45[j] = R_CalculateColoredColormap();
+			R_InitColoredColormap(k, scale, C_FF7F7F);  colormaps_FF7F7F[j] = R_CalculateColoredColormap();
+			R_InitColoredColormap(k, scale, C_55B828);  colormaps_55B828[j] = R_CalculateColoredColormap();
+			R_InitColoredColormap(k, scale, C_BBE357);  colormaps_BBE357[j] = R_CalculateColoredColormap();
+			R_InitColoredColormap(k, scale, C_949DB9);  colormaps_949DB9[j] = R_CalculateColoredColormap();
+			R_InitColoredColormap(k, scale, C_2A2F6B);  colormaps_2A2F6B[j] = R_CalculateColoredColormap();
+			R_InitColoredColormap(k, scale, C_50ADAC);  colormaps_50ADAC[j] = R_CalculateColoredColormap();
 
 			colormaps[j++] = 0xff000000 | (r << 16) | (g << 8) | b;
 		}
