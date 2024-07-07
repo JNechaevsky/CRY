@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -14,36 +14,34 @@
 // GNU General Public License for more details.
 //
 
+#pragma once
 
-#ifndef __AMMAP_H__
-#define __AMMAP_H__
 
 #include "d_event.h"
-#include "m_cheat.h"
-
-// Used by ST StatusBar stuff.
-#define AM_MSGHEADER    (('a'<<24)+('m'<<16))
-#define AM_MSGENTERED   (AM_MSGHEADER | ('e'<<8))
-#define AM_MSGEXITED    (AM_MSGHEADER | ('x'<<8))
+#include "st_bar.h"
 
 
-// Called by main loop.
-boolean AM_Responder (event_t* ev);
+typedef struct
+{
+    int64_t x,y;
+} mpoint_t;
 
-// Called by main loop.
-void AM_Ticker (void);
-
-// Called by main loop,
-// called instead of view drawer if automap active.
-void AM_Drawer (void);
-
-// Called to force the automap to quit
-// if the level is completed while it is up.
-void AM_Stop (void);
-
+extern boolean AM_Responder (event_t *ev);
 
 extern cheatseq_t cheat_amap;
 
+extern int iddt_cheating;
+extern int markpointnum, markpointnum_max;
 
-#endif
+extern mpoint_t *markpoints;
 
+extern void AM_clearMarks (void);
+extern void AM_Drawer (void);
+extern void AM_Init (void);
+extern void AM_initVariables (void);
+extern void AM_LevelInit (boolean reinit);
+extern void AM_LevelNameDrawer (void);
+extern void AM_SetdrawFline (void);
+extern void AM_Start (void);
+extern void AM_Stop (void);
+extern void AM_Ticker (void);

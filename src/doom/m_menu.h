@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -13,26 +13,26 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
+// DESCRIPTION:
+//   Menu widget stuff, episode selection and such.
+//    
 
 
 #ifndef __M_MENU__
 #define __M_MENU__
 
 
+
 #include "d_event.h"
 
-
-// =============================================================================
+//
 // MENUS
-// =============================================================================
-
-
+//
 // Called by main loop,
 // saves config file and calls I_Quit when user exits.
 // Even when the menu is not displayed,
 // this can resize the view and change game parameters.
 // Does all the real work of the menu interaction.
-
 boolean M_Responder (event_t *ev);
 
 
@@ -53,9 +53,16 @@ void M_Init (void);
 void M_StartControlPanel (void);
 
 
+extern void M_ConfirmDeleteGame (void);
 
-extern int detailLevel;
+extern void M_WriteText (int x, int y, const char *string, byte *table);
+extern void M_WriteTextCentered (const int y, const char *string, byte *table);
+extern void M_WriteTextCritical (const int y, const char *string1, const char *string2, byte *table);
+extern const int M_StringWidth (const char *string);
+extern void M_WriteTextBig (int x, int y, const char *string, byte *table);
+extern void M_WriteTextBigCentered (const int y, const char *string, byte *table);
 
-
+// [FG] support up to 8 pages of savegames
+// extern int savepage;
 
 #endif    

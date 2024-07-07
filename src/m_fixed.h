@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -22,6 +22,8 @@
 #define __M_FIXED__
 
 
+
+
 //
 // Fixed point, 32bit as 16.16.
 //
@@ -34,6 +36,15 @@ typedef int fixed_t;
 fixed_t FixedMul	(fixed_t a, fixed_t b);
 fixed_t FixedDiv	(fixed_t a, fixed_t b);
 
+#ifndef MIN
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#endif
+#ifndef MAX
+#define MAX(a,b) (((a)>(b))?(a):(b))
+#endif
+#ifndef BETWEEN
+#define BETWEEN(l,u,x) (((l)>(x))?(l):((x)>(u))?(u):(x))
+#endif
 
 
 #endif

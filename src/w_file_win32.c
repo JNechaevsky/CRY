@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,23 +17,19 @@
 //	WAD I/O functions.
 //
 
-
 #include "config.h"
 
 #ifdef _WIN32
 
 #include <stdio.h>
 
-#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
-#endif
 #include <windows.h>
 
 #include "i_system.h"
 #include "m_misc.h"
 #include "w_file.h"
 #include "z_zone.h"
-#include "jn.h"
 
 // This constant doesn't exist in VC6:
 
@@ -48,9 +44,8 @@ typedef struct
     HANDLE handle_map;
 } win32_wad_file_t;
 
-extern wad_file_class_t win32_wad_file;
 
-static void MapFile(win32_wad_file_t *wad, char *filename)
+static void MapFile(win32_wad_file_t *wad, const char *filename)
 {
     wad->handle_map = CreateFileMapping(wad->handle,
                                         NULL,
@@ -61,8 +56,8 @@ static void MapFile(win32_wad_file_t *wad, char *filename)
 
     if (wad->handle_map == NULL)
     {
-        fprintf(stderr, "W_Win32_OpenFile: Unable to CreateFileMapping() for %s\n",
-                filename);
+        fprintf(stderr, "W_Win32_OpenFile: Unable to CreateFileMapping() "
+                        "for %s\n", filename);
         return;
     }
 
@@ -73,7 +68,7 @@ static void MapFile(win32_wad_file_t *wad, char *filename)
     if (wad->wad.mapped == NULL)
     {
         fprintf(stderr, "W_Win32_OpenFile: Unable to MapViewOfFile() for %s\n",
-                filename);
+                        filename);
     }
 }
 
@@ -91,17 +86,20 @@ unsigned int GetFileLength(HANDLE handle)
     return result;
 }
    
-static wad_file_t *W_Win32_OpenFile(char *path)
+static wad_file_t *W_Win32_OpenFile(const char *path)
 {
     win32_wad_file_t *result;
-    wchar_t wpath[MAX_PATH + 1];
+    wchar_t *wpath = NULL;
     HANDLE handle;
 
     // Open the file:
 
-    MultiByteToWideChar(CP_OEMCP, 0,
-                        path, strlen(path) + 1,
-                        wpath, sizeof(wpath));
+    wpath = M_ConvertUtf8ToWide(path);
+
+    if (wpath == NULL)
+    {
+       return NULL;
+    }
 
     handle = CreateFileW(wpath,
                          GENERIC_READ,
@@ -110,6 +108,8 @@ static wad_file_t *W_Win32_OpenFile(char *path)
                          OPEN_EXISTING,
                          FILE_ATTRIBUTE_NORMAL,
                          NULL);
+
+    free(wpath);
 
     if (handle == INVALID_HANDLE_VALUE)
     {
@@ -177,7 +177,8 @@ size_t W_Win32_Read(wad_file_t *wad, unsigned int offset,
 
     if (result == INVALID_SET_FILE_POINTER)
     {
-        I_Error("W_Win32_Read: Failed to set file pointer to %i", offset);
+        I_Error("W_Win32_Read: Failed to set file pointer to %i",
+                offset);
     }
 
     // Read into the buffer.

@@ -1,6 +1,6 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -19,7 +19,6 @@
 // read the deutex source code made my brain hurt.
 //
 
-
 #ifndef W_MERGE_H
 #define W_MERGE_H
 
@@ -28,15 +27,15 @@
 
 // Add a new WAD and merge it into the main directory
 
-void W_MergeFile(char *filename);
+void W_MergeFile(const char *filename);
 
 // NWT-style merging
 
-void W_NWTMergeFile(char *filename, int flags);
+void W_NWTMergeFile(const char *filename, int flags);
 
 // Acts the same as NWT's "-merge" option.
 
-void W_NWTDashMerge(char *filename);
+void W_NWTDashMerge(const char *filename);
 
 // Debug function that prints the WAD directory.
 

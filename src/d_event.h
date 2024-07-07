@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -60,6 +60,7 @@ typedef enum
     //    data2: X axis mouse movement (turn).
     //    data3: Y axis mouse movement (forward/backward).
     //    data4: Third axis mouse movement (strafe).
+    //    data5: Fourth axis mouse movement (look)
     ev_joystick,
 
     // Quit event. Triggered when the user clicks the "close" button
@@ -73,7 +74,7 @@ typedef struct
     evtype_t type;
 
     // Event-specific data; see the descriptions given above.
-    int data1, data2, data3, data4;
+    int data1, data2, data3, data4, data5;
 } event_t;
 
  
@@ -108,6 +109,8 @@ typedef enum
     BTS_SAVEMASK	= (4+8+16),
     BTS_SAVESHIFT 	= 2,
   
+    // [crispy] demo joined.
+    BT_JOIN = 64
 } buttoncode_t;
 
 // villsa [STRIFE] Strife specific buttons
@@ -132,7 +135,10 @@ typedef enum
 } buttoncode2_t;
 
 
+// [crispy] For fast polling
+extern event_t fastmouse;
 
+extern boolean newfastmouse;
 
 // Called by IO functions when input is detected.
 void D_PostEvent (event_t *ev);

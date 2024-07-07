@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -22,6 +22,8 @@
 #ifndef __DOOMTYPE__
 #define __DOOMTYPE__
 
+#include "config.h"
+
 #if defined(_MSC_VER) && !defined(__cplusplus)
 #define inline __inline
 #endif
@@ -30,11 +32,15 @@
 // Outside Windows, we use strings.h for str[n]casecmp.
 
 
-#ifdef _WIN32
+#if !HAVE_DECL_STRCASECMP || !HAVE_DECL_STRNCASECMP
 
 #include <string.h>
+#if !HAVE_DECL_STRCASECMP
 #define strcasecmp stricmp
+#endif
+#if !HAVE_DECL_STRNCASECMP
 #define strncasecmp strnicmp
+#endif
 
 #else
 
@@ -60,11 +66,32 @@
 #define PACKEDATTR __attribute__((packed))
 #endif
 
+#define PRINTF_ATTR(fmt, first) __attribute__((format(printf, fmt, first)))
+#define PRINTF_ARG_ATTR(x) __attribute__((format_arg(x)))
+#define NORETURN __attribute__((noreturn))
+
+#else
+#if defined(_MSC_VER)
+#define PACKEDATTR __pragma(pack(pop))
 #else
 #define PACKEDATTR
 #endif
+#define PRINTF_ATTR(fmt, first)
+#define PRINTF_ARG_ATTR(x)
+#define NORETURN
+#endif
 
-// C99 integer types; with gcc we just use this.  Other compilers 
+#ifdef __WATCOMC__
+#define PACKEDPREFIX _Packed
+#elif defined(_MSC_VER)
+#define PACKEDPREFIX __pragma(pack(push,1))
+#else
+#define PACKEDPREFIX
+#endif
+
+#define PACKED_STRUCT(...) PACKEDPREFIX struct __VA_ARGS__ PACKEDATTR
+
+// C99 integer types; with gcc we just use this.  Other compilers
 // should add conditional statements that define the C99 types.
 
 // What is really wanted here is stdint.h; however, some old versions
@@ -91,6 +118,13 @@ typedef enum
 #endif
 
 typedef uint8_t byte;
+#ifndef CRISPY_TRUECOLOR
+typedef uint8_t pixel_t;
+typedef int16_t dpixel_t;
+#else
+typedef uint32_t pixel_t;
+typedef int64_t dpixel_t;
+#endif
 
 #include <limits.h>
 

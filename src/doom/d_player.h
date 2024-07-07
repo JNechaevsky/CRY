@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -13,6 +13,9 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
+// DESCRIPTION:
+//
+//
 
 
 #ifndef __D_PLAYER__
@@ -23,19 +26,15 @@
 // of other structs: items (internal inventory),
 // animation states (closely tied to the sprites
 // used to represent them, unfortunately).
-#include "d_items.h"
-#include "p_pspr.h"
-
-// In addition, the player is just a special
-// case of the generic moving object/actor.
-#include "p_mobj.h"
+#include "doomdef.h"
 
 // Finally, for odd reasons, the player input
 // is buffered within the player data struct,
 // as commands per game tick.
 #include "d_ticcmd.h"
 
-#include "net_defs.h"
+
+
 
 
 //
@@ -43,9 +42,13 @@
 //
 typedef enum
 {
-    PST_LIVE, // Playing or camping.
-    PST_DEAD, // Dead on the ground, view follows killer.
-    PST_REBORN // Ready to restart/respawn???
+    // Playing or camping.
+    PST_LIVE,
+    // Dead on the ground, view follows killer.
+    PST_DEAD,
+    // Ready to restart/respawn???
+    PST_REBORN		
+
 } playerstate_t;
 
 
@@ -54,9 +57,17 @@ typedef enum
 //
 typedef enum
 {
-    CF_NOCLIP		= 1, // No clipping, walk through barriers.
-    CF_GODMODE		= 2, // No damage, no health loss.
-    CF_NOMOMENTUM	= 4  // Not really a cheat, just a debug aid.
+    // No clipping, walk through barriers.
+    CF_NOCLIP		= 1,
+    // No damage, no health loss.
+    CF_GODMODE		= 2,
+    // Not really a cheat, just a debug aid.
+    CF_NOMOMENTUM	= 4,
+    // [JN] NOTARGET game mode.
+    CF_NOTARGET		= 8,
+    // [JN] BUDDHA cheat.
+    CF_BUDDHA		= 16
+
 } cheat_t;
 
 
@@ -65,88 +76,107 @@ typedef enum
 //
 typedef struct player_s
 {
-    mobj_t*         mo;
-    playerstate_t   playerstate;
-    ticcmd_t        cmd;
+    mobj_t*		mo;
+    playerstate_t	playerstate;
+    ticcmd_t		cmd;
 
     // Determine POV,
     //  including viewpoint bobbing during movement.
     // Focal origin above r.z
-    fixed_t viewz;
+    fixed_t		viewz;
     // Base height above floor for viewz.
-    fixed_t viewheight;
+    fixed_t		viewheight;
     // Bob/squat speed.
-    fixed_t deltaviewheight;
+    fixed_t         	deltaviewheight;
     // bounded/scaled total momentum.
-    fixed_t bob;	
+    fixed_t         	bob;	
 
     // This is only used between levels,
     // mo->health is used during levels.
-    int health;	
-    int armorpoints;
+    int			health;	
+    int			health_negative;  // [JN] Negative health.
+    int			armorpoints;
     // Armor type is 0-2.
-    int armortype;	
+    int			armortype;	
 
     // Power ups. invinc and invis are tic counters.
-    int     powers[NUMPOWERS];
-    boolean cards[NUMCARDS];
-    boolean tryopen[NUMCARDS];
-    boolean backpack;
-
+    int			powers[NUMPOWERS];
+    boolean		cards[NUMCARDS];
+    boolean		tryopen[NUMCARDS];  // [crispy] blinking key or skull in the status bar
+    boolean		backpack;
+    
     // Frags, kills of other players.
-    int          frags[MAXPLAYERS];
-    weapontype_t readyweapon;
-
+    int			frags[MAXPLAYERS];
+    weapontype_t	readyweapon;
+    
     // Is wp_nochange if not changing.
-    weapontype_t pendingweapon;
+    weapontype_t	pendingweapon;
 
-    int weaponowned[NUMWEAPONS];
-    int ammo[NUMAMMO];
-    int maxammo[NUMAMMO];
+    int                 weaponowned[NUMWEAPONS];
+    int			ammo[NUMAMMO];
+    int			maxammo[NUMAMMO];
 
     // True if button down last tic.
-    int attackdown;
-    int usedown;
+    int			attackdown;
+    int			usedown;
 
     // Bit flags, for cheats and debug.
     // See cheat_t, above.
-    int cheats;		
+    int			cheats;		
 
     // Refired shots are less accurate.
-    int refire;		
+    int			refire;		
 
      // For intermission stats.
-    int killcount;
-    int itemcount;
-    int secretcount;
+    int			killcount;
+    int			extrakillcount;  // [JN] Ressurected monsters counter.
+    int			itemcount;
+    int			secretcount;
 
     // Hint messages.
-    char* message;	
+    const char *message;	
+    int			messageTics;
+    byte*		messageColor;
+
+    // [JN] Hint centered messages.
+    const char *messageCentered;	
+    int			messageCenteredTics;
+    byte*		messageCenteredColor;
+
+    // [JN] CRL - prevent other than typing actions in G_Responder
+    // while cheat tics are ticking.
+    int			cheatTics;
+    
+    // [JN] CRL - target's health.
+    const char *targetsname;
+    int 		targetsheath;
+    int 		targetsmaxheath;
+    int			targetsheathTics;    
 
     // For screen flashing (red or bright).
-    int damagecount;
-    int bonuscount;
+    int			damagecount;
+    int			bonuscount;
 
     // Who did damage (NULL for floors/ceilings).
-    mobj_t* attacker;
-
+    mobj_t*		attacker;
+    
     // So gun flashes light up areas.
-    int extralight;
+    int			extralight;
 
     // Current PLAYPAL, ???
     //  can be set to REDCOLORMAP for pain, etc.
-    int fixedcolormap;
+    int			fixedcolormap;
 
     // Player skin colorshift,
     //  0-3 for which color to draw player.
-    int colormap;	
+    int			colormap;	
 
     // Overlay view sprites (gun, etc).
-    pspdef_t psprites[NUMPSPRITES];
+    pspdef_t		psprites[NUMPSPRITES];
 
     // True if secret level has been done.
-    boolean didsecret;	
-    
+    boolean		didsecret;	
+
     // [AM] Previous position of viewz before think.
     //      Used to interpolate between camera positions.
     angle_t		oldviewz;
@@ -154,8 +184,12 @@ typedef struct player_s
     // [crispy] squat down weapon sprite a bit after hitting the ground
     fixed_t	psp_dy, psp_dy_max;
 
-    int     lookdir, oldlookdir;
-    boolean centering;
+    // [crispy] free look / mouse look
+    int	lookdir, oldlookdir;
+    boolean	centering;
+
+    // [crispy] weapon sound source
+    mobj_t	*so;
 
 } player_t;
 
@@ -166,44 +200,45 @@ typedef struct player_s
 //
 typedef struct
 {
-    boolean	in; // whether the player is in game
-
+    boolean	in;	// whether the player is in game
+    
     // Player stats, kills, collected items etc.
-    int skills;
-    int sitems;
-    int ssecret;
-    int stime; 
-    int frags[4];
-    int score; // current score on entry, modified on return
+    int		skills;
+    int		sitems;
+    int		ssecret;
+    int		stime; 
+    int		frags[4];
+    int		score;	// current score on entry, modified on return
+  
 } wbplayerstruct_t;
-
 
 typedef struct
 {
-    int epsd;   // episode # (0-2)
+    int		epsd;	// episode # (0-2)
 
     // if true, splash the secret level
-    boolean didsecret;
-
+    boolean	didsecret;
+    
     // previous and next levels, origin 0
-    int last;
-    int next;	
+    int		last;
+    int		next;	
+    
+    int		maxkills;
+    int		maxitems;
+    int		maxsecret;
+    int		maxfrags;
 
-    int maxkills;
-    int maxitems;
-    int maxsecret;
-    int maxfrags;
-
+    // the par time
+    int		partime;
+    
     // index of this player in game
-    int pnum;	
+    int		pnum;	
 
-    wbplayerstruct_t plyr[MAXPLAYERS];
+    wbplayerstruct_t	plyr[MAXPLAYERS];
 
     // [crispy] CPhipps - total game time for completed levels so far
-    int totaltimes;
-
+    int		totaltimes;
 } wbstartstruct_t;
 
 
 #endif
-

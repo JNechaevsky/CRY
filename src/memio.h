@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -13,7 +13,6 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-
 
 #ifndef MEMIO_H
 #define MEMIO_H
@@ -31,6 +30,7 @@ MEMFILE *mem_fopen_read(void *buf, size_t buflen);
 size_t mem_fread(void *buf, size_t size, size_t nmemb, MEMFILE *stream);
 MEMFILE *mem_fopen_write(void);
 size_t mem_fwrite(const void *ptr, size_t size, size_t nmemb, MEMFILE *stream);
+int mem_fputs(const char *str, MEMFILE *stream);
 void mem_get_buf(MEMFILE *stream, void **buf, size_t *buflen);
 void mem_fclose(MEMFILE *stream);
 long mem_ftell(MEMFILE *stream);

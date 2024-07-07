@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -14,297 +14,193 @@
 // GNU General Public License for more details.
 //
 
-
-#ifndef __D_ENGLSH__
-#define __D_ENGLSH__
+#pragma once
 
 
-// -----------------------------------------------------------------------------
-// D_Main.C strings
-// -----------------------------------------------------------------------------
+//
+//	M_Menu.C
+//
+#define PRESSKEY 	"press a key."
+#define PRESSYN 	"press y or n."
+#define QUITMSG	"are you sure you want to\nquit this great game?"
+#define LOADNET 	"you can't do load while in a net game!\n\n"PRESSKEY
+#define QLOADNET	"you can't quickload during a netgame!\n\n"PRESSKEY
+#define QSAVESPOT	"you haven't picked a quicksave slot yet!\n\n"PRESSKEY
+#define SAVEDEAD 	"you can't save if you aren't playing!\n\n"PRESSKEY
+#define QSPROMPT 	"quicksave over your game named\n\n'%s'?\n\n"PRESSYN
+#define QLPROMPT	"do you want to quickload the game named\n\n'%s'?\n\n"PRESSYN
 
-#define D_DEVSTR    "Development mode ON.\n"
-#define D_CDROM     "CD-ROM Version: default.cfg from c:\\doomdata\n"
+#define NEWGAME	\
+"you can't start a new game\n"\
+"while in a network game.\n\n"PRESSKEY
 
-// -----------------------------------------------------------------------------
-// M_Menu.C
-// -----------------------------------------------------------------------------
+#define MSGOFF	"Messages OFF"
+#define MSGON		"Messages ON"
+#define NETEND	"you can't end a netgame!\n\n"PRESSKEY
+#define ENDGAME	"are you sure you want to end the game?\n\n"PRESSYN
 
-#define PRESSKEY    "press a key."
-#define PRESSYN     "(press \"y\" or \"n\")"
-#define QUITMSG     "are you sure you want to quit?"
-#define QSAVESPOT   "you haven't picked a quicksave slot yet!\n\n"PRESSKEY
-#define SAVEDEAD    "you can't save if you aren't playing!\n\n"PRESSKEY
+#define DOSY		"(press y to quit.)"
 
-#define SAVEGAMENAME "savegame-"
+#define DETAILHI	"High detail"
+#define DETAILLO	"Low detail"
 
-#define MSGON       "Messages ON"
-#define MSGOFF      "Messages OFF"
-
-#define ENDGAME     "are you sure you want to end the game?\n\n"PRESSYN
-
-#define DETAILHI    "High detail"
-#define DETAILLO    "Low detail"
-
-#define GAMMA_OFF   "Gamma correction OFF"
-#define GAMMA_05    "Gamma correction level 0.5"
-#define GAMMA_1     "Gamma correction level 1.0"
-#define GAMMA_15    "Gamma correction level 1.5"
-#define GAMMA_2     "Gamma correction level 2.0"
-#define GAMMA_25    "Gamma correction level 2.5"
-#define GAMMA_3     "Gamma correction level 3.0"
-#define GAMMA_35    "Gamma correction level 3.5"
-#define GAMMA_4     "Gamma correction level 4.0"
+#define GAMMALVL05  "GAMMA CORRECTION LEVEL 0.50"
+#define GAMMALVL055 "GAMMA CORRECTION LEVEL 0.55"
+#define GAMMALVL06  "GAMMA CORRECTION LEVEL 0.60"
+#define GAMMALVL065 "GAMMA CORRECTION LEVEL 0.65"
+#define GAMMALVL07  "GAMMA CORRECTION LEVEL 0.70"
+#define GAMMALVL075 "GAMMA CORRECTION LEVEL 0.75"
+#define GAMMALVL08  "GAMMA CORRECTION LEVEL 0.80"
+#define GAMMALVL085 "GAMMA CORRECTION LEVEL 0.85"
+#define GAMMALVL09  "GAMMA CORRECTION LEVEL 0.90"
+#define GAMMALVL095 "GAMMA CORRECTION LEVEL 0.95"
+#define GAMMALVL0   "GAMMA CORRECTION OFF"
+#define GAMMALVL1   "GAMMA CORRECTION LEVEL 1"
+#define GAMMALVL2   "GAMMA CORRECTION LEVEL 2"
+#define GAMMALVL3   "GAMMA CORRECTION LEVEL 3"
+#define GAMMALVL4   "GAMMA CORRECTION LEVEL 4"
 
 #define EMPTYSTRING	"empty slot"
 
-// -----------------------------------------------------------------------------
-// Health and Armor
-// -----------------------------------------------------------------------------
+//
+//	P_inter.C
+//
+#define GOTARMOR	"Picked up the armor."
+#define GOTMEGA	"Picked up the MegaArmor!"
+#define GOTHTHBONUS	"Picked up a health bonus."
+#define GOTARMBONUS	"Picked up an armor bonus."
+#define GOTSTIM	"Picked up a stimpack."
+#define GOTMEDINEED	"Picked up a medikit that you REALLY need!"
+#define GOTMEDIKIT	"Picked up a medikit."
+#define GOTSUPER	"Supercharge!"
 
-#define GOTHTHBONUS "Picked up a health bonus."
-#define GOTARMBONUS "Picked up an armor bonus."
-#define GOTSTIM     "Picked up a stimpack."
-#define GOTMEDIKIT  "Picked up a medikit."
-#define GOTMEDINEED "Picked up a medikit that you REALLY need!"
-#define GOTSUPER    "Supercharge!"
-#define GOTARMOR    "Picked up the armor."
-#define GOTMEGA     "Picked up the MegaArmor!"
+#define GOTBLUECARD	"Picked up a blue keycard."
+#define GOTYELWCARD	"Picked up a yellow keycard."
+#define GOTREDCARD	"Picked up a red keycard."
+#define GOTBLUESKUL	"Picked up a blue skull key."
+#define GOTYELWSKUL	"Picked up a yellow skull key."
+#define GOTREDSKULL	"Picked up a red skull key."
 
+#define GOTINVUL	"Invulnerability!"
+#define GOTBERSERK	"Berserk!"
+#define GOTINVIS	"Partial Invisibility"
+#define GOTSUIT	"Radiation Shielding Suit"
+#define GOTMAP	"Computer Area Map"
+#define GOTVISOR	"Light Amplification Visor"
+#define GOTMSPHERE	"MegaSphere!"
 
-// -----------------------------------------------------------------------------
-// Weapons
-// -----------------------------------------------------------------------------
+#define GOTCLIP	"Picked up a clip."
+#define GOTCLIPBOX	"Picked up a box of bullets."
+#define GOTROCKET	"Picked up a rocket."
+#define GOTROCKBOX	"Picked up a box of rockets."
+#define GOTCELL	"Picked up an energy cell."
+#define GOTCELLBOX	"Picked up an energy cell pack."
+#define GOTSHELLS	"Picked up 4 shotgun shells."
+#define GOTSHELLBOX	"Picked up a box of shotgun shells."
+#define GOTBACKPACK	"Picked up a backpack full of ammo!"
 
-#define GOTCHAINSAW	"A chainsaw! Find some meat!"
-#define GOTSHOTGUN	"You got the shotgun!"
+#define GOTBFG9000	"You got the BFG9000!  Oh, yes."
 #define GOTCHAINGUN	"You got the chaingun!"
+#define GOTCHAINSAW	"A chainsaw!  Find some meat!"
 #define GOTLAUNCHER	"You got the rocket launcher!"
 #define GOTPLASMA	"You got the plasma gun!"
-#define GOTBFG9000	"You got the BFG9000!  Oh, yes."
+#define GOTSHOTGUN	"You got the shotgun!"
 
+//
+// P_Doors.C
+//
+#define PD_BLUEO	"You need a blue key to activate this object"
+#define PD_REDO	"You need a red key to activate this object"
+#define PD_YELLOWO	"You need a yellow key to activate this object"
+#define PD_BLUEK	"You need a blue key to open this door"
+#define PD_REDK	"You need a red key to open this door"
+#define PD_YELLOWK	"You need a yellow key to open this door"
 
-// -----------------------------------------------------------------------------
-// Ammo
-// -----------------------------------------------------------------------------
+//
+//	G_game.C
+//
+#define GGSAVED	"game saved."
 
-#define GOTCLIP     "Picked up a clip."
-#define GOTCLIPBOX  "Picked up a box of bullets."
-#define GOTROCKET   "Picked up a rocket."
-#define GOTROCKET2  "Picked up a two rockets."
-#define GOTROCKBOX  "Picked up a box of rockets."
-#define GOTCELL     "Picked up an energy cell."
-#define GOTCELLBOX  "Picked up an energy cell pack."
-#define GOTSHELLS   "Picked up 4 shotgun shells."
-#define GOTSHELLS8  "Picked up 8 shotgun shells."
-#define GOTSHELLBOX "Picked up a box of shotgun shells."
-#define GOTBACKPACK "Picked up a backpack full of ammo!"
+//
+//	AM_map.C
+//
 
+#define AMSTR_FOLLOWON	"Follow Mode ON"
+#define AMSTR_FOLLOWOFF	"Follow Mode OFF"
 
-// -----------------------------------------------------------------------------
-// Powerups
-// -----------------------------------------------------------------------------
+#define AMSTR_GRIDON	"Grid ON"
+#define AMSTR_GRIDOFF	"Grid OFF"
 
-#define GOTINVUL    "Invulnerability!"
-#define GOTBERSERK  "Berserk!"
-#define GOTSUIT     "Radiation Shielding Suit"
-#define GOTMAP      "Computer Area Map"
+#define AMSTR_MARKEDSPOT	"Marked Spot"
+#define AMSTR_MARKCLEARED	"Cleared Spot"
+#define AMSTR_MARKSCLEARED	"All Marks Cleared"
 
+//
+//	ST_stuff.C
+//
 
-// -----------------------------------------------------------------------------
-// Keys and Skulls
-// -----------------------------------------------------------------------------
+#define STSTR_MUS		"Music Change"
+#define STSTR_NOMUS		"IMPOSSIBLE SELECTION"
+#define STSTR_DQDON		"Degreelessness Mode On"
+#define STSTR_DQDOFF	"Degreelessness Mode Off"
 
-#define GOTBLUECARD "Picked up a blue keycard."
-#define GOTYELWCARD "Picked up a yellow keycard."
-#define GOTREDCARD  "Picked up a red keycard."
-#define GOTBLUESKUL "Picked up a blue skull key."
-#define GOTYELWSKUL "Picked up a yellow skull key."
-#define GOTREDSKULL "Picked up a red skull key."
+#define STSTR_KFAADDED	"Very Happy Ammo Added"
+#define STSTR_FAADDED	"Ammo (no keys) Added"
+#define STSTR_KAADDED	"KEYS ADDED"
 
+#define STSTR_NCON		"No Clipping Mode ON"
+#define STSTR_NCOFF		"No Clipping Mode OFF"
 
-// -----------------------------------------------------------------------------
-// Doors
-// -----------------------------------------------------------------------------
+#define STSTR_BEHOLD	"inVuln, Str, Inviso, Rad, Allmap, or Lite-amp"
+#define STSTR_BEHOLDX	"Power-up Toggled"
 
-#define PD_BLUEC    "You need a blue keycard to open this door"
-#define PD_REDC     "You need a red keycard to open this door"
-#define PD_YELLOWC  "You need a yellow keycard to open this door"
-#define PD_BLUES    "You need a blue skull key to open this door"
-#define PD_REDS     "You need a red skull key to open this door"
-#define PD_YELLOWS  "You need a yellow skull key to open this door" 
+#define STSTR_CHOPPERS	"... doesn't suck - GM"
+#define STSTR_CLEV		"Changing Level..."
 
+//
+// [JN] ID-specific strings.
+//
 
-// -----------------------------------------------------------------------------
-// HUD messages
-// -----------------------------------------------------------------------------
+#define ID_RESET \
+"GRAPHICAL, AUDIO AND GAMEPLAY SETTINGS\n" \
+"WILL BE RESET TO DEFAULT VALUES.\n\n" \
+"ARE YOU SURE WANT TO CONTINUE?\n\n" \
+PRESSYN
 
-#define GGSAVED     "game saved."
-#define GGLOADED    "game loaded."
-#define HUSTR_MSGU	"[Message unsent]"
+#define ID_SPECTATOR_ON    "SPECTATOR MODE ON"
+#define ID_SPECTATOR_OFF   "SPECTATOR MODE OFF"
+#define ID_SPECTATOR_NA_N  "SPECTATING NOT AVAILABLE IN MULTIPLAYER GAME"
 
+#define ID_FREEZE_ON       "FREEZE MODE ON"
+#define ID_FREEZE_OFF      "FREEZE MODE OFF"
+#define ID_FREEZE_NA_R     "FREEZE NOT AVAILABLE IN DEMO RECORDING"
+#define ID_FREEZE_NA_P     "FREEZE NOT AVAILABLE IN DEMO PLAYING"
+#define ID_FREEZE_NA_N     "FREEZE NOT AVAILABLE IN MULTIPLAYER GAME"
 
-// -----------------------------------------------------------------------------
-// DOOM for Atari Jaguar map names
-// -----------------------------------------------------------------------------
+#define ID_NOTARGET_ON     "NOTARGET MODE ON"
+#define ID_NOTARGET_OFF    "NOTARGET MODE OFF"
+#define ID_NOTARGET_NA_R   "NOTARGET NOT AVAILABLE IN DEMO RECORDING"
+#define ID_NOTARGET_NA_P   "NOTARGET NOT AVAILABLE IN DEMO PLAYING"
+#define ID_NOTARGET_NA_N   "NOTARGET NOT AVAILABLE IN MULTIPLAYER GAME"
 
-#define JHUSTR_1    "level 1: Hangar"
-#define JHUSTR_2    "level 2: Plant"
-#define JHUSTR_3    "level 3: Toxin Refinery"
-#define JHUSTR_4    "level 4: Command Control"
-#define JHUSTR_5    "level 5: Phobos Lab"
-#define JHUSTR_6    "level 6: Central Processing"
-#define JHUSTR_7    "level 7: Computer Station"
-#define JHUSTR_8    "level 8: Phobos Anomaly"
-#define JHUSTR_9    "level 9: Deimos Anomaly"
-#define JHUSTR_10   "level 10: Containment Area"
-#define JHUSTR_11   "level 11: Refinery"
-#define JHUSTR_12   "level 12: Deimos Lab"
-#define JHUSTR_13   "level 13: Command Center"
-#define JHUSTR_14   "level 14: Halls of the Damned"
-#define JHUSTR_15   "level 15: Spawning Vats"
-#define JHUSTR_16   "level 16: Tower of Babel"
-#define JHUSTR_17   "level 17: Hell Keep"
-#define JHUSTR_18   "level 18: Pandemonium"
-#define JHUSTR_19   "level 19: House of Pain"
-#define JHUSTR_20   "level 20: Unholy Cathedral"
-#define JHUSTR_21   "level 21: Mt. Erebus"
-#define JHUSTR_22   "level 22: Limbo"
-#define JHUSTR_23   "level 23: Dis"
-#define JHUSTR_24   "level 24: Military Base"
-#define JHUSTR_25   "level 25: Extra Map"
-#define JHUSTR_26   "level 26: Warrens"
+#define ID_BUDDHA_ON        "BUDDHA MODE ON"
+#define ID_BUDDHA_OFF       "BUDDHA MODE OFF"
+#define ID_BUDDHA_NA_R      "BUDDHA NOT AVAILABLE IN DEMO RECORDING"
+#define ID_BUDDHA_NA_P      "BUDDHA NOT AVAILABLE IN DEMO PLAYING"
+#define ID_BUDDHA_NA_N      "BUDDHA NOT AVAILABLE IN MULTIPLAYER GAME"
 
-// -----------------------------------------------------------------------------
-// Short map names for intermission screen
-// -----------------------------------------------------------------------------
+#define ID_AUTOMAPROTATE_ON     "ROTATE MODE ON"
+#define ID_AUTOMAPROTATE_OFF    "ROTATE MODE OFF"
+#define ID_AUTOMAPOVERLAY_ON    "OVERLAY MODE ON"
+#define ID_AUTOMAPOVERLAY_OFF   "OVERLAY MODE OFF"
 
-#define JAGLVL_01   "Hangar"
-#define JAGLVL_02   "Plant"
-#define JAGLVL_03   "Toxin Refinery"
-#define JAGLVL_04   "Command Control"
-#define JAGLVL_05   "Phobos Lab"
-#define JAGLVL_06   "Central Processing"
-#define JAGLVL_07   "Computer Station"
-#define JAGLVL_08   "Phobos Anomaly"
-#define JAGLVL_09   "Deimos Anomaly"
-#define JAGLVL_10   "Containment Area"
-#define JAGLVL_11   "Refinery"
-#define JAGLVL_12   "Deimos Lab"
-#define JAGLVL_13   "Command Center"
-#define JAGLVL_14   "Halls of the Damned"
-#define JAGLVL_15   "Spawning Vats"
-#define JAGLVL_16   "Tower of Babel"
-#define JAGLVL_17   "Hell Keep"
-#define JAGLVL_18   "Pandemonium"
-#define JAGLVL_19   "House of Pain"
-#define JAGLVL_20   "Unholy Cathedral"
-#define JAGLVL_21   "Mt. Erebus"
-#define JAGLVL_22   "Limbo"
-#define JAGLVL_23   "Dis"
-#define JAGLVL_24   "Military Base"
-#define JAGLVL_25   "Extra Map"
-#define JAGLVL_26   "Warrens"
+#define ID_AUTORUN_ON      "ALWAYS RUN ON"
+#define ID_AUTORUN_OFF     "ALWAYS RUN OFF"
 
+#define ID_MLOOK_ON        "MOUSE LOOK ON"
+#define ID_MLOOK_OFF       "MOUSE LOOK OFF"
 
-// -----------------------------------------------------------------------------
-// Player names
-// -----------------------------------------------------------------------------
+#define ID_NOVERT_ON       "VERTICAL MOUSE MOVEMENT OFF"
+#define ID_NOVERT_OFF      "VERTICAL MOUSE MOVEMENT ON"
 
-#define HUSTR_PLRGREEN      "Green: "
-#define HUSTR_PLRINDIGO     "Indigo: "
-#define HUSTR_PLRBROWN      "Brown: "
-#define HUSTR_PLRRED        "Red: "
-
-// -----------------------------------------------------------------------------
-// Automap
-// -----------------------------------------------------------------------------
-
-#define AMSTR_FOLLOWON      "Follow Mode ON"
-#define AMSTR_FOLLOWOFF     "Follow Mode OFF"
-#define AMSTR_GRIDON        "Grid ON"
-#define AMSTR_GRIDOFF       "Grid OFF"
-#define AMSTR_MARKEDSPOT    "Marked Spot"
-#define AMSTR_MARKSCLEARED  "All Marks Cleared"
-
-// -----------------------------------------------------------------------------
-// Status bar
-// -----------------------------------------------------------------------------
-
-#define STSTR_MUS           "Music Change"
-#define STSTR_NOMUS         "IMPOSSIBLE SELECTION"
-#define STSTR_DQDON         "Degreelessness Mode On"
-#define STSTR_DQDOFF        "Degreelessness Mode Off"
-
-#define STSTR_KFAADDED      "Very Happy Ammo Added"
-#define STSTR_FAADDED       "Ammo (no keys) Added"
-#define STSTR_KAADDED       "Keys Added"
-
-#define STSTR_NCON          "No Clipping Mode ON"
-#define STSTR_NCOFF         "No Clipping Mode OFF"
-
-#define STSTR_CHOPPERS      "... doesn't suck - GM"
-#define STSTR_CLEV          "Changing Level..."
-
-#define STSTR_BEHOLD        "inVuln, Str, Rad or Allmap"
-#define STSTR_BEHOLDX       "Power-up Activated"
-#define STSTR_BEHOLDZ       "Power-up Deactivated"
-
-
-// -----------------------------------------------------------------------------
-// Final text
-// -----------------------------------------------------------------------------
-
-#define JAGENDING               \
-    "     id software\n"        \
-    "     salutes you!\n"       \
-    "\n"                        \
-    "  the horrors of hell\n"   \
-    "  could not kill you.\n"   \
-    "  their most cunning\n"    \
-    "  traps were no match\n"   \
-    "  for you. you have\n"     \
-    "  proven yourself the\n"   \
-    "  best of all!\n"          \
-    "\n"                        \
-    "  congratulations!"
-    
-    
-// -----------------------------------------------------------------------------
-// Casting screen
-// -----------------------------------------------------------------------------
-
-#define CC_ZOMBIE   "zombieman"
-#define CC_SHOTGUN  "shotgun guy"
-#define CC_IMP      "imp"
-#define CC_DEMON    "demon"
-#define CC_LOST     "lost soul"
-#define CC_CACO     "cacodemon"
-#define CC_BARON    "baron of hell"
-#define CC_HERO     "our hero"
-
-
-// -----------------------------------------------------------------------------
-// Port-specific strings
-// -----------------------------------------------------------------------------
-
-
-#define STSTR_TESTCTRLS "Press escape to quit."
-#define STSTR_MASSACRE  "All monsters killed"
-
-#define STSTR_SCRNSHT   "Screen shot"
-
-#define STSTR_ALWAYSRUN "Always run "
-#define STSTR_ALWRUNON  "ON"
-#define STSTR_ALWRUNOFF "OFF"
-
-#define STSRT_MOUSELOOK "Mouse look "
-#define STSTR_MLOOK_ON  "ON"
-#define STSTR_MLOOK_OFF "OFF"
-
-#define STSRT_CROSSHAIR     "Crosshair "
-#define STSTR_CROSSHAIR_ON  "ON"
-#define STSTR_CROSSHAIR_OFF "OFF"
-
-
-#endif
+#define ID_SECRET_FOUND    "A SECRET IS REVEALED!"

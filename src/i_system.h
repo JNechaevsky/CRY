@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -35,8 +35,6 @@ void I_Init (void);
 // for the zone management.
 byte*	I_ZoneBase (int *size);
 
-boolean I_ConsoleStdout(void);
-
 
 // Asynchronous interrupt functions should maintain private queues
 // that are read by the synchronous functions
@@ -51,11 +49,10 @@ ticcmd_t* I_BaseTiccmd (void);
 
 // Called by M_Responder when quit is selected.
 // Clean exit, displays sell blurb.
-void I_Quit (void);
+void I_Quit (void) NORETURN;
 
-void I_Error (char *error, ...);
-
-void I_Tactile (int on, int off, int total);
+extern boolean i_error_safe;
+void I_Error (const char *error, ...) NORETURN PRINTF_ATTR(1, 2);
 
 void *I_Realloc(void *ptr, size_t size);
 
@@ -73,11 +70,11 @@ void I_BindVariables(void);
 
 // Print startup banner copyright message.
 
-void I_PrintStartupBanner(char *gamedescription);
+void I_PrintStartupBanner(const char *gamedescription);
 
 // Print a centered text banner displaying the given string.
 
-void I_PrintBanner(char *text);
+void I_PrintBanner(const char *text);
 
 // Print a dividing line for startup banners.
 

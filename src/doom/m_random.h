@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -13,6 +13,9 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
+// DESCRIPTION:
+//
+//    
 
 
 #ifndef __M_RANDOM__
@@ -29,14 +32,15 @@ int M_Random (void);
 // As M_Random, but used only by the play simulation.
 int P_Random (void);
 
-// [crispy] our own private random function
-int Crispy_Random (void);
-
 // Fix randoms for demos.
 void M_ClearRandom (void);
 
 // Defined version of P_Random() - P_Random()
 int P_SubRandom (void);
-int Crispy_SubRandom (void);
+
+// [JN] Own random functions
+extern int ID_Random (void);
+extern int ID_SubRandom (void);
+extern int ID_RealRandom (void);
 
 #endif

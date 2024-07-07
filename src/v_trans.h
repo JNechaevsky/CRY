@@ -31,22 +31,116 @@
 //-----------------------------------------------------------------------------
 
 
-#ifndef __V_TRANS__
-#define __V_TRANS__
+#pragma once
 
 #include "doomtype.h"
 
 
 enum
 {
+    CR_DARK,
+
+    CR_MENU_BRIGHT5,
+    CR_MENU_BRIGHT4,
+    CR_MENU_BRIGHT3,
+    CR_MENU_BRIGHT2,
+    CR_MENU_BRIGHT1,
+    CR_MENU_DARK1,
+    CR_MENU_DARK2,
+    CR_MENU_DARK3,
+    CR_MENU_DARK4,
+
+    CR_RED,
+    CR_RED_BRIGHT5,
+    CR_RED_BRIGHT4,
+    CR_RED_BRIGHT3,
+    CR_RED_BRIGHT2,
+    CR_RED_BRIGHT1,
+    CR_RED_DARK1,
+    CR_RED_DARK2,
+    CR_RED_DARK3,
+    CR_RED_DARK4,
+    CR_RED_DARK5,
+
+    CR_DARKRED,
+
+    CR_GREEN,
+    CR_GREEN_BRIGHT5,
+    CR_GREEN_BRIGHT4,
+    CR_GREEN_BRIGHT3,
+    CR_GREEN_BRIGHT2,
+    CR_GREEN_BRIGHT1,
+
+    CR_DARKGREEN,
+    CR_DARKGREEN_BRIGHT5,
+    CR_DARKGREEN_BRIGHT4,
+    CR_DARKGREEN_BRIGHT3,
+    CR_DARKGREEN_BRIGHT2,
+    CR_DARKGREEN_BRIGHT1,
+
+    CR_OLIVE,
+    CR_OLIVE_BRIGHT5,
+    CR_OLIVE_BRIGHT4,
+    CR_OLIVE_BRIGHT3,
+    CR_OLIVE_BRIGHT2,
+    CR_OLIVE_BRIGHT1,
+
+    CR_BLUE2,
+    CR_BLUE2_BRIGHT5,
+    CR_BLUE2_BRIGHT4,
+    CR_BLUE2_BRIGHT3,
+    CR_BLUE2_BRIGHT2,
+    CR_BLUE2_BRIGHT1,
+
+    CR_YELLOW,
+    CR_YELLOW_BRIGHT5,
+    CR_YELLOW_BRIGHT4,
+    CR_YELLOW_BRIGHT3,
+    CR_YELLOW_BRIGHT2,
+    CR_YELLOW_BRIGHT1,
+
+    CR_ORANGE,
+    CR_ORANGE_BRIGHT5,
+    CR_ORANGE_BRIGHT4,
+    CR_ORANGE_BRIGHT3,
+    CR_ORANGE_BRIGHT2,
+    CR_ORANGE_BRIGHT1,
+
+    CR_WHITE,
+    CR_GRAY,
+
+    CR_LIGHTGRAY,
+    CR_LIGHTGRAY_BRIGHT5,
+    CR_LIGHTGRAY_BRIGHT4,
+    CR_LIGHTGRAY_BRIGHT3,
+    CR_LIGHTGRAY_BRIGHT2,
+    CR_LIGHTGRAY_BRIGHT1,
+    CR_LIGHTGRAY_DARK1,
+
+    CR_BROWN,
+
     CR_RED2BLUE,
     CR_RED2GREEN,
-    CRMAX
-} cr_t;
+
+    CRMAX,
+    CR_NONE,
+};
 
 extern byte  *cr[CRMAX];
 extern char **crstr;
-extern byte  *tranmap;
+
+#define cr_esc '~'
+
+extern const pixel_t (*blendfunc) (const pixel_t fg, const pixel_t bg);
+extern const pixel_t I_BlendAdd (const pixel_t bg, const pixel_t fg);
+extern const pixel_t I_BlendDark (const pixel_t bg, const int d);
+extern const pixel_t I_BlendOver (const pixel_t bg, const pixel_t fg);
+extern const pixel_t I_BlendOverTinttab (const pixel_t bg, const pixel_t fg);
+extern const pixel_t I_BlendOverAltTinttab (const pixel_t bg, const pixel_t fg);
+
+extern const pixel_t I_BlendFuzz (const pixel_t bg, const pixel_t fg);
+extern const pixel_t I_BlendOverExtra (const pixel_t bg, const pixel_t fg);
 
 
-#endif // __V_TRANS__
+int V_GetPaletteIndex(byte *palette, int r, int g, int b);
+byte V_Colorize (byte *playpal, int cr, byte source, boolean keepgray109);

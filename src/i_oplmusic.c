@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -21,17 +21,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "memio.h"
 #include "mus2mid.h"
-#include "deh_main.h"
+
 #include "i_sound.h"
 #include "i_swap.h"
 #include "m_misc.h"
 #include "w_wad.h"
 #include "z_zone.h"
+
 #include "opl.h"
 #include "midifile.h"
-#include "jn.h"
 
 // #define OPL_MIDI_DEBUG
 
@@ -45,7 +46,7 @@
 
 #define PERCUSSION_LOG_LEN 16
 
-typedef struct
+typedef PACKED_STRUCT (
 {
     byte tremolo;
     byte attack;
@@ -53,25 +54,25 @@ typedef struct
     byte waveform;
     byte scale;
     byte level;
-} PACKEDATTR genmidi_op_t;
+}) genmidi_op_t;
 
-typedef struct
+typedef PACKED_STRUCT (
 {
     genmidi_op_t modulator;
     byte feedback;
     genmidi_op_t carrier;
     byte unused;
     short base_note_offset;
-} PACKEDATTR genmidi_voice_t;
+}) genmidi_voice_t;
 
-typedef struct
+typedef PACKED_STRUCT (
 {
     unsigned short flags;
     byte fine_tuning;
     byte fixed_note;
 
     genmidi_voice_t voices[2];
-} PACKEDATTR genmidi_instr_t;
+}) genmidi_instr_t;
 
 // Data associated with a channel of a track that is currently playing.
 
@@ -363,7 +364,7 @@ static boolean LoadInstrumentTable(void)
 {
     byte *lump;
 
-    lump = W_CacheLumpName(DEH_String("genmidi"), PU_STATIC);
+    lump = W_CacheLumpName("genmidi", PU_STATIC);
 
     // DMX does not check header
 
@@ -636,6 +637,14 @@ static void SetChannelVolume(opl_channel_data_t *channel, unsigned int volume,
 static void I_OPL_SetMusicVolume(int volume)
 {
     unsigned int i;
+
+    // [JN] OPL volume is notably lower than MIDI/GUS.
+    // Double the value, but don't let it go out of bounds.
+    volume *= 2;
+    if (volume > 127)
+    {
+        volume = 127;
+    }
 
     if (current_music_volume == volume)
     {
@@ -1196,7 +1205,7 @@ static void ControllerEvent(opl_track_data_t *track, midi_event_t *event)
 
     switch (controller)
     {
-        case MIDI_CONTROLLER_MAIN_VOLUME:
+        case MIDI_CONTROLLER_VOLUME_MSB:
             SetChannelVolume(channel, param, true);
             break;
 
@@ -1210,8 +1219,7 @@ static void ControllerEvent(opl_track_data_t *track, midi_event_t *event)
 
         default:
 #ifdef OPL_MIDI_DEBUG
-            fprintf(stderr, "Unknown MIDI controller type: %i\n",
-                            controller);
+            fprintf(stderr, "Unknown MIDI controller type: %u\n", controller);
 #endif
             break;
     }
@@ -1304,7 +1312,7 @@ static void MetaEvent(opl_track_data_t *track, midi_event_t *event)
 
         default:
 #ifdef OPL_MIDI_DEBUG
-            fprintf(stderr, "Unknown MIDI meta event type: %i\n",
+            fprintf(stderr, "Unknown MIDI meta event type: %u\n",
                             event->data.meta.type);
 #endif
             break;
@@ -1349,8 +1357,7 @@ static void ProcessEvent(opl_track_data_t *track, midi_event_t *event)
 
         default:
 #ifdef OPL_MIDI_DEBUG
-            fprintf(stderr, "Unknown MIDI event type %i\n",
-            event->event_type);
+            fprintf(stderr, "Unknown MIDI event type %i\n", event->event_type);
 #endif
             break;
     }
@@ -1606,13 +1613,6 @@ static void I_OPL_UnRegisterSong(void *handle)
     }
 }
 
-// Determine whether memory block is a .mid file
-
-static boolean IsMid(byte *mem, int len)
-{
-    return len > 4 && !memcmp(mem, "MThd", 4);
-}
-
 static boolean ConvertMus(byte *musdata, int len, char *filename)
 {
     MEMFILE *instream;
@@ -1654,7 +1654,8 @@ static void *I_OPL_RegisterSong(void *data, int len)
 
     filename = M_TempFile("doom.mid");
 
-    if (IsMid(data, len) && len < MAXMIDLENGTH)
+    // [crispy] remove MID file size limit
+    if (IsMid(data, len) /* && len < MAXMIDLENGTH */)
     {
         M_WriteFile(filename, data, len);
     }
@@ -1674,7 +1675,7 @@ static void *I_OPL_RegisterSong(void *data, int len)
 
     // remove file now
 
-    remove(filename);
+    M_remove(filename);
     free(filename);
 
     return result;
@@ -1706,7 +1707,7 @@ static void I_OPL_ShutdownMusic(void)
 
         // Release GENMIDI lump
 
-        W_ReleaseLumpName(DEH_String("genmidi"));
+        W_ReleaseLumpName("genmidi");
 
         music_initialized = false;
     }
@@ -1716,7 +1717,7 @@ static void I_OPL_ShutdownMusic(void)
 
 static boolean I_OPL_InitMusic(void)
 {
-    char *dmxoption;
+    const char *dmxoption;
     opl_init_result_t chip_type;
 
     OPL_SetSampleRate(snd_samplerate);
@@ -1772,13 +1773,13 @@ static boolean I_OPL_InitMusic(void)
     return true;
 }
 
-static snddevice_t music_opl_devices[] =
+const static snddevice_t music_opl_devices[] =
 {
     SNDDEVICE_ADLIB,
     SNDDEVICE_SB,
 };
 
-music_module_t music_opl_module =
+const music_module_t music_opl_module =
 {
     music_opl_devices,
     arrlen(music_opl_devices),

@@ -2,7 +2,7 @@
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
 // Copyright(C) 2006 Ben Ryves 2006
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,7 +17,6 @@
 // mus2mid.c - Ben Ryves 2006 - http://benryves.com - benryves@benryves.com
 // Use to convert a MUS file into a single track, type 0 MIDI file.
 
-
 #include <stdio.h>
 
 #include "doomtype.h"
@@ -25,7 +24,6 @@
 
 #include "memio.h"
 #include "mus2mid.h"
-#include "jn.h"
 
 #define NUM_CHANNELS 16
 
@@ -56,7 +54,7 @@ typedef enum
 } midievent;
 
 // Structure to hold MUS file header
-typedef struct
+typedef PACKED_STRUCT (
 {
     byte id[4];
     unsigned short scorelength;
@@ -64,7 +62,7 @@ typedef struct
     unsigned short primarychannels;
     unsigned short secondarychannels;
     unsigned short instrumentcount;
-} PACKEDATTR musheader;
+}) musheader;
 
 // Standard MIDI type 0 header + track header
 static const byte midiheader[] =
@@ -485,6 +483,8 @@ boolean mus2mid(MEMFILE *musinput, MEMFILE *midioutput)
         return true;
     }
 
+// [crispy] enable MUS format header check
+#define CHECK_MUS_HEADER
 #ifdef CHECK_MUS_HEADER
     // Check MUS header
     if (musfileheader.id[0] != 'M'

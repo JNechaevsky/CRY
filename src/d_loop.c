@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -13,18 +13,16 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-
-// [Julia] TODO - remove remainings of network code
+// DESCRIPTION:
+//     Main loop code.
+//
 
 #include <stdlib.h>
 #include <string.h>
 
-#include "doomfeatures.h"
-
 #include "d_event.h"
 #include "d_loop.h"
 #include "d_ticcmd.h"
-#include "d_mode.h"
 
 #include "i_system.h"
 #include "i_timer.h"
@@ -33,10 +31,7 @@
 #include "m_argv.h"
 #include "m_fixed.h"
 
-
-
-
-int uncapped_fps = 1;
+#include "id_vars.h"
 
 // The complete set of data for a particular tic.
 
@@ -74,6 +69,11 @@ static int recvtic;
 // The number of tics that have been run (using RunTic) so far.
 
 int gametic;
+int oldgametic;   // [JN] Invoke certain actions independently from uncapped framerate.
+int oldleveltime; // [crispy] check if leveltime keeps tickin'
+
+// [JN] used by player, render and interpolation. Always ticking.
+int realleveltime;
 
 // When set to true, a single tic is run each time TryRunTics() is called.
 // This is used for -timedemo mode.
@@ -151,8 +151,24 @@ static boolean BuildNewTic(void)
 
     loop_interface->RunMenu();
 
-    if (maketic - gameticdiv > 2)
-    return false;
+    if (new_sync)
+    {
+       // If playing single player, do not allow tics to buffer
+       // up very far
+
+       if (maketic - gameticdiv > 2)
+           return false;
+
+       // Never go more than ~200ms ahead
+
+       if (maketic - gameticdiv > 8)
+           return false;
+    }
+    else
+    {
+       if (maketic - gameticdiv >= 5)
+           return false;
+    }
 
     //printf ("mk:%i ",maketic);
     memset(&cmd, 0, sizeof(ticcmd_t));
@@ -264,7 +280,6 @@ void D_StartGameLoop(void)
     lasttime = GetAdjustedTime() / ticdup;
 }
 
-
 void D_StartNetGame(net_gamesettings_t *settings,
                     netgame_startup_callback_t callback)
 {
@@ -280,21 +295,10 @@ void D_StartNetGame(net_gamesettings_t *settings,
     //!
     // @category net
     //
-    // Use new network client sync code rather than the classic
-    // sync code. This is currently disabled by default because it
-    // has some bugs.
+    // Use original network client sync code rather than the improved
+    // sync code.
     //
-    if (M_CheckParm("-newsync") > 0)
-        settings->new_sync = 1;
-    else
-        settings->new_sync = 0;
-
-    // TODO: New sync code is not enabled by default because it's
-    // currently broken. 
-    //if (M_CheckParm("-oldsync") > 0)
-    //    settings->new_sync = 0;
-    //else
-    //    settings->new_sync = 1;
+    settings->new_sync = !M_ParmExists("-oldsync");
 
     //!
     // @category net
@@ -340,35 +344,16 @@ void D_StartNetGame(net_gamesettings_t *settings,
     ticdup = settings->ticdup;
     new_sync = settings->new_sync;
 
+    if (ticdup < 1)
+    {
+        I_Error("D_StartNetGame: invalid ticdup value (%d)", ticdup);
+    }
+
     // TODO: Message disabled until we fix new_sync.
     //if (!new_sync)
     //{
     //    printf("Syncing netgames like Vanilla Doom.\n");
     //}
-}
-
-boolean D_InitNetGame(net_connect_data_t *connect_data)
-{
-    boolean result = false;
-
-    // Call D_QuitNetGame on exit:
-
-    I_AtExit(D_QuitNetGame, true);
-
-    player_class = connect_data->player_class;
-
-    return result;
-}
-
-
-//
-// D_QuitNetGame
-// Called before quitting to leave a net game
-// without hanging the other players
-//
-void D_QuitNetGame (void)
-{
-
 }
 
 static int GetLowTic(void)
@@ -380,15 +365,14 @@ static int GetLowTic(void)
     return lowtic;
 }
 
- 
 // Returns true if there are players in the game:
 
 static boolean PlayersInGame(void)
 {
     boolean result = false;
 
-    // If we are connected to a server, check if there are any players
-    // in the game.
+    // Whether single or multi-player, unless we are running as a drone,
+    // we are in the game.
 
     result = true;
 
@@ -428,6 +412,7 @@ static void SinglePlayerClear(ticcmd_set_t *set)
     }
 }
 
+
 //
 // TryRunTics
 //
@@ -441,9 +426,14 @@ void TryRunTics (void)
     int realtics;
     int	availabletics;
     int	counts;
-    // [Julia] Ingame variables for additional capping conditions
-    extern int paused, menuactive, demoplayback, netgame;
-    extern int gamestate;
+
+    // [AM] If we've uncapped the framerate and there are no tics
+    //      to run, return early instead of waiting around.
+    // [JN] CRL - Keep uncapped framerate while paused and Spectator mode.
+    extern boolean paused;
+    #define return_early (vid_uncapped_fps && counts == 0 && \
+                         ((paused && crl_spectating) || realleveltime > oldleveltime) && \
+                         screenvisible)
 
     // get real tics
     entertic = I_GetTime() / ticdup;
@@ -470,7 +460,25 @@ void TryRunTics (void)
 
     if (new_sync)
     {
+        if (vid_uncapped_fps)
+        {
+            // decide how many tics to run
+            if (realtics < availabletics-1)
+                counts = realtics+1;
+            else if (realtics < availabletics)
+                counts = realtics;
+            else
+                counts = availabletics;
+        }
+        else
+        {
 	counts = availabletics;
+        }
+
+        // [AM] If we've uncapped the framerate and there are no tics
+        //      to run, return early instead of waiting around.
+        if (return_early)
+            return;
     }
     else
     {
@@ -484,11 +492,7 @@ void TryRunTics (void)
 
         // [AM] If we've uncapped the framerate and there are no tics
         //      to run, return early instead of waiting around.
-        // [Julia] Also don't interpolate while paused state and active menu,
-        //      but interpolate in same conditions in demo playback and network game.
-        if (counts == 0 && uncapped_fps && gametic && screenvisible &&
-            !paused && (!menuactive || demoplayback || netgame) &&
-            gamestate == GS_LEVEL)
+        if (return_early)
             return;
 
         if (counts < 1)
@@ -537,6 +541,7 @@ void TryRunTics (void)
 
         SinglePlayerClear(set);
 
+
 	for (i=0 ; i<ticdup ; i++)
 	{
             if (gametic/ticdup > lowtic)
@@ -583,7 +588,7 @@ static boolean StrictDemos(void)
 // this extension (no extensions are allowed if -strictdemos is given
 // on the command line). A warning is shown on the console using the
 // provided string describing the non-vanilla expansion.
-boolean D_NonVanillaRecord(boolean conditional, char *feature)
+boolean D_NonVanillaRecord(boolean conditional, const char *feature)
 {
     if (!conditional || StrictDemos())
     {
@@ -621,7 +626,7 @@ static boolean IsDemoFile(int lumpnum)
 //    demo that comes from a .lmp file, not a .wad file.
 //  - Before proceeding, a warning is shown to the user on the console.
 boolean D_NonVanillaPlayback(boolean conditional, int lumpnum,
-                             char *feature)
+                             const char *feature)
 {
     if (!conditional || StrictDemos())
     {
@@ -632,7 +637,6 @@ boolean D_NonVanillaPlayback(boolean conditional, int lumpnum,
     {
         printf("Warning: WAD contains demo with a non-vanilla extension "
                "(%s)\n", feature);
-
         return false;
     }
 

@@ -1,6 +1,5 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -15,7 +14,6 @@
 // DESCRIPTION:
 //     OPL callback queue.
 //
-
 
 #ifndef OPL_QUEUE_H
 #define OPL_QUEUE_H

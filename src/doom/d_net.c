@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -13,11 +13,13 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-
+// DESCRIPTION:
+//	DOOM Network game communication and protocol,
+//	all OS independend parts.
+//
 
 #include <stdlib.h>
 
-#include "doomfeatures.h"
 #include "d_main.h"
 #include "m_argv.h"
 #include "m_menu.h"
@@ -28,20 +30,17 @@
 #include "g_game.h"
 #include "doomdef.h"
 #include "doomstat.h"
-#include "w_checksum.h"
 #include "w_wad.h"
-#include "deh_main.h"
+
 #include "d_loop.h"
-#include "jn.h"
+#include "p_local.h"
+#include "ct_chat.h"
+
+#include "id_vars.h"
 
 ticcmd_t *netcmds;
 
-
-// -----------------------------------------------------------------------------
-// PlayerQuitGame
-//
 // Called when a player leaves the game
-// -----------------------------------------------------------------------------
 
 static void PlayerQuitGame(player_t *player)
 {
@@ -53,22 +52,25 @@ static void PlayerQuitGame(player_t *player)
     // Do this the same way as Vanilla Doom does, to allow dehacked
     // replacements of this message
 
-    M_StringCopy(exitmsg, DEH_String("Player 1 left the game"), sizeof(exitmsg));
+    M_StringCopy(exitmsg, "Player 1 left the game", sizeof(exitmsg));
 
     exitmsg[7] += player_num;
 
     playeringame[player_num] = false;
-    players[consoleplayer].message = exitmsg;
+    CT_SetMessage(&players[consoleplayer], exitmsg, true, NULL);
+    // [crispy] don't interpolate players who left the game
+    player->mo->interp = false;
+
+    // TODO: check if it is sensible to do this:
+
+    if (demorecording) 
+    {
+        G_CheckDemoStatus ();
+    }
 }
-
-
-// -----------------------------------------------------------------------------
-// RunTic
-// -----------------------------------------------------------------------------
 
 static void RunTic(ticcmd_t *cmds, boolean *ingame)
 {
-    extern boolean advancedemo;
     unsigned int i;
 
     // Check for player quits.
@@ -100,23 +102,30 @@ static loop_interface_t doom_loop_interface = {
 };
 
 
-// -----------------------------------------------------------------------------
-// LoadGameSettings
-//
 // Load game settings from the specified structure and
 // set global variables.
-// -----------------------------------------------------------------------------
 
 static void LoadGameSettings(net_gamesettings_t *settings)
 {
     unsigned int i;
 
+    deathmatch = settings->deathmatch;
     startepisode = settings->episode;
     startmap = settings->map;
     startskill = settings->skill;
     startloadgame = settings->loadgame;
+    lowres_turn = settings->lowres_turn;
+    nomonsters = settings->nomonsters;
     fastparm = settings->fast_monsters;
+    respawnparm = settings->respawn_monsters;
+    timelimit = settings->timelimit;
     consoleplayer = settings->consoleplayer;
+
+    if (lowres_turn)
+    {
+        printf("NOTE: Turning resolution is reduced; this is probably "
+               "because there is a client recording a Vanilla demo.\n");
+    }
 
     for (i = 0; i < MAXPLAYERS; ++i)
     {
@@ -124,37 +133,96 @@ static void LoadGameSettings(net_gamesettings_t *settings)
     }
 }
 
-
-// -----------------------------------------------------------------------------
-// SaveGameSettings
-//
 // Save the game settings from global variables to the specified
 // game settings structure.
-// -----------------------------------------------------------------------------
 
 static void SaveGameSettings(net_gamesettings_t *settings)
 {
     // Fill in game settings structure with appropriate parameters
     // for the new game
 
+    settings->deathmatch = deathmatch;
     settings->episode = startepisode;
     settings->map = startmap;
     settings->skill = startskill;
     settings->loadgame = startloadgame;
     settings->gameversion = gameversion;
+    settings->nomonsters = nomonsters;
     settings->fast_monsters = fastparm;
+    settings->respawn_monsters = respawnparm;
+    settings->timelimit = timelimit;
+
+    settings->lowres_turn = (M_ParmExists("-record")
+                         && !M_ParmExists("-longtics"))
+                          || M_ParmExists("-shorttics");
 }
 
+static void InitConnectData(net_connect_data_t *connect_data)
+{
+    boolean shorttics;
 
-// -----------------------------------------------------------------------------
-// D_CheckNetGame
+    connect_data->max_players = MAXPLAYERS;
+
+    //
+    // Connect data
+    //
+
+    // Game type fields:
+
+    connect_data->gamemode = gamemode;
+    connect_data->gamemission = gamemission;
+
+    //!
+    // @category demo
+    //
+    // Play with low turning resolution to emulate demo recording.
+    //
+
+    shorttics = M_ParmExists("-shorttics");
+
+    // Are we recording a demo? Possibly set lowres turn mode
+
+    connect_data->lowres_turn = (M_ParmExists("-record")
+                             && !M_ParmExists("-longtics"))
+                              || shorttics;
+
+    // Are we playing with the Freedoom IWAD?
+
+    connect_data->is_freedoom = W_CheckNumForName("FREEDOOM") >= 0;
+}
+
+void D_ConnectNetGame(void)
+{
+    net_connect_data_t connect_data;
+
+    InitConnectData(&connect_data);
+
+    //!
+    // @category net
+    //
+    // Start the game playing as though in a netgame with a single
+    // player.  This can also be used to play back single player netgame
+    // demos.
+    //
+
+    if (M_CheckParm("-solo-net") > 0)
+    {
+        netgame = true;
+    }
+}
+
 //
+// D_CheckNetGame
 // Works out player numbers among the net participants
-// -----------------------------------------------------------------------------
-
+//
 void D_CheckNetGame (void)
 {
     net_gamesettings_t settings;
+
+    if (netgame)
+    {
+        autostart = true;
+    }
 
     D_RegisterLoopCallbacks(&doom_loop_interface);
 

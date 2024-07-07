@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,11 +17,12 @@
 //	Main loop stuff.
 //
 
-
 #ifndef __D_LOOP__
 #define __D_LOOP__
 
 #include "net_defs.h"
+#include "m_fixed.h"
+
 
 // Callback function invoked while waiting for the netgame to start.
 // The callback is invoked when new players are ready. The callback
@@ -34,7 +35,7 @@ typedef struct
 {
     // Read events from the event queue, and process them.
 
-    void (*ProcessEvents)();
+    void (*ProcessEvents)(void);
 
     // Given the current input state, fill in the fields of the specified
     // ticcmd_t structure with data for a new tic.
@@ -47,7 +48,7 @@ typedef struct
 
     // Run the menu (runs independently of the game).
 
-    void (*RunMenu)();
+    void (*RunMenu)(void);
 } loop_interface_t;
 
 // Register callback functions for the main loop code to use.
@@ -55,10 +56,6 @@ void D_RegisterLoopCallbacks(loop_interface_t *i);
 
 // Create any new ticcmds and broadcast to other players.
 void NetUpdate (void);
-
-// Broadcasts special packets to other players
-//  to notify of game exit
-void D_QuitNetGame (void);
 
 //? how many ticks to run?
 void TryRunTics (void);
@@ -78,13 +75,21 @@ void D_StartNetGame(net_gamesettings_t *settings,
 
 extern boolean singletics;
 extern int gametic, ticdup;
+extern int oldgametic;   // [JN] Invoke certain actions independently from uncapped framerate.
+extern int oldleveltime; // [crispy] check if leveltime keeps tickin'
 
 // Check if it is permitted to record a demo with a non-vanilla feature.
-boolean D_NonVanillaRecord(boolean conditional, char *feature);
+boolean D_NonVanillaRecord(boolean conditional, const char *feature);
 
 // Check if it is permitted to play back a demo with a non-vanilla feature.
 boolean D_NonVanillaPlayback(boolean conditional, int lumpnum,
-                             char *feature);
+                             const char *feature);
+
+void D_ReceiveTic(ticcmd_t *ticcmds, boolean *playeringame);
+
+
+extern fixed_t offsetms;
+
 
 #endif
 

@@ -1,23 +1,40 @@
-![](http://jnechaevsky.users.sourceforge.net/projects/yaguar/files/git_logo.png)
+![](https://jnechaevsky.github.io/inter-doom/files/id-logo-git.png)
+### About
+Small, functional and simple source ports, created with help, efforts and bits of code from people around the world.<br/>
+The project is based on [Chocolate Doom](https://github.com/chocolate-doom/chocolate-doom) and [Crispy Doom](http://github.com/fabiangreffrath/crispy-doom), with significant additions from [DOOM Retro](https://github.com/bradharding/doomretro).
 
-##### Please note, this project is no longer supported!
+The project is created by [Julia Nechaevskaya](mailto:julia.nechaevskaya@live.com).
 
-Yaguar Doom is no longer under development and completely merged into my prymary project - [Russian Doom](https://github.com/jnechaevsky/russian-doom/), where it's available in both English and Russian languages. Jaguar mode can be started as simple as:
+### Download
 
-* `russian-doom.exe -jaguar` or
-* `russian-doom-wide.exe -jaguar`
+**International Doom, version 7.4 (released: March 8, 2024):**
+* Windows (32-bit): [inter-doom-7.4-win32.zip](https://github.com/JNechaevsky/international-doom/releases/download/7.4/inter-doom-7.4-win32.zip)
+* Windows (64-bit): [inter-doom-7.4-win64.zip](https://github.com/JNechaevsky/international-doom/releases/download/7.4/inter-doom-7.4-win64.zip)
 
-#### About
+**International Heretic, version 7.0 (released: March 8, 2024):**
+* Windows (32-bit): [inter-heretic-7.0-win32.zip](https://github.com/JNechaevsky/international-doom/releases/download/htic-7.0/inter-heretic-7.0-win32.zip)
+* Windows (64-bit): [inter-heretic-7.0-win64.zip](https://github.com/JNechaevsky/international-doom/releases/download/htic-7.0/inter-heretic-7.0-win64.zip)
 
-A nonconservative recreation of Jaguar Doom for PC.
+**International Hexen, version 7.0 (released: March 8, 2024):**
+* Windows (32-bit): [inter-hexen-7.0-win32.zip](https://github.com/JNechaevsky/international-doom/releases/download/hxn-7.0/inter-hexen-7.0-win32.zip)
+* Windows (64-bit): [inter-hexen-7.0-win64.zip](https://github.com/JNechaevsky/international-doom/releases/download/hxn-7.0/inter-hexen-7.0-win64.zip)
 
-Yaguar Doom is Copyright © 2018-2019 by [Julian Nechaevsky](http://jnechaevsky.users.sourceforge.net/author.html). The project is based on [Chocolate Doom](https://github.com/chocolate-doom/chocolate-doom/) by Simon Howard, with technical and visual improvements from [Crispy Doom](https://github.com/fabiangreffrath/crispy-doom) by Fabian Greffrath.
+### Major features
 
-Project's source code is available under the terms and conditions of [GNU General Public License version 2](https://github.com/JNechaevsky/yaguar-doom/blob/master/COPYING.md).
+* Optional True Color render.
+* Up to x6 (1200p) rendering resolutions.
+* Uncapped framerate.
+* Additional, darker gamma-correction levels.
+* Support for OPL2, OPL3, MIDI, Fluidsynth and GUS music playback.
+* In-game keyboard and mouse bindings.
+* Various visual, audible, physical and demo enhancements.
+* Compatibility with vanilla-engine demos.
+* Removed limitations of vanilla engine.
+* Support for nodes in extended format (ZDBSP and DeePBSP).
+* Support for BEX/DEHEXTRA DeHackEd extensions.
 
-##### Download latest version (February 10, 2019)
+Note: BOOM/MBF/MBF21 specifications are not supported.
 
-For Windows (32-bit and 64-bit): [yaguar-doom-1.0-win32.zip](https://github.com/JNechaevsky/yaguar-doom/releases/download/1.0/yaguar-doom-1.0-win32.zip)<br />
-Source code: [yaguar-doom-1.0-source.zip](https://github.com/JNechaevsky/yaguar-doom/releases/download/1.0/yaguar-doom-1.0-source.zip)<br />
+### License
 
-Please refer to readme.txt file for more information about the project.
+International Doom is [Open Source](https://opensource.org/osd) and licensed under the [GNU General Public License v2](https://www.gnu.org/licenses/gpl-2.0.html).

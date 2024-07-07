@@ -1,6 +1,5 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,7 +15,6 @@
 //     OPL interface.
 //
 
-
 #include "config.h"
 
 #include <stdio.h>
@@ -27,32 +25,16 @@
 
 #include "opl.h"
 #include "opl_internal.h"
+#include "m_misc.h"
 
 //#define OPL_DEBUG_TRACE
 
-#if (defined(__i386__) || defined(__x86_64__)) && defined(HAVE_IOPERM)
-extern opl_driver_t opl_linux_driver;
-#endif
-#if defined(HAVE_LIBI386) || defined(HAVE_LIBAMD64)
-extern opl_driver_t opl_openbsd_driver;
-#endif
-#ifdef _WIN32
-extern opl_driver_t opl_win32_driver;
-#endif
-extern opl_driver_t opl_sdl_driver;
 
 static opl_driver_t *drivers[] =
 {
-#if (defined(__i386__) || defined(__x86_64__)) && defined(HAVE_IOPERM)
-    &opl_linux_driver,
-#endif
-#if defined(HAVE_LIBI386) || defined(HAVE_LIBAMD64)
-    &opl_openbsd_driver,
-#endif
-#ifdef _WIN32
-    &opl_win32_driver,
-#endif
+#ifndef DISABLE_SDL2MIXER
     &opl_sdl_driver,
+#endif // DISABLE_SDL2MIXER
     NULL
 };
 
@@ -112,7 +94,7 @@ static opl_init_result_t AutoSelectDriver(unsigned int port_base)
     int i;
     opl_init_result_t result;
 
-    for (i=0; drivers[i] != NULL; ++i)
+    for (i = 0; drivers[i] != NULL; ++i)
     {
         result = InitDriver(drivers[i], port_base);
         if (result != OPL_INIT_NONE)
@@ -120,7 +102,7 @@ static opl_init_result_t AutoSelectDriver(unsigned int port_base)
             return result;
         }
     }
-    
+
     printf("OPL_Init: Failed to find a working driver.\n");
 
     return OPL_INIT_NONE;
@@ -135,7 +117,7 @@ opl_init_result_t OPL_Init(unsigned int port_base)
     int i;
     int result;
 
-    driver_name = getenv("OPL_DRIVER");
+    driver_name = M_getenv("OPL_DRIVER");
 
     if (driver_name != NULL)
     {

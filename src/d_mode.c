@@ -1,6 +1,6 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,10 +18,8 @@
 //   mode.
 //
 
-
 #include "doomtype.h"
 #include "d_mode.h"
-
 
 // Valid game mode/mission combinations, with the number of
 // episodes/maps for each.
@@ -41,7 +39,6 @@ static struct
     { pack_tnt,  commercial, 1, 32 },
     { pack_plut, commercial, 1, 32 },
     { pack_hacx, commercial, 1, 32 },
-    { pack_nerve, commercial, 1, 9 },
     { heretic,   shareware,  1, 9 },
     { heretic,   registered, 3, 9 },
     { heretic,   retail,     5, 9 },
@@ -124,13 +121,13 @@ static struct {
     GameMission_t mission;
     GameVersion_t version;
 } valid_versions[] = {
+    { doom,     exe_doom_1_2 },
     { doom,     exe_doom_1_666 },
     { doom,     exe_doom_1_7 },
     { doom,     exe_doom_1_8 },
     { doom,     exe_doom_1_9 },
     { doom,     exe_hacx },
     { doom,     exe_ultimate },
-    { doom,     exe_doom_se },
     { doom,     exe_final },
     { doom,     exe_final2 },
     { doom,     exe_chex },
@@ -147,7 +144,7 @@ boolean D_ValidGameVersion(GameMission_t mission, GameVersion_t version)
     // All Doom variants can use the Doom versions.
 
     if (mission == doom2 || mission == pack_plut || mission == pack_tnt
-     || mission == pack_hacx || mission == pack_chex || mission == pack_nerve)
+     || mission == pack_hacx || mission == pack_chex)
     {
         mission = doom;
     }
@@ -181,14 +178,13 @@ boolean D_IsEpisodeMap(GameMission_t mission)
         case pack_hacx:
         case pack_tnt:
         case pack_plut:
-        case pack_nerve:
         case strife:
         default:
             return false;
     }
 }
 
-char *D_GameMissionString(GameMission_t mission)
+const char *D_GameMissionString(GameMission_t mission)
 {
     switch (mission)
     {
@@ -213,6 +209,24 @@ char *D_GameMissionString(GameMission_t mission)
             return "hexen";
         case strife:
             return "strife";
+    }
+}
+
+const char *D_GameModeString(GameMode_t mode)
+{
+    switch (mode)
+    {
+        case shareware:
+            return "shareware";
+        case registered:
+            return "registered";
+        case commercial:
+            return "commercial";
+        case retail:
+            return "retail";
+        case indetermined:
+        default:
+            return "unknown";
     }
 }
 

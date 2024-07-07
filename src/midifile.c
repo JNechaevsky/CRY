@@ -1,6 +1,6 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,7 +16,6 @@
 //    Reading of MIDI files.
 //
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,8 +23,9 @@
 
 #include "doomtype.h"
 #include "i_swap.h"
+#include "i_system.h"
+#include "m_misc.h"
 #include "midifile.h"
-#include "jn.h"
 
 #define HEADER_CHUNK_ID "MThd"
 #define TRACK_CHUNK_ID  "MTrk"
@@ -36,19 +36,19 @@
 #pragma pack(push, 1)
 #endif
 
-typedef struct
+typedef PACKED_STRUCT (
 {
     byte chunk_id[4];
     unsigned int chunk_size;
-} PACKEDATTR chunk_header_t;
+}) chunk_header_t;
 
-typedef struct
+typedef PACKED_STRUCT (
 {
     chunk_header_t chunk_header;
     unsigned short format_type;
     unsigned short num_tracks;
     unsigned short time_division;
-} PACKEDATTR midi_header_t;
+}) midi_header_t;
 
 // haleyjd 09/09/10: packing off.
 #ifdef _MSC_VER
@@ -71,6 +71,7 @@ struct midi_track_iter_s
 {
     midi_track_t *track;
     unsigned int position;
+    unsigned int loop_point;
 };
 
 struct midi_file_s
@@ -89,7 +90,7 @@ struct midi_file_s
 // Check the header of a chunk:
 
 static boolean CheckChunkHeader(chunk_header_t *chunk,
-                                char *expected_id)
+                                const char *expected_id)
 {
     boolean result;
     
@@ -97,7 +98,8 @@ static boolean CheckChunkHeader(chunk_header_t *chunk,
 
     if (!result)
     {
-        fprintf(stderr, "CheckChunkHeader: Expected '%s' chunk header, got '%c%c%c%c'\n",
+        fprintf(stderr, "CheckChunkHeader: Expected '%s' chunk header, "
+                        "got '%c%c%c%c'\n",
                         expected_id,
                         chunk->chunk_id[0], chunk->chunk_id[1],
                         chunk->chunk_id[2], chunk->chunk_id[3]);
@@ -140,7 +142,8 @@ static boolean ReadVariableLength(unsigned int *result, FILE *stream)
     {
         if (!ReadByte(&b, stream))
         {
-            fprintf(stderr, "ReadVariableLength: Error while reading variable-length value\n");
+            fprintf(stderr, "ReadVariableLength: Error while reading "
+                            "variable-length value\n");
             return false;
         }
 
@@ -157,7 +160,8 @@ static boolean ReadVariableLength(unsigned int *result, FILE *stream)
         }
     }
 
-    fprintf(stderr, "ReadVariableLength: Variable-length value too long: maximum of four bytes\n");
+    fprintf(stderr, "ReadVariableLength: Variable-length value too "
+                    "long: maximum of four bytes\n");
     return false;
 }
 
@@ -214,7 +218,8 @@ static boolean ReadChannelEvent(midi_event_t *event,
 
     if (!ReadByte(&b, stream))
     {
-        fprintf(stderr, "ReadChannelEvent: Error while reading channel event parameters\n");
+        fprintf(stderr, "ReadChannelEvent: Error while reading channel "
+                        "event parameters\n");
         return false;
     }
 
@@ -226,7 +231,8 @@ static boolean ReadChannelEvent(midi_event_t *event,
     {
         if (!ReadByte(&b, stream))
         {
-            fprintf(stderr, "ReadChannelEvent: Error while reading channel event parameters\n");
+            fprintf(stderr, "ReadChannelEvent: Error while reading channel "
+                            "event parameters\n");
             return false;
         }
 
@@ -245,7 +251,8 @@ static boolean ReadSysExEvent(midi_event_t *event, int event_type,
 
     if (!ReadVariableLength(&event->data.sysex.length, stream))
     {
-        fprintf(stderr, "ReadSysExEvent: Failed to read length of SysEx block\n");
+        fprintf(stderr, "ReadSysExEvent: Failed to read length of "
+                                        "SysEx block\n");
         return false;
     }
 
@@ -284,7 +291,8 @@ static boolean ReadMetaEvent(midi_event_t *event, FILE *stream)
 
     if (!ReadVariableLength(&event->data.meta.length, stream))
     {
-        fprintf(stderr, "ReadSysExEvent: Failed to read length of SysEx block\n");
+        fprintf(stderr, "ReadSysExEvent: Failed to read length of "
+                                        "SysEx block\n");
         return false;
     }
 
@@ -452,14 +460,8 @@ static boolean ReadTrack(midi_track_t *track, FILE *stream)
     {
         // Resize the track slightly larger to hold another event:
 
-        new_events = realloc(track->events, 
+        new_events = I_Realloc(track->events, 
                              sizeof(midi_event_t) * (track->num_events + 1));
-
-        if (new_events == NULL)
-        {
-            return false;
-        }
-
         track->events = new_events;
 
         // Read the next event:
@@ -543,7 +545,8 @@ static boolean ReadFileHeader(midi_file_t *file, FILE *stream)
     if (!CheckChunkHeader(&file->header.chunk_header, HEADER_CHUNK_ID)
      || SDL_SwapBE32(file->header.chunk_header.chunk_size) != 6)
     {
-        fprintf(stderr, "ReadFileHeader: Invalid MIDI chunk header! chunk_size=%i\n",
+        fprintf(stderr, "ReadFileHeader: Invalid MIDI chunk header! "
+                        "chunk_size=%i\n",
                         SDL_SwapBE32(file->header.chunk_header.chunk_size));
         return false;
     }
@@ -554,7 +557,8 @@ static boolean ReadFileHeader(midi_file_t *file, FILE *stream)
     if ((format_type != 0 && format_type != 1)
      || file->num_tracks < 1)
     {
-        fprintf(stderr, "ReadFileHeader: Only type 0/1 MIDI files supported!\n");
+        fprintf(stderr, "ReadFileHeader: Only type 0/1 "
+                                         "MIDI files supported!\n");
         return false;
     }
 
@@ -597,7 +601,7 @@ midi_file_t *MIDI_LoadFile(char *filename)
 
     // Open file
 
-    stream = fopen(filename, "rb");
+    stream = M_fopen(filename, "rb");
 
     if (stream == NULL)
     {
@@ -647,6 +651,7 @@ midi_track_iter_t *MIDI_IterateTrack(midi_file_t *file, unsigned int track)
     iter = malloc(sizeof(*iter));
     iter->track = &file->tracks[track];
     iter->position = 0;
+    iter->loop_point = 0;
 
     return iter;
 }
@@ -711,6 +716,17 @@ unsigned int MIDI_GetFileTimeDivision(midi_file_t *file)
 void MIDI_RestartIterator(midi_track_iter_t *iter)
 {
     iter->position = 0;
+    iter->loop_point = 0;
+}
+
+void MIDI_SetLoopPoint(midi_track_iter_t *iter)
+{
+    iter->loop_point = iter->position;
+}
+
+void MIDI_RestartAtLoopPoint(midi_track_iter_t *iter)
+{
+    iter->position = iter->loop_point;
 }
 
 #ifdef TEST
@@ -756,7 +772,7 @@ void PrintTrack(midi_track_t *track)
 
         if (event->delta_time > 0)
         {
-            printf("Delay: %i ticks\n", event->delta_time);
+            printf("Delay: %u ticks\n", event->delta_time);
         }
 
         printf("Event type: %s (%i)\n",
@@ -772,25 +788,19 @@ void PrintTrack(midi_track_t *track)
             case MIDI_EVENT_PROGRAM_CHANGE:
             case MIDI_EVENT_CHAN_AFTERTOUCH:
             case MIDI_EVENT_PITCH_BEND:
-                printf("\tChannel: %i\n",
-                       event->data.channel.channel);
-                printf("\tParameter 1: %i\n",
-                       event->data.channel.param1);
-                printf("\tParameter 2: %i\n",
-                        event->data.channel.param2);
+                printf("\tChannel: %u\n", event->data.channel.channel);
+                printf("\tParameter 1: %u\n", event->data.channel.param1);
+                printf("\tParameter 2: %u\n", event->data.channel.param2);
                 break;
 
             case MIDI_EVENT_SYSEX:
             case MIDI_EVENT_SYSEX_SPLIT:
-                printf("\tLength: %i\n",
-                        event->data.sysex.length);
+                printf("\tLength: %u\n", event->data.sysex.length);
                 break;
 
             case MIDI_EVENT_META:
-                printf("\tMeta type: %i\n",
-                        event->data.meta.type);
-                printf("\tLength: %i\n",
-                       event->data.meta.length);
+                printf("\tMeta type: %u\n", event->data.meta.type);
+                printf("\tLength: %u\n", event->data.meta.length);
                 break;
         }
     }
@@ -817,7 +827,7 @@ int main(int argc, char *argv[])
 
     for (i=0; i<file->num_tracks; ++i)
     {
-        printf("\n== Track %i ==\n\n", i);
+        printf("\n== Track %u ==\n\n", i);
 
         PrintTrack(&file->tracks[i]);
     }

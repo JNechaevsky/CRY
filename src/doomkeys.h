@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,7 +16,6 @@
 // DESCRIPTION:
 //       Key definitions
 //
-
 
 #ifndef __DOOMKEYS__
 #define __DOOMKEYS__
@@ -147,9 +146,10 @@
     { 'y', "Y" },   { 'z', "Z" },   { '0', "0" },   { '1', "1" },    \
     { '2', "2" },   { '3', "3" },   { '4', "4" },   { '5', "5" },    \
     { '6', "6" },   { '7', "7" },   { '8', "8" },   { '9', "9" },    \
-    { '[', "[" },   { ']', "]" },   { ';', ";" },   { '`', "`" },    \
+    { '[', "[" },   { ']', "]" },   { ';', ";" },   { '`', "TILDE" },\
     { ',', "," },   { '.', "." },   { '/', "/" },   { '\\', "\\" },  \
-    { '\'', "\'" },                                                  \
+    { '\'', "\'" }, { '*', "*" },   { '+', "+" },                    \
 }
 
-#endif // __DOOMKEYS__
+#endif          // __DOOMKEYS__
+

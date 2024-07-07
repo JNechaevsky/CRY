@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -29,22 +29,26 @@
 extern  int	myargc;
 extern  char**	myargv;
 
+extern char *exedir;
+void M_SetExeDir(void);
+
 // Returns the position of the given parameter
 // in the arg list (0 if not found).
-int M_CheckParm (char* check);
+int M_CheckParm (const char* check);
 
 // Same as M_CheckParm, but checks that num_args arguments are available
 // following the specified argument.
-int M_CheckParmWithArgs(char *check, int num_args);
+int M_CheckParmWithArgs(const char *check, int num_args);
 
 void M_FindResponseFile(void);
+void M_AddLooseFiles(void);
 
 // Parameter has been specified?
 
-boolean M_ParmExists(char *check);
+boolean M_ParmExists(const char *check);
 
 // Get name of executable used to run this program:
 
-char *M_GetExecutableName(void);
+const char *M_GetExecutableName(void);
 
 #endif

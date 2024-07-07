@@ -1,7 +1,7 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2019 Julia Nechaevskaya
+// Copyright(C) 2016-2024 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,12 +20,15 @@
 // Events can be discarded if no responder claims them
 //
 
-
 #include <stdlib.h>
 #include "d_event.h"
 
-
 #define MAXEVENTS 64
+
+// [crispy] For fast polling
+// Written by ceski, Michael Day and Roman Fomin, thanks!
+event_t fastmouse;
+boolean newfastmouse;
 
 static event_t events[MAXEVENTS];
 static int eventhead;
