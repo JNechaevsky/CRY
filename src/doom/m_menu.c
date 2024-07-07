@@ -569,6 +569,7 @@ static void M_ID_Automap_Shading (int choice);
 static void M_Choose_ID_Gameplay_1 (int choice);
 static void M_Draw_ID_Gameplay_1 (void);
 static void M_ID_Brightmaps (int choice);
+static void M_ID_ColoredLighting (int choice);
 static void M_ID_Translucency (int choice);
 static void M_ID_ImprovedFuzz (int choice);
 static void M_ID_ColoredBlood (int choice);
@@ -2619,6 +2620,7 @@ static void M_ID_Automap_Secrets (int choice)
 static menuitem_t ID_Menu_Gameplay_1[]=
 {
     { M_LFRT, "BRIGHTMAPS",                  M_ID_Brightmaps,        'b' },
+    { M_LFRT, "COLORED LIGHTING",            M_ID_ColoredLighting,   'c' },
     { M_LFRT, "TRANSLUCENCY",                M_ID_Translucency,      't' },
     { M_LFRT, "FUZZ EFFECT",                 M_ID_ImprovedFuzz,      'f' },
     { M_LFRT, "COLORED BLOOD AND CORPSES",   M_ID_ColoredBlood,      'c' },
@@ -2631,7 +2633,7 @@ static menuitem_t ID_Menu_Gameplay_1[]=
     { M_SKIP, "", 0, '\0' },
     { M_LFRT, "COLORED ELEMENTS",              M_ID_ColoredSTBar,      'c' },
     { M_LFRT, "SHOW NEGATIVE HEALTH",          M_ID_NegativeHealth,    's' },
-    { M_SKIP, "", 0, '\0' },
+    //{ M_SKIP, "", 0, '\0' },
     { M_SWTC, "", /*NEXT PAGE >*/            M_Choose_ID_Gameplay_2, 'n' },
 };
 
@@ -2663,39 +2665,44 @@ static void M_Draw_ID_Gameplay_1 (void)
     M_WriteText (M_ItemRightAlign(str), 18, str,
                  M_Item_Glow(0, vis_brightmaps ? GLOW_GREEN : GLOW_DARKRED));
 
+    // Colored lighting
+    sprintf(str, vis_colored_lighting ? "ON" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 27, str,
+                 M_Item_Glow(1, vis_colored_lighting ? GLOW_GREEN : GLOW_DARKRED));
+
     // Translucency
     sprintf(str, vis_translucency == 1 ? "ADDITIVE" :
                  vis_translucency == 2 ? "BLENDING" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 27, str,
-                 M_Item_Glow(1, vis_translucency ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 36, str,
+                 M_Item_Glow(2, vis_translucency ? GLOW_GREEN : GLOW_DARKRED));
 
     // Fuzz effect
     sprintf(str, vis_improved_fuzz == 1 ? "FUZZ" :
                  vis_improved_fuzz == 2 ? "TRANSLUCENT" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 36, str,
-                 M_Item_Glow(2, vis_improved_fuzz ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 45, str,
+                 M_Item_Glow(3, vis_improved_fuzz ? GLOW_GREEN : GLOW_DARKRED));
 
     // Colored blood and corpses
     sprintf(str, vis_colored_blood ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 45, str,
-                 M_Item_Glow(3, vis_colored_blood ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 54, str,
+                 M_Item_Glow(4, vis_colored_blood ? GLOW_GREEN : GLOW_DARKRED));
 
     // Liquids animation
     sprintf(str, vis_swirling_liquids ? "SWIRLING" : "ORIGINAL");
-    M_WriteText (M_ItemRightAlign(str), 54, str,
-                 M_Item_Glow(4, vis_swirling_liquids ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 63, str,
+                 M_Item_Glow(5, vis_swirling_liquids ? GLOW_GREEN : GLOW_DARKRED));
 
     // Sky drawing mode
     sprintf(str, vis_linear_sky ? "LINEAR" : "ORIGINAL");
-    M_WriteText (M_ItemRightAlign(str), 63, str,
-                 M_Item_Glow(5, vis_linear_sky ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 72, str,
+                 M_Item_Glow(6, vis_linear_sky ? GLOW_GREEN : GLOW_DARKRED));
 
     // Randomly mirrored corpses
     sprintf(str, vis_flip_corpses ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 72, str,
-                 M_Item_Glow(6, vis_flip_corpses ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 81, str,
+                 M_Item_Glow(7, vis_flip_corpses ? GLOW_GREEN : GLOW_DARKRED));
 
-    M_WriteTextCentered(81, "CROSSHAIR", cr[CR_YELLOW]);
+    M_WriteTextCentered(90, "CROSSHAIR", cr[CR_YELLOW]);
 
     // Crosshair shape
     sprintf(str, xhair_draw == 1 ? "CROSS 1" :
@@ -2705,27 +2712,27 @@ static void M_Draw_ID_Gameplay_1 (void)
                  xhair_draw == 5 ? "ANGLE" :
                  xhair_draw == 6 ? "TRIANGLE" :
                  xhair_draw == 7 ? "DOT" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 90, str,
-                 M_Item_Glow(8, xhair_draw ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 99, str,
+                 M_Item_Glow(9, xhair_draw ? GLOW_GREEN : GLOW_DARKRED));
 
     // Crosshair indication
     sprintf(str, xhair_color == 1 ? "HEALTH" :
                  xhair_color == 2 ? "TARGET HIGHLIGHT" :
                  xhair_color == 3 ? "TARGET HIGHLIGHT+HEALTH" : "STATIC");
-    M_WriteText (M_ItemRightAlign(str), 99, str,
-                 M_Item_Glow(9, xhair_color ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 108, str,
+                 M_Item_Glow(10, xhair_color ? GLOW_GREEN : GLOW_DARKRED));
 
-    M_WriteTextCentered(108, "STATUS BAR", cr[CR_YELLOW]);
+    M_WriteTextCentered(117, "STATUS BAR", cr[CR_YELLOW]);
 
     // Colored elements
     sprintf(str, st_colored_stbar ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 117, str,
-                 M_Item_Glow(11, st_colored_stbar ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 126, str,
+                 M_Item_Glow(12, st_colored_stbar ? GLOW_GREEN : GLOW_DARKRED));
 
     // Show negative health
     sprintf(str, st_negative_health ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 126, str,
-                 M_Item_Glow(12, st_negative_health ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 135, str,
+                 M_Item_Glow(13, st_negative_health ? GLOW_GREEN : GLOW_DARKRED));
 
     // Footer
     M_WriteText (ID_MENU_LEFTOFFSET_BIG, 144, "NEXT PAGE >",
@@ -2738,6 +2745,11 @@ static void M_Draw_ID_Gameplay_1 (void)
 static void M_ID_Brightmaps (int choice)
 {
     vis_brightmaps ^= 1;
+}
+
+static void M_ID_ColoredLighting (int choice)
+{
+    vis_colored_lighting ^= 1;
 }
 
 static void M_ID_Translucency (int choice)
@@ -3065,6 +3077,7 @@ static void M_ID_ApplyResetHook (void)
 
     // Visual
     vis_brightmaps = 0;
+    vis_colored_lighting = 0;
     vis_translucency = 0;
     vis_fake_contrast = 1;
     vis_smooth_light = 0;

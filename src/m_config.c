@@ -430,6 +430,7 @@ static default_t	doom_defaults_list[] =
 
     // Visual
     CONFIG_VARIABLE_INT(vis_brightmaps),
+    CONFIG_VARIABLE_INT(vis_colored_lighting),
     CONFIG_VARIABLE_INT(vis_translucency),
     CONFIG_VARIABLE_INT(vis_fake_contrast),
     CONFIG_VARIABLE_INT(vis_smooth_light),
