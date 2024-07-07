@@ -1090,7 +1090,13 @@ void R_InitColormaps (void)
 	// [JN] Colored sector lighting. TODO - make pregenerated?
 	byte r_c, g_c, b_c;
 	byte *const C_EEC06B = W_CacheLumpName("C_EEC06B", PU_STATIC);
+	byte *const C_D97C45 = W_CacheLumpName("C_D97C45", PU_STATIC);
 	byte *const C_FF7F7F = W_CacheLumpName("C_FF7F7F", PU_STATIC);
+	byte *const C_55B828 = W_CacheLumpName("C_55B828", PU_STATIC);
+	byte *const C_BBE357 = W_CacheLumpName("C_BBE357", PU_STATIC);
+	byte *const C_949DB9 = W_CacheLumpName("C_949DB9", PU_STATIC);
+	byte *const C_2A2F6B = W_CacheLumpName("C_2A2F6B", PU_STATIC);
+	byte *const C_50ADAC = W_CacheLumpName("C_50ADAC", PU_STATIC);
 
 	if (!colormaps)
 	{
@@ -1115,10 +1121,40 @@ void R_InitColormaps (void)
 			b_c = gammatable[vid_gamma][C_EEC06B[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
 			colormaps_EEC06B[j] = 0xff000000 | (r_c << 16) | (g_c << 8) | b_c;
 
+			r_c = gammatable[vid_gamma][C_D97C45[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			g_c = gammatable[vid_gamma][C_D97C45[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			b_c = gammatable[vid_gamma][C_D97C45[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			colormaps_D97C45[j] = 0xff000000 | (r_c << 16) | (g_c << 8) | b_c;
+
 			r_c = gammatable[vid_gamma][C_FF7F7F[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
 			g_c = gammatable[vid_gamma][C_FF7F7F[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
 			b_c = gammatable[vid_gamma][C_FF7F7F[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
 			colormaps_FF7F7F[j] = 0xff000000 | (r_c << 16) | (g_c << 8) | b_c;
+
+			r_c = gammatable[vid_gamma][C_55B828[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			g_c = gammatable[vid_gamma][C_55B828[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			b_c = gammatable[vid_gamma][C_55B828[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			colormaps_55B828[j] = 0xff000000 | (r_c << 16) | (g_c << 8) | b_c;
+
+			r_c = gammatable[vid_gamma][C_BBE357[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			g_c = gammatable[vid_gamma][C_BBE357[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			b_c = gammatable[vid_gamma][C_BBE357[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			colormaps_BBE357[j] = 0xff000000 | (r_c << 16) | (g_c << 8) | b_c;
+
+			r_c = gammatable[vid_gamma][C_949DB9[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			g_c = gammatable[vid_gamma][C_949DB9[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			b_c = gammatable[vid_gamma][C_949DB9[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			colormaps_949DB9[j] = 0xff000000 | (r_c << 16) | (g_c << 8) | b_c;
+
+			r_c = gammatable[vid_gamma][C_2A2F6B[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			g_c = gammatable[vid_gamma][C_2A2F6B[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			b_c = gammatable[vid_gamma][C_2A2F6B[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			colormaps_2A2F6B[j] = 0xff000000 | (r_c << 16) | (g_c << 8) | b_c;
+
+			r_c = gammatable[vid_gamma][C_50ADAC[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			g_c = gammatable[vid_gamma][C_50ADAC[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			b_c = gammatable[vid_gamma][C_50ADAC[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			colormaps_50ADAC[j] = 0xff000000 | (r_c << 16) | (g_c << 8) | b_c;
 
 			colormaps[j++] = 0xff000000 | (r << 16) | (g << 8) | b;
 		}
@@ -1158,7 +1194,13 @@ void R_InitColormaps (void)
 	W_ReleaseLumpName("INVULPAL");
 
 	W_ReleaseLumpName("C_EEC06B");
+	W_ReleaseLumpName("C_D97C45");
 	W_ReleaseLumpName("C_FF7F7F");
+	W_ReleaseLumpName("C_55B828");
+	W_ReleaseLumpName("C_BBE357");
+	W_ReleaseLumpName("C_949DB9");
+	W_ReleaseLumpName("C_2A2F6B");
+	W_ReleaseLumpName("C_50ADAC");
 }
 
 

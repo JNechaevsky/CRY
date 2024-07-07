@@ -21,15 +21,33 @@
 
 // Main colormaps
 extern lighttable_t   *colormaps_EEC06B;
+extern lighttable_t   *colormaps_D97C45;
 extern lighttable_t   *colormaps_FF7F7F;
+extern lighttable_t   *colormaps_55B828;
+extern lighttable_t   *colormaps_BBE357;
+extern lighttable_t   *colormaps_949DB9;
+extern lighttable_t   *colormaps_2A2F6B;
+extern lighttable_t   *colormaps_50ADAC;
 
 // Visplanes data
 extern lighttable_t ***zlight_EEC06B;
+extern lighttable_t ***zlight_D97C45;
 extern lighttable_t ***zlight_FF7F7F;
+extern lighttable_t ***zlight_55B828;
+extern lighttable_t ***zlight_BBE357;
+extern lighttable_t ***zlight_949DB9;
+extern lighttable_t ***zlight_2A2F6B;
+extern lighttable_t ***zlight_50ADAC;
 
 // Segments data
 extern lighttable_t ***scalelight_EEC06B;
+extern lighttable_t ***scalelight_D97C45;
 extern lighttable_t ***scalelight_FF7F7F;
+extern lighttable_t ***scalelight_55B828;
+extern lighttable_t ***scalelight_BBE357;
+extern lighttable_t ***scalelight_949DB9;
+extern lighttable_t ***scalelight_2A2F6B;
+extern lighttable_t ***scalelight_50ADAC;
 
 
 // Main colormaps
