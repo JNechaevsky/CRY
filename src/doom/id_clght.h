@@ -87,3 +87,13 @@ typedef struct
 } sectorcolor_t;
 
 extern const sectorcolor_t sectorcolor[];
+
+// Colored colormaps
+extern const byte C_EEC06B[];
+extern const byte C_D97C45[];
+extern const byte C_FF7F7F[];
+extern const byte C_55B828[];
+extern const byte C_BBE357[];
+extern const byte C_949DB9[];
+extern const byte C_2A2F6B[];
+extern const byte C_50ADAC[];

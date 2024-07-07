@@ -1081,22 +1081,13 @@ void R_InitColormaps (void)
 {
 	int c, i, j = 0;
 	byte r, g, b;
+	// [JN] For colored lighting
+	byte r_c, g_c, b_c;
 
 	byte *const playpal = W_CacheLumpName("PLAYPAL", PU_STATIC);
 	byte *const crypal = W_CacheLumpName("CRYPAL", PU_STATIC);
 	byte *const invulpal = W_CacheLumpName("INVULPAL", PU_STATIC);
 	byte *const colormap = W_CacheLumpName("COLORMAP", PU_STATIC);
-
-	// [JN] Colored sector lighting. TODO - make pregenerated?
-	byte r_c, g_c, b_c;
-	byte *const C_EEC06B = W_CacheLumpName("C_EEC06B", PU_STATIC);
-	byte *const C_D97C45 = W_CacheLumpName("C_D97C45", PU_STATIC);
-	byte *const C_FF7F7F = W_CacheLumpName("C_FF7F7F", PU_STATIC);
-	byte *const C_55B828 = W_CacheLumpName("C_55B828", PU_STATIC);
-	byte *const C_BBE357 = W_CacheLumpName("C_BBE357", PU_STATIC);
-	byte *const C_949DB9 = W_CacheLumpName("C_949DB9", PU_STATIC);
-	byte *const C_2A2F6B = W_CacheLumpName("C_2A2F6B", PU_STATIC);
-	byte *const C_50ADAC = W_CacheLumpName("C_50ADAC", PU_STATIC);
 
 	if (!colormaps)
 	{
@@ -1192,15 +1183,6 @@ void R_InitColormaps (void)
 	W_ReleaseLumpName("PLAYPAL");
 	W_ReleaseLumpName("CRYPAL");
 	W_ReleaseLumpName("INVULPAL");
-
-	W_ReleaseLumpName("C_EEC06B");
-	W_ReleaseLumpName("C_D97C45");
-	W_ReleaseLumpName("C_FF7F7F");
-	W_ReleaseLumpName("C_55B828");
-	W_ReleaseLumpName("C_BBE357");
-	W_ReleaseLumpName("C_949DB9");
-	W_ReleaseLumpName("C_2A2F6B");
-	W_ReleaseLumpName("C_50ADAC");
 }
 
 
