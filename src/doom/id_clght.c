@@ -160,6 +160,22 @@ lighttable_t **R_ColoredSegsColorize (int lightnum, int color)
 
 // =============================================================================
 //
+//                               SPRITES COLORING
+//
+// =============================================================================
+
+lighttable_t *R_ColoredSprColorize (int color)
+{
+    switch (color)
+    {
+        case 0xEEC06B:  return colormaps_EEC06B;  break;
+        case 0xFF7F7F:  return colormaps_FF7F7F;  break;
+        default:        return colormaps;         break;
+    }
+}
+
+// =============================================================================
+//
 //                       COLORED LIGHTING INJECTION TABLE
 //
 // =============================================================================

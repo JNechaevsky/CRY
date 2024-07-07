@@ -56,6 +56,9 @@ extern lighttable_t **R_ColoredVisplanesColorize (int light, int color);
 // Segments coloring
 extern lighttable_t **R_ColoredSegsColorize (int lightnum, int color);
 
+// Sprites coloring
+extern lighttable_t  *R_ColoredSprColorize (int color);
+
 
 // Colored lighting injection data type
 typedef struct

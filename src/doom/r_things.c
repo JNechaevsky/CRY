@@ -35,6 +35,7 @@
 
 #include "id_vars.h"
 #include "id_func.h"
+#include "id_clght.h"
 
 
 #define MINZ				(FRACUNIT*4)
@@ -743,7 +744,15 @@ static void R_ProjectSprite (mobj_t* thing)
     // with full brightness to represent vanilla Jaguar effect.
     if (!vis_brightmaps)
     {
+        // [JN] Colorize sprite drawing.
+        if (vis_colored_lighting)
+        {
+        vis->colormap[0] = vis->colormap[1] = R_ColoredSprColorize(thing->subsector->sector->color);
+        }
+        else
+        {
         vis->colormap[0] = vis->colormap[1] = colormaps;
+        }
     }
     else
     {
@@ -792,8 +801,10 @@ static void R_ProjectSprite (mobj_t* thing)
         ||  thing->sprite == SPR_SMGT   // Short Green Torch
         ||  thing->sprite == SPR_SMRT)  // Short Red Torch
         {
-            vis->colormap[0] = vis->colormap[1]
-                             = &colormaps[thing->bmap_flick/4*256];
+            const int demi_bright = MIN(index*8, MAXDIMINDEX);
+            
+            vis->colormap[0] = spritelights[demi_bright];
+            vis->colormap[1] = &colormaps[thing->bmap_flick/4*256];
         }
         else
         if (thing->sprite == SPR_FSKU)  // Floating Skull Rock
@@ -873,12 +884,20 @@ void R_AddSprites (sector_t* sec)
 
     lightnum = (sec->lightlevel >> LIGHTSEGSHIFT)+(extralight * LIGHTBRIGHT);
 
+    // [JN] Colorize sprite drawing.
+    if (vis_colored_lighting)
+    {
+        spritelights = R_ColoredSegsColorize(lightnum, sec->color);
+    }
+    else
+    {
     if (lightnum < 0)		
 	spritelights = scalelight[0];
     else if (lightnum >= LIGHTLEVELS)
 	spritelights = scalelight[LIGHTLEVELS-1];
     else
 	spritelights = scalelight[lightnum];
+    }
 
     // Handle all things in sector.
     for (thing = sec->thinglist ; thing ; thing = thing->snext)
@@ -1060,7 +1079,18 @@ static void R_DrawPSprite (pspdef_t* psp)
     else if (psp->state->frame & FF_FULLBRIGHT)
     {
 	// full bright
+    // [JN] Colorize STbar sprite drawing.
+    if (vis_colored_lighting)
+    {
+	    player_t *player = &players[displayplayer];
+
+	    vis->colormap[0] = R_ColoredSprColorize(player->mo->subsector->sector->color);
+	    vis->colormap[1] = colormaps;
+    }
+    else
+    {
 	vis->colormap[0] = vis->colormap[1] = colormaps;
+    }
     }
     else
     {
@@ -1131,12 +1161,20 @@ static void R_DrawPlayerSprites (void)
 	(viewplayer->mo->subsector->sector->lightlevel >> LIGHTSEGSHIFT) 
 	+(extralight * LIGHTBRIGHT);
 
+    // [JN] Colorize STbar sprite drawing.
+    if (vis_colored_lighting)
+    {
+        spritelights = R_ColoredSegsColorize(lightnum, viewplayer->mo->subsector->sector->color);
+    }
+    else
+    {
     if (lightnum < 0)		
 	spritelights = scalelight[0];
     else if (lightnum >= LIGHTLEVELS)
 	spritelights = scalelight[LIGHTLEVELS-1];
     else
 	spritelights = scalelight[lightnum];
+    }
     
     // clip to screen bounds
     mfloorclip = screenheightarray;
