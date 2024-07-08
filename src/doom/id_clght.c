@@ -37,7 +37,7 @@ lighttable_t   *colormaps_55B828;  // Bright green
 lighttable_t   *colormaps_BBE357;  // Slime green
 lighttable_t   *colormaps_949DB9;  // Bright desaturated blue
 lighttable_t   *colormaps_2A2F6B;  // Middle desaturated blue
-lighttable_t   *colormaps_50ADAC;  // Middle cyan
+lighttable_t   *colormaps_50ADAC;  // Middle cyan (also 31A29F)
 lighttable_t   *colormaps_CCE4A5;  // Middle green-yellow
 lighttable_t   *colormaps_CCEA5F;  // Bright green-yellow
 lighttable_t   *colormaps_B30202;  // Middle red
@@ -48,6 +48,7 @@ lighttable_t   *colormaps_FFF588;  // Bright yellow
 lighttable_t   *colormaps_043E8B;  // Dark cyanic blue
 lighttable_t   *colormaps_5B4318;  // Dark brown
 lighttable_t   *colormaps_4F5D8B;  // Dark cyanic blue 2
+lighttable_t   *colormaps_D46D3D;  // Middle orange 2
 
 // Visplanes data
 lighttable_t ***zlight_EEC06B = NULL;
@@ -68,6 +69,7 @@ lighttable_t ***zlight_FFF588 = NULL;
 lighttable_t ***zlight_043E8B = NULL;
 lighttable_t ***zlight_5B4318 = NULL;
 lighttable_t ***zlight_4F5D8B = NULL;
+lighttable_t ***zlight_D46D3D = NULL;
 
 // Segments data
 lighttable_t ***scalelight_EEC06B = NULL;
@@ -88,6 +90,7 @@ lighttable_t ***scalelight_FFF588 = NULL;
 lighttable_t ***scalelight_043E8B = NULL;
 lighttable_t ***scalelight_5B4318 = NULL;
 lighttable_t ***scalelight_4F5D8B = NULL;
+lighttable_t ***scalelight_D46D3D = NULL;
 
 
 // =============================================================================
@@ -120,6 +123,7 @@ void R_AllocateColoredColormaps (void)
     colormaps_043E8B = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
     colormaps_5B4318 = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
     colormaps_4F5D8B = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
+    colormaps_D46D3D = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
 }
 
 static int r_clrmp_color, g_clrmp_color, b_clrmp_color;
@@ -160,6 +164,7 @@ void R_ColoredVisplanesFreeI (int i)
     free(zlight_043E8B[i]);
     free(zlight_5B4318[i]);
     free(zlight_4F5D8B[i]);
+    free(zlight_D46D3D[i]);
 }
 
 void R_ColoredVisplanesFree (void)
@@ -182,6 +187,7 @@ void R_ColoredVisplanesFree (void)
     free(zlight_043E8B);
     free(zlight_5B4318);
     free(zlight_4F5D8B);
+    free(zlight_D46D3D);
 }
 
 void R_ColoredVisplanesMalloc (void)
@@ -204,6 +210,7 @@ void R_ColoredVisplanesMalloc (void)
     zlight_043E8B = malloc(LIGHTLEVELS * sizeof(*zlight));
     zlight_5B4318 = malloc(LIGHTLEVELS * sizeof(*zlight));
     zlight_4F5D8B = malloc(LIGHTLEVELS * sizeof(*zlight));
+    zlight_D46D3D = malloc(LIGHTLEVELS * sizeof(*zlight));
 }
 
 void R_ColoredVisplanesMAXLIGHTZ (int i)
@@ -226,6 +233,7 @@ void R_ColoredVisplanesMAXLIGHTZ (int i)
     zlight_043E8B[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
     zlight_5B4318[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
     zlight_4F5D8B[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
+    zlight_D46D3D[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
 }
 
 void R_ColoredVisplanesIJLevel (int i, int j, int level)
@@ -248,6 +256,7 @@ void R_ColoredVisplanesIJLevel (int i, int j, int level)
     zlight_043E8B[i][j] = colormaps_043E8B + level*256;
     zlight_5B4318[i][j] = colormaps_5B4318 + level*256;
     zlight_4F5D8B[i][j] = colormaps_4F5D8B + level*256;
+    zlight_D46D3D[i][j] = colormaps_D46D3D + level*256;
 }
 
 // -----------------------------------------------------------------------------
@@ -274,6 +283,7 @@ void R_ColoredSegsFreeI (int i)
     free(scalelight_043E8B[i]);
     free(scalelight_5B4318[i]);
     free(scalelight_4F5D8B[i]);
+    free(scalelight_D46D3D[i]);
 }
 
 void R_ColoredSegsFree (void)
@@ -296,6 +306,7 @@ void R_ColoredSegsFree (void)
     free(scalelight_043E8B);
     free(scalelight_5B4318);
     free(scalelight_4F5D8B);
+    free(scalelight_D46D3D);
 }
 
 void R_ColoredSegsMalloc (void)
@@ -318,6 +329,7 @@ void R_ColoredSegsMalloc (void)
     scalelight_043E8B = malloc(LIGHTLEVELS * sizeof(*scalelight));
     scalelight_5B4318 = malloc(LIGHTLEVELS * sizeof(*scalelight));
     scalelight_4F5D8B = malloc(LIGHTLEVELS * sizeof(*scalelight));
+    scalelight_D46D3D = malloc(LIGHTLEVELS * sizeof(*scalelight));
 }
 
 void R_ColoredSegsMAXLIGHTSCALE (int i)
@@ -340,6 +352,7 @@ void R_ColoredSegsMAXLIGHTSCALE (int i)
     scalelight_043E8B[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
     scalelight_5B4318[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
     scalelight_4F5D8B[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
+    scalelight_D46D3D[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
 }
 
 void R_ColoredSegsIJLevel (int i, int j, int level)
@@ -362,6 +375,7 @@ void R_ColoredSegsIJLevel (int i, int j, int level)
     scalelight_043E8B[i][j] = colormaps_043E8B + level*256;
     scalelight_5B4318[i][j] = colormaps_5B4318 + level*256;
     scalelight_4F5D8B[i][j] = colormaps_4F5D8B + level*256;
+    scalelight_D46D3D[i][j] = colormaps_D46D3D + level*256;
 }
 
 // =============================================================================
@@ -394,6 +408,7 @@ lighttable_t **R_ColoredVisplanesColorize (int light, int color)
             case 0x043E8B:  return zlight_043E8B[light]; break;
             case 0x5B4318:  return zlight_5B4318[light]; break;
             case 0x4F5D8B:  return zlight_4F5D8B[light]; break;
+            case 0xD46D3D:  return zlight_D46D3D[light]; break;
         }
     }
 
@@ -432,6 +447,7 @@ lighttable_t **R_ColoredSegsColorize (int lightnum, int color)
             case 0x043E8B:  return scalelight_043E8B[BETWEEN(0, l, lightnum)];  break;
             case 0x5B4318:  return scalelight_5B4318[BETWEEN(0, l, lightnum)];  break;
             case 0x4F5D8B:  return scalelight_4F5D8B[BETWEEN(0, l, lightnum)];  break;
+            case 0xD46D3D:  return scalelight_D46D3D[BETWEEN(0, l, lightnum)];  break;
         }
     }
 
@@ -466,6 +482,7 @@ lighttable_t *R_ColoredSprColorize (int color)
         case 0x043E8B:  return colormaps_043E8B;  break;
         case 0x5B4318:  return colormaps_5B4318;  break;
         case 0x4F5D8B:  return colormaps_4F5D8B;  break;
+        case 0xD46D3D:  return colormaps_D46D3D;  break;
         default:        return colormaps;         break;
     }
 }
@@ -694,6 +711,55 @@ static const sectorcolor_t sectorcolor_map04[] =
     SECTORCOLOR_END
 };
 
+//
+// Area 5: Phobos Lab
+//
+
+static const sectorcolor_t sectorcolor_map05[] =
+{
+    {    5,      0,    0x4F5D8B },
+    {    5,      3,    0xBBE357 },
+    {    5,      6,    0x043E8B },
+    {    5,      7,    0x043E8B },
+    {    5,      9,    0x4F5D8B },
+    {    5,     10,    0xFF7F7F },
+    {    5,     11,    0xFF7F7F },
+    {    5,     12,    0xFF7F7F },
+    {    5,     14,    0x949DB9 },
+    {    5,     15,    0x949DB9 },
+    {    5,     16,    0x949DB9 },
+    {    5,     17,    0x949DB9 },
+    {    5,     18,    0x949DB9 },
+    {    5,     19,    0x949DB9 },
+    {    5,     21,    0x949DB9 },
+    {    5,     28,    0x949DB9 },
+    {    5,     31,    0x55B828 },
+    {    5,     33,    0x55B828 },
+    {    5,     36,    0x949DB9 },
+    {    5,     37,    0x949DB9 },
+    {    5,     38,    0xD46D3D },
+    {    5,     39,    0xD46D3D },
+    {    5,     42,    0x55B828 },
+    {    5,     43,    0x55B828 },
+    {    5,     46,    0x949DB9 },
+    {    5,     48,    0x55B828 },
+    {    5,     50,    0x55B828 },
+    {    5,     63,    0x949DB9 },
+    {    5,     64,    0x949DB9 },
+    {    5,     65,    0x949DB9 },
+    {    5,     69,    0x043E8B },
+    {    5,     71,    0xB30202 },
+    {    5,     72,    0xB30202 },
+    {    5,     78,    0x55B828 },
+    {    5,     81,    0xFFF588 },
+    {    5,     99,    0x55B828 },
+    {    5,    120,    0xFFF588 },
+    {    5,    121,    0xFFF588 },
+    {    5,    122,    0x043E8B },
+    {    5,    123,    0x043E8B },
+    SECTORCOLOR_END
+};
+
 void P_SetSectorColorTable (int area)
 {
     switch (area)
@@ -702,6 +768,7 @@ void P_SetSectorColorTable (int area)
         case  2:  sectorcolor = sectorcolor_map02;  break;
         case  3:  sectorcolor = sectorcolor_map03;  break;
         case  4:  sectorcolor = sectorcolor_map04;  break;
+        case  5:  sectorcolor = sectorcolor_map05;  break;
         default:  sectorcolor = sectorcolor_dummy;  break;
     }
 }
@@ -1628,4 +1695,55 @@ const byte C_4F5D8B[] = {
     0,0,45,0,0,39,0,0,32,0,0,26,0,0,19,0,
     0,13,0,0,6,0,0,0,79,58,37,79,84,41,79,45,
     139,79,0,139,64,0,113,49,0,84,34,0,58,52,39,58
+};
+
+const byte C_D46D3D[] = {
+    0,0,0,26,10,3,19,6,2,62,32,18,212,109,61,22,
+    12,6,16,8,5,9,5,3,6,3,2,39,24,7,29,18,
+    4,19,13,2,12,10,0,66,25,10,59,22,8,52,18,6,
+    212,78,44,205,73,41,202,70,39,195,65,36,192,61,34,185,
+    58,32,182,53,29,175,49,28,169,46,26,165,42,24,159,39,
+    22,155,37,21,149,34,19,145,30,17,139,27,15,136,25,14,
+    129,22,12,126,20,11,119,18,10,116,15,8,109,13,7,106,
+    12,6,99,10,6,96,8,5,89,6,4,86,5,3,79,3,
+    2,76,3,2,69,3,2,66,0,0,59,0,0,56,0,0,
+    212,100,53,212,97,50,212,94,48,212,90,45,212,88,43,212,
+    85,40,212,82,37,212,80,35,212,77,31,205,73,29,199,70,
+    28,192,66,26,185,63,24,179,59,22,172,56,20,169,54,19,
+    159,53,18,149,49,17,142,47,16,136,46,15,129,42,14,119,
+    41,13,112,37,12,106,35,11,99,34,10,89,30,9,79,29,
+    8,69,27,7,62,24,6,52,20,6,42,18,5,36,15,4,
+    199,102,57,192,99,55,185,95,53,182,94,52,175,90,50,169,
+    87,49,165,85,48,159,82,46,152,78,44,149,77,43,142,73,
+    41,139,71,40,132,68,38,126,65,36,122,63,35,116,59,33,
+    109,56,31,106,54,30,99,51,28,92,47,27,89,46,26,82,
+    42,24,76,39,22,72,37,21,66,34,19,59,30,17,56,29,
+    16,49,25,14,46,24,13,39,20,11,32,17,9,29,15,8,
+    99,109,27,92,102,25,86,95,23,79,88,21,76,82,19,69,
+    75,17,62,68,15,56,63,13,52,56,11,46,49,10,39,42,
+    8,32,35,6,26,29,6,19,22,4,16,15,3,9,10,2,
+    159,71,34,152,68,32,145,65,30,139,61,28,132,58,27,129,
+    54,26,122,53,24,116,49,22,109,46,21,102,42,19,99,41,
+    18,92,37,16,86,35,15,79,32,13,72,29,12,69,27,11,
+    132,56,24,119,51,20,109,46,18,99,41,15,86,35,12,76,
+    30,10,66,25,8,56,22,6,102,54,24,92,49,21,86,46,
+    19,76,42,17,69,37,14,59,34,12,52,30,10,46,27,9,
+    212,109,28,195,94,21,179,80,16,162,66,11,145,53,7,129,
+    39,5,112,29,2,96,18,0,212,109,61,212,94,52,212,80,
+    45,212,66,37,212,53,29,212,41,23,212,27,15,212,13,7,
+    212,0,0,199,0,0,189,0,0,179,0,0,169,0,0,159,
+    0,0,149,0,0,139,0,0,129,0,0,116,0,0,106,0,
+    0,96,0,0,86,0,0,76,0,0,66,0,0,56,0,0,
+    192,99,61,165,85,61,142,73,61,119,61,61,96,49,61,69,
+    35,61,46,24,61,22,12,61,0,0,61,0,0,54,0,0,
+    49,0,0,43,0,0,37,0,0,31,0,0,26,0,0,20,
+    212,109,61,212,100,52,212,92,45,212,85,37,212,77,29,212,
+    70,22,212,61,14,212,54,6,202,49,6,195,47,4,185,44,
+    4,179,41,3,169,37,2,162,34,0,152,30,0,145,29,0,
+    212,109,61,212,109,51,212,109,43,212,109,34,212,109,26,212,
+    109,17,212,109,8,212,109,0,139,27,0,132,24,0,122,20,
+    0,112,15,0,66,25,9,56,20,6,46,15,5,39,12,3,
+    0,0,20,0,0,17,0,0,14,0,0,11,0,0,8,0,
+    0,6,0,0,3,0,0,0,212,68,16,212,99,18,212,53,
+    61,212,0,61,172,0,50,132,0,37,92,0,26,139,46,26
 };

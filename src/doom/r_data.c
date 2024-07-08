@@ -1123,6 +1123,7 @@ void R_InitColormaps (void)
 			R_InitColoredColormap(k, scale, C_043E8B);  colormaps_043E8B[j] = R_CalculateColoredColormap();
 			R_InitColoredColormap(k, scale, C_5B4318);  colormaps_5B4318[j] = R_CalculateColoredColormap();
 			R_InitColoredColormap(k, scale, C_4F5D8B);  colormaps_4F5D8B[j] = R_CalculateColoredColormap();
+			R_InitColoredColormap(k, scale, C_D46D3D);  colormaps_D46D3D[j] = R_CalculateColoredColormap();
 
 			colormaps[j++] = 0xff000000 | (r << 16) | (g << 8) | b;
 		}
