@@ -17,6 +17,7 @@
 #include <stdlib.h>
 
 #include "z_zone.h"
+#include "doomstat.h"
 
 #include "id_vars.h"
 #include "id_clght.h"
@@ -475,11 +476,18 @@ lighttable_t *R_ColoredSprColorize (int color)
 //
 // =============================================================================
 
-const sectorcolor_t sectorcolor[] =
+const sectorcolor_t *sectorcolor;
+
+#define SECTORCOLOR_END    { -1, 0, 0x000000 }
+static const sectorcolor_t sectorcolor_dummy[] = { SECTORCOLOR_END };
+
+//
+// Area 1: Hangar
+//
+
+static const sectorcolor_t sectorcolor_map01[] =
 {
     // map, sector, color table
-
-    // Area 1: Hangar
     {    1,      0,    0xFF7F7F },
     {    1,      1,    0xFF7F7F },
     {    1,      2,    0xFF7F7F },
@@ -514,8 +522,15 @@ const sectorcolor_t sectorcolor[] =
     {    1,     72,    0xFF7F7F },
     {    1,     73,    0xFF7F7F },
     {    1,     81,    0x55B828 },
+    SECTORCOLOR_END
+};
 
-    // Area 2: Plant
+//
+// Area 2: Plant
+//
+
+static const sectorcolor_t sectorcolor_map02[] =
+{
     {    2,      1,    0xFF7F7F },
     {    2,      2,    0xFF7F7F },
     {    2,     30,    0x043E8B },
@@ -554,8 +569,15 @@ const sectorcolor_t sectorcolor[] =
     {    2,    189,    0xCCE4A5 },
     {    2,    190,    0xCCEA5F },
     {    2,    191,    0xFF7F7F },
+    SECTORCOLOR_END
+};
 
-    // Area 3: Toxin Refinery
+//
+// Area 3: Toxin Refinery
+//
+
+static const sectorcolor_t sectorcolor_map03[] =
+{
     {    3,      3,    0xFF7F7F },
     {    3,      4,    0xFF7F7F },
     {    3,      5,    0xFF7F7F },
@@ -625,9 +647,19 @@ const sectorcolor_t sectorcolor[] =
     {    3,    157,    0x043E8B },
     {    3,    158,    0xFFF588 },
     {    3,    159,    0xFFF588 },
-
-    {   -1,      0,    0x000000 }
+    SECTORCOLOR_END
 };
+
+void P_SetSectorColorTable (int area)
+{
+    switch (area)
+    {
+        case  1:  sectorcolor = sectorcolor_map01;  break;
+        case  2:  sectorcolor = sectorcolor_map02;  break;
+        case  3:  sectorcolor = sectorcolor_map03;  break;
+        default:  sectorcolor = sectorcolor_dummy;  break;
+    }
+}
 
 // =============================================================================
 //

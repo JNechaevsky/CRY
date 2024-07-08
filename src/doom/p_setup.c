@@ -1326,6 +1326,9 @@ P_SetupLevel
 
     lumpnum = W_GetNumForName (lumpname);
 	
+    // [JN] Set per-level sector colors table.
+    P_SetSectorColorTable(map);
+
     leveltime = 0;
     realleveltime = 0;
     oldleveltime = 0;

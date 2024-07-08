@@ -118,7 +118,9 @@ typedef struct
     int color;
 } sectorcolor_t;
 
-extern const sectorcolor_t sectorcolor[];
+extern const sectorcolor_t *sectorcolor;
+extern void  P_SetSectorColorTable (int area);
+
 
 // Colored colormaps
 extern const byte C_EEC06B[];
