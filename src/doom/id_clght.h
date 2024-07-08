@@ -30,6 +30,12 @@ extern lighttable_t   *colormaps_2A2F6B;
 extern lighttable_t   *colormaps_50ADAC;
 extern lighttable_t   *colormaps_CCE4A5;
 extern lighttable_t   *colormaps_CCEA5F;
+extern lighttable_t   *colormaps_B30202;
+extern lighttable_t   *colormaps_B87A15;
+extern lighttable_t   *colormaps_FFD000;
+extern lighttable_t   *colormaps_FFDE4C;
+extern lighttable_t   *colormaps_FFF588;
+extern lighttable_t   *colormaps_043E8B;
 
 // Visplanes data
 extern lighttable_t ***zlight_EEC06B;
@@ -42,6 +48,12 @@ extern lighttable_t ***zlight_2A2F6B;
 extern lighttable_t ***zlight_50ADAC;
 extern lighttable_t ***zlight_CCE4A5;
 extern lighttable_t ***zlight_CCEA5F;
+extern lighttable_t ***zlight_B30202;
+extern lighttable_t ***zlight_B87A15;
+extern lighttable_t ***zlight_FFD000;
+extern lighttable_t ***zlight_FFDE4C;
+extern lighttable_t ***zlight_FFF588;
+extern lighttable_t ***zlight_043E8B;
 
 // Segments data
 extern lighttable_t ***scalelight_EEC06B;
@@ -54,6 +66,12 @@ extern lighttable_t ***scalelight_2A2F6B;
 extern lighttable_t ***scalelight_50ADAC;
 extern lighttable_t ***scalelight_CCE4A5;
 extern lighttable_t ***scalelight_CCEA5F;
+extern lighttable_t ***scalelight_B30202;
+extern lighttable_t ***scalelight_B87A15;
+extern lighttable_t ***scalelight_FFD000;
+extern lighttable_t ***scalelight_FFDE4C;
+extern lighttable_t ***scalelight_FFF588;
+extern lighttable_t ***scalelight_043E8B;
 
 
 // Main colormaps
@@ -107,3 +125,9 @@ extern const byte C_2A2F6B[];
 extern const byte C_50ADAC[];
 extern const byte C_CCE4A5[];
 extern const byte C_CCEA5F[];
+extern const byte C_B30202[];
+extern const byte C_B87A15[];
+extern const byte C_FFD000[];
+extern const byte C_FFDE4C[];
+extern const byte C_FFF588[];
+extern const byte C_043E8B[];
