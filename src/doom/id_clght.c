@@ -650,6 +650,50 @@ static const sectorcolor_t sectorcolor_map03[] =
     SECTORCOLOR_END
 };
 
+//
+// Area 4: Command Control
+//
+
+static const sectorcolor_t sectorcolor_map04[] =
+{
+    {    4,     11,    0x043E8B },
+    {    4,     16,    0xFF7F7F },
+    {    4,     20,    0x55B828 },
+    {    4,     23,    0xFFF588 },
+    {    4,     24,    0xFFF588 },
+    {    4,     25,    0xFFF588 },
+    {    4,     27,    0xFFF588 },
+    {    4,     34,    0x50ADAC },
+    {    4,     35,    0x50ADAC },
+    {    4,     36,    0x50ADAC },
+    {    4,     37,    0x50ADAC },
+    {    4,     38,    0x50ADAC },
+    {    4,     42,    0x043E8B },
+    {    4,     43,    0x043E8B },
+    {    4,     46,    0xBBE357 },
+    {    4,     47,    0xBBE357 },
+    {    4,     48,    0xBBE357 },
+    {    4,     51,    0xBBE357 },
+    {    4,     60,    0xBBE357 },
+    {    4,     61,    0x043E8B },
+    {    4,     71,    0xBBE357 },
+    {    4,     72,    0xBBE357 },
+    {    4,     75,    0x55B828 },
+    {    4,     77,    0xFFF588 },
+    {    4,     92,    0xFFF588 },
+    {    4,     94,    0xFFF588 },
+    {    4,     96,    0xFFF588 },
+    {    4,     99,    0xFFF588 },
+    {    4,    101,    0x55B828 },
+    {    4,    102,    0x55B828 },
+    {    4,    113,    0xFFF588 },
+    {    4,    114,    0xFFF588 },
+    {    4,    115,    0xFFF588 },
+    {    4,    118,    0xFFF588 },
+    {    4,    120,    0x043E8B },
+    SECTORCOLOR_END
+};
+
 void P_SetSectorColorTable (int area)
 {
     switch (area)
@@ -657,6 +701,7 @@ void P_SetSectorColorTable (int area)
         case  1:  sectorcolor = sectorcolor_map01;  break;
         case  2:  sectorcolor = sectorcolor_map02;  break;
         case  3:  sectorcolor = sectorcolor_map03;  break;
+        case  4:  sectorcolor = sectorcolor_map04;  break;
         default:  sectorcolor = sectorcolor_dummy;  break;
     }
 }
