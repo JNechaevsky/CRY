@@ -760,6 +760,79 @@ static const sectorcolor_t sectorcolor_map05[] =
     SECTORCOLOR_END
 };
 
+//
+// Area 6: Central Processing
+//
+
+static const sectorcolor_t sectorcolor_map06[] =
+{
+    {    6,      0,    0x55B828 },
+    {    6,      1,    0x55B828 },
+    {    6,      2,    0x2A2F6B },
+    {    6,      3,    0x55B828 },
+    {    6,      4,    0x55B828 },
+    {    6,      5,    0x55B828 },
+    {    6,      6,    0x55B828 },
+    {    6,      7,    0x55B828 },
+    {    6,      8,    0x2A2F6B },
+    {    6,      9,    0x55B828 },
+    {    6,     10,    0x043E8B },
+    {    6,     12,    0x043E8B },
+    {    6,     17,    0xBBE357 },
+    {    6,     18,    0xBBE357 },
+    {    6,     25,    0x949DB9 },
+    {    6,     26,    0x949DB9 },
+    {    6,     29,    0x4F5D8B },
+    {    6,     30,    0x4F5D8B },
+    {    6,     31,    0x4F5D8B },
+    {    6,     32,    0x4F5D8B },
+    {    6,     34,    0xBBE357 },
+    {    6,     35,    0x55B828 },
+    {    6,     36,    0x55B828 },
+    {    6,     39,    0x043E8B },
+    {    6,     43,    0xBBE357 },
+    {    6,     48,    0x55B828 },
+    {    6,     50,    0xBBE357 },
+    {    6,     54,    0x55B828 },
+    {    6,     55,    0xBBE357 },
+    {    6,     59,    0xFF7F7F },
+    {    6,     76,    0xFF7F7F },
+    {    6,     77,    0xBBE357 },
+    {    6,     78,    0xBBE357 },
+    {    6,     83,    0x55B828 },
+    {    6,     84,    0x55B828 },
+    {    6,     92,    0x949DB9 },
+    {    6,     93,    0x949DB9 },
+    {    6,     95,    0xFFF588 },
+    {    6,     96,    0xFFF588 },
+    {    6,     97,    0xFFF588 },
+    {    6,     98,    0xFFF588 },
+    {    6,     99,    0x4F5D8B },
+    {    6,    100,    0x4F5D8B },
+    {    6,    101,    0x4F5D8B },
+    {    6,    104,    0x55B828 },
+    {    6,    105,    0x55B828 },
+    {    6,    112,    0x55B828 },
+    {    6,    113,    0x55B828 },
+    {    6,    132,    0x4F5D8B },
+    {    6,    133,    0x4F5D8B },
+    {    6,    147,    0xFF7F7F },
+    {    6,    148,    0xFF7F7F },
+    {    6,    151,    0xFF7F7F },
+    {    6,    153,    0x55B828 },
+    {    6,    165,    0xFFF588 },
+    {    6,    167,    0xFFF588 },
+    {    6,    172,    0xFF7F7F },
+    {    6,    173,    0xFF7F7F },
+    {    6,    174,    0xFF7F7F },
+    {    6,    175,    0xFF7F7F },
+    {    6,    176,    0xFFF588 },
+    {    6,    177,    0xFFF588 },
+    {    6,    178,    0xFFF588 },
+    {    6,    179,    0xFFF588 },
+    {    6,    180,    0x043E8B },
+};
+
 void P_SetSectorColorTable (int area)
 {
     switch (area)
@@ -769,6 +842,7 @@ void P_SetSectorColorTable (int area)
         case  3:  sectorcolor = sectorcolor_map03;  break;
         case  4:  sectorcolor = sectorcolor_map04;  break;
         case  5:  sectorcolor = sectorcolor_map05;  break;
+        case  6:  sectorcolor = sectorcolor_map06;  break;
         default:  sectorcolor = sectorcolor_dummy;  break;
     }
 }
