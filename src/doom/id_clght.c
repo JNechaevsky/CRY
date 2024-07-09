@@ -57,7 +57,7 @@ lighttable_t   *colormaps_ECB866;  // Bright orange
 lighttable_t   *colormaps_C63F23;  // Middle orange 3
 lighttable_t   *colormaps_9BC8CD;  // Bright cyan
 
-// Visplanes data
+// Visplane light tables
 lighttable_t ***zlight_EEC06B = NULL;
 lighttable_t ***zlight_D97C45 = NULL;
 lighttable_t ***zlight_FF7F7F = NULL;
@@ -85,7 +85,7 @@ lighttable_t ***zlight_ECB866 = NULL;
 lighttable_t ***zlight_C63F23 = NULL;
 lighttable_t ***zlight_9BC8CD = NULL;
 
-// Segments data
+// Segment/sprite light tables
 lighttable_t ***scalelight_EEC06B = NULL;
 lighttable_t ***scalelight_D97C45 = NULL;
 lighttable_t ***scalelight_FF7F7F = NULL;
@@ -116,13 +116,9 @@ lighttable_t ***scalelight_9BC8CD = NULL;
 
 // =============================================================================
 //
-//                           INITIALIZATION FUNCTIONS
+//                   MAIN COLORMAPS INITIALIZATION FUNCTIONS
 //
 // =============================================================================
-
-// -----------------------------------------------------------------------------
-// Main colormaps
-// -----------------------------------------------------------------------------
 
 void R_AllocateColoredColormaps (void)
 {
@@ -156,51 +152,50 @@ void R_AllocateColoredColormaps (void)
 
 static int r_clrmp_color, g_clrmp_color, b_clrmp_color;
 
-static void R_InitColoredColormap (byte k, const float scale, const byte *colormap_name)
+static void R_InitColoredColormap (const byte k, const float scale, const byte *lump_name, lighttable_t *colormap_name, const int j)
 {
-    r_clrmp_color = gammatable[vid_gamma][colormap_name[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-    g_clrmp_color = gammatable[vid_gamma][colormap_name[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-    b_clrmp_color = gammatable[vid_gamma][colormap_name[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+    r_clrmp_color = gammatable[vid_gamma][lump_name[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+    g_clrmp_color = gammatable[vid_gamma][lump_name[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+    b_clrmp_color = gammatable[vid_gamma][lump_name[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+    
+    colormap_name[j] = 0xff000000 | (r_clrmp_color << 16) | (g_clrmp_color << 8) | b_clrmp_color;
 }
 
-static const int R_CalculateColoredColormap (void)
+void R_InitColoredColormaps (const byte k, const float scale, const int j)
 {
-    return 0xff000000 | (r_clrmp_color << 16) | (g_clrmp_color << 8) | b_clrmp_color;
+    R_InitColoredColormap(k, scale, C_EEC06B, colormaps_EEC06B, j);
+    R_InitColoredColormap(k, scale, C_D97C45, colormaps_D97C45, j);
+    R_InitColoredColormap(k, scale, C_FF7F7F, colormaps_FF7F7F, j);
+    R_InitColoredColormap(k, scale, C_55B828, colormaps_55B828, j);
+    R_InitColoredColormap(k, scale, C_BBE357, colormaps_BBE357, j);
+    R_InitColoredColormap(k, scale, C_949DB9, colormaps_949DB9, j);
+    R_InitColoredColormap(k, scale, C_2A2F6B, colormaps_2A2F6B, j);
+    R_InitColoredColormap(k, scale, C_50ADAC, colormaps_50ADAC, j);
+    R_InitColoredColormap(k, scale, C_CCE4A5, colormaps_CCE4A5, j);
+    R_InitColoredColormap(k, scale, C_CCEA5F, colormaps_CCEA5F, j);
+    R_InitColoredColormap(k, scale, C_B30202, colormaps_B30202, j);
+    R_InitColoredColormap(k, scale, C_B87A15, colormaps_B87A15, j);
+    R_InitColoredColormap(k, scale, C_FFD000, colormaps_FFD000, j);
+    R_InitColoredColormap(k, scale, C_FFDE4C, colormaps_FFDE4C, j);
+    R_InitColoredColormap(k, scale, C_FFF588, colormaps_FFF588, j);
+    R_InitColoredColormap(k, scale, C_043E8B, colormaps_043E8B, j);
+    R_InitColoredColormap(k, scale, C_5B4318, colormaps_5B4318, j);
+    R_InitColoredColormap(k, scale, C_4F5D8B, colormaps_4F5D8B, j);
+    R_InitColoredColormap(k, scale, C_D46D3D, colormaps_D46D3D, j);
+    R_InitColoredColormap(k, scale, C_04918B, colormaps_04918B, j);
+    R_InitColoredColormap(k, scale, C_FF3030, colormaps_FF3030, j);
+    R_InitColoredColormap(k, scale, C_311A59, colormaps_311A59, j);
+    R_InitColoredColormap(k, scale, C_FFAFAF, colormaps_FFAFAF, j);
+    R_InitColoredColormap(k, scale, C_ECB866, colormaps_C63F23, j);
+    R_InitColoredColormap(k, scale, C_C63F23, colormaps_ECB866, j);
+    R_InitColoredColormap(k, scale, C_9BC8CD, colormaps_9BC8CD, j);
 }
 
-void R_InitColoredColormaps (const byte k, const float scale, int j)
-{
-    R_InitColoredColormap(k, scale, C_EEC06B);  colormaps_EEC06B[j] = R_CalculateColoredColormap();
-    R_InitColoredColormap(k, scale, C_D97C45);  colormaps_D97C45[j] = R_CalculateColoredColormap();
-    R_InitColoredColormap(k, scale, C_FF7F7F);  colormaps_FF7F7F[j] = R_CalculateColoredColormap();
-    R_InitColoredColormap(k, scale, C_55B828);  colormaps_55B828[j] = R_CalculateColoredColormap();
-    R_InitColoredColormap(k, scale, C_BBE357);  colormaps_BBE357[j] = R_CalculateColoredColormap();
-    R_InitColoredColormap(k, scale, C_949DB9);  colormaps_949DB9[j] = R_CalculateColoredColormap();
-    R_InitColoredColormap(k, scale, C_2A2F6B);  colormaps_2A2F6B[j] = R_CalculateColoredColormap();
-    R_InitColoredColormap(k, scale, C_50ADAC);  colormaps_50ADAC[j] = R_CalculateColoredColormap();
-    R_InitColoredColormap(k, scale, C_CCE4A5);  colormaps_CCE4A5[j] = R_CalculateColoredColormap();
-    R_InitColoredColormap(k, scale, C_CCEA5F);  colormaps_CCEA5F[j] = R_CalculateColoredColormap();
-    R_InitColoredColormap(k, scale, C_B30202);  colormaps_B30202[j] = R_CalculateColoredColormap();
-    R_InitColoredColormap(k, scale, C_B87A15);  colormaps_B87A15[j] = R_CalculateColoredColormap();
-    R_InitColoredColormap(k, scale, C_FFD000);  colormaps_FFD000[j] = R_CalculateColoredColormap();
-    R_InitColoredColormap(k, scale, C_FFDE4C);  colormaps_FFDE4C[j] = R_CalculateColoredColormap();
-    R_InitColoredColormap(k, scale, C_FFF588);  colormaps_FFF588[j] = R_CalculateColoredColormap();
-    R_InitColoredColormap(k, scale, C_043E8B);  colormaps_043E8B[j] = R_CalculateColoredColormap();
-    R_InitColoredColormap(k, scale, C_5B4318);  colormaps_5B4318[j] = R_CalculateColoredColormap();
-    R_InitColoredColormap(k, scale, C_4F5D8B);  colormaps_4F5D8B[j] = R_CalculateColoredColormap();
-    R_InitColoredColormap(k, scale, C_D46D3D);  colormaps_D46D3D[j] = R_CalculateColoredColormap();
-    R_InitColoredColormap(k, scale, C_04918B);  colormaps_04918B[j] = R_CalculateColoredColormap();
-    R_InitColoredColormap(k, scale, C_FF3030);  colormaps_FF3030[j] = R_CalculateColoredColormap();
-    R_InitColoredColormap(k, scale, C_311A59);  colormaps_311A59[j] = R_CalculateColoredColormap();
-    R_InitColoredColormap(k, scale, C_FFAFAF);  colormaps_FFAFAF[j] = R_CalculateColoredColormap();
-    R_InitColoredColormap(k, scale, C_ECB866);  colormaps_C63F23[j] = R_CalculateColoredColormap();
-    R_InitColoredColormap(k, scale, C_C63F23);  colormaps_ECB866[j] = R_CalculateColoredColormap();
-    R_InitColoredColormap(k, scale, C_9BC8CD);  colormaps_9BC8CD[j] = R_CalculateColoredColormap();
-}
-
-// -----------------------------------------------------------------------------
-// Colored visplanes initialization
-// -----------------------------------------------------------------------------
+// =============================================================================
+//
+//                  COLORED VISPLANES INITIALIZATION FUNCTIONS
+//
+// =============================================================================
 
 void R_ColoredVisplanesFreeI (int i)
 {
@@ -352,9 +347,11 @@ void R_ColoredVisplanesIJLevel (int i, int j, int level)
     zlight_9BC8CD[i][j] = colormaps_9BC8CD + level*256;
 }
 
-// -----------------------------------------------------------------------------
-// Colored segments initialization
-// -----------------------------------------------------------------------------
+// =============================================================================
+//
+//              COLORED SEGMENTS/SPRITES INITIALIZATION FUNCTIONS
+//
+// =============================================================================
 
 void R_ColoredSegsFreeI (int i)
 {
@@ -508,7 +505,7 @@ void R_ColoredSegsIJLevel (int i, int j, int level)
 
 // =============================================================================
 //
-//                             VISPLANES COLORING
+//                            COLORING LOOKUP TABLES
 //
 // =============================================================================
 
@@ -550,12 +547,6 @@ lighttable_t **R_ColoredVisplanesColorize (int light, int color)
     return zlight[light];
 }
 
-// =============================================================================
-//
-//                              SEGMENTS COLORING
-//
-// =============================================================================
-
 lighttable_t **R_ColoredSegsColorize (int lightnum, int color)
 {
     const int l = LIGHTLEVELS - 1;
@@ -596,12 +587,6 @@ lighttable_t **R_ColoredSegsColorize (int lightnum, int color)
     return scalelight[BETWEEN(0, l, lightnum)]; 
 }
 
-// =============================================================================
-//
-//                               SPRITES COLORING
-//
-// =============================================================================
-
 lighttable_t *R_ColoredSprColorize (int color)
 {
     switch (color)
@@ -638,7 +623,7 @@ lighttable_t *R_ColoredSprColorize (int color)
 
 // =============================================================================
 //
-//                       COLORED LIGHTING INJECTION TABLE
+//                      COLORED LIGHTING INJECTION TABLES
 //
 // =============================================================================
 
@@ -1181,6 +1166,16 @@ static const sectorcolor_t sectorcolor_map10[] =
     SECTORCOLOR_END
 };
 
+//
+// Area 11: Refinery
+//
+
+static const sectorcolor_t sectorcolor_map11[] =
+{
+    {   11,      3,    0xFF7F7F },
+    SECTORCOLOR_END
+};
+
 void P_SetSectorColorTable (int area)
 {
     switch (area)
@@ -1195,13 +1190,14 @@ void P_SetSectorColorTable (int area)
         case  8:  sectorcolor = sectorcolor_map08;  break;
         case  9:  sectorcolor = sectorcolor_map09;  break;
         case 10:  sectorcolor = sectorcolor_map10;  break;
+        case 11:  sectorcolor = sectorcolor_map11;  break;
         default:  sectorcolor = sectorcolor_dummy;  break;
     }
 }
 
 // =============================================================================
 //
-//                              COLORED COLORMAPS
+//                           COLORED COLORMAP LUMPS
 //
 // =============================================================================
 

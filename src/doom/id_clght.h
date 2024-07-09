@@ -47,7 +47,7 @@ extern lighttable_t   *colormaps_ECB866;
 extern lighttable_t   *colormaps_C63F23;
 extern lighttable_t   *colormaps_9BC8CD;
 
-// Visplanes data
+// Visplane light tables
 extern lighttable_t ***zlight_EEC06B;
 extern lighttable_t ***zlight_D97C45;
 extern lighttable_t ***zlight_FF7F7F;
@@ -73,7 +73,7 @@ extern lighttable_t ***zlight_311A59;
 extern lighttable_t ***zlight_FFAFAF;
 extern lighttable_t ***zlight_9BC8CD;
 
-// Segments data
+// Segment/sprite light tables
 extern lighttable_t ***scalelight_EEC06B;
 extern lighttable_t ***scalelight_D97C45;
 extern lighttable_t ***scalelight_FF7F7F;
@@ -127,36 +127,30 @@ extern const byte C_ECB866[];
 extern const byte C_C63F23[];
 extern const byte C_9BC8CD[];
 
-// Main colormaps
+// Main colormaps initialization functions
 extern void R_AllocateColoredColormaps (void);
-extern void R_InitColoredColormaps (const byte k, const float scale, int j);
+extern void R_InitColoredColormaps (const byte k, const float scale, const int j);
 
-// Colored visplanes initialization
+// Colored visplanes initialization functions
 extern void R_ColoredVisplanesFreeI (int i);
 extern void R_ColoredVisplanesFree (void);
 extern void R_ColoredVisplanesMalloc (void);
 extern void R_ColoredVisplanesMAXLIGHTZ (int i);
 extern void R_ColoredVisplanesIJLevel (int i, int j, int level);
 
-// Colored segments initialization
+// Colored segments/sprites initialization functions
 extern void R_ColoredSegsFreeI (int i);
 extern void R_ColoredSegsFree (void);
 extern void R_ColoredSegsMalloc (void);
 extern void R_ColoredSegsMAXLIGHTSCALE (int i);
 extern void R_ColoredSegsIJLevel (int i, int j, int level);
 
-
-// Visplanes coloring
+// Coloring lookup tables
 extern lighttable_t **R_ColoredVisplanesColorize (int light, int color);
-
-// Segments coloring
 extern lighttable_t **R_ColoredSegsColorize (int lightnum, int color);
-
-// Sprites coloring
 extern lighttable_t  *R_ColoredSprColorize (int color);
 
-
-// Colored lighting injection data type
+// Colored lighting injection tables
 typedef struct
 {
     int map;
