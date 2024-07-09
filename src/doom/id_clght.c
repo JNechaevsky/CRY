@@ -168,6 +168,36 @@ const int R_CalculateColoredColormap (void)
     return 0xff000000 | (r_clrmp_color << 16) | (g_clrmp_color << 8) | b_clrmp_color;
 }
 
+inline void R_InitColoredColormaps (const byte k, const float scale, int j)
+{
+    R_InitColoredColormap(k, scale, C_EEC06B);  colormaps_EEC06B[j] = R_CalculateColoredColormap();
+    R_InitColoredColormap(k, scale, C_D97C45);  colormaps_D97C45[j] = R_CalculateColoredColormap();
+    R_InitColoredColormap(k, scale, C_FF7F7F);  colormaps_FF7F7F[j] = R_CalculateColoredColormap();
+    R_InitColoredColormap(k, scale, C_55B828);  colormaps_55B828[j] = R_CalculateColoredColormap();
+    R_InitColoredColormap(k, scale, C_BBE357);  colormaps_BBE357[j] = R_CalculateColoredColormap();
+    R_InitColoredColormap(k, scale, C_949DB9);  colormaps_949DB9[j] = R_CalculateColoredColormap();
+    R_InitColoredColormap(k, scale, C_2A2F6B);  colormaps_2A2F6B[j] = R_CalculateColoredColormap();
+    R_InitColoredColormap(k, scale, C_50ADAC);  colormaps_50ADAC[j] = R_CalculateColoredColormap();
+    R_InitColoredColormap(k, scale, C_CCE4A5);  colormaps_CCE4A5[j] = R_CalculateColoredColormap();
+    R_InitColoredColormap(k, scale, C_CCEA5F);  colormaps_CCEA5F[j] = R_CalculateColoredColormap();
+    R_InitColoredColormap(k, scale, C_B30202);  colormaps_B30202[j] = R_CalculateColoredColormap();
+    R_InitColoredColormap(k, scale, C_B87A15);  colormaps_B87A15[j] = R_CalculateColoredColormap();
+    R_InitColoredColormap(k, scale, C_FFD000);  colormaps_FFD000[j] = R_CalculateColoredColormap();
+    R_InitColoredColormap(k, scale, C_FFDE4C);  colormaps_FFDE4C[j] = R_CalculateColoredColormap();
+    R_InitColoredColormap(k, scale, C_FFF588);  colormaps_FFF588[j] = R_CalculateColoredColormap();
+    R_InitColoredColormap(k, scale, C_043E8B);  colormaps_043E8B[j] = R_CalculateColoredColormap();
+    R_InitColoredColormap(k, scale, C_5B4318);  colormaps_5B4318[j] = R_CalculateColoredColormap();
+    R_InitColoredColormap(k, scale, C_4F5D8B);  colormaps_4F5D8B[j] = R_CalculateColoredColormap();
+    R_InitColoredColormap(k, scale, C_D46D3D);  colormaps_D46D3D[j] = R_CalculateColoredColormap();
+    R_InitColoredColormap(k, scale, C_04918B);  colormaps_04918B[j] = R_CalculateColoredColormap();
+    R_InitColoredColormap(k, scale, C_FF3030);  colormaps_FF3030[j] = R_CalculateColoredColormap();
+    R_InitColoredColormap(k, scale, C_311A59);  colormaps_311A59[j] = R_CalculateColoredColormap();
+    R_InitColoredColormap(k, scale, C_FFAFAF);  colormaps_FFAFAF[j] = R_CalculateColoredColormap();
+    R_InitColoredColormap(k, scale, C_ECB866);  colormaps_C63F23[j] = R_CalculateColoredColormap();
+    R_InitColoredColormap(k, scale, C_C63F23);  colormaps_ECB866[j] = R_CalculateColoredColormap();
+    R_InitColoredColormap(k, scale, C_9BC8CD);  colormaps_9BC8CD[j] = R_CalculateColoredColormap();
+}
+
 // -----------------------------------------------------------------------------
 // Colored visplanes initialization
 // -----------------------------------------------------------------------------
