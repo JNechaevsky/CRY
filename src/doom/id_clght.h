@@ -43,6 +43,8 @@ extern lighttable_t   *colormaps_04918B;
 extern lighttable_t   *colormaps_FF3030;
 extern lighttable_t   *colormaps_311A59;
 extern lighttable_t   *colormaps_FFAFAF;
+extern lighttable_t   *colormaps_ECB866;
+extern lighttable_t   *colormaps_C63F23;
 
 // Visplanes data
 extern lighttable_t ***zlight_EEC06B;
@@ -161,3 +163,5 @@ extern const byte C_04918B[];
 extern const byte C_FF3030[];
 extern const byte C_311A59[];
 extern const byte C_FFAFAF[];
+extern const byte C_ECB866[];
+extern const byte C_C63F23[];
