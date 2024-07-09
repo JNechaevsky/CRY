@@ -156,19 +156,19 @@ void R_AllocateColoredColormaps (void)
 
 static int r_clrmp_color, g_clrmp_color, b_clrmp_color;
 
-void R_InitColoredColormap (byte k, const float scale, const byte *colormap_name)
+static void R_InitColoredColormap (byte k, const float scale, const byte *colormap_name)
 {
     r_clrmp_color = gammatable[vid_gamma][colormap_name[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
     g_clrmp_color = gammatable[vid_gamma][colormap_name[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
     b_clrmp_color = gammatable[vid_gamma][colormap_name[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
 }
 
-const int R_CalculateColoredColormap (void)
+static const int R_CalculateColoredColormap (void)
 {
     return 0xff000000 | (r_clrmp_color << 16) | (g_clrmp_color << 8) | b_clrmp_color;
 }
 
-inline void R_InitColoredColormaps (const byte k, const float scale, int j)
+void R_InitColoredColormaps (const byte k, const float scale, int j)
 {
     R_InitColoredColormap(k, scale, C_EEC06B);  colormaps_EEC06B[j] = R_CalculateColoredColormap();
     R_InitColoredColormap(k, scale, C_D97C45);  colormaps_D97C45[j] = R_CalculateColoredColormap();

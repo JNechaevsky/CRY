@@ -129,9 +129,7 @@ extern const byte C_9BC8CD[];
 
 // Main colormaps
 extern void R_AllocateColoredColormaps (void);
-extern void R_InitColoredColormap (byte k, const float scale, const byte *colormap_name);
-extern const int R_CalculateColoredColormap (void);
-extern inline void R_InitColoredColormaps (const byte k, const float scale, int j);
+extern void R_InitColoredColormaps (const byte k, const float scale, int j);
 
 // Colored visplanes initialization
 extern void R_ColoredVisplanesFreeI (int i);
