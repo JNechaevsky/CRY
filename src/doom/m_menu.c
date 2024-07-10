@@ -5585,13 +5585,13 @@ static void M_DrawBindKey (int itemNum, int yPos, int key)
 
 static void M_DrawBindFooter (char *pagenum, boolean drawPages)
 {
-    M_WriteTextCentered(142, "PRESS ENTER TO BIND, DEL TO CLEAR",  cr[CR_MENU_DARK1]);
+    M_WriteTextCentered(143, "PRESS ENTER TO BIND, DEL TO CLEAR",  cr[CR_MENU_DARK1]);
 
     if (drawPages)
     {
-        M_WriteText(ID_MENU_LEFTOFFSET, 151, "< PGUP", cr[CR_MENU_DARK3]);
-        M_WriteTextCentered(151, M_StringJoin("PAGE ", pagenum, "/6", NULL), cr[CR_MENU_DARK2]);
-        M_WriteText(M_ItemRightAlign("PGDN >"), 151, "PGDN >", cr[CR_MENU_DARK3]);
+        M_WriteText(ID_MENU_LEFTOFFSET, 152, "< PGUP", cr[CR_MENU_DARK3]);
+        M_WriteTextCentered(152, M_StringJoin("PAGE ", pagenum, "/6", NULL), cr[CR_MENU_DARK2]);
+        M_WriteText(M_ItemRightAlign("PGDN >"), 152, "PGDN >", cr[CR_MENU_DARK3]);
     }
 }
 
