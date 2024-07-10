@@ -32,13 +32,13 @@
 #include "m_argv.h"
 #include "m_bbox.h"
 #include "p_local.h"
+#include "r_collit.h"
 #include "s_sound.h"
 #include "w_wad.h"
 #include "z_zone.h"
 
 #include "id_vars.h"
 #include "id_func.h"
-#include "id_clght.h"
 
 
 //

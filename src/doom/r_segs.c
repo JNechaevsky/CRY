@@ -23,10 +23,10 @@
 #include "i_system.h"
 #include "doomstat.h"
 #include "p_local.h"
+#include "r_collit.h"
 
 #include "id_vars.h"
 #include "id_func.h"
-#include "id_clght.h"
 
 
 // OPTIMIZE: closed two sided lines as single sided

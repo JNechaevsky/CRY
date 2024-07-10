@@ -25,12 +25,12 @@
 #include "w_wad.h"
 #include "m_misc.h"
 #include "p_local.h"
+#include "r_collit.h"
 #include "doomstat.h"
 #include "v_trans.h"
 #include "v_video.h"
 
 #include "id_vars.h"
-#include "id_clght.h"
 
 
 //

@@ -29,13 +29,12 @@
 #include "p_local.h"
 #include "r_local.h"
 #include "doomstat.h"
-
+#include "r_collit.h"
 #include "v_trans.h" // [crispy] colored blood sprites
 #include "v_video.h" // [JN] translucency tables
 
 #include "id_vars.h"
 #include "id_func.h"
-#include "id_clght.h"
 
 
 #define MINZ				(FRACUNIT*4)

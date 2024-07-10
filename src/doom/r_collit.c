@@ -18,9 +18,9 @@
 
 #include "z_zone.h"
 #include "doomstat.h"
+#include "r_collit.h"
 
 #include "id_vars.h"
-#include "id_clght.h"
 
 
 // =============================================================================
@@ -197,7 +197,7 @@ void R_InitColoredColormaps (const byte k, const float scale, const int j)
 //
 // =============================================================================
 
-void R_ColoredVisplanesFreeI (int i)
+void R_ColoredZLightFreeI (const int i)
 {
     free(zlight_EEC06B[i]);
     free(zlight_D97C45[i]);
@@ -227,7 +227,7 @@ void R_ColoredVisplanesFreeI (int i)
     free(zlight_9BC8CD[i]);
 }
 
-void R_ColoredVisplanesFree (void)
+void R_ColoredZLightFree (void)
 {
     free(zlight_EEC06B);
     free(zlight_D97C45);
@@ -257,7 +257,7 @@ void R_ColoredVisplanesFree (void)
     free(zlight_9BC8CD);
 }
 
-void R_ColoredVisplanesMalloc (void)
+void R_ColoredZLightMalloc (void)
 {
     zlight_EEC06B = malloc(LIGHTLEVELS * sizeof(*zlight));
     zlight_D97C45 = malloc(LIGHTLEVELS * sizeof(*zlight));
@@ -287,7 +287,7 @@ void R_ColoredVisplanesMalloc (void)
     zlight_9BC8CD = malloc(LIGHTLEVELS * sizeof(*zlight));
 }
 
-void R_ColoredVisplanesMAXLIGHTZ (int i)
+void R_ColoredZLightMAXLIGHTZ (const int i)
 {
     zlight_EEC06B[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
     zlight_D97C45[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
@@ -317,7 +317,7 @@ void R_ColoredVisplanesMAXLIGHTZ (int i)
     zlight_9BC8CD[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
 }
 
-void R_ColoredVisplanesIJLevel (int i, int j, int level)
+void R_ColoredZLightLevels (const int i, const int j, const int level)
 {
     zlight_EEC06B[i][j] = colormaps_EEC06B + level*256;
     zlight_D97C45[i][j] = colormaps_D97C45 + level*256;
@@ -353,7 +353,7 @@ void R_ColoredVisplanesIJLevel (int i, int j, int level)
 //
 // =============================================================================
 
-void R_ColoredSegsFreeI (int i)
+void R_ColoredScLightFreeI (const int i)
 {
     free(scalelight_EEC06B[i]);
     free(scalelight_D97C45[i]);
@@ -383,7 +383,7 @@ void R_ColoredSegsFreeI (int i)
     free(scalelight_9BC8CD[i]);
 }
 
-void R_ColoredSegsFree (void)
+void R_ColoredScLightFree (void)
 {
     free(scalelight_EEC06B);
     free(scalelight_D97C45);
@@ -413,7 +413,7 @@ void R_ColoredSegsFree (void)
     free(scalelight_9BC8CD);
 }
 
-void R_ColoredSegsMalloc (void)
+void R_ColoredScLightMalloc (void)
 {
     scalelight_EEC06B = malloc(LIGHTLEVELS * sizeof(*scalelight));
     scalelight_D97C45 = malloc(LIGHTLEVELS * sizeof(*scalelight));
@@ -443,7 +443,7 @@ void R_ColoredSegsMalloc (void)
     scalelight_9BC8CD = malloc(LIGHTLEVELS * sizeof(*scalelight));
 }
 
-void R_ColoredSegsMAXLIGHTSCALE (int i)
+void R_ColoredScLightMAXLIGHTSCALE (int i)
 {
     scalelight_EEC06B[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
     scalelight_D97C45[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
@@ -473,7 +473,7 @@ void R_ColoredSegsMAXLIGHTSCALE (int i)
     scalelight_9BC8CD[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
 }
 
-void R_ColoredSegsIJLevel (int i, int j, int level)
+void R_ColoredScLightLevels (const int i, const int j, const int level)
 {
     scalelight_EEC06B[i][j] = colormaps_EEC06B + level*256;
     scalelight_D97C45[i][j] = colormaps_EEC06B + level*256;
@@ -509,7 +509,7 @@ void R_ColoredSegsIJLevel (int i, int j, int level)
 //
 // =============================================================================
 
-lighttable_t **R_ColoredVisplanesColorize (int light, int color)
+lighttable_t **R_ColoredVisplanesColorize (const int light, const int color)
 {
     if (vis_colored_lighting)
     {
@@ -547,7 +547,7 @@ lighttable_t **R_ColoredVisplanesColorize (int light, int color)
     return zlight[light];
 }
 
-lighttable_t **R_ColoredSegsColorize (int lightnum, int color)
+lighttable_t **R_ColoredSegsColorize (const int lightnum, const int color)
 {
     const int l = LIGHTLEVELS - 1;
 
@@ -587,7 +587,7 @@ lighttable_t **R_ColoredSegsColorize (int lightnum, int color)
     return scalelight[BETWEEN(0, l, lightnum)]; 
 }
 
-lighttable_t *R_ColoredSprColorize (int color)
+lighttable_t *R_ColoredSprColorize (const int color)
 {
     switch (color)
     {

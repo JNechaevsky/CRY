@@ -132,23 +132,23 @@ extern void R_AllocateColoredColormaps (void);
 extern void R_InitColoredColormaps (const byte k, const float scale, const int j);
 
 // Colored visplanes initialization functions
-extern void R_ColoredVisplanesFreeI (int i);
-extern void R_ColoredVisplanesFree (void);
-extern void R_ColoredVisplanesMalloc (void);
-extern void R_ColoredVisplanesMAXLIGHTZ (int i);
-extern void R_ColoredVisplanesIJLevel (int i, int j, int level);
+extern void R_ColoredZLightFreeI (const int i);
+extern void R_ColoredZLightFree (void);
+extern void R_ColoredZLightMalloc (void);
+extern void R_ColoredZLightMAXLIGHTZ (const int i);
+extern void R_ColoredZLightLevels (const int i, const int j, const int level);
 
 // Colored segments/sprites initialization functions
-extern void R_ColoredSegsFreeI (int i);
-extern void R_ColoredSegsFree (void);
-extern void R_ColoredSegsMalloc (void);
-extern void R_ColoredSegsMAXLIGHTSCALE (int i);
-extern void R_ColoredSegsIJLevel (int i, int j, int level);
+extern void R_ColoredScLightFreeI (const int i);
+extern void R_ColoredScLightFree (void);
+extern void R_ColoredScLightMalloc (void);
+extern void R_ColoredScLightMAXLIGHTSCALE (int i);
+extern void R_ColoredScLightLevels (const int i, const int j, const int level);
 
 // Coloring lookup tables
-extern lighttable_t **R_ColoredVisplanesColorize (int light, int color);
-extern lighttable_t **R_ColoredSegsColorize (int lightnum, int color);
-extern lighttable_t  *R_ColoredSprColorize (int color);
+extern lighttable_t **R_ColoredVisplanesColorize (const int light, const int color);
+extern lighttable_t **R_ColoredSegsColorize (const int lightnum, const int color);
+extern lighttable_t  *R_ColoredSprColorize (const int color);
 
 // Colored lighting injection tables
 typedef struct

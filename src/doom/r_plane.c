@@ -27,12 +27,12 @@
 #include "w_wad.h"
 #include "doomstat.h"
 #include "p_local.h"
+#include "r_collit.h"
 #include "r_local.h"
 #include "m_misc.h"
 
 #include "id_vars.h"
 #include "id_func.h"
-#include "id_clght.h"
 
 
 // -----------------------------------------------------------------------------
