@@ -52,7 +52,7 @@ lighttable_t   *colormaps_D46D3D;  // Middle orange 2
 lighttable_t   *colormaps_04918B;  // Middle saturated cyan
 lighttable_t   *colormaps_FF3030;  // Bright saturated red
 lighttable_t   *colormaps_311A59;  // Un-darked magenta
-lighttable_t   *colormaps_FFAFAF;  // Brighter red
+lighttable_t   *colormaps_FFAFAF;  // Brighter red (also FFCECE)
 lighttable_t   *colormaps_ECB866;  // Bright orange
 lighttable_t   *colormaps_C63F23;  // Middle orange 3
 lighttable_t   *colormaps_9BC8CD;  // Bright cyan
@@ -1200,6 +1200,101 @@ static const sectorcolor_t sectorcolor_map11[] =
     SECTORCOLOR_END
 };
 
+//
+// Area 12: Deimos Lab
+//
+
+static const sectorcolor_t sectorcolor_map12[] =
+{
+    {   12,      0,    0xFFAFAF },
+    {   12,      3,    0xFFAFAF },
+    {   12,      5,    0xFFAFAF },
+    {   12,      6,    0xFFAFAF },
+    {   12,      7,    0xFFAFAF },
+    {   12,      8,    0xFFAFAF },
+    {   12,      9,    0xFFAFAF },
+    {   12,     10,    0xFFAFAF },
+    {   12,     13,    0xB30202 },
+    {   12,     14,    0xFFF588 },
+    {   12,     15,    0xFFF588 },
+    {   12,     19,    0xFFAFAF },
+    {   12,     20,    0xFFAFAF },
+    {   12,     22,    0xFFAFAF },
+    {   12,     23,    0xFF7F7F },
+    {   12,     24,    0xFF7F7F },
+    {   12,     25,    0xFF7F7F },
+    {   12,     26,    0xFF7F7F },
+    {   12,     27,    0xFFF588 },
+    {   12,     28,    0x043E8B },
+    {   12,     29,    0x043E8B },
+    {   12,     30,    0x043E8B },
+    {   12,     31,    0xFF7F7F },
+    {   12,     34,    0xFF7F7F },
+    {   12,     39,    0x55B828 },
+    {   12,     40,    0xFFF588 },
+    {   12,     41,    0xFF7F7F },
+    {   12,     42,    0xFF7F7F },
+    {   12,     49,    0xBBE357 },
+    {   12,     51,    0x55B828 },
+    {   12,     52,    0xD97C45 },
+    {   12,     53,    0x55B828 },
+    {   12,     54,    0xBBE357 },
+    {   12,     55,    0xBBE357 },
+    {   12,     58,    0xB30202 },
+    {   12,     59,    0xD97C45 },
+    {   12,     60,    0xD97C45 },
+    {   12,     61,    0xD97C45 },
+    {   12,     63,    0xD97C45 },
+    {   12,     64,    0xD97C45 },
+    {   12,     65,    0xD97C45 },
+    {   12,     67,    0xD97C45 },
+    {   12,     70,    0xFFF588 },
+    {   12,     71,    0xFFF588 },
+    {   12,     73,    0xFFF588 },
+    {   12,     74,    0xFFF588 },
+    {   12,     77,    0x55B828 },
+    {   12,     78,    0xBBE357 },
+    {   12,     85,    0xBBE357 },
+    {   12,    106,    0xBBE357 },
+    {   12,    108,    0xC63F23 },
+    {   12,    109,    0xC63F23 },
+    {   12,    110,    0xC63F23 },
+    {   12,    111,    0xD97C45 },
+    {   12,    112,    0xC63F23 },
+    {   12,    113,    0xD97C45 },
+    {   12,    137,    0xFFF588 },
+    {   12,    144,    0xBBE357 },
+    {   12,    146,    0xBBE357 },
+    {   12,    147,    0xFFF588 },
+    {   12,    148,    0xFFF588 },
+    {   12,    150,    0xB30202 },
+    {   12,    151,    0xD97C45 },
+    {   12,    152,    0xC63F23 },
+    {   12,    153,    0xC63F23 },
+    {   12,    154,    0xC63F23 },
+    {   12,    155,    0xC63F23 },
+    {   12,    156,    0xC63F23 },
+    {   12,    157,    0xC63F23 },
+    {   12,    158,    0xB30202 },
+    {   12,    159,    0xFF7F7F },
+    {   12,    160,    0xC63F23 },
+    {   12,    161,    0xC63F23 },
+    {   12,    162,    0xC63F23 },
+    {   12,    163,    0xB30202 },
+    {   12,    165,    0x043E8B },
+    {   12,    167,    0xFF7F7F },
+    {   12,    168,    0xFFF588 },
+    {   12,    169,    0xFFF588 },
+    {   12,    170,    0xB30202 },
+    {   12,    171,    0xBBE357 },
+    {   12,    172,    0xBBE357 },
+    {   12,    173,    0xBBE357 },
+    {   12,    174,    0xBBE357 },
+    {   12,    175,    0xBBE357 },
+    {   12,    176,    0xBBE357 },
+    SECTORCOLOR_END
+};
+
 void P_SetSectorColorTable (int area)
 {
     switch (area)
@@ -1215,6 +1310,7 @@ void P_SetSectorColorTable (int area)
         case  9:  sectorcolor = sectorcolor_map09;  break;
         case 10:  sectorcolor = sectorcolor_map10;  break;
         case 11:  sectorcolor = sectorcolor_map11;  break;
+        case 12:  sectorcolor = sectorcolor_map12;  break;
         default:  sectorcolor = sectorcolor_dummy;  break;
     }
 }

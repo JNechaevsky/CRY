@@ -801,10 +801,8 @@ static void R_ProjectSprite (mobj_t* thing)
         ||  thing->sprite == SPR_SMGT   // Short Green Torch
         ||  thing->sprite == SPR_SMRT)  // Short Red Torch
         {
-            const int demi_bright = MIN(index*8, MAXDIMINDEX);
-            
-            vis->colormap[0] = spritelights[demi_bright];
-            vis->colormap[1] = &colormaps[thing->bmap_flick/4*256];
+            vis->colormap[0] = vis->colormap[1]
+                             = &colormaps[thing->bmap_flick/4*256];
         }
         else
         if (thing->sprite == SPR_FSKU)  // Floating Skull Rock
