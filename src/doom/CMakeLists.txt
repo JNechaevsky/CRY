@@ -37,6 +37,7 @@ add_library(doom STATIC
             p_user.c
             r_bmaps.c
             r_bsp.c
+            r_collit.c      r_collit.h
             r_data.c
             r_draw.c
                             r_local.h

@@ -29,7 +29,7 @@
 #include "p_local.h"
 #include "r_local.h"
 #include "doomstat.h"
-
+#include "r_collit.h"
 #include "v_trans.h" // [crispy] colored blood sprites
 #include "v_video.h" // [JN] translucency tables
 
@@ -743,7 +743,15 @@ static void R_ProjectSprite (mobj_t* thing)
     // with full brightness to represent vanilla Jaguar effect.
     if (!vis_brightmaps)
     {
+        // [JN] Colorize sprite drawing.
+        if (vis_colored_lighting)
+        {
+        vis->colormap[0] = vis->colormap[1] = R_ColoredSprColorize(thing->subsector->sector->color);
+        }
+        else
+        {
         vis->colormap[0] = vis->colormap[1] = colormaps;
+        }
     }
     else
     {
@@ -873,12 +881,8 @@ void R_AddSprites (sector_t* sec)
 
     lightnum = (sec->lightlevel >> LIGHTSEGSHIFT)+(extralight * LIGHTBRIGHT);
 
-    if (lightnum < 0)		
-	spritelights = scalelight[0];
-    else if (lightnum >= LIGHTLEVELS)
-	spritelights = scalelight[LIGHTLEVELS-1];
-    else
-	spritelights = scalelight[lightnum];
+    // [JN] Colorize sprite drawing.
+	spritelights = R_ColoredSegsColorize(lightnum, sec->color);
 
     // Handle all things in sector.
     for (thing = sec->thinglist ; thing ; thing = thing->snext)
@@ -1060,7 +1064,18 @@ static void R_DrawPSprite (pspdef_t* psp)
     else if (psp->state->frame & FF_FULLBRIGHT)
     {
 	// full bright
+    // [JN] Colorize STbar sprite drawing.
+    if (vis_colored_lighting)
+    {
+	    player_t *player = &players[displayplayer];
+
+	    vis->colormap[0] = R_ColoredSprColorize(player->mo->subsector->sector->color);
+	    vis->colormap[1] = colormaps;
+    }
+    else
+    {
 	vis->colormap[0] = vis->colormap[1] = colormaps;
+    }
     }
     else
     {
@@ -1131,12 +1146,8 @@ static void R_DrawPlayerSprites (void)
 	(viewplayer->mo->subsector->sector->lightlevel >> LIGHTSEGSHIFT) 
 	+(extralight * LIGHTBRIGHT);
 
-    if (lightnum < 0)		
-	spritelights = scalelight[0];
-    else if (lightnum >= LIGHTLEVELS)
-	spritelights = scalelight[LIGHTLEVELS-1];
-    else
-	spritelights = scalelight[lightnum];
+    // [JN] Colorize STbar sprite drawing.
+    spritelights = R_ColoredSegsColorize(lightnum, viewplayer->mo->subsector->sector->color);
     
     // clip to screen bounds
     mfloorclip = screenheightarray;

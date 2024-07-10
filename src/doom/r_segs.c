@@ -23,6 +23,7 @@
 #include "i_system.h"
 #include "doomstat.h"
 #include "p_local.h"
+#include "r_collit.h"
 
 #include "id_vars.h"
 #include "id_func.h"
@@ -729,7 +730,8 @@ R_StoreWallRange
 
         if (worldlow != worldbottom 
             || backsector->floorpic != frontsector->floorpic
-            || backsector->lightlevel != frontsector->lightlevel)
+            || backsector->lightlevel != frontsector->lightlevel
+            || backsector->color != frontsector->color)
         {
             markfloor = true;
         }
@@ -741,7 +743,8 @@ R_StoreWallRange
 
         if (worldhigh != worldtop 
             || backsector->ceilingpic != frontsector->ceilingpic
-            || backsector->lightlevel != frontsector->lightlevel)
+            || backsector->lightlevel != frontsector->lightlevel
+            || backsector->color != frontsector->color)
         {
             markceiling = true;
         }
@@ -819,7 +822,8 @@ R_StoreWallRange
         if (!fixedcolormap)
         {
             lightnum = (frontsector->lightlevel >> LIGHTSEGSHIFT) + (extralight * LIGHTBRIGHT);
-            walllights = scalelight[BETWEEN(0, LIGHTLEVELS-1, lightnum)];
+            // [JN] Colorize segments drawing.
+            walllights = R_ColoredSegsColorize(lightnum, frontsector->color);
         }
     }
 

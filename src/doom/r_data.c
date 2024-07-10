@@ -25,6 +25,7 @@
 #include "w_wad.h"
 #include "m_misc.h"
 #include "p_local.h"
+#include "r_collit.h"
 #include "doomstat.h"
 #include "v_trans.h"
 #include "v_video.h"
@@ -1089,6 +1090,7 @@ void R_InitColormaps (void)
 	if (!colormaps)
 	{
 		colormaps = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
+		R_AllocateColoredColormaps();
 	}
 
 	for (c = 0; c < NUMCOLORMAPS; c++)
@@ -1102,6 +1104,9 @@ void R_InitColormaps (void)
 			r = gammatable[vid_gamma][crypal[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
 			g = gammatable[vid_gamma][crypal[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
 			b = gammatable[vid_gamma][crypal[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+
+			// [JN] Generate colored colormaps.
+			R_InitColoredColormaps(k, scale, j);
 
 			colormaps[j++] = 0xff000000 | (r << 16) | (g << 8) | b;
 		}

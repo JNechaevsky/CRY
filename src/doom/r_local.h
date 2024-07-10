@@ -86,6 +86,9 @@ typedef	struct
     short   special;
     short   tag;
 
+    // [JN] Value that refers to custom sector's colormap table.
+    int     color;
+
     // 0 = untraversed, 1,2 = sndlines -1
     int     soundtraversed;
 
@@ -418,6 +421,7 @@ typedef struct visplane_s
     fixed_t height;
     int     picnum;
     int     lightlevel;
+    int     color; // [JN] Colored lighting
     int     minx;
     int     maxx;
 
@@ -765,7 +769,7 @@ extern fixed_t distscale[MAXWIDTH];
 extern fixed_t swirlCoord_x;
 extern fixed_t swirlCoord_y;
 
-extern visplane_t *R_FindPlane (fixed_t height, int picnum, int lightlevel);
+extern visplane_t *R_FindPlane (fixed_t height, int picnum, int lightlevel, int color);
 extern visplane_t *R_CheckPlane (visplane_t *pl, int start, int stop);
 extern visplane_t *R_DupPlane (const visplane_t *pl, int start, int stop);
 

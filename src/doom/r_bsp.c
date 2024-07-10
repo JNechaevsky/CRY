@@ -140,7 +140,8 @@ static void R_RecalcLineFlags (line_t *linedef)
         || curline->sidedef->midtexture
         || backsector->ceilingpic != frontsector->ceilingpic
         || backsector->floorpic != frontsector->floorpic
-        || backsector->lightlevel != frontsector->lightlevel)
+        || backsector->lightlevel != frontsector->lightlevel
+        || backsector->color != frontsector->color)
         {
             linedef->r_flags = 0;
             return;
@@ -466,7 +467,8 @@ static void R_Subsector (int num)
 				              frontsector->floorpic == skyflatnum &&
 				              frontsector->sky & PL_SKYFLAT ? frontsector->sky :
                               frontsector->floorpic,
-                              frontsector->lightlevel) : NULL;
+                              frontsector->lightlevel,
+                              frontsector->color) : NULL;
 
     ceilingplane = frontsector->interpceilingheight > viewz ||
                    frontsector->ceilingpic == skyflatnum ?
@@ -475,7 +477,8 @@ static void R_Subsector (int num)
 				                frontsector->ceilingpic == skyflatnum &&
 				                frontsector->sky & PL_SKYFLAT ? frontsector->sky :
                                 frontsector->ceilingpic,
-                                frontsector->lightlevel) : NULL;
+                                frontsector->lightlevel,
+                                frontsector->color) : NULL;
 
     // BSP is traversed by subsector.
     // A sector might have been split into several 

@@ -32,6 +32,7 @@
 #include "m_argv.h"
 #include "m_bbox.h"
 #include "p_local.h"
+#include "r_collit.h"
 #include "s_sound.h"
 #include "w_wad.h"
 #include "z_zone.h"
@@ -443,6 +444,19 @@ void P_LoadSectors (int lump)
         ss->interpceilingheight = ss->ceilingheight;
         // [crispy] inhibit sector interpolation during the 0th gametic
         ss->oldgametic = -1;
+
+        // [JN] Inject color tables into sectors.
+        for (int j = 0; sectorcolor[j].map != -1; j++)
+        {
+            if (i == sectorcolor[j].sector && gamemap == sectorcolor[j].map)
+            {
+                if (sectorcolor[j].color)
+                {
+                    ss->color = sectorcolor[j].color;
+                }
+                break;
+            }
+        }
     }
 	
     W_ReleaseLumpNum(lump);
@@ -1312,6 +1326,9 @@ P_SetupLevel
 
     lumpnum = W_GetNumForName (lumpname);
 	
+    // [JN] Set per-level sector colors table.
+    P_SetSectorColorTable(map);
+
     leveltime = 0;
     realleveltime = 0;
     oldleveltime = 0;
