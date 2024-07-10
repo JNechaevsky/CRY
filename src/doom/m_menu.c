@@ -3014,7 +3014,6 @@ static void M_ID_ApplyResetHook (void)
     vid_smooth_scaling = 0;
     // Miscellaneous
     vid_screenwipe = 1;
-    vid_endoom = 0;
 
     //
     // Display options

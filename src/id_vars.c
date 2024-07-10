@@ -40,11 +40,7 @@ int vid_fpslimit = 0;
 int vid_vsync = 1;
 int vid_showfps = 0;
 int vid_smooth_scaling = 0;
-// Miscellaneous
 int vid_screenwipe = 1;
-int vid_endoom = 0;
-int vid_graphical_startup = 0;
-int vid_banners = 1;
 
 //
 // Display options
@@ -126,11 +122,6 @@ int xhair_color = 0;
 int st_colored_stbar = 0;
 int st_negative_health = 0;
 int st_blinking_keys = 0;
-int st_ammo_widget = 0;
-int st_ammo_widget_translucent = 0;
-int st_ammo_widget_colors = 0;
-int st_weapon_widget = 0;
-int st_armor_icon = 0;
 
 // Audible
 int aud_z_axis_sfx = 0;
@@ -181,20 +172,7 @@ void ID_BindVariables (GameMission_t mission)
     M_BindIntVariable("vid_vsync",                      &vid_vsync);
     M_BindIntVariable("vid_showfps",                    &vid_showfps);
     M_BindIntVariable("vid_smooth_scaling",             &vid_smooth_scaling);
-    // Miscellaneous
-    if (mission == doom)
-    {
-        M_BindIntVariable("vid_screenwipe",             &vid_screenwipe);
-    }
-    if (mission == doom || mission == heretic)
-    {
-        M_BindIntVariable("vid_endoom",                 &vid_endoom);
-    }
-    if (mission == hexen)
-    {
-        M_BindIntVariable("vid_graphical_startup",      &vid_graphical_startup);
-        M_BindIntVariable("vid_banners",                &vid_banners);
-    }  
+    M_BindIntVariable("vid_screenwipe",                 &vid_screenwipe);
 
     //
     // Display options
@@ -297,17 +275,6 @@ void ID_BindVariables (GameMission_t mission)
         M_BindIntVariable("st_negative_health",         &st_negative_health);
         M_BindIntVariable("st_blinking_keys",           &st_blinking_keys);
     }
-    if (mission == heretic)
-    {
-        M_BindIntVariable("st_ammo_widget",             &st_ammo_widget);
-        M_BindIntVariable("st_ammo_widget_translucent", &st_ammo_widget_translucent);
-        M_BindIntVariable("st_ammo_widget_colors",      &st_ammo_widget_colors);
-    }
-    if (mission == hexen)
-    {
-        M_BindIntVariable("st_weapon_widget",           &st_weapon_widget);
-        M_BindIntVariable("st_armor_icon",              &st_armor_icon);
-    }        
     
     // Audible
     M_BindIntVariable("aud_z_axis_sfx",                 &aud_z_axis_sfx);

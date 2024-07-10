@@ -168,9 +168,6 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_INT(vid_showfps),
     CONFIG_VARIABLE_INT(vid_smooth_scaling),
     CONFIG_VARIABLE_INT(vid_screenwipe),
-    CONFIG_VARIABLE_INT(vid_endoom),
-    CONFIG_VARIABLE_INT(vid_graphical_startup),    
-    CONFIG_VARIABLE_INT(vid_banners),
 
     // Display options
     CONFIG_VARIABLE_INT(vid_gamma),
@@ -449,11 +446,6 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_INT(st_colored_stbar),
     CONFIG_VARIABLE_INT(st_negative_health),
     CONFIG_VARIABLE_INT(st_blinking_keys),
-    CONFIG_VARIABLE_INT(st_ammo_widget),
-    CONFIG_VARIABLE_INT(st_ammo_widget_translucent),
-    CONFIG_VARIABLE_INT(st_ammo_widget_colors),
-    CONFIG_VARIABLE_INT(st_weapon_widget),
-    CONFIG_VARIABLE_INT(st_armor_icon),
 
     // Audible
     CONFIG_VARIABLE_INT(aud_z_axis_sfx),

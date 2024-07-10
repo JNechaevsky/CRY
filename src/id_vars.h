@@ -30,10 +30,6 @@
 extern int vid_resolution;
 extern int vid_widescreen;
 
-extern int vid_endoom;
-extern int vid_graphical_startup;
-extern int vid_banners;
-
 extern int vid_uncapped_fps;
 extern int vid_fpslimit;
 extern int vid_vsync;
@@ -104,11 +100,6 @@ extern int xhair_color;
 extern int st_colored_stbar;
 extern int st_negative_health;
 extern int st_blinking_keys;
-extern int st_ammo_widget;  // Heretic only
-extern int st_ammo_widget_translucent;  // Heretic only
-extern int st_ammo_widget_colors;  // Heretic only
-extern int st_weapon_widget;  // Hexen only
-extern int st_armor_icon;  // Hexen only
 
 extern int aud_z_axis_sfx;
 extern int aud_full_sounds;
