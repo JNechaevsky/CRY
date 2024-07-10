@@ -1254,6 +1254,7 @@ static const sectorcolor_t sectorcolor_map12[] =
     {   12,     74,    0xFFF588 },
     {   12,     77,    0x55B828 },
     {   12,     78,    0xBBE357 },
+    {   12,     84,    0xB30202 },
     {   12,     85,    0xBBE357 },
     {   12,    106,    0xBBE357 },
     {   12,    108,    0xC63F23 },
@@ -1295,6 +1296,16 @@ static const sectorcolor_t sectorcolor_map12[] =
     SECTORCOLOR_END
 };
 
+//
+// Area 13: Command Center
+//
+
+static const sectorcolor_t sectorcolor_map13[] =
+{
+    //{   13,      0,    0xFFAFAF },
+    SECTORCOLOR_END
+};
+
 void P_SetSectorColorTable (int area)
 {
     switch (area)
@@ -1311,6 +1322,7 @@ void P_SetSectorColorTable (int area)
         case 10:  sectorcolor = sectorcolor_map10;  break;
         case 11:  sectorcolor = sectorcolor_map11;  break;
         case 12:  sectorcolor = sectorcolor_map12;  break;
+        case 13:  sectorcolor = sectorcolor_map13;  break;
         default:  sectorcolor = sectorcolor_dummy;  break;
     }
 }
