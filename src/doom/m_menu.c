@@ -559,7 +559,6 @@ static void M_ID_Widget_LevelName (int choice);
 static void M_ID_Widget_Coords (int choice);
 static void M_ID_Widget_Render (int choice);
 static void M_ID_Widget_Health (int choice);
-static void M_ID_Automap_Colors (int choice);
 static void M_ID_Automap_Smooth (int choice);
 static void M_ID_Automap_Secrets (int choice);
 static void M_ID_Automap_Rotate (int choice);
@@ -2425,12 +2424,12 @@ static menuitem_t ID_Menu_Widgets[]=
     { M_LFRT, "RENDER COUNTERS",       M_ID_Widget_Render,    'r' },
     { M_LFRT, "TARGET'S HEALTH",       M_ID_Widget_Health,    't' },
     { M_SKIP, "", 0, '\0' },
-    { M_LFRT, "COLOR SCHEME",          M_ID_Automap_Colors,   'c' },
     { M_LFRT, "SMOOTH LINES",          M_ID_Automap_Smooth,   's' },
     { M_LFRT, "MARK SECRET SECTORS",   M_ID_Automap_Secrets,  'm' },
     { M_LFRT, "ROTATE MODE",           M_ID_Automap_Rotate,   'r' },
     { M_LFRT, "OVERLAY MODE",          M_ID_Automap_Overlay,  'o' },
     { M_LFRT, "OVERLAY SHADING LEVEL", M_ID_Automap_Shading,  'o' },
+    { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
 };
 
@@ -2505,39 +2504,31 @@ static void M_Draw_ID_Widgets (void)
 
     M_WriteTextCentered(90, "AUTOMAP", cr[CR_YELLOW]);
 
-    // Color scheme
-    sprintf(str, automap_scheme == 1 ? "BOOM" :
-                 automap_scheme == 2 ? "UNITY" :
-                 automap_scheme == 3 ? "JAGUAR" :
-                                       "ORIGINAL");
-    M_WriteText (M_ItemRightAlign(str), 99, str,
-                 M_Item_Glow(9, automap_scheme ? GLOW_GREEN : GLOW_DARKRED));
-
     // Smooth lines
     sprintf(str, automap_smooth ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 108, str,
-                 M_Item_Glow(10, automap_smooth ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 99, str,
+                 M_Item_Glow(9, automap_smooth ? GLOW_GREEN : GLOW_DARKRED));
 
     // Mark secret sectors
     sprintf(str, automap_secrets == 1 ? "REVEALED" :
                  automap_secrets == 2 ? "ALWAYS" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 117, str,
-                 M_Item_Glow(11, automap_secrets ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 108, str,
+                 M_Item_Glow(10, automap_secrets ? GLOW_GREEN : GLOW_DARKRED));
 
     // Rotate mode
     sprintf(str, automap_rotate ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 125, str,
-                 M_Item_Glow(12, automap_rotate ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 117, str,
+                 M_Item_Glow(11, automap_rotate ? GLOW_GREEN : GLOW_DARKRED));
 
     // Overlay mode
     sprintf(str, automap_overlay ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 136, str,
-                 M_Item_Glow(13, automap_overlay ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 126, str,
+                 M_Item_Glow(12, automap_overlay ? GLOW_GREEN : GLOW_DARKRED));
 
     // Overlay shading level
     sprintf(str,"%d", automap_shading);
-    M_WriteText (M_ItemRightAlign(str), 145, str,
-                 M_Item_Glow(14, !automap_overlay ? GLOW_DARKRED :
+    M_WriteText (M_ItemRightAlign(str), 135, str,
+                 M_Item_Glow(13, !automap_overlay ? GLOW_DARKRED :
                                   automap_shading ==  0 ? GLOW_RED :
                                   automap_shading == 12 ? GLOW_YELLOW : GLOW_GREEN));
 }
@@ -2580,11 +2571,6 @@ static void M_ID_Widget_Render (int choice)
 static void M_ID_Widget_Health (int choice)
 {
     widget_health = M_INT_Slider(widget_health, 0, 4, choice, false);
-}
-
-static void M_ID_Automap_Colors (int choice)
-{
-    automap_scheme = M_INT_Slider(automap_scheme, 0, 3, choice, false);
 }
 
 static void M_ID_Automap_Smooth (int choice)
@@ -3063,7 +3049,6 @@ static void M_ID_ApplyResetHook (void)
     widget_render = 0;
     widget_health = 0;
     // Automap
-    automap_scheme = 0;
     automap_smooth = 0;
     automap_secrets = 0;
     automap_rotate = 0;

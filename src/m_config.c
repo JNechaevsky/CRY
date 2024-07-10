@@ -414,7 +414,6 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_INT(widget_health),
 
     // Automap
-    CONFIG_VARIABLE_INT(automap_scheme),
     CONFIG_VARIABLE_INT(automap_smooth),
     CONFIG_VARIABLE_INT(automap_secrets),
     CONFIG_VARIABLE_INT(automap_rotate),

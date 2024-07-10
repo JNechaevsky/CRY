@@ -90,7 +90,6 @@ int widget_coords = 0;
 int widget_render = 0;
 int widget_health = 0;
 // Automap
-int automap_scheme = 0;
 int automap_smooth = 0;
 int automap_secrets = 0;
 int automap_rotate = 0;
@@ -225,15 +224,8 @@ void ID_BindVariables (GameMission_t mission)
     M_BindIntVariable("widget_render",                  &widget_render);
     M_BindIntVariable("widget_health",                  &widget_health);
     // Automap
-    if (mission == doom)
-    {
-        M_BindIntVariable("automap_scheme",             &automap_scheme);
-        M_BindIntVariable("automap_smooth",             &automap_smooth);
-    }
-    if (mission == doom || mission == heretic)
-    {
-        M_BindIntVariable("automap_secrets",            &automap_secrets);
-    }
+    M_BindIntVariable("automap_smooth",                 &automap_smooth);
+    M_BindIntVariable("automap_secrets",                &automap_secrets);
     M_BindIntVariable("automap_rotate",                 &automap_rotate);
     M_BindIntVariable("automap_overlay",                &automap_overlay);
     M_BindIntVariable("automap_shading",                &automap_shading);
