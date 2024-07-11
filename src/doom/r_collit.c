@@ -35,8 +35,8 @@ lighttable_t   *colormaps_D97C45;  // Middle yellow/gold
 lighttable_t   *colormaps_FF7F7F;  // Bright red
 lighttable_t   *colormaps_55B828;  // Bright green
 lighttable_t   *colormaps_BBE357;  // Slime green
-lighttable_t   *colormaps_949DB9;  // Bright desaturated blue
-lighttable_t   *colormaps_2A2F6B;  // Middle desaturated blue
+lighttable_t   *colormaps_949DB9;  // Bright desaturated blue (also 6B779E)
+lighttable_t   *colormaps_2A2F6B;  // Middle desaturated blue (also 032149)
 lighttable_t   *colormaps_50ADAC;  // Middle cyan (also 31A29F)
 lighttable_t   *colormaps_CCE4A5;  // Middle green-yellow
 lighttable_t   *colormaps_CCEA5F;  // Bright green-yellow
@@ -1302,7 +1302,109 @@ static const sectorcolor_t sectorcolor_map12[] =
 
 static const sectorcolor_t sectorcolor_map13[] =
 {
-    //{   13,      0,    0xFFAFAF },
+    {   13,     20,    0xFFF588 },
+    {   13,     21,    0xD97C45 },
+    {   13,     23,    0xFFF588 },
+    {   13,     35,    0x949DB9 },
+    {   13,     65,    0xFFF588 },
+    {   13,     67,    0xCCEA5F },
+    {   13,     70,    0xCCEA5F },
+    {   13,     73,    0xD97C45 },
+    {   13,     77,    0x2A2F6B },
+    {   13,     78,    0x2A2F6B },
+    {   13,     79,    0x2A2F6B },
+    {   13,     80,    0x2A2F6B },
+    {   13,     81,    0x2A2F6B },
+    {   13,     82,    0x2A2F6B },
+    {   13,     83,    0x2A2F6B },
+    {   13,     84,    0x2A2F6B },
+    {   13,     85,    0x2A2F6B },
+    {   13,     86,    0x2A2F6B },
+    {   13,     87,    0x2A2F6B },
+    {   13,     88,    0xD97C45 },
+    {   13,     89,    0xD97C45 },
+    {   13,     95,    0x2A2F6B },
+    {   13,     96,    0x2A2F6B },
+    {   13,     97,    0x2A2F6B },
+    {   13,     98,    0x2A2F6B },
+    {   13,     99,    0x2A2F6B },
+    {   13,    100,    0x2A2F6B },
+    {   13,    102,    0xD97C45 },
+    {   13,    103,    0xD97C45 },
+    {   13,    104,    0xD97C45 },
+    {   13,    105,    0xD97C45 },
+    {   13,    108,    0xD97C45 },
+    {   13,    109,    0xD97C45 },
+    {   13,    110,    0xD97C45 },
+    {   13,    112,    0xD97C45 },
+    {   13,    113,    0xFFF588 },
+    {   13,    114,    0xFFF588 },
+    SECTORCOLOR_END
+};
+
+//
+// Area 14: Halls of the Damned
+//
+
+static const sectorcolor_t sectorcolor_map14[] =
+{
+    {   14,      0,    0xFFF588 },
+    {   14,      5,    0xFFF588 },
+    {   14,      6,    0xFFF588 },
+    {   14,      1,    0xFF7F7F },
+    {   14,      2,    0xFF7F7F },
+    {   14,      7,    0x55B828 },
+    {   14,      8,    0xBBE357 },
+    {   14,      9,    0x55B828 },
+    {   14,     12,    0x043E8B },
+    {   14,     17,    0xBBE357 },
+    {   14,     18,    0x55B828 },
+    {   14,     19,    0xBBE357 },
+    {   14,     20,    0xBBE357 },
+    {   14,     21,    0xBBE357 },
+    {   14,     22,    0xBBE357 },
+    {   14,     23,    0xBBE357 },
+    {   14,     27,    0x9BC8CD },
+    {   14,     28,    0x9BC8CD },
+    {   14,     29,    0x9BC8CD },
+    {   14,     30,    0x9BC8CD },
+    {   14,     32,    0x9BC8CD },
+    {   14,     33,    0xFFF588 },
+    {   14,     34,    0x9BC8CD },
+    {   14,     35,    0x9BC8CD },
+    {   14,     36,    0x9BC8CD },
+    {   14,     37,    0x9BC8CD },
+    {   14,     39,    0x9BC8CD },
+    {   14,     46,    0xFFF588 },
+    {   14,     51,    0x50ADAC },
+    {   14,     52,    0x50ADAC },
+    {   14,     55,    0xFFF588 },
+    {   14,     56,    0xFFF588 },
+    {   14,     57,    0x50ADAC },
+    {   14,     58,    0x50ADAC },
+    {   14,     59,    0x50ADAC },
+    {   14,     60,    0x50ADAC },
+    {   14,     61,    0x50ADAC },
+    {   14,     62,    0x9BC8CD },
+    {   14,     63,    0x9BC8CD },
+    {   14,     64,    0x50ADAC },
+    {   14,     69,    0x9BC8CD },
+    {   14,     70,    0x50ADAC },
+    {   14,     71,    0x9BC8CD },
+    {   14,     82,    0xB30202 },
+    {   14,     83,    0xB30202 },
+    {   14,     89,    0x50ADAC },
+    {   14,     90,    0x50ADAC },
+    {   14,     91,    0x50ADAC },
+    {   14,     92,    0x50ADAC },
+    {   14,     96,    0x50ADAC },
+    {   14,     97,    0x50ADAC },
+    {   14,    105,    0x50ADAC },
+    {   14,    111,    0x043E8B },
+    {   14,    112,    0x043E8B },
+    {   14,    113,    0xFF7F7F },
+    {   14,    114,    0xFF7F7F },
+    {   14,    116,    0x043E8B },
     SECTORCOLOR_END
 };
 
@@ -1323,6 +1425,7 @@ void P_SetSectorColorTable (int area)
         case 11:  sectorcolor = sectorcolor_map11;  break;
         case 12:  sectorcolor = sectorcolor_map12;  break;
         case 13:  sectorcolor = sectorcolor_map13;  break;
+        case 14:  sectorcolor = sectorcolor_map14;  break;
         default:  sectorcolor = sectorcolor_dummy;  break;
     }
 }
