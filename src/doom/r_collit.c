@@ -1408,6 +1408,171 @@ static const sectorcolor_t sectorcolor_map14[] =
     SECTORCOLOR_END
 };
 
+//
+// Area 15: Spawning Vats
+//
+
+static const sectorcolor_t sectorcolor_map15[] =
+{
+    {   15,      0,    0xC63F23 },
+    {   15,      1,    0xB30202 },
+    {   15,      2,    0xC63F23 },
+    {   15,      3,    0xFF7F7F },
+    {   15,      4,    0xC63F23 },
+    {   15,      5,    0x55B828 },
+    {   15,      6,    0x55B828 },
+    {   15,      8,    0x55B828 },
+    {   15,      9,    0x55B828 },
+    {   15,     10,    0x55B828 },
+    {   15,     11,    0xBBE357 },
+    {   15,     13,    0xBBE357 },
+    {   15,     14,    0xBBE357 },
+    {   15,     15,    0xFF7F7F },
+    {   15,     16,    0xBBE357 },
+    {   15,     17,    0xBBE357 },
+    {   15,     18,    0x55B828 },
+    {   15,     19,    0x55B828 },
+    {   15,     20,    0xBBE357 },
+    {   15,     21,    0xC63F23 },
+    {   15,     22,    0xBBE357 },
+    {   15,     23,    0xC63F23 },
+    {   15,     28,    0xC63F23 },
+    {   15,     29,    0xC63F23 },
+    {   15,     37,    0xC63F23 },
+    {   15,     38,    0xC63F23 },
+    {   15,     39,    0xC63F23 },
+    {   15,     40,    0xC63F23 },
+    {   15,     88,    0xFFF588 },
+    {   15,     89,    0xFF7F7F },
+    {   15,     90,    0xFFF588 },
+    {   15,     91,    0xFFF588 },
+    {   15,     93,    0xFF7F7F },
+    {   15,     94,    0xBBE357 },
+    {   15,     95,    0xFF7F7F },
+    {   15,     96,    0xFF7F7F },
+    {   15,    104,    0xFF7F7F },
+    {   15,    113,    0x55B828 },
+    {   15,    114,    0x55B828 },
+    {   15,    115,    0x55B828 },
+    {   15,    116,    0x55B828 },
+    {   15,    117,    0x55B828 },
+    {   15,    118,    0x55B828 },
+    {   15,    119,    0x55B828 },
+    SECTORCOLOR_END
+};
+
+//
+// Area 16: Tower of Babel
+//
+
+static const sectorcolor_t sectorcolor_map16[] =
+{
+    {   16,      0,    0xFF7F7F },
+    {   16,      1,    0xFF7F7F },
+    {   16,      3,    0xFF7F7F },
+    {   16,      2,    0xFF7F7F },
+    {   16,      4,    0xFF7F7F },
+    {   16,      5,    0xFF7F7F },
+    {   16,      6,    0xFF7F7F },
+    {   16,      7,    0xFF7F7F },
+    {   16,      8,    0xFF7F7F },
+    {   16,      9,    0xFF7F7F },
+    {   16,     10,    0xBBE357 },
+    {   16,     11,    0xFF7F7F },
+    {   16,     12,    0xBBE357 },
+    {   16,     13,    0xFF7F7F },
+    {   16,     14,    0xFF7F7F },
+    {   16,     15,    0xFF7F7F },
+    {   16,     16,    0xFF7F7F },
+    {   16,     17,    0xFF7F7F },
+    {   16,     18,    0xFF7F7F },
+    {   16,     19,    0xFF7F7F },
+    {   16,     20,    0xFF7F7F },
+    {   16,     21,    0xFF7F7F },
+    {   16,     22,    0xEEC06B },
+    {   16,     23,    0xEEC06B },
+    {   16,     24,    0xBBE357 },
+    {   16,     25,    0xBBE357 },
+    {   16,     26,    0xFF7F7F },
+    {   16,     27,    0xBBE357 },
+    {   16,     28,    0xBBE357 },
+    {   16,     29,    0xEEC06B },
+    {   16,     30,    0xBBE357 },
+    {   16,     31,    0xBBE357 },
+    {   16,     32,    0xEEC06B },
+    {   16,     36,    0xBBE357 },
+    {   16,     37,    0xBBE357 },
+    {   16,     38,    0xBBE357 },
+    {   16,     39,    0xBBE357 },
+    {   16,     40,    0xBBE357 },
+    {   16,     41,    0xBBE357 },
+    SECTORCOLOR_END
+};
+
+//
+// Area 17: Hell Keep
+//
+
+static const sectorcolor_t sectorcolor_map17[] =
+{
+    {   17,      0,    0xFF7F7F },
+    {   17,      3,    0xFF7F7F },
+    {   17,      6,    0xFF7F7F },
+    {   17,      7,    0xFF7F7F },
+    {   17,      8,    0xFF7F7F },
+    {   17,      9,    0xFF7F7F },
+    {   17,     10,    0xFF7F7F },
+    {   17,     11,    0xFF7F7F },
+    {   17,     12,    0xFF7F7F },
+    {   17,     13,    0xFF7F7F },
+    {   17,     14,    0xFF7F7F },
+    {   17,     15,    0xFF7F7F },
+    {   17,     16,    0xFF7F7F },
+    {   17,     19,    0x043E8B },
+    {   17,     20,    0x043E8B },
+    {   17,     28,    0xFF7F7F },
+    {   17,     31,    0xFF7F7F },
+    {   17,     32,    0xFF7F7F },
+    {   17,     33,    0xFF7F7F },
+    {   17,     34,    0xFF7F7F },
+    {   17,     35,    0xFF7F7F },
+    {   17,     36,    0xFFF588 },
+    {   17,     37,    0xFF7F7F },
+    {   17,     38,    0xFF7F7F },
+    {   17,     39,    0xFF7F7F },
+    {   17,     40,    0xFF7F7F },
+    {   17,     41,    0xFF7F7F },
+    {   17,     42,    0xFF7F7F },
+    {   17,     43,    0xFF7F7F },
+    {   17,     44,    0xFF7F7F },
+    {   17,     45,    0xFF7F7F },
+    {   17,     55,    0xFF7F7F },
+    {   17,     61,    0xFF7F7F },
+    {   17,     62,    0xFF7F7F },
+    {   17,     65,    0xFF7F7F },
+    {   17,     75,    0xFF7F7F },
+    {   17,     76,    0xB30202 },
+    {   17,     77,    0xC63F23 },
+    {   17,     78,    0xD97C45 },
+    {   17,     79,    0xFF7F7F },
+    {   17,     81,    0xFF7F7F },
+    {   17,     83,    0xC63F23 },
+    {   17,     84,    0xC63F23 },
+    {   17,     85,    0xC63F23 },
+    {   17,     86,    0xC63F23 },
+    {   17,     88,    0xC63F23 },
+    {   17,     89,    0xD97C45 },
+    {   17,     94,    0xFF7F7F },
+    {   17,    100,    0xFF7F7F },
+    {   17,    101,    0xC63F23 },
+    {   17,    102,    0xC63F23 },
+    {   17,    103,    0xC63F23 },
+    {   17,    104,    0xC63F23 },
+    {   17,    105,    0xD97C45 },
+    {   17,    106,    0xFFF588 },
+    SECTORCOLOR_END
+};
+
 void P_SetSectorColorTable (int area)
 {
     switch (area)
@@ -1426,6 +1591,9 @@ void P_SetSectorColorTable (int area)
         case 12:  sectorcolor = sectorcolor_map12;  break;
         case 13:  sectorcolor = sectorcolor_map13;  break;
         case 14:  sectorcolor = sectorcolor_map14;  break;
+        case 15:  sectorcolor = sectorcolor_map15;  break;
+        case 16:  sectorcolor = sectorcolor_map16;  break;
+        case 17:  sectorcolor = sectorcolor_map17;  break;
         default:  sectorcolor = sectorcolor_dummy;  break;
     }
 }
