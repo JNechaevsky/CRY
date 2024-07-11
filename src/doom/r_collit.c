@@ -476,7 +476,7 @@ void R_ColoredScLightMAXLIGHTSCALE (int i)
 void R_ColoredScLightLevels (const int i, const int j, const int level)
 {
     scalelight_EEC06B[i][j] = colormaps_EEC06B + level*256;
-    scalelight_D97C45[i][j] = colormaps_EEC06B + level*256;
+    scalelight_D97C45[i][j] = colormaps_D97C45 + level*256;
     scalelight_FF7F7F[i][j] = colormaps_FF7F7F + level*256;
     scalelight_55B828[i][j] = colormaps_55B828 + level*256;
     scalelight_BBE357[i][j] = colormaps_BBE357 + level*256;
