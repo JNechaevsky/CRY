@@ -46,6 +46,8 @@ extern lighttable_t   *colormaps_FFAFAF;
 extern lighttable_t   *colormaps_ECB866;
 extern lighttable_t   *colormaps_C63F23;
 extern lighttable_t   *colormaps_9BC8CD;
+extern lighttable_t   *colormaps_666666;
+extern lighttable_t   *colormaps_777777;
 
 // Visplane light tables
 extern lighttable_t ***zlight_EEC06B;
@@ -72,6 +74,8 @@ extern lighttable_t ***zlight_FF3030;
 extern lighttable_t ***zlight_311A59;
 extern lighttable_t ***zlight_FFAFAF;
 extern lighttable_t ***zlight_9BC8CD;
+extern lighttable_t ***zlight_666666;
+extern lighttable_t ***zlight_777777;
 
 // Segment/sprite light tables
 extern lighttable_t ***scalelight_EEC06B;
@@ -98,6 +102,8 @@ extern lighttable_t ***scalelight_FF3030;
 extern lighttable_t ***scalelight_311A59;
 extern lighttable_t ***scalelight_FFAFAF;
 extern lighttable_t ***scalelight_9BC8CD;
+extern lighttable_t ***scalelight_666666;
+extern lighttable_t ***scalelight_777777;
 
 // Colored colormap lumps
 extern const byte C_EEC06B[];
@@ -126,6 +132,9 @@ extern const byte C_FFAFAF[];
 extern const byte C_ECB866[];
 extern const byte C_C63F23[];
 extern const byte C_9BC8CD[];
+extern const byte C_666666[];
+extern const byte C_777777[];
+
 
 // Main colormaps initialization functions
 extern void R_AllocateColoredColormaps (void);
