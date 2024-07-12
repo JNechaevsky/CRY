@@ -2041,6 +2041,58 @@ static const sectorcolor_t sectorcolor_map23[] =
     SECTORCOLOR_END
 };
 
+//
+// Area 24: Military Base
+//
+
+static const sectorcolor_t sectorcolor_map24[] =
+{
+    {   24,      5,    0xBBE357 },
+    {   24,     23,    0xBBE357 },
+    {   24,     24,    0x043E8B },
+    {   24,     25,    0x043E8B },
+    {   24,     26,    0xBBE357 },
+    {   24,     27,    0xBBE357 },
+    {   24,     28,    0xBBE357 },
+    {   24,     29,    0x55B828 },
+    {   24,     30,    0xBBE357 },
+    {   24,     31,    0xBBE357 },
+    {   24,     32,    0xBBE357 },
+    {   24,     33,    0xBBE357 },
+    {   24,     34,    0xBBE357 },
+    {   24,     36,    0xBBE357 },
+    {   24,     37,    0x55B828 },
+    {   24,     38,    0x55B828 },
+    {   24,     39,    0x55B828 },
+    {   24,     46,    0x55B828 },
+    {   24,     47,    0xFF7F7F },
+    {   24,     50,    0x55B828 },
+    {   24,     51,    0x55B828 },
+    {   24,     52,    0xBBE357 },
+    {   24,     58,    0xBBE357 },
+    {   24,     59,    0xBBE357 },
+    {   24,     60,    0xBBE357 },
+    {   24,     61,    0xBBE357 },
+    {   24,     62,    0xBBE357 },
+    {   24,     64,    0xBBE357 },
+    {   24,     65,    0xBBE357 },
+    {   24,     66,    0x55B828 },
+    {   24,     80,    0xEEC06B },
+    {   24,    103,    0x55B828 },
+    {   24,    107,    0xFFF588 },
+    {   24,    115,    0xFFF588 },
+    {   24,    119,    0xFFF588 },
+    {   24,    120,    0xFFF588 },
+    {   24,    125,    0xFF7F7F },
+    {   24,    127,    0xFF7F7F },
+    {   24,    130,    0xD97C45 },
+    {   24,    145,    0x043E8B },
+    {   24,    147,    0xFFF588 },
+    {   24,    148,    0xFF7F7F },
+    {   24,    149,    0xFFF588 },
+    SECTORCOLOR_END
+};
+
 void P_SetSectorColorTable (int area)
 {
     switch (area)
@@ -2068,6 +2120,7 @@ void P_SetSectorColorTable (int area)
         case 21:  sectorcolor = sectorcolor_map21;  break;
         case 22:  sectorcolor = sectorcolor_map22;  break;
         case 23:  sectorcolor = sectorcolor_map23;  break;
+        case 24:  sectorcolor = sectorcolor_map24;  break;
         default:  sectorcolor = sectorcolor_dummy;  break;
     }
 }
