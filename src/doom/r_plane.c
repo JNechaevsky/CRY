@@ -409,6 +409,9 @@ R_MakeSpans
 // R_DrawPlanes
 // At the end of each frame.
 //
+
+#define SKYTEXTUREMIDSHIFTED 200
+
 void R_DrawPlanes (void)
 {
     // [JN] CRL - openings counter.
@@ -419,51 +422,92 @@ void R_DrawPlanes (void)
     if (pl->minx <= pl->maxx)
     {
         // sky flat
-        // [crispy] add support for MBF sky tranfers
         if (pl->picnum == skyflatnum || pl->picnum & PL_SKYFLAT)
         {
-            int texture;
-            angle_t an = viewangle, flip;
-            if (pl->picnum & PL_SKYFLAT)
-            {
-                const line_t *l = &lines[pl->picnum & ~PL_SKYFLAT];
-                const side_t *s = *l->sidenum + sides;
-                texture = texturetranslation[s->toptexture];
-                dc_texturemid = s->rowoffset - 28*FRACUNIT;
-                flip = (l->special == 272) ? 0u : ~0u;
-                an += s->textureoffset;
-            }
-            else
-            {
-                texture = skytexture;
-                dc_texturemid = skytexturemid;
-                flip = 0;
-            }
-            dc_iscale = pspriteiscale >> detailshift;
-            
             // Sky is allways drawn full bright, i.e. colormaps[0] is used.
             // Because of this hack, sky is not affected by INVUL inverse mapping.
             // [crispy] no brightmaps for sky
             // [JN] Jaguar: sky is always colored with invul effect.
             dc_colormap[0] = dc_colormap[1] = fixedcolormap ? fixedcolormap : colormaps;
-            dc_texheight = textureheight[texture]>>FRACBITS;
 
-            // [crispy] stretch short skies
-            if (mouse_look && dc_texheight < 200)
-            {
-                dc_iscale = dc_iscale * dc_texheight / SKYSTRETCH_HEIGHT;
-                dc_texturemid = dc_texturemid * dc_texheight / SKYSTRETCH_HEIGHT;
-            }
             for (int x = pl->minx ; x <= pl->maxx ; x++)
             {
+                dc_yl = pl->top[x];
+                dc_yh = pl->bottom[x];
+
                 if ((dc_yl = pl->top[x]) != USHRT_MAX && dc_yl <= (dc_yh = pl->bottom[x]))
                 {
+                    // [JN] Render sky as 2 layers, sky 1 in front
+                    angle_t angle, angle2;
+                    int frac, fracstep;
+                    int count = dc_yh - dc_yl;
+
+                    if (count < 0)
+                    {
+                        return;
+                    }
+
                     // [crispy] Optionally draw skies horizontally linear.
-                    const int angle = ((an + (vis_linear_sky ?
-                                        linearskyangle[x] : xtoviewangle[x]))^flip)>>ANGLETOSKYSHIFT;
-                    dc_x = x;
-                    dc_source = R_GetColumnMod2(texture, angle);
-                    colfunc ();
+                    angle = ((viewangle + (vis_linear_sky ? 
+                              linearskyangle[x] : xtoviewangle[x])) ^ gp_flip_levels) >> ANGLETOSKYSHIFT;
+                    angle2 = ((viewangle + skysmoothdelta + (vis_linear_sky ? 
+                               linearskyangle[x] : xtoviewangle[x])) ^ gp_flip_levels) >> ANGLETOSKYSHIFT;
+                    dc_source = R_GetColumn(texturetranslation[skytexture2], angle);
+                    dc_source2 = R_GetColumn(texturetranslation[skytexture], angle2);
+                    fracstep = FRACUNIT / vid_resolution;
+                    frac = SKYTEXTUREMIDSHIFTED * FRACUNIT + (dc_yl - centery) * fracstep;
+
+                    // [JN] HIGH detail mode.
+                    if (!detailshift)
+                    {
+                        pixel_t *dest = dest = ylookup[dc_yl] + columnofs[flipviewwidth[x]];
+
+                        do
+                        {
+                            const int fraccalc = frac >> FRACBITS;
+                            const byte source1 = dc_source[fraccalc];
+                            const byte source2 = dc_source2[fraccalc];
+                            
+                            if (dc_source[fraccalc])
+                            {
+                                *dest = dc_colormap[dc_brightmap[source1]][source1];
+                            }
+                            else
+                            {
+                                *dest = dc_colormap[dc_brightmap[source2]][source2];
+                            }
+
+                            dest += SCREENWIDTH;
+                            frac += fracstep;
+                        } while (count--);
+                    }
+                    // [JN] LOW detail mode.
+                    else
+                    {
+                        const int xx = x << 1;  // Blocky mode, need to multiply by 2.
+                        pixel_t *dest1 = ylookup[dc_yl] + columnofs[flipviewwidth[xx]];
+                        pixel_t *dest2 = ylookup[dc_yl] + columnofs[flipviewwidth[xx + 1]];
+
+                        do
+                        {
+                            const int fraccalc = frac >> FRACBITS;
+                            const byte source1 = dc_source[fraccalc];
+                            const byte source2 = dc_source2[fraccalc];
+                            
+                            if (dc_source[fraccalc])
+                            {
+                                *dest1 = *dest2 = dc_colormap[dc_brightmap[source1]][source1];
+                            }
+                            else
+                            {
+                                *dest1 = *dest2 = dc_colormap[dc_brightmap[source2]][source2];
+                            }
+
+                            dest1 += SCREENWIDTH;
+                            dest2 += SCREENWIDTH;
+                            frac += fracstep;
+                        } while (count--);
+                    }
                 }
             }
         }

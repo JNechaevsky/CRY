@@ -568,21 +568,21 @@ static void M_ID_Automap_Shading (int choice);
 static void M_Choose_ID_Gameplay_1 (int choice);
 static void M_Draw_ID_Gameplay_1 (void);
 static void M_ID_Brightmaps (int choice);
-static void M_ID_ColoredLighting (int choice);
 static void M_ID_Translucency (int choice);
 static void M_ID_ImprovedFuzz (int choice);
+static void M_ID_ColoredLighting (int choice);
 static void M_ID_ColoredBlood (int choice);
 static void M_ID_SwirlingLiquids (int choice);
+static void M_ID_AnimatedSky (int choice);
 static void M_ID_LinearSky (int choice);
 static void M_ID_FlipCorpses (int choice);
 static void M_ID_Crosshair (int choice);
 static void M_ID_CrosshairColor (int choice);
-static void M_ID_ColoredSTBar (int choice);
-static void M_ID_NegativeHealth (int choice);
 
 static void M_Choose_ID_Gameplay_2 (int choice);
 static void M_Draw_ID_Gameplay_2 (void);
-static void M_ID_FullSounds (int choice);
+static void M_ID_ColoredSTBar (int choice);
+static void M_ID_NegativeHealth (int choice);
 static void M_ID_Torque (int choice);
 static void M_ID_TossDrop (int choice);
 static void M_ID_FloatingPowerups (int choice);
@@ -1636,7 +1636,6 @@ static void M_ID_Controls_MLook (int choice)
     {
         players[consoleplayer].lookdir = 0;
     }
-    R_InitSkyMap();
 }
 
 static void M_ID_Controls_NoVert (int choice)
@@ -2606,19 +2605,19 @@ static void M_ID_Automap_Secrets (int choice)
 static menuitem_t ID_Menu_Gameplay_1[]=
 {
     { M_LFRT, "BRIGHTMAPS",                  M_ID_Brightmaps,        'b' },
-    { M_LFRT, "COLORED LIGHTING",            M_ID_ColoredLighting,   'c' },
     { M_LFRT, "TRANSLUCENCY",                M_ID_Translucency,      't' },
     { M_LFRT, "FUZZ EFFECT",                 M_ID_ImprovedFuzz,      'f' },
+    { M_LFRT, "COLORED LIGHTING",            M_ID_ColoredLighting,   'c' },
     { M_LFRT, "COLORED BLOOD AND CORPSES",   M_ID_ColoredBlood,      'c' },
     { M_LFRT, "LIQUIDS ANIMATION",           M_ID_SwirlingLiquids,   'l' },
+    { M_LFRT, "SKY ANIMATION",               M_ID_AnimatedSky,       's' },
     { M_LFRT, "SKY DRAWING MODE",            M_ID_LinearSky,         's' },
     { M_LFRT, "RANDOMLY MIRRORED CORPSES",   M_ID_FlipCorpses,       'r' },
     { M_SKIP, "", 0, '\0' },
     { M_LFRT, "SHAPE",                       M_ID_Crosshair,         's' },
     { M_LFRT, "INDICATION",                  M_ID_CrosshairColor,    'i' },
     { M_SKIP, "", 0, '\0' },
-    { M_LFRT, "COLORED ELEMENTS",              M_ID_ColoredSTBar,      'c' },
-    { M_LFRT, "SHOW NEGATIVE HEALTH",          M_ID_NegativeHealth,    's' },
+    { M_SKIP, "", 0, '\0' },
     //{ M_SKIP, "", 0, '\0' },
     { M_SWTC, "", /*NEXT PAGE >*/            M_Choose_ID_Gameplay_2, 'n' },
 };
@@ -2651,22 +2650,22 @@ static void M_Draw_ID_Gameplay_1 (void)
     M_WriteText (M_ItemRightAlign(str), 18, str,
                  M_Item_Glow(0, vis_brightmaps ? GLOW_GREEN : GLOW_DARKRED));
 
-    // Colored lighting
-    sprintf(str, vis_colored_lighting ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 27, str,
-                 M_Item_Glow(1, vis_colored_lighting ? GLOW_GREEN : GLOW_DARKRED));
-
     // Translucency
     sprintf(str, vis_translucency == 1 ? "ADDITIVE" :
                  vis_translucency == 2 ? "BLENDING" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 36, str,
-                 M_Item_Glow(2, vis_translucency ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 27, str,
+                 M_Item_Glow(1, vis_translucency ? GLOW_GREEN : GLOW_DARKRED));
 
     // Fuzz effect
     sprintf(str, vis_improved_fuzz == 1 ? "FUZZ" :
                  vis_improved_fuzz == 2 ? "TRANSLUCENT" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 36, str,
+                 M_Item_Glow(2, vis_improved_fuzz ? GLOW_GREEN : GLOW_DARKRED));
+
+    // Colored lighting
+    sprintf(str, vis_colored_lighting ? "ON" : "OFF");
     M_WriteText (M_ItemRightAlign(str), 45, str,
-                 M_Item_Glow(3, vis_improved_fuzz ? GLOW_GREEN : GLOW_DARKRED));
+                 M_Item_Glow(3, vis_colored_lighting ? GLOW_GREEN : GLOW_DARKRED));
 
     // Colored blood and corpses
     sprintf(str, vis_colored_blood ? "ON" : "OFF");
@@ -2678,17 +2677,22 @@ static void M_Draw_ID_Gameplay_1 (void)
     M_WriteText (M_ItemRightAlign(str), 63, str,
                  M_Item_Glow(5, vis_swirling_liquids ? GLOW_GREEN : GLOW_DARKRED));
 
+    // Sky animation
+    sprintf(str, vis_animated_sky ? "ON" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 72, str,
+                 M_Item_Glow(6, vis_animated_sky ? GLOW_GREEN : GLOW_DARKRED));
+
     // Sky drawing mode
     sprintf(str, vis_linear_sky ? "LINEAR" : "ORIGINAL");
-    M_WriteText (M_ItemRightAlign(str), 72, str,
-                 M_Item_Glow(6, vis_linear_sky ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 81, str,
+                 M_Item_Glow(7, vis_linear_sky ? GLOW_GREEN : GLOW_DARKRED));
 
     // Randomly mirrored corpses
     sprintf(str, vis_flip_corpses ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 81, str,
-                 M_Item_Glow(7, vis_flip_corpses ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 90, str,
+                 M_Item_Glow(8, vis_flip_corpses ? GLOW_GREEN : GLOW_DARKRED));
 
-    M_WriteTextCentered(90, "CROSSHAIR", cr[CR_YELLOW]);
+    M_WriteTextCentered(99, "CROSSHAIR", cr[CR_YELLOW]);
 
     // Crosshair shape
     sprintf(str, xhair_draw == 1 ? "CROSS 1" :
@@ -2698,27 +2702,15 @@ static void M_Draw_ID_Gameplay_1 (void)
                  xhair_draw == 5 ? "ANGLE" :
                  xhair_draw == 6 ? "TRIANGLE" :
                  xhair_draw == 7 ? "DOT" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 99, str,
+    M_WriteText (M_ItemRightAlign(str), 108, str,
                  M_Item_Glow(9, xhair_draw ? GLOW_GREEN : GLOW_DARKRED));
 
     // Crosshair indication
     sprintf(str, xhair_color == 1 ? "HEALTH" :
                  xhair_color == 2 ? "TARGET HIGHLIGHT" :
                  xhair_color == 3 ? "TARGET HIGHLIGHT+HEALTH" : "STATIC");
-    M_WriteText (M_ItemRightAlign(str), 108, str,
+    M_WriteText (M_ItemRightAlign(str), 117, str,
                  M_Item_Glow(10, xhair_color ? GLOW_GREEN : GLOW_DARKRED));
-
-    M_WriteTextCentered(117, "STATUS BAR", cr[CR_YELLOW]);
-
-    // Colored elements
-    sprintf(str, st_colored_stbar ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 126, str,
-                 M_Item_Glow(12, st_colored_stbar ? GLOW_GREEN : GLOW_DARKRED));
-
-    // Show negative health
-    sprintf(str, st_negative_health ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 135, str,
-                 M_Item_Glow(13, st_negative_health ? GLOW_GREEN : GLOW_DARKRED));
 
     // Footer
     M_WriteText (ID_MENU_LEFTOFFSET_BIG, 144, "NEXT PAGE >",
@@ -2760,6 +2752,17 @@ static void M_ID_SwirlingLiquids (int choice)
     P_InitPicAnims();
 }
 
+static void M_ID_AnimatedSky (int choice)
+{
+    vis_animated_sky ^= 1;
+
+    // [JN] Reset clouds position when toggling feature off.
+    if (!vis_animated_sky)
+    {
+        skysmoothdelta = 0;
+    }
+}
+
 static void M_ID_LinearSky (int choice)
 {
     vis_linear_sky ^= 1;
@@ -2780,23 +2783,14 @@ static void M_ID_CrosshairColor (int choice)
     xhair_color = M_INT_Slider(xhair_color, 0, 3, choice, false);
 }
 
-static void M_ID_ColoredSTBar (int choice)
-{
-    st_colored_stbar ^= 1;
-}
-
-static void M_ID_NegativeHealth (int choice)
-{
-    st_negative_health ^= 1;
-}
-
 // -----------------------------------------------------------------------------
 // Gameplay features 2
 // -----------------------------------------------------------------------------
 
 static menuitem_t ID_Menu_Gameplay_2[]=
 {
-    { M_LFRT, "PLAY SOUNDS IN FULL LENGTH",    M_ID_FullSounds,        'p' },
+    { M_LFRT, "COLORED ELEMENTS",              M_ID_ColoredSTBar,      'c' },
+    { M_LFRT, "SHOW NEGATIVE HEALTH",          M_ID_NegativeHealth,    's' },
     { M_SKIP, "", 0, '\0' },
     { M_LFRT, "CORPSES SLIDING FROM LEDGES",   M_ID_Torque,            'c' },
     { M_LFRT, "ITEMS ARE TOSSED WHEN DROPPED", M_ID_TossDrop,          'i' },
@@ -2809,7 +2803,6 @@ static menuitem_t ID_Menu_Gameplay_2[]=
     { M_LFRT, "REPORT REVEALED SECRETS",       M_ID_RevealedSecrets,   'r' },
     { M_LFRT, "FLIP LEVELS HORIZONTALLY",      M_ID_FlipLevels,        'f' },
     { M_LFRT, "ON DEATH ACTION",               M_ID_OnDeathAction,     'o' },
-    { M_SKIP, "", 0, '\0' },
     { M_SWTC, "", /*< PREV PAGE*/              M_Choose_ID_Gameplay_1, 'p' },
 };
 
@@ -2834,71 +2827,76 @@ static void M_Draw_ID_Gameplay_2 (void)
     char str[32];
     Gameplay_Cur = 1;
 
-    M_WriteTextCentered(9, "AUDIBLE", cr[CR_YELLOW]);
+    M_WriteTextCentered(9, "STATUS BAR", cr[CR_YELLOW]);
 
-    // Play sounds in full length
-    sprintf(str, aud_full_sounds ? "ON" : "OFF");
+    // Colored elements
+    sprintf(str, st_colored_stbar ? "ON" : "OFF");
     M_WriteText (M_ItemRightAlign(str), 18, str,
-                 M_Item_Glow(0, aud_full_sounds ? GLOW_GREEN : GLOW_DARKRED));
+                 M_Item_Glow(0, st_colored_stbar ? GLOW_GREEN : GLOW_DARKRED));
 
-    M_WriteTextCentered(27, "PHYSICAL", cr[CR_YELLOW]);
+    // Show negative health
+    sprintf(str, st_negative_health ? "ON" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 27, str,
+                 M_Item_Glow(1, st_negative_health ? GLOW_GREEN : GLOW_DARKRED));
+
+    M_WriteTextCentered(36, "PHYSICAL", cr[CR_YELLOW]);
 
     // Corpses sliding from ledges
     sprintf(str, phys_torque ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 36, str,
-                 M_Item_Glow(2, phys_torque ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 45, str,
+                 M_Item_Glow(3, phys_torque ? GLOW_GREEN : GLOW_DARKRED));
 
     // Items are tossed when dropped
     sprintf(str, phys_toss_drop ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 45, str,
-                 M_Item_Glow(3, phys_toss_drop ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 54, str,
+                 M_Item_Glow(4, phys_toss_drop ? GLOW_GREEN : GLOW_DARKRED));
 
     // Floating powerups amplitude
     sprintf(str, phys_floating_powerups == 1 ? "LOW" :
                  phys_floating_powerups == 2 ? "MIDDLE" :
                  phys_floating_powerups == 3 ? "HIGH" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 54, str,
-                 M_Item_Glow(4, phys_floating_powerups ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 63, str,
+                 M_Item_Glow(5, phys_floating_powerups ? GLOW_GREEN : GLOW_DARKRED));
 
     // Weapon attack alignment
     sprintf(str, phys_weapon_alignment == 1 ? "BOBBING" :
                  phys_weapon_alignment == 2 ? "CENTERED" : "ORIGINAL");
-    M_WriteText (M_ItemRightAlign(str), 63, str,
-                 M_Item_Glow(5, phys_weapon_alignment ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 72, str,
+                 M_Item_Glow(6, phys_weapon_alignment ? GLOW_GREEN : GLOW_DARKRED));
 
     // Imitate player's breathing
     sprintf(str, phys_breathing ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 72, str,
-                 M_Item_Glow(6, phys_breathing ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 81, str,
+                 M_Item_Glow(7, phys_breathing ? GLOW_GREEN : GLOW_DARKRED));
 
-    M_WriteTextCentered(81, "GAMEPLAY", cr[CR_YELLOW]);
+    M_WriteTextCentered(90, "GAMEPLAY", cr[CR_YELLOW]);
 
     // Default skill level
     snprintf(str, sizeof(str), "%s", DefSkillName[gp_default_skill]);
-    M_WriteText (M_ItemRightAlign(str), 90, str, 
-                 M_Item_Glow(8, DefSkillColor(gp_default_skill)));
+    M_WriteText (M_ItemRightAlign(str), 99, str, 
+                 M_Item_Glow(9, DefSkillColor(gp_default_skill)));
 
     // Pistol start game mode
     sprintf(str, compat_pistol_start ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 99, str,
-                 M_Item_Glow(9, compat_pistol_start ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 108, str,
+                 M_Item_Glow(10, compat_pistol_start ? GLOW_GREEN : GLOW_DARKRED));
 
     // Report revealed secrets
     sprintf(str, gp_revealed_secrets == 1 ? "TOP" :
                  gp_revealed_secrets == 2 ? "CENTERED" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 108, str,
-                 M_Item_Glow(10, gp_revealed_secrets ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 117, str,
+                 M_Item_Glow(11, gp_revealed_secrets ? GLOW_GREEN : GLOW_DARKRED));
 
     // Flip levels horizontally
     sprintf(str, gp_flip_levels ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 117, str,
-                 M_Item_Glow(11, gp_flip_levels ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 126, str,
+                 M_Item_Glow(12, gp_flip_levels ? GLOW_GREEN : GLOW_DARKRED));
 
     // On death action
     sprintf(str, gp_death_use_action == 1 ? "LAST SAVE" :
                  gp_death_use_action == 2 ? "NOTHING" : "DEFAULT");
-    M_WriteText (M_ItemRightAlign(str), 126, str,
-                 M_Item_Glow(12, gp_death_use_action ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 135, str,
+                 M_Item_Glow(13, gp_death_use_action ? GLOW_GREEN : GLOW_DARKRED));
 
     // Footer
     M_WriteText (ID_MENU_LEFTOFFSET_BIG, 144, "< PREV PAGE",
@@ -2908,18 +2906,14 @@ static void M_Draw_ID_Gameplay_2 (void)
     M_WriteText(M_ItemRightAlign(str), 144, str, cr[CR_GRAY]);
 }
 
-static void M_ID_FullSounds (int choice)
+static void M_ID_ColoredSTBar (int choice)
 {
-    aud_full_sounds ^= 1;
+    st_colored_stbar ^= 1;
+}
 
-    // [crispy] weapon sound sources
-    for (int i = 0 ; i < MAXPLAYERS ; i++)
-    {
-        if (playeringame[i])
-        {
-            players[i].so = Crispy_PlayerSO(i);
-        }
-    }
+static void M_ID_NegativeHealth (int choice)
+{
+    st_negative_health ^= 1;
 }
 
 static void M_ID_Torque (int choice)
@@ -3069,6 +3063,7 @@ static void M_ID_ApplyResetHook (void)
     vis_colored_blood = 0;
     vis_swirling_liquids = 0;
     vis_invul_sky = 0;
+    vis_animated_sky = 0; skysmoothdelta = 0;
     vis_linear_sky = 0;
     vis_flip_corpses = 0;
 

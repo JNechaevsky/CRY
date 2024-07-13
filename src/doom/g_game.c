@@ -483,7 +483,6 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
         {
             cmd->lookdir = players[consoleplayer].lookdir = 0;
         }
-        R_InitSkyMap();
         CT_SetMessage(&players[consoleplayer], mouse_look ?
                        ID_MLOOK_ON : ID_MLOOK_OFF, false, NULL);
         S_StartSound(NULL, sfx_swtchn);
@@ -853,7 +852,6 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
 void G_DoLoadLevel (void) 
 { 
     int i;
-	const char *skytexturename;
 
 	// [JN] Properly remove paused state and resume music playing.
 	// Fixes a bug when pausing intermission screen causes locking up sound.
@@ -873,16 +871,23 @@ void G_DoLoadLevel (void)
 
     // [JN] Set Jaguar skies.
     if (gamemap < 9 || gamemap == 24)
-    skytexturename = "SKY1";
+    {
+        skytexture = R_TextureNumForName("SKY1_1");
+        skytexture2 = R_TextureNumForName("SKY1_2");
+        skyscrollspeed = 40; // slow for Phobos levels
+    }
     else if (gamemap < 17)
-    skytexturename = "SKY2";
+    {
+        skytexture = R_TextureNumForName("SKY2_1");
+        skytexture2 = R_TextureNumForName("SKY2_2");
+        skyscrollspeed = 60; // Middle for Deimos levels
+    }
     else
-    skytexturename = "SKY3";
-
-	skytexture = R_TextureNumForName(skytexturename);
-
-    // [crispy] sky texture scales
-    R_InitSkyMap();
+    {
+        skytexture = R_TextureNumForName("SKY3_1");
+        skytexture2 = R_TextureNumForName("SKY3_2");
+        skyscrollspeed = 75; // Fast for Hellish levels
+    }
 
     levelstarttic = gametic;        // for time calculation
     

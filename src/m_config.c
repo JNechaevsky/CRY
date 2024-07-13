@@ -434,6 +434,7 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_INT(vis_colored_blood),
     CONFIG_VARIABLE_INT(vis_swirling_liquids),
     CONFIG_VARIABLE_INT(vis_invul_sky),
+    CONFIG_VARIABLE_INT(vis_animated_sky),
     CONFIG_VARIABLE_INT(vis_linear_sky),
     CONFIG_VARIABLE_INT(vis_flip_corpses),
 

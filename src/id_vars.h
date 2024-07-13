@@ -90,6 +90,7 @@ extern int vis_improved_fuzz;
 extern int vis_colored_blood;
 extern int vis_swirling_liquids;
 extern int vis_invul_sky;
+extern int vis_animated_sky;
 extern int vis_linear_sky;
 extern int vis_flip_corpses;
 

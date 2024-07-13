@@ -654,36 +654,13 @@ void R_InitLightTables (void)
 // Called whenever the view size changes.
 //
 int			skyflatnum;
-int			skytexture = -1; // [crispy] initialize
+int			skytexture;
 int			skytexturemid;
-
-void R_InitSkyMap (void)
-{
-    int skyheight;
-
-    // [crispy] stretch short skies
-    if (skytexture == -1)
-    {
-        return;
-    }
-
-    skyheight = textureheight[skytexture] >> FRACBITS;
-
-    if (mouse_look && skyheight < 200)
-    {
-        skytexturemid = -28*FRACUNIT;
-    }
-    else if (skyheight >= 200)
-    {
-        skytexturemid = 200*FRACUNIT;
-    }
-    else
-    {
-        skytexturemid = ORIGHEIGHT/2*FRACUNIT;
-    }
-}
-
-
+// [JN] Two layers of sky texture.
+int			skytexture2;    // "SKY*_2" texture.
+int			skyscrollspeed; // Scrolling speed, depending on game episode.
+int			skycloudoffset; // Scrolling offset, depending of speed.
+int			skysmoothdelta; // Smooth scrolling offset for rendering.
 
 //
 // R_SetViewSize
@@ -910,7 +887,6 @@ void R_Init (void)
     printf (".");
     R_InitLightTables ();
     printf (".");
-    R_InitSkyMap ();
     R_InitTranslationTables ();
     printf (".");
     printf ("]");
