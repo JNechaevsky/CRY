@@ -2759,7 +2759,6 @@ static void M_ID_AnimatedSky (int choice)
     // [JN] Reset clouds position when toggling feature off.
     if (!vis_animated_sky)
     {
-        skycloudoffset = 0;
         skysmoothdelta = 0;
     }
 }
@@ -3064,7 +3063,7 @@ static void M_ID_ApplyResetHook (void)
     vis_colored_blood = 0;
     vis_swirling_liquids = 0;
     vis_invul_sky = 0;
-    vis_animated_sky = 0; skycloudoffset = 0;
+    vis_animated_sky = 0; skysmoothdelta = 0;
     vis_linear_sky = 0;
     vis_flip_corpses = 0;
 
