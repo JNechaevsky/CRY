@@ -3271,6 +3271,10 @@ static void M_LoadSelect(int choice)
 
     G_LoadGame (name);
     M_ClearMenus ();
+
+    // [crispy] allow quickload before quicksave
+    if (quickSaveSlot == -2)
+	quickSaveSlot = choice;
 }
 
 //
@@ -3464,7 +3468,11 @@ static void M_QuickLoad(void)
 	
     if (quickSaveSlot < 0)
     {
-	M_StartMessage(QSAVESPOT,NULL,false);
+	// [crispy] allow quickload before quicksave
+	M_StartControlPanel();
+	M_ReadSaveStrings();
+	M_SetupNextMenu(&LoadDef);
+	quickSaveSlot = -2;
 	return;
     }
 
