@@ -19,6 +19,7 @@
 
 #include "ct_chat.h"
 #include "d_main.h"
+#include "d_englsh.h"
 #include "doomstat.h"
 #include "i_swap.h"
 #include "m_menu.h"
@@ -259,15 +260,15 @@ typedef struct
 } castinfo_t;
 
 static castinfo_t castorder[] = {
-	{"zombieman",		MT_POSSESSED},
-	{"shotgun guy",		MT_SHOTGUY},
-	{"imp",				MT_TROOP},
-	{"demon",			MT_SERGEANT},
-	{"lost soul",       MT_SKULL},
-	{"cacodemon",       MT_HEAD},
-	{"baron of hell",	MT_BRUISER},
-	{"our hero",		MT_PLAYER},
-	{NULL,          	0}
+	{CC_ZOMBIE,     MT_POSSESSED},
+	{CC_SHOTGUN,    MT_SHOTGUY},
+	{CC_IMP,        MT_TROOP},
+	{CC_DEMON,      MT_SERGEANT},
+	{CC_LOST,       MT_SKULL},
+	{CC_CACO,       MT_HEAD},
+	{CC_BARON,      MT_BRUISER},
+	{CC_HERO,       MT_PLAYER},
+	{NULL,          0}
 };
 
 static int      castnum;

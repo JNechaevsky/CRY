@@ -286,17 +286,17 @@ static char *CRL_GetMobjName (mobjtype_t type)
 {
     switch (type)
     {
-		/*
         case MT_POSSESSED:  return CC_ZOMBIE;   break;
         case MT_SHOTGUY:    return CC_SHOTGUN;  break;
-        case MT_CHAINGUY:   return CC_HEAVY;    break;
         case MT_TROOP:      return CC_IMP;      break;
-        case MT_SERGEANT:
-        case MT_SHADOWS:    return CC_DEMON;    break;
+        case MT_SERGEANT:   return CC_DEMON;    break;
+        case MT_SHADOWS:    return CC_SPECTRE;  break;
         case MT_SKULL:      return CC_LOST;     break;
         case MT_HEAD:       return CC_CACO;     break;
-        case MT_KNIGHT:     return CC_HELL;     break;
         case MT_BRUISER:    return CC_BARON;    break;
+        /*
+        case MT_CHAINGUY:   return CC_HEAVY;    break;
+        case MT_KNIGHT:     return CC_HELL;     break;
         case MT_BABY:       return CC_ARACH;    break;
         case MT_PAIN:       return CC_PAIN;     break;
         case MT_UNDEAD:     return CC_REVEN;    break;
@@ -306,7 +306,7 @@ static char *CRL_GetMobjName (mobjtype_t type)
         case MT_CYBORG:     return CC_CYBER;    break;
         // Wolfenstein guard is not Dehackedable, so leave it nameless.
         //case MT_WOLFSS:   return "WOLFENSTEIN SS";    break;
-		*/
+        */
         default:            return "";
     }
 }

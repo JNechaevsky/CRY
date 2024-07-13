@@ -158,6 +158,20 @@
 #define STSTR_CLEV		"Changing Level..."
 
 //
+// F_Finale.C
+//
+
+#define CC_ZOMBIE   "zombieman"
+#define CC_SHOTGUN  "shotgun guy"
+#define CC_IMP      "imp"
+#define CC_DEMON    "demon"
+#define CC_SPECTRE  "spectre"
+#define CC_LOST     "lost soul"
+#define CC_CACO     "cacodemon"
+#define CC_BARON    "baron of hell"
+#define CC_HERO     "our hero"
+
+//
 // [JN] ID-specific strings.
 //
 
