@@ -884,7 +884,7 @@ void P_UpdateSpecials (void)
     // [JN] Update sky cloud offsets.
     if (vis_animated_sky)
     {
-        skycloudoffset += 50;
+        skycloudoffset += skyscrollspeed;
         skysmoothdelta = skycloudoffset << 13;
     }
     else

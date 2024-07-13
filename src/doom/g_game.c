@@ -872,18 +872,21 @@ void G_DoLoadLevel (void)
     // [JN] Set Jaguar skies.
     if (gamemap < 9 || gamemap == 24)
     {
-        skytexture = R_TextureNumForName("SKY1");
+        skytexture = R_TextureNumForName("SKY1_1");
         skytexture2 = R_TextureNumForName("SKY1_2");
+        skyscrollspeed = 40; // slow for Phobos levels
     }
     else if (gamemap < 17)
     {
-        skytexture = R_TextureNumForName("SKY2");
+        skytexture = R_TextureNumForName("SKY2_1");
         skytexture2 = R_TextureNumForName("SKY2_2");
+        skyscrollspeed = 60; // Middle for Deimos levels
     }
     else
     {
-        skytexture = R_TextureNumForName("SKY3");
+        skytexture = R_TextureNumForName("SKY3_1");
         skytexture2 = R_TextureNumForName("SKY3_2");
+        skyscrollspeed = 75; // Fast for Hellish levels
     }
 
     levelstarttic = gametic;        // for time calculation

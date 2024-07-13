@@ -654,10 +654,13 @@ void R_InitLightTables (void)
 // Called whenever the view size changes.
 //
 int			skyflatnum;
-int			skytexture, skytexture2; // [JN] Two layers of sky texture.
+int			skytexture;
 int			skytexturemid;
-int			skycloudoffset;
-int			skysmoothdelta;
+// [JN] Two layers of sky texture.
+int			skytexture2;    // "SKY*_2" texture.
+int			skyscrollspeed; // Scrolling speed, depending on game episode.
+int			skycloudoffset; // Scrolling offset, depending of speed.
+int			skysmoothdelta; // Smooth scrolling offset for rendering.
 
 //
 // R_SetViewSize

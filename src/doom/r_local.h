@@ -794,8 +794,11 @@ extern lighttable_t **walllights;
 // [crispy] stretch sky
 #define SKYSTRETCH_HEIGHT 228
 
-extern int skytexture, skytexture2;
+extern int skytexture;
 extern int skytexturemid;
+// [JN] Two layers of sky texture.
+extern int skytexture2;
+extern int skyscrollspeed;
 extern int skycloudoffset;
 extern int skysmoothdelta;
 
