@@ -783,7 +783,6 @@ P_SpawnMobjSafe
     mobj->resurrected = false;
     // [JN] Initialize animated brightmaps;
     mobj->bmap_flick = 0;
-    mobj->bmap_glow = 0;
 
     // [JN] Jaguar: monsters doesn't attack imideatelly in Nightmare.
     // if (gameskill != sk_nightmare)

@@ -120,31 +120,15 @@ void P_RunThinkers (void)
 	        {
 	            // [JN] Random brightmap flickering effect.
 	            if (mo->sprite == SPR_CAND  // Candestick
-	            ||  mo->sprite == SPR_CBRA  // Candelabra
-	            ||  mo->sprite == SPR_FCAN  // Flaming Barrel
-	            ||  mo->sprite == SPR_TBLU  // Tall Blue Torch
-	            ||  mo->sprite == SPR_TGRN  // Tall Green Torch
-	            ||  mo->sprite == SPR_TRED  // Tall Red Torch
-	            ||  mo->sprite == SPR_SMBT  // Short Blue Torch
-	            ||  mo->sprite == SPR_SMGT  // Short Green Torch
-	            ||  mo->sprite == SPR_SMRT  // Short Red Torch
-	            ||  mo->sprite == SPR_POL3) // Pile of Skulls and Candles
+	            ||  mo->sprite == SPR_CBRA) // Candelabra
 	            {
 	                mo->bmap_flick = ID_RealRandom() % 16;
-	            }
-	            // [JN] Smooth brightmap glowing effect.
-	            if (mo->sprite == SPR_FCAN  // Flaming Barrel
-	            ||  mo->sprite == SPR_CEYE  // Evil Eye
-	            ||  mo->sprite == SPR_FSKU) // Floating Skull Rock
-	            {
-	                mo->bmap_glow = ID_RealRandom() % 6;
 	            }
 	        }
 	    }
 	    else
 	    {
 	    	mo->bmap_flick = 0;
-	    	mo->bmap_glow = 0;
 	    }
 	}
 

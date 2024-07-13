@@ -739,86 +739,43 @@ static void R_ProjectSprite (mobj_t* thing)
 	if (index >= MAXLIGHTSCALE) 
 	    index = MAXLIGHTSCALE-1;
 
+    // [crispy] brightmaps for select sprites
     // [JN] Jaguar: if brightmaps are disabled, then highlight all sprites
     // with full brightness to represent vanilla Jaguar effect.
     if (!vis_brightmaps)
     {
-        // [JN] Colorize sprite drawing.
         if (vis_colored_lighting)
         {
-        vis->colormap[0] = vis->colormap[1] = R_ColoredSprColorize(thing->subsector->sector->color);
+            // [JN] Colorize sprite drawing.
+            vis->colormap[0] = vis->colormap[1]
+                             = R_ColoredSprColorize(thing->subsector->sector->color);
         }
         else
         {
-        vis->colormap[0] = vis->colormap[1] = colormaps;
+            vis->colormap[0] = vis->colormap[1] = colormaps;
         }
     }
     else
     {
-        // [crispy] brightmaps for select sprites
-        vis->colormap[0] = spritelights[index];
-
-        // [JN] Apply different types half-brights for certain objects.
-        //  Not to be confused:
-        //   * Semi-bright. Lits up brightmapped pixels with non-full power.
-        //     If sector brightness is below ~48, no brighting will be applied.
-        //   * Demi-bright. Lits up brightmapped pixels with full power,
-        //     and non-brightmapped pixels with distance index miltipled by 2.
-        //   * Hemi-bright. Lits up brightmapped pixels with full power,
-        //     and non-brightmapped pixels with distance index miltipled by 4.
-        //   * Just animated. Lits up all sprite pixels and applies animation.
-        // Semi-brigths:
-        if (thing->sprite == SPR_BON2   // Armor Bonus
-        ||  thing->sprite == SPR_BAR1)  // Explosive Barrel
-        {
-            vis->colormap[1] = spritelights[MAXDIMINDEX];
-        }
-        // Demi-brigths:
-        else
         if (thing->sprite == SPR_CAND   // Candestick
-        ||  thing->sprite == SPR_CBRA   // Candelabra
-        ||  thing->sprite == SPR_COLU)  // Floor Lamp
+        ||  thing->sprite == SPR_CBRA)  // Candelabra
         {
-            const int demi_bright = MIN(index*2, MAXDIMINDEX);
-
-            vis->colormap[0] = spritelights[demi_bright];
-
-            // Animated brightmaps:
-            if (thing->sprite == SPR_CAND   // Candestick
-            ||  thing->sprite == SPR_CBRA)  // Candelabra
+            vis->colormap[0] = spritelights[index];
+            vis->colormap[1] = &colormaps[thing->bmap_flick*256];
+        }
+        else
+        {
+            if (vis_colored_lighting)
             {
-                vis->colormap[1] = &colormaps[thing->bmap_flick*256];
+                // [JN] Colorize sprite drawing.
+                vis->colormap[0] = spritelights[index];
+                vis->colormap[1] = R_ColoredSprColorize(thing->subsector->sector->color);
             }
             else
             {
+                vis->colormap[0] = spritelights[index];
                 vis->colormap[1] = colormaps;
             }
-        }
-        // Just animated:
-        else
-        if (thing->sprite == SPR_SMBT   // Short Blue Torch
-        ||  thing->sprite == SPR_SMGT   // Short Green Torch
-        ||  thing->sprite == SPR_SMRT)  // Short Red Torch
-        {
-            vis->colormap[0] = vis->colormap[1]
-                             = &colormaps[thing->bmap_flick/4*256];
-        }
-        else
-        if (thing->sprite == SPR_FSKU)  // Floating Skull Rock
-        {
-            vis->colormap[0] = vis->colormap[1]
-                             = &colormaps[thing->bmap_glow*256];
-        }
-        else
-        if (thing->sprite == SPR_POL3)  // Pile of Skulls and Candles
-        {
-            vis->colormap[0] = vis->colormap[1]
-                             = &colormaps[thing->bmap_flick/3*256];
-        }
-        // Normal brightmap:
-        else
-        {
-            vis->colormap[1] = colormaps;
         }
     }	
     }

@@ -636,7 +636,6 @@ typedef struct mobj_s
 
     // [JN] Animated brightmaps.
     int         bmap_flick;
-    int         bmap_glow;
 } mobj_t;
 
 // -----------------------------------------------------------------------------
