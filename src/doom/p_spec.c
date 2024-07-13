@@ -880,6 +880,9 @@ void P_UpdateSpecials (void)
 		swirlCoord_x = SwirlFlowSine[leveltime % 195];
 		swirlCoord_y = SwirlFlowCosine[leveltime % 195];
 	}
+
+    // [JN] Update sky cloud offsets
+    skycloudoffset += 50;
 }
 
 // [crispy] smooth texture scrolling

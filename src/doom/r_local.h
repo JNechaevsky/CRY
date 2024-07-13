@@ -637,7 +637,6 @@ extern const byte *ds_brightmap;
 extern void    R_ExecuteSetViewSize (void);
 extern void    R_Init (void);
 extern void    R_InitLightTables (void);
-extern void    R_InitSkyMap (void);
 extern void    R_RenderPlayerView (player_t *player);
 extern void    R_SetViewSize (int blocks, int detail);
 
@@ -795,8 +794,9 @@ extern lighttable_t **walllights;
 // [crispy] stretch sky
 #define SKYSTRETCH_HEIGHT 228
 
-extern int skytexture;
+extern int skytexture, skytexture2;
 extern int skytexturemid;
+extern int skycloudoffset;
 
 // -----------------------------------------------------------------------------
 // R_SWIRL
@@ -834,3 +834,6 @@ extern fixed_t pspriteiscale;
 
 // [crispy] interpolate weapon bobbing
 extern boolean pspr_interp;
+
+extern pixel_t *ylookup[MAXHEIGHT];
+extern int      columnofs[MAXWIDTH]; 

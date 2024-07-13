@@ -1636,7 +1636,6 @@ static void M_ID_Controls_MLook (int choice)
     {
         players[consoleplayer].lookdir = 0;
     }
-    R_InitSkyMap();
 }
 
 static void M_ID_Controls_NoVert (int choice)
