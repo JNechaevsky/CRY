@@ -774,6 +774,20 @@ void P_PlayerInSpecialSector (player_t *player)
 			player->secretcount++;
 			sector->oldspecial = sector->special;
 			sector->special = 0;
+			// [JN] "A secret is revelaed!" message.
+			if (gp_revealed_secrets)
+			{
+				if (gp_revealed_secrets == 1)  // [JN] Top
+				{
+					CT_SetMessage(player, ID_SECRET_FOUND, true, cr[CR_YELLOW]);
+				}
+				else
+				if (gp_revealed_secrets == 2)  // [JN] Centered
+				{
+					CT_SetMessageCentered(player, ID_SECRET_FOUND, cr[CR_YELLOW]);
+				}
+				S_StartSound(NULL, sfx_itemup);
+			}
 			break;
 			
 		default:
