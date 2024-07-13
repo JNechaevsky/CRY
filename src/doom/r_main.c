@@ -657,6 +657,7 @@ int			skyflatnum;
 int			skytexture, skytexture2; // [JN] Two layers of sky texture.
 int			skytexturemid;
 int			skycloudoffset;
+int			skysmoothdelta;
 
 //
 // R_SetViewSize

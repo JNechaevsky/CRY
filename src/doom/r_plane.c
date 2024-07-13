@@ -414,13 +414,6 @@ R_MakeSpans
 
 void R_DrawPlanes (void)
 {
-    // Render 2 layers, sky 1 in front
-    int count;
-    int skyTexture1, skyTexture2;
-    int smoothDelta = 0; // [JN] Smooth sky scrolling.
-    int frac;
-    int fracstep = FRACUNIT / vid_resolution;
-
     // [JN] CRL - openings counter.
     IDRender.numopenings = lastopening - openings;
 
@@ -431,10 +424,6 @@ void R_DrawPlanes (void)
         // sky flat
         if (pl->picnum == skyflatnum || pl->picnum & PL_SKYFLAT)
         {
-            skyTexture1 = texturetranslation[skytexture];
-            skyTexture2 = texturetranslation[skytexture2];
-            smoothDelta = skycloudoffset << 13;
-            
             // Sky is allways drawn full bright, i.e. colormaps[0] is used.
             // Because of this hack, sky is not affected by INVUL inverse mapping.
             // [crispy] no brightmaps for sky
@@ -448,20 +437,24 @@ void R_DrawPlanes (void)
 
                 if ((dc_yl = pl->top[x]) != USHRT_MAX && dc_yl <= (dc_yh = pl->bottom[x]))
                 {
-                    // [crispy] Optionally draw skies horizontally linear.
-                    const int angle = ((viewangle + (vis_linear_sky ? 
-                                    linearskyangle[x] : xtoviewangle[x])) ^ gp_flip_levels) >> ANGLETOSKYSHIFT;
-                    const int angle2 = ((viewangle + smoothDelta + (vis_linear_sky ? 
-                                     linearskyangle[x] : xtoviewangle[x])) ^ gp_flip_levels) >> ANGLETOSKYSHIFT;
+                    // [JN] Render sky as 2 layers, sky 1 in front
+                    angle_t angle, angle2;
+                    int frac, fracstep;
+                    int count = dc_yh - dc_yl;
 
-                    count = dc_yh - dc_yl;
                     if (count < 0)
                     {
                         return;
                     }
 
-                    dc_source = R_GetColumn(skyTexture2, angle);
-                    dc_source2 = R_GetColumn(skyTexture1, angle2);
+                    // [crispy] Optionally draw skies horizontally linear.
+                    angle = ((viewangle + (vis_linear_sky ? 
+                              linearskyangle[x] : xtoviewangle[x])) ^ gp_flip_levels) >> ANGLETOSKYSHIFT;
+                    angle2 = ((viewangle + skysmoothdelta + (vis_linear_sky ? 
+                               linearskyangle[x] : xtoviewangle[x])) ^ gp_flip_levels) >> ANGLETOSKYSHIFT;
+                    dc_source = R_GetColumn(texturetranslation[skytexture2], angle);
+                    dc_source2 = R_GetColumn(texturetranslation[skytexture], angle2);
+                    fracstep = FRACUNIT / vid_resolution;
                     frac = SKYTEXTUREMIDSHIFTED * FRACUNIT + (dc_yl - centery) * fracstep;
 
                     // [JN] HIGH detail mode.
@@ -471,10 +464,11 @@ void R_DrawPlanes (void)
 
                         do
                         {
-                            const byte source1 = dc_source[frac >> FRACBITS];
-                            const byte source2 = dc_source2[frac >> FRACBITS];
+                            const int fraccalc = frac >> FRACBITS;
+                            const byte source1 = dc_source[fraccalc];
+                            const byte source2 = dc_source2[fraccalc];
                             
-                            if (dc_source[(frac >> FRACBITS)])
+                            if (dc_source[fraccalc])
                             {
                                 *dest = dc_colormap[dc_brightmap[source1]][source1];
                             }
@@ -496,10 +490,11 @@ void R_DrawPlanes (void)
 
                         do
                         {
-                            const byte source1 = dc_source[frac >> FRACBITS];
-                            const byte source2 = dc_source2[frac >> FRACBITS];
+                            const int fraccalc = frac >> FRACBITS;
+                            const byte source1 = dc_source[fraccalc];
+                            const byte source2 = dc_source2[fraccalc];
                             
-                            if (dc_source[(frac >> FRACBITS)])
+                            if (dc_source[fraccalc])
                             {
                                 *dest1 = *dest2 = dc_colormap[dc_brightmap[source1]][source1];
                             }

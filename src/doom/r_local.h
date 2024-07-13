@@ -797,6 +797,7 @@ extern lighttable_t **walllights;
 extern int skytexture, skytexture2;
 extern int skytexturemid;
 extern int skycloudoffset;
+extern int skysmoothdelta;
 
 // -----------------------------------------------------------------------------
 // R_SWIRL

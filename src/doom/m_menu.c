@@ -2760,6 +2760,7 @@ static void M_ID_AnimatedSky (int choice)
     if (!vis_animated_sky)
     {
         skycloudoffset = 0;
+        skysmoothdelta = 0;
     }
 }
 

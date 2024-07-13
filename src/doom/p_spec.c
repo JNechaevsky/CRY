@@ -885,10 +885,12 @@ void P_UpdateSpecials (void)
     if (vis_animated_sky)
     {
         skycloudoffset += 50;
+        skysmoothdelta = skycloudoffset << 13;
     }
     else
     {
         skycloudoffset = 0;
+        skysmoothdelta = 0;
     }
 }
 
