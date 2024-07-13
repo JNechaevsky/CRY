@@ -1174,7 +1174,7 @@ static void ST_DrawBigNumber (int val, const int x, const int y, byte *table)
 
         // [JN] Draw minus symbol with respection of digits placement.
         // However, values below -10 requires some correction in "x" placement.
-        V_DrawPatch(xpos + (val <= 9 ? 20 : 5) - 4, y, tallminus);
+        V_DrawShadowedPatchOptional(xpos + (val <= 9 ? 20 : 5) - 4, y, tallminus);
     }
     if (val > 999)
     {
@@ -1183,7 +1183,7 @@ static void ST_DrawBigNumber (int val, const int x, const int y, byte *table)
 
     if (val > 99)
     {
-        V_DrawPatch(xpos - 4, y, tallnum[val / 100]);
+        V_DrawShadowedPatchOptional(xpos - 4, y, tallnum[val / 100]);
     }
 
     val = val % 100;
@@ -1191,13 +1191,13 @@ static void ST_DrawBigNumber (int val, const int x, const int y, byte *table)
 
     if (val > 9 || oldval > 99)
     {
-        V_DrawPatch(xpos - 4, y, tallnum[val / 10]);
+        V_DrawShadowedPatchOptional(xpos - 4, y, tallnum[val / 10]);
     }
 
     val = val % 10;
     xpos += 14;
 
-    V_DrawPatch(xpos - 4, y, tallnum[val]);
+    V_DrawShadowedPatchOptional(xpos - 4, y, tallnum[val]);
     
     dp_translation = NULL;
 }
@@ -1210,7 +1210,7 @@ static void ST_DrawBigNumber (int val, const int x, const int y, byte *table)
 static void ST_DrawPercent (const int x, const int y, byte *table)
 {
     dp_translation = table;
-    V_DrawPatch(x, y, tallpercent);
+    V_DrawShadowedPatchOptional(x, y, tallpercent);
     dp_translation = NULL;
 }
 
