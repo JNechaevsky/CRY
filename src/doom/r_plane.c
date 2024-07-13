@@ -415,7 +415,6 @@ R_MakeSpans
 void R_DrawPlanes (void)
 {
     // Render 2 layers, sky 1 in front
-    byte *source, *source2;
     int count;
     int skyTexture1, skyTexture2;
     int smoothDelta = 0; // [JN] Smooth sky scrolling.
@@ -461,8 +460,8 @@ void R_DrawPlanes (void)
                         return;
                     }
 
-                    source = R_GetColumn(skyTexture2, angle);
-                    source2 = R_GetColumn(skyTexture1, angle2);
+                    dc_source = R_GetColumn(skyTexture2, angle);
+                    dc_source2 = R_GetColumn(skyTexture1, angle2);
                     frac = SKYTEXTUREMIDSHIFTED * FRACUNIT + (dc_yl - centery) * fracstep;
 
                     // [JN] HIGH detail mode.
@@ -472,13 +471,16 @@ void R_DrawPlanes (void)
 
                         do
                         {
-                            if (source[(frac >> FRACBITS)])
+                            const byte source1 = dc_source[frac >> FRACBITS];
+                            const byte source2 = dc_source2[frac >> FRACBITS];
+                            
+                            if (dc_source[(frac >> FRACBITS)])
                             {
-                                *dest = pal_color[source[(frac >> FRACBITS)]];
+                                *dest = dc_colormap[dc_brightmap[source1]][source1];
                             }
                             else
                             {
-                                *dest = pal_color[source2[(frac >> FRACBITS)]];
+                                *dest = dc_colormap[dc_brightmap[source2]][source2];
                             }
 
                             dest += SCREENWIDTH;
@@ -494,13 +496,16 @@ void R_DrawPlanes (void)
 
                         do
                         {
-                            if (source[(frac >> FRACBITS)])
+                            const byte source1 = dc_source[frac >> FRACBITS];
+                            const byte source2 = dc_source2[frac >> FRACBITS];
+                            
+                            if (dc_source[(frac >> FRACBITS)])
                             {
-                                *dest1 = *dest2 = pal_color[source[(frac >> FRACBITS)]];
+                                *dest1 = *dest2 = dc_colormap[dc_brightmap[source1]][source1];
                             }
                             else
                             {
-                                *dest1 = *dest2 = pal_color[source2[(frac >> FRACBITS)]];
+                                *dest1 = *dest2 = dc_colormap[dc_brightmap[source2]][source2];
                             }
 
                             dest1 += SCREENWIDTH;

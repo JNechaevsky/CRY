@@ -604,7 +604,7 @@ extern void R_SetFuzzPosDraw (void);
 extern void R_SetFuzzPosTic (void);
 extern void R_VideoErase (unsigned ofs, int count);
 
-extern byte *dc_source;
+extern byte *dc_source, *dc_source2;
 extern byte *ds_source;		
 extern byte *translationtables;
 extern byte *dc_translation;

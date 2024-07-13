@@ -89,6 +89,7 @@ int			dc_texheight; // [crispy] Tutti-Frutti fix
 
 // first pixel in a column (possibly virtual) 
 byte*			dc_source;		
+byte*			dc_source2;
 
 
 //
