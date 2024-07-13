@@ -957,7 +957,8 @@ static degenmobj_t muzzles[MAXPLAYERS];
 
 mobj_t *Crispy_PlayerSO (int p)
 {
-	return aud_full_sounds ? (mobj_t *) &muzzles[p] : players[p].mo;
+	// [JN] Always play sounds in full lenght.
+	return (mobj_t *) &muzzles[p];
 }
 
 //

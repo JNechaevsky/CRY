@@ -403,16 +403,8 @@ static int S_AdjustSoundParams(mobj_t *listener, mobj_t *source,
     ady = abs(listener->y - source->y);
     adz = abs(listener->z - source->z);
 
-    if (aud_z_axis_sfx)
-    {
-        // [JN] Use better precision for distance calculation.
-        approx_dist = S_ApproxDistanceZ(adx, ady, adz);
-    }
-    else
-    {
-        // From _GG1_ p.428. Appox. eucledian distance fast.
-        approx_dist = adx + ady - ((adx < ady ? adx : ady)>>1);
-    }
+    // [JN] Always use XYZ sound attenuation.
+    approx_dist = S_ApproxDistanceZ(adx, ady, adz);
 
     if (approx_dist > S_CLIPPING_DIST)
     {

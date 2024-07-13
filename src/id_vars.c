@@ -16,8 +16,9 @@
 //
 
 
-#include "id_vars.h"
 #include "m_config.h"  // [JN] M_BindIntVariable
+
+#include "id_vars.h"
 
 
 // Game modes
@@ -52,11 +53,6 @@ int vid_gamma = 10;
 int vid_fov = 90;
 int dp_menu_shading = 0;
 int dp_level_brightness = 0;
-// Color settings
-int vid_saturation = 100;
-float vid_r_intensity = 1.000000;
-float vid_g_intensity = 1.000000;
-float vid_b_intensity = 1.000000;
 // Messages Settings
 int msg_show = 1;
 int msg_alignment = 0;
@@ -102,14 +98,11 @@ int automap_shading = 0;
 
 // Visual
 int vis_brightmaps = 0;
-int vis_colored_lighting = 0;
 int vis_translucency = 0;
-int vis_fake_contrast = 1;
-int vis_smooth_light = 0;
 int vis_improved_fuzz = 0;
+int vis_colored_lighting = 0;
 int vis_colored_blood = 0;
 int vis_swirling_liquids = 0;
-int vis_invul_sky = 0;
 int vis_animated_sky = 0;
 int vis_linear_sky = 0;
 int vis_flip_corpses = 0;
@@ -121,24 +114,17 @@ int xhair_color = 0;
 // Status bar
 int st_colored_stbar = 0;
 int st_negative_health = 0;
-int st_blinking_keys = 0;
-
-// Audible
-int aud_z_axis_sfx = 0;
-int aud_full_sounds = 0;
-int aud_exit_sounds = 0;
 
 // Physical
 int phys_torque = 0;
-int phys_ssg_tear_monsters = 0;
 int phys_toss_drop = 0;
 int phys_floating_powerups = 0;
 int phys_weapon_alignment = 0;
 int phys_breathing = 0;
 
 // Gameplay
-int gp_default_class = 0;
 int gp_default_skill = 2;
+int gp_pistol_start = 0;
 int gp_revealed_secrets = 0;
 int gp_flip_levels = 0;
 int gp_death_use_action = 0;
@@ -150,7 +136,7 @@ int demo_bar = 0;
 int demo_internal = 1;
 
 // Compatibility-breaking
-int compat_pistol_start = 0;
+
 int compat_blockmap_fix = 0;
 int compat_vertical_aiming = 0;
 
@@ -159,7 +145,7 @@ int compat_vertical_aiming = 0;
 // [JN] ID-specific config variables binding functions.
 // -----------------------------------------------------------------------------
 
-void ID_BindVariables (GameMission_t mission)
+void ID_BindVariables (void)
 {
     //
     // Video options
@@ -184,17 +170,9 @@ void ID_BindVariables (GameMission_t mission)
     M_BindIntVariable("vid_fov",                        &vid_fov);
     M_BindIntVariable("dp_menu_shading",                &dp_menu_shading);
     M_BindIntVariable("dp_level_brightness",            &dp_level_brightness);
-    // Color settings
-    M_BindIntVariable("vid_saturation",                 &vid_saturation);
-    M_BindFloatVariable("vid_r_intensity",              &vid_r_intensity);
-    M_BindFloatVariable("vid_g_intensity",              &vid_g_intensity);
-    M_BindFloatVariable("vid_b_intensity",              &vid_b_intensity);
     // Messages Settings
     M_BindIntVariable("msg_show",                       &msg_show);
-    if (mission == doom)
-    {
-        M_BindIntVariable("msg_alignment",              &msg_alignment);
-    }
+    M_BindIntVariable("msg_alignment",                  &msg_alignment);
     M_BindIntVariable("msg_text_shadows",               &msg_text_shadows);
     M_BindIntVariable("msg_local_time",                 &msg_local_time);    
 
@@ -237,23 +215,11 @@ void ID_BindVariables (GameMission_t mission)
 
     // Visual
     M_BindIntVariable("vis_brightmaps",                 &vis_brightmaps);
-    M_BindIntVariable("vis_colored_lighting",           &vis_colored_lighting);
     M_BindIntVariable("vis_translucency",               &vis_translucency);
-    if (mission == doom || mission == heretic)
-    {
-        M_BindIntVariable("vis_fake_contrast",          &vis_fake_contrast);
-    }
-    M_BindIntVariable("vis_smooth_light",               &vis_smooth_light);
-    if (mission == doom)
-    {
-        M_BindIntVariable("vis_improved_fuzz",          &vis_improved_fuzz);
-        M_BindIntVariable("vis_colored_blood",          &vis_colored_blood);
-    }
+    M_BindIntVariable("vis_improved_fuzz",              &vis_improved_fuzz);
+    M_BindIntVariable("vis_colored_lighting",           &vis_colored_lighting);
+    M_BindIntVariable("vis_colored_blood",              &vis_colored_blood);
     M_BindIntVariable("vis_swirling_liquids",           &vis_swirling_liquids);
-    if (mission == doom || mission == heretic)
-    {
-        M_BindIntVariable("vis_invul_sky",              &vis_invul_sky);
-    }
     M_BindIntVariable("vis_animated_sky",               &vis_animated_sky);
     M_BindIntVariable("vis_linear_sky",                 &vis_linear_sky);
     M_BindIntVariable("vis_flip_corpses",               &vis_flip_corpses);
@@ -264,44 +230,19 @@ void ID_BindVariables (GameMission_t mission)
     
     // Status bar
     M_BindIntVariable("st_colored_stbar",               &st_colored_stbar);
-    if (mission == doom)
-    {
-        M_BindIntVariable("st_negative_health",         &st_negative_health);
-        M_BindIntVariable("st_blinking_keys",           &st_blinking_keys);
-    }
-    
-    // Audible
-    M_BindIntVariable("aud_z_axis_sfx",                 &aud_z_axis_sfx);
-    if (mission == doom)
-    {
-        M_BindIntVariable("aud_full_sounds",            &aud_full_sounds);
-        M_BindIntVariable("aud_exit_sounds",            &aud_exit_sounds);
-    }
+    M_BindIntVariable("st_negative_health",             &st_negative_health);
     
     // Physical
     M_BindIntVariable("phys_torque",                    &phys_torque);
-    if (mission == doom)
-    {
-        M_BindIntVariable("phys_ssg_tear_monsters",     &phys_ssg_tear_monsters);
-        M_BindIntVariable("phys_toss_drop",             &phys_toss_drop);
-        M_BindIntVariable("phys_floating_powerups",     &phys_floating_powerups);
-    }
-    if (mission == doom || mission == heretic)
-    {
-        M_BindIntVariable("phys_weapon_alignment",      &phys_weapon_alignment);
-    }
+    M_BindIntVariable("phys_toss_drop",                 &phys_toss_drop);
+    M_BindIntVariable("phys_floating_powerups",         &phys_floating_powerups);
+    M_BindIntVariable("phys_weapon_alignment",          &phys_weapon_alignment);
     M_BindIntVariable("phys_breathing",                 &phys_breathing);
     
     // Gameplay
-    if (mission == hexen)
-    {
-        M_BindIntVariable("gp_default_class",           &gp_default_class);
-    }
     M_BindIntVariable("gp_default_skill",               &gp_default_skill);
-    if (mission == doom || mission == heretic)
-    {
-        M_BindIntVariable("gp_revealed_secrets",        &gp_revealed_secrets);
-    }
+    M_BindIntVariable("gp_pistol_start",                &gp_pistol_start);
+    M_BindIntVariable("gp_revealed_secrets",        &gp_revealed_secrets);
     M_BindIntVariable("gp_flip_levels",                 &gp_flip_levels);
     M_BindIntVariable("gp_death_use_action",            &gp_death_use_action);
     
@@ -311,14 +252,6 @@ void ID_BindVariables (GameMission_t mission)
     M_BindIntVariable("demo_bar",                       &demo_bar);
     M_BindIntVariable("demo_internal",                  &demo_internal);
     
-    // Compatibility-breaking
-    if (mission == doom || mission == heretic)
-    {
-        M_BindIntVariable("compat_pistol_start",        &compat_pistol_start);
-    }
     M_BindIntVariable("compat_blockmap_fix",            &compat_blockmap_fix);
-    if (mission == doom)
-    {
-        M_BindIntVariable("compat_vertical_aiming",     &compat_vertical_aiming);
-    }
+    M_BindIntVariable("compat_vertical_aiming",     &compat_vertical_aiming);
 }

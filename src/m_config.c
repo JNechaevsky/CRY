@@ -172,10 +172,6 @@ static default_t	doom_defaults_list[] =
     // Display options
     CONFIG_VARIABLE_INT(vid_gamma),
     CONFIG_VARIABLE_INT(vid_fov),
-    CONFIG_VARIABLE_INT(vid_saturation),
-    CONFIG_VARIABLE_FLOAT(vid_r_intensity),
-    CONFIG_VARIABLE_FLOAT(vid_g_intensity),
-    CONFIG_VARIABLE_FLOAT(vid_b_intensity),
     CONFIG_VARIABLE_INT(dp_screen_size),
     CONFIG_VARIABLE_INT(dp_detail_level),
     CONFIG_VARIABLE_INT(dp_menu_shading),
@@ -426,14 +422,12 @@ static default_t	doom_defaults_list[] =
 
     // Visual
     CONFIG_VARIABLE_INT(vis_brightmaps),
-    CONFIG_VARIABLE_INT(vis_colored_lighting),
     CONFIG_VARIABLE_INT(vis_translucency),
-    CONFIG_VARIABLE_INT(vis_fake_contrast),
-    CONFIG_VARIABLE_INT(vis_smooth_light),
     CONFIG_VARIABLE_INT(vis_improved_fuzz),
+    CONFIG_VARIABLE_INT(vis_colored_lighting),
+    CONFIG_VARIABLE_INT(vis_smooth_light),
     CONFIG_VARIABLE_INT(vis_colored_blood),
     CONFIG_VARIABLE_INT(vis_swirling_liquids),
-    CONFIG_VARIABLE_INT(vis_invul_sky),
     CONFIG_VARIABLE_INT(vis_animated_sky),
     CONFIG_VARIABLE_INT(vis_linear_sky),
     CONFIG_VARIABLE_INT(vis_flip_corpses),
@@ -445,24 +439,17 @@ static default_t	doom_defaults_list[] =
     // Status Bar
     CONFIG_VARIABLE_INT(st_colored_stbar),
     CONFIG_VARIABLE_INT(st_negative_health),
-    CONFIG_VARIABLE_INT(st_blinking_keys),
-
-    // Audible
-    CONFIG_VARIABLE_INT(aud_z_axis_sfx),
-    CONFIG_VARIABLE_INT(aud_full_sounds),
-    CONFIG_VARIABLE_INT(aud_exit_sounds),
 
     // Physical
     CONFIG_VARIABLE_INT(phys_torque),
-    CONFIG_VARIABLE_INT(phys_ssg_tear_monsters),
     CONFIG_VARIABLE_INT(phys_toss_drop),
     CONFIG_VARIABLE_INT(phys_floating_powerups),
     CONFIG_VARIABLE_INT(phys_weapon_alignment),
     CONFIG_VARIABLE_INT(phys_breathing),
 
     // Gameplay
-    CONFIG_VARIABLE_INT(gp_default_class),
     CONFIG_VARIABLE_INT(gp_default_skill),
+    CONFIG_VARIABLE_INT(gp_pistol_start),
     CONFIG_VARIABLE_INT(gp_revealed_secrets),
     CONFIG_VARIABLE_INT(gp_flip_levels),
     CONFIG_VARIABLE_INT(gp_death_use_action),
@@ -474,7 +461,6 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_INT(demo_internal),
 
     // Compatibility-breaking
-    CONFIG_VARIABLE_INT(compat_pistol_start),
     CONFIG_VARIABLE_INT(compat_blockmap_fix),
     CONFIG_VARIABLE_INT(compat_vertical_aiming),
 };

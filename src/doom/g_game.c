@@ -904,7 +904,7 @@ void G_DoLoadLevel (void)
     } 
 		 
     // [JN] Pistol start game mode.
-    if (compat_pistol_start)
+    if (gp_pistol_start)
     {
         if (singleplayer)
         {

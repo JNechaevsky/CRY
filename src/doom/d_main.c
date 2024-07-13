@@ -391,7 +391,7 @@ void D_BindVariables(void)
     M_BindStringVariable("screenshots_path",    &ShotPathConfig);
 
 	// [JN] Bind ID-specific config variables.
-	ID_BindVariables(doom);
+	ID_BindVariables();
 }
 
 //

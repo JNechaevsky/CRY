@@ -2415,8 +2415,8 @@ static void M_Draw_ID_MouseBinds (void)
 static menuitem_t ID_Menu_Widgets[]=
 {
     { M_LFRT, "WIDGETS LOCATION",      M_ID_Widget_Location,  'w' },
-    { M_LFRT, "KIS STATS/FRAGS",       M_ID_Widget_KIS,       'k' },
-    { M_LFRT, "LEVEL/DM TIMER",        M_ID_Widget_Time,      'l' },
+    { M_LFRT, "KIS STATS",             M_ID_Widget_KIS,       'k' },
+    { M_LFRT, "LEVEL TIME",            M_ID_Widget_Time,      'l' },
     { M_LFRT, "TOTAL TIME",            M_ID_Widget_TotalTime, 't' },
     { M_LFRT, "LEVEL NAME",            M_ID_Widget_LevelName, 'l' },
     { M_LFRT, "PLAYER COORDS",         M_ID_Widget_Coords,    'p' },
@@ -2877,9 +2877,9 @@ static void M_Draw_ID_Gameplay_2 (void)
                  M_Item_Glow(9, DefSkillColor(gp_default_skill)));
 
     // Pistol start game mode
-    sprintf(str, compat_pistol_start ? "ON" : "OFF");
+    sprintf(str, gp_pistol_start ? "ON" : "OFF");
     M_WriteText (M_ItemRightAlign(str), 108, str,
-                 M_Item_Glow(10, compat_pistol_start ? GLOW_GREEN : GLOW_DARKRED));
+                 M_Item_Glow(10, gp_pistol_start ? GLOW_GREEN : GLOW_DARKRED));
 
     // Report revealed secrets
     sprintf(str, gp_revealed_secrets == 1 ? "TOP" :
@@ -2951,7 +2951,7 @@ static void M_ID_DefaulSkill (int choice)
 
 static void M_ID_PistolStart (int choice)
 {
-    compat_pistol_start ^= 1;
+    gp_pistol_start ^= 1;
 }
 
 static void M_ID_RevealedSecrets (int choice)
@@ -3005,11 +3005,6 @@ static void M_ID_ApplyResetHook (void)
     vid_fov = 90;
     dp_menu_shading = 0;
     dp_level_brightness = 0;
-    // Color settings
-    vid_saturation = 100;
-    vid_r_intensity = 1.000000;
-    vid_g_intensity = 1.000000;
-    vid_b_intensity = 1.000000;
     // Messages settings
     msg_show = 1;
     msg_alignment = 0;
@@ -3055,14 +3050,11 @@ static void M_ID_ApplyResetHook (void)
 
     // Visual
     vis_brightmaps = 0;
-    vis_colored_lighting = 0;
     vis_translucency = 0;
-    vis_fake_contrast = 1;
-    vis_smooth_light = 0;
     vis_improved_fuzz = 0;
+    vis_colored_lighting = 0;
     vis_colored_blood = 0;
     vis_swirling_liquids = 0;
-    vis_invul_sky = 0;
     vis_animated_sky = 0; skysmoothdelta = 0;
     vis_linear_sky = 0;
     vis_flip_corpses = 0;
@@ -3074,16 +3066,9 @@ static void M_ID_ApplyResetHook (void)
     // Status bar
     st_colored_stbar = 0;
     st_negative_health = 0;
-    st_blinking_keys = 0;
-
-    // Audible
-    aud_z_axis_sfx = 0;
-    aud_full_sounds = 0;
-    aud_exit_sounds = 0;
 
     // Physical
     phys_torque = 0;
-    phys_ssg_tear_monsters = 0;
     phys_toss_drop = 0;
     phys_floating_powerups = 0;
     phys_weapon_alignment = 0;
@@ -3091,6 +3076,7 @@ static void M_ID_ApplyResetHook (void)
 
     // Gameplay
     gp_default_skill = 2;
+    gp_pistol_start = 0;
     gp_revealed_secrets = 0;
     gp_flip_levels = 0;
     gp_death_use_action = 0;
@@ -3102,7 +3088,6 @@ static void M_ID_ApplyResetHook (void)
     demo_internal = 1;
 
     // Compatibility-breaking
-    compat_pistol_start = 0;
     compat_blockmap_fix = 0;
     compat_vertical_aiming = 0;
 

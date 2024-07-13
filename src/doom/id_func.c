@@ -98,73 +98,34 @@ void ID_LeftWidgets (void)
         if (widget_kis == 1
         || (widget_kis == 2 && automapactive))
         {
-            if (!deathmatch)
+            char str1[16];  // kills
+            char str2[16];  // items
+            char str3[16];  // secret
+
+            // Kills:
+            M_WriteText(0 - WIDESCREENDELTA, 9, "K:", cr[CR_GRAY]);
+            if (IDWidget.extrakills)
             {
-                char str1[16];  // kills
-                char str2[16];  // items
-                char str3[16];  // secret
-
-                // Kills:
-                M_WriteText(0 - WIDESCREENDELTA, 9, "K:", cr[CR_GRAY]);
-                if (IDWidget.extrakills)
-                {
-                    sprintf(str1, "%d+%d/%d ", IDWidget.kills, IDWidget.extrakills, IDWidget.totalkills);
-                }
-                else
-                {
-                    sprintf(str1, "%d/%d ", IDWidget.kills, IDWidget.totalkills);
-                }
-                M_WriteText(0 - WIDESCREENDELTA + 16, 9, str1, ID_WidgetColor(widget_kills));
-
-                // Items:
-                M_WriteText(0 - WIDESCREENDELTA, 18, "I:", cr[CR_GRAY]);
-                sprintf(str2, "%d/%d ", IDWidget.items, IDWidget.totalitems);
-                M_WriteText(0 - WIDESCREENDELTA + 16, 18, str2, ID_WidgetColor(widget_items));
-
-                // Secret:
-                M_WriteText(0 - WIDESCREENDELTA, 27, "S:", cr[CR_GRAY]);
-                sprintf(str3, "%d/%d ", IDWidget.secrets, IDWidget.totalsecrets);
-                M_WriteText(0 - WIDESCREENDELTA + 16, 27, str3, ID_WidgetColor(widget_secret));
+                sprintf(str1, "%d+%d/%d ", IDWidget.kills, IDWidget.extrakills, IDWidget.totalkills);
             }
             else
             {
-                char str1[16] = {0};  // Green
-                char str2[16] = {0};  // Indigo
-                char str3[16] = {0};  // Brown
-                char str4[16] = {0};  // Red
-
-                // Green
-                if (playeringame[0])
-                {
-                    M_WriteText(0 - WIDESCREENDELTA, 9, "G:", cr[CR_GREEN]);
-                    sprintf(str1, "%d", IDWidget.frags_g);
-                    M_WriteText(0 - WIDESCREENDELTA + 16, 9, str1, cr[CR_GREEN]);
-                }
-                // Indigo
-                if (playeringame[1])
-                {
-                    M_WriteText(0 - WIDESCREENDELTA, 18, "I:", cr[CR_GRAY]);
-                    sprintf(str2, "%d", IDWidget.frags_i);
-                    M_WriteText(0 - WIDESCREENDELTA + 16, 18, str2, cr[CR_GRAY]);
-                }
-                // Brown
-                if (playeringame[2])
-                {
-                    M_WriteText(0 - WIDESCREENDELTA, 27, "B:", cr[CR_BROWN]);
-                    sprintf(str3, "%d", IDWidget.frags_b);
-                    M_WriteText(0 - WIDESCREENDELTA + 16, 27, str3, cr[CR_BROWN]);
-                }
-                // Red
-                if (playeringame[3])
-                {
-                    M_WriteText(0 - WIDESCREENDELTA, 36, "B:", cr[CR_RED]);
-                    sprintf(str4, "%d", IDWidget.frags_r);
-                    M_WriteText(0 - WIDESCREENDELTA + 16, 36, str4, cr[CR_RED]);
-                }
+                sprintf(str1, "%d/%d ", IDWidget.kills, IDWidget.totalkills);
             }
+            M_WriteText(0 - WIDESCREENDELTA + 16, 9, str1, ID_WidgetColor(widget_kills));
+
+            // Items:
+            M_WriteText(0 - WIDESCREENDELTA, 18, "I:", cr[CR_GRAY]);
+            sprintf(str2, "%d/%d ", IDWidget.items, IDWidget.totalitems);
+            M_WriteText(0 - WIDESCREENDELTA + 16, 18, str2, ID_WidgetColor(widget_items));
+
+            // Secret:
+            M_WriteText(0 - WIDESCREENDELTA, 27, "S:", cr[CR_GRAY]);
+            sprintf(str3, "%d/%d ", IDWidget.secrets, IDWidget.totalsecrets);
+            M_WriteText(0 - WIDESCREENDELTA + 16, 27, str3, ID_WidgetColor(widget_secret));
         }
 
-        // Level / DeathMatch timer. Time gathered in G_Ticker.
+        // Level timer. Time gathered in G_Ticker.
         if (widget_time == 1
         || (widget_time == 2 && automapactive))
         {
