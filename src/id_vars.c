@@ -110,6 +110,7 @@ int vis_improved_fuzz = 0;
 int vis_colored_blood = 0;
 int vis_swirling_liquids = 0;
 int vis_invul_sky = 0;
+int vis_animated_sky = 0;
 int vis_linear_sky = 0;
 int vis_flip_corpses = 0;
 
@@ -253,6 +254,7 @@ void ID_BindVariables (GameMission_t mission)
     {
         M_BindIntVariable("vis_invul_sky",              &vis_invul_sky);
     }
+    M_BindIntVariable("vis_animated_sky",               &vis_animated_sky);
     M_BindIntVariable("vis_linear_sky",                 &vis_linear_sky);
     M_BindIntVariable("vis_flip_corpses",               &vis_flip_corpses);
     
