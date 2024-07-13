@@ -119,7 +119,7 @@ int st_negative_health = 0;
 int phys_torque = 0;
 int phys_toss_drop = 0;
 int phys_floating_powerups = 0;
-int phys_weapon_alignment = 0;
+int phys_weapon_alignment = 2;
 int phys_breathing = 0;
 
 // Gameplay
@@ -242,7 +242,7 @@ void ID_BindVariables (void)
     // Gameplay
     M_BindIntVariable("gp_default_skill",               &gp_default_skill);
     M_BindIntVariable("gp_pistol_start",                &gp_pistol_start);
-    M_BindIntVariable("gp_revealed_secrets",        &gp_revealed_secrets);
+    M_BindIntVariable("gp_revealed_secrets",            &gp_revealed_secrets);
     M_BindIntVariable("gp_flip_levels",                 &gp_flip_levels);
     M_BindIntVariable("gp_death_use_action",            &gp_death_use_action);
     
@@ -253,5 +253,5 @@ void ID_BindVariables (void)
     M_BindIntVariable("demo_internal",                  &demo_internal);
     
     M_BindIntVariable("compat_blockmap_fix",            &compat_blockmap_fix);
-    M_BindIntVariable("compat_vertical_aiming",     &compat_vertical_aiming);
+    M_BindIntVariable("compat_vertical_aiming",         &compat_vertical_aiming);
 }

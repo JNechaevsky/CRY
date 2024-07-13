@@ -2862,7 +2862,7 @@ static void M_Draw_ID_Gameplay_2 (void)
     sprintf(str, phys_weapon_alignment == 1 ? "BOBBING" :
                  phys_weapon_alignment == 2 ? "CENTERED" : "ORIGINAL");
     M_WriteText (M_ItemRightAlign(str), 72, str,
-                 M_Item_Glow(6, phys_weapon_alignment ? GLOW_GREEN : GLOW_DARKRED));
+                 M_Item_Glow(6, phys_weapon_alignment == 2 ? GLOW_DARKRED : GLOW_GREEN));
 
     // Imitate player's breathing
     sprintf(str, phys_breathing ? "ON" : "OFF");
@@ -3071,7 +3071,7 @@ static void M_ID_ApplyResetHook (void)
     phys_torque = 0;
     phys_toss_drop = 0;
     phys_floating_powerups = 0;
-    phys_weapon_alignment = 0;
+    phys_weapon_alignment = 2;
     phys_breathing = 0;
 
     // Gameplay
