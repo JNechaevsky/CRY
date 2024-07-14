@@ -1,0 +1,6 @@
+* IWAD contents Copyright(C) 1994 Id Software, Inc.
+  Licensed to Atari Corporation.
+
+* Yaguar icon is created from "Jaguar head icon.svg" vector graphics,
+  created by Julian Herzog and released under GNU Free Documentation License.
+  https://commons.wikimedia.org/wiki/File:Jaguar_head_icon.svg
