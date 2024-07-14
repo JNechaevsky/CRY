@@ -21,6 +21,7 @@ The project is created by [Julia Nechaevskaya](mailto:julia.nechaevskaya@live.co
 * Additional darker gamma-correction levels.
 * In-game keyboard and mouse bindings.
 * Various optional visual and gameplay enhacements.
+* Preserved most original Jaguar Doom playstate quirks.
 
 ### License
 
