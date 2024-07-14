@@ -197,8 +197,8 @@ void R_InitColoredColormaps (const byte k, const float scale, const int j)
     R_InitColoredColormap(k, scale, C_ECB866, colormaps_C63F23, j);
     R_InitColoredColormap(k, scale, C_C63F23, colormaps_ECB866, j);
     R_InitColoredColormap(k, scale, C_9BC8CD, colormaps_9BC8CD, j);
-    R_InitColoredColormap(k, scale, C_666666, colormaps_777777, j);
-    R_InitColoredColormap(k, scale, C_777777, colormaps_666666, j);
+    R_InitColoredColormap(k, scale, C_666666, colormaps_666666, j);
+    R_InitColoredColormap(k, scale, C_777777, colormaps_777777, j);
 }
 
 // =============================================================================
@@ -363,8 +363,8 @@ void R_ColoredZLightLevels (const int i, const int j, const int level)
     zlight_ECB866[i][j] = colormaps_ECB866 + level*256;
     zlight_C63F23[i][j] = colormaps_C63F23 + level*256;
     zlight_9BC8CD[i][j] = colormaps_9BC8CD + level*256;
-    zlight_666666[i][j] = colormaps_777777 + level*256;
-    zlight_777777[i][j] = colormaps_666666 + level*256;
+    zlight_666666[i][j] = colormaps_666666 + level*256;
+    zlight_777777[i][j] = colormaps_777777 + level*256;
 }
 
 // =============================================================================
@@ -529,8 +529,8 @@ void R_ColoredScLightLevels (const int i, const int j, const int level)
     scalelight_ECB866[i][j] = colormaps_ECB866 + level*256;
     scalelight_C63F23[i][j] = colormaps_C63F23 + level*256;
     scalelight_9BC8CD[i][j] = colormaps_9BC8CD + level*256;
-    scalelight_666666[i][j] = colormaps_777777 + level*256;
-    scalelight_777777[i][j] = colormaps_666666 + level*256;
+    scalelight_666666[i][j] = colormaps_666666 + level*256;
+    scalelight_777777[i][j] = colormaps_777777 + level*256;
 }
 
 // =============================================================================
