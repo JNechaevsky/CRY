@@ -1655,7 +1655,7 @@ static void AM_drawWalls (void)
                     // Ceiling level change
                     else if (lines[i].backsector->ceilingheight != lines[i].frontsector->ceilingheight)
                     {
-                        AM_drawMline(&l, 163);
+                        AM_drawMline(&l, 75);
                     }
                     // Hidden gray walls
                     else if (iddt_cheating)
