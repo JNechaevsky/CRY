@@ -7,7 +7,7 @@ The project is created by [Julia Nechaevskaya](mailto:julia.nechaevskaya@live.co
 ### Download
 
 **Version 2.0:**
-* _under development_
+* _Under development_
 
 **Version 1.0 (released: February 10, 2019):**
 * Windows (32-bit): [yaguar-doom-1.0-win32.zip](https://github.com/JNechaevsky/yaguar-doom/releases/download/1.0/yaguar-doom-1.0-win32.zip)
@@ -25,4 +25,4 @@ The project is created by [Julia Nechaevskaya](mailto:julia.nechaevskaya@live.co
 
 ### License
 
-Yaguar Doom is licensed under the [GNU General Public License v2](https://www.gnu.org/licenses/gpl-2.0.html) and [Jaguar Doom Source Code license](https://github.com/JNechaevsky/yaguar-doom/blob/main/COPYING-JAG.txt).
+Yaguar Doom source code is licensed under the [GNU General Public License v2](https://github.com/JNechaevsky/yaguar-doom/blob/main/COPYING.txt) and [Jaguar Doom Source Code license](https://github.com/JNechaevsky/yaguar-doom/blob/main/COPYING-JAG.txt). Infromation about game assest is provided in [COPYING-RES.txt](https://github.com/JNechaevsky/yaguar-doom/blob/main/COPYING-RES.txt) file.
