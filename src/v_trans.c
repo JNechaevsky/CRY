@@ -450,22 +450,27 @@ byte V_Colorize (byte *playpal, int cr, byte source, boolean keepgray109)
     // [JN] Menu glowing effects.
     else if (cr == CR_MENU_BRIGHT5)
     {
+        hsv.y *= 0.8;
         hsv.z *= 1.5;
     }
     else if (cr == CR_MENU_BRIGHT4)
     {
+        hsv.y *= 0.8;
         hsv.z *= 1.4;
     }
     else if (cr == CR_MENU_BRIGHT3)
     {
+        hsv.y *= 0.8;
         hsv.z *= 1.3;
     }
     else if (cr == CR_MENU_BRIGHT2)
     {
+        hsv.y *= 0.8;
         hsv.z *= 1.2;
     }
     else if (cr == CR_MENU_BRIGHT1)
     {
+        hsv.y *= 0.8;
         hsv.z *= 1.1;
     }
     else if (cr == CR_MENU_DARK1)
