@@ -378,11 +378,14 @@ boolean ST_Responder (event_t *ev)
                 plyr->cheats ^= CF_GODMODE;
                 if (plyr->cheats & CF_GODMODE)
                 {
+                    // [JN] Jaguar: no healing by using god mode cheat.
+                    /*
                     if (plyr->mo)
                     {
                         plyr->mo->health = 100;
                     }
                     plyr->health = 100;
+                    */
                     CT_SetMessage(plyr, STSTR_DQDON, false, NULL);
                 }
                 else 
