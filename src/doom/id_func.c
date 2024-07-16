@@ -104,14 +104,7 @@ void ID_LeftWidgets (void)
 
             // Kills:
             M_WriteText(0 - WIDESCREENDELTA, 9, "K:", cr[CR_GRAY]);
-            if (IDWidget.extrakills)
-            {
-                sprintf(str1, "%d+%d/%d ", IDWidget.kills, IDWidget.extrakills, IDWidget.totalkills);
-            }
-            else
-            {
-                sprintf(str1, "%d/%d ", IDWidget.kills, IDWidget.totalkills);
-            }
+            sprintf(str1, "%d/%d ", IDWidget.kills, IDWidget.totalkills);
             M_WriteText(0 - WIDESCREENDELTA + 16, 9, str1, ID_WidgetColor(widget_kills));
 
             // Items:
@@ -265,15 +258,7 @@ void ID_LeftWidgets (void)
             // Kills:
             sprintf(str1, "K ");
             M_WriteText(0 - WIDESCREENDELTA, 152 + yy, str1, cr[CR_GRAY]);
-            
-            if (IDWidget.extrakills)
-            {
-                sprintf(str2, "%d+%d/%d ", IDWidget.kills, IDWidget.extrakills, IDWidget.totalkills);
-            }
-            else
-            {
-                sprintf(str2, "%d/%d ", IDWidget.kills, IDWidget.totalkills);
-            }
+            sprintf(str2, "%d/%d ", IDWidget.kills, IDWidget.totalkills);
             M_WriteText(0 - WIDESCREENDELTA + M_StringWidth(str1), 152 + yy, str2, ID_WidgetColor(widget_kills));
     
             // Items:

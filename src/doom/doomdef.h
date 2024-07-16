@@ -626,9 +626,6 @@ typedef struct mobj_s
     fixed_t		oldz;
     angle_t		oldangle;
 
-    // [JN] Flag for counting resurrected monsters.
-    boolean     resurrected;
-
     // [JN] Amplitude of floating powerups, used *only* while rendering.
     fixed_t     float_amp;
     fixed_t     float_z;

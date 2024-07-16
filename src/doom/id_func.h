@@ -48,7 +48,6 @@ typedef struct ID_Widget_s
     int time; // Time spent on the level.
 
     int kills;         // Current kill count
-    int extrakills;    // Current extra kill count
     int totalkills;    // Total enemy count on the level
     int items;         // Current items count
     int totalitems;    // Total item count on the level

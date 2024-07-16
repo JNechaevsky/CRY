@@ -40,7 +40,6 @@ extern int G_VanillaVersionCode(void);
 
 extern void G_BeginRecording (void);
 extern void G_BuildTiccmd (ticcmd_t *cmd, int maketic); 
-extern void G_DeathMatchSpawnPlayer (int playernum);
 extern void G_DeferedInitNew (skill_t skill, int episode, int map);
 extern void G_DeferedPlayDemo (const char* name);
 extern void G_DoCompleted (void); 
