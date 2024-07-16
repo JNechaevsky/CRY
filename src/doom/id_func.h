@@ -54,11 +54,6 @@ typedef struct ID_Widget_s
     int totalitems;    // Total item count on the level
     int secrets;       // Current secrets count
     int totalsecrets;  // Total secrets on the level
-
-    int frags_g;       // Frags counter of green player
-    int frags_i;       // Frags counter of indigo player
-    int frags_b;       // Frags counter of brown player
-    int frags_r;       // Frags counter of red player
 } ID_Widget_t;
 
 extern ID_Widget_t IDWidget;

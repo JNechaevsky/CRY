@@ -117,7 +117,6 @@ static patch_t *faceback;            // player face background
 // [crispy] blinking key or skull in the status bar
 int st_keyorskull[3];
 
-static int st_fragscount; // number of frags so far in deathmatch
 static int st_oldhealth = -1;  // used to use appopriately pained face
 static int st_facecount = 0;  // count until face changes
 static int st_faceindex = 1;  // current face index, used by w_faces
@@ -923,9 +922,6 @@ static void ST_updateFaceWidget (void)
 void ST_doPaletteStuff (void)
 {
     int palette;
-#ifndef CRISPY_TRUECOLOR
-    byte*	pal;
-#endif
     int bzc;
     int cnt = plyr->damagecount;
 
@@ -981,40 +977,6 @@ void ST_doPaletteStuff (void)
 }
 
 // -----------------------------------------------------------------------------
-// ST_UpdateFragsCounter
-// [JN] Updated to int type, allowing to show frags of any player.
-// -----------------------------------------------------------------------------
-
-static const int ST_UpdateFragsCounter (const int playernum, const boolean big_values)
-{
-    st_fragscount = 0;
-
-    for (int i = 0 ; i < MAXPLAYERS ; i++)
-    {
-        if (i != playernum)
-        {
-            st_fragscount += players[playernum].frags[i];
-        }
-        else
-        {
-            st_fragscount -= players[playernum].frags[i];
-        }
-    }
-    
-    // [JN] Prevent overflow, ST_DrawBigNumber can only draw three 
-    // digit number, and status bar fits well only two digits number
-    if (!big_values)
-    {
-        if (st_fragscount > 99)
-            st_fragscount = 99;
-        if (st_fragscount < -99)
-            st_fragscount = -99;
-    }
-
-    return st_fragscount;
-}
-
-// -----------------------------------------------------------------------------
 // ST_Ticker
 // -----------------------------------------------------------------------------
 
@@ -1038,26 +1000,6 @@ void ST_Ticker (void)
     IDWidget.x = plyr->mo->x >> FRACBITS;
     IDWidget.y = plyr->mo->y >> FRACBITS;
     IDWidget.ang = plyr->mo->angle / ANG1;
-
-    if (deathmatch)
-    {
-        if (playeringame[0])
-        {
-            IDWidget.frags_g = ST_UpdateFragsCounter(0, true);
-        }
-        if (playeringame[1])
-        {
-            IDWidget.frags_i = ST_UpdateFragsCounter(1, true);
-        }
-        if (playeringame[2])
-        {
-            IDWidget.frags_b = ST_UpdateFragsCounter(2, true);
-        }
-        if (playeringame[3])
-        {
-            IDWidget.frags_r = ST_UpdateFragsCounter(3, true);
-        }
-    }
 
     // [JN] Update blinking key or skull timer.
     for (int i = 0 ; i < 3 ; i++)
