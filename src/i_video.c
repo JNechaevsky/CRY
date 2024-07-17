@@ -99,7 +99,6 @@ static SDL_Texture *palette_14 = NULL;
 static int pane_alpha;
 
 static unsigned int rmask, gmask, bmask, amask; // [crispy] moved up here
-static const uint8_t blend_alpha = 184; // [JN] Increased opacity from 0xa8 (168).
 extern pixel_t* pal_color; // [crispy] evil hack to get FPS dots working as in Vanilla
 
 static boolean palette_to_set;
@@ -1852,16 +1851,23 @@ const pixel_t I_BlendDark (const pixel_t bg, const int d)
 	return amask | sag | srb;
 }
 
-const pixel_t I_BlendOver (const pixel_t bg, const pixel_t fg)
+// [crispy] Main overlay blending function
+const pixel_t I_BlendOver (const pixel_t bg, const pixel_t fg, const int amount)
 {
-	const uint32_t r = ((blend_alpha * (fg & rmask) + (0xff - blend_alpha) * (bg & rmask)) >> 8) & rmask;
-	const uint32_t g = ((blend_alpha * (fg & gmask) + (0xff - blend_alpha) * (bg & gmask)) >> 8) & gmask;
-	const uint32_t b = ((blend_alpha * (fg & bmask) + (0xff - blend_alpha) * (bg & bmask)) >> 8) & bmask;
+	const uint32_t r = ((amount * (fg & rmask) + (0xff - amount) * (bg & rmask)) >> 8) & rmask;
+	const uint32_t g = ((amount * (fg & gmask) + (0xff - amount) * (bg & gmask)) >> 8) & gmask;
+	const uint32_t b = ((amount * (fg & bmask) + (0xff - amount) * (bg & bmask)) >> 8) & bmask;
 
 	return amask | r | g | b;
 }
 
-const pixel_t (*blendfunc) (const pixel_t fg, const pixel_t bg) = I_BlendOver;
+// [crispy] TRANMAP blending emulation, used for Doom
+const pixel_t I_BlendOverTranmap (const pixel_t bg, const pixel_t fg)
+{
+	return I_BlendOver(bg, fg, 0xB8); // [JN] 184, increased from 168 (72% opacity)
+}
+
+const pixel_t (*blendfunc) (const pixel_t fg, const pixel_t bg) = I_BlendOverTranmap;
 
 const pixel_t I_MapRGB (const uint8_t r, const uint8_t g, const uint8_t b)
 {

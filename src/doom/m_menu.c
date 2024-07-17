@@ -441,7 +441,7 @@ static void M_ID_LimitFPS (int choice);
 static void M_ID_VSync (int choice);
 static void M_ID_ShowFPS (int choice);
 static void M_ID_PixelScaling (int choice);
-static void M_ID_LoadingBanner (int choice);
+static void M_ID_ScreenWipe (int choice);
 static void M_ID_Gamma (int choice);
 static void M_ID_FOV (int choice);
 static void M_ID_TextShadows (int choice);
@@ -1033,7 +1033,7 @@ static menuitem_t ID_Menu_Video[]=
     { M_LFRT, "ENABLE VSYNC",         M_ID_VSync,         'e' },
     { M_LFRT, "SHOW FPS COUNTER",     M_ID_ShowFPS,       's' },
     { M_LFRT, "PIXEL SCALING",        M_ID_PixelScaling,  'p' },
-    { M_LFRT, "LOADING BANNER",       M_ID_LoadingBanner, 'l' },
+    { M_LFRT, "SCREEN WIPE EFFECT",   M_ID_ScreenWipe,    's' },
     { M_SKIP, "", 0, '\0' },
     { M_LFRT, "GAMMA-CORRECTION",     M_ID_Gamma,         'g' },
     { M_LFRT, "FIELD OF VIEW",        M_ID_FOV,           'f' },
@@ -1118,8 +1118,9 @@ static void M_Draw_ID_Video (void)
                  M_Item_Glow(6, vid_smooth_scaling ? GLOW_GREEN : GLOW_DARKRED));
 
     // Loading banner
-    sprintf(str, vid_screenwipe == 1 ? "ORIGINAL" :
-                 vid_screenwipe == 2 ? "FAST" : "OFF");
+    sprintf(str, vid_screenwipe == 1 ? "LOADING" :
+                 vid_screenwipe == 2 ? "MELT" :
+                 vid_screenwipe == 3 ? "CROSSFADE" : "OFF");
     M_WriteText (M_ItemRightAlign(str), 81, str,
                  M_Item_Glow(7, vid_screenwipe == 1 ? GLOW_DARKRED : GLOW_GREEN));
 
@@ -1290,9 +1291,9 @@ static void M_ID_PixelScaling (int choice)
     R_ExecuteSetViewSize();
 }
 
-static void M_ID_LoadingBanner (int choice)
+static void M_ID_ScreenWipe (int choice)
 {
-    vid_screenwipe = M_INT_Slider(vid_screenwipe, 0, 2, choice, false);
+    vid_screenwipe = M_INT_Slider(vid_screenwipe, 0, 3, choice, false);
 }
 
 static void M_ID_Gamma (int choice)

@@ -816,7 +816,7 @@ static void R_ProjectSprite (mobj_t* thing)
     {
 	vis->blendfunc = 
 		(thing->frame & FF_FULLBRIGHT) ? (vis_translucency == 1 ?
-			I_BlendAdd : I_BlendOver) : I_BlendOver;
+			I_BlendAdd : I_BlendOverTranmap) : I_BlendOverTranmap;
     }
 }
 
