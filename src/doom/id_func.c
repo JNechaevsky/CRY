@@ -630,23 +630,13 @@ void ID_DemoBar (void)
     // try to find nearest colors instead.
     if (!colors_set)
     {
-#ifndef CRISPY_TRUECOLOR
-        black = I_GetPaletteIndex(0, 0, 0);
-        white = I_GetPaletteIndex(255, 255, 255);
-#else
         black = I_MapRGB(0, 0, 0);
         white = I_MapRGB(255, 255, 255);
-#endif
         colors_set = true;
     }
 
-#ifndef CRISPY_TRUECOLOR
     V_DrawHorizLine(0, SCREENHEIGHT - 2, i, black); // [crispy] black
     V_DrawHorizLine(0, SCREENHEIGHT - 1, i, white); // [crispy] white
-#else
-    V_DrawHorizLine(0, SCREENHEIGHT - 2, i, black); // [crispy] black
-    V_DrawHorizLine(0, SCREENHEIGHT - 1, i, white); // [crispy] white
-#endif
 }
 
 // =============================================================================

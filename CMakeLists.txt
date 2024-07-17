@@ -68,8 +68,6 @@ else()
     add_compile_definitions(DISABLE_SDL2MIXER=1)
 endif()
 
-option(CRISPY_TRUECOLOR "True color rendering" ON)
-
 # Check for libsamplerate.
 find_package(SampleRate)
 if(SampleRate_FOUND)

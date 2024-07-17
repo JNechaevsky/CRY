@@ -816,11 +816,7 @@ static void R_ProjectSprite (mobj_t* thing)
     {
 	vis->blendfunc = 
 		(thing->frame & FF_FULLBRIGHT) ? (vis_translucency == 1 ?
-#ifndef CRISPY_TRUECOLOR
-			addmap : tintmap) : tintmap;
-#else
 			I_BlendAdd : I_BlendOver) : I_BlendOver;
-#endif
     }
 }
 

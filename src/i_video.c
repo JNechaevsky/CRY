@@ -896,27 +896,6 @@ void I_FinishUpdate (void)
 		}
 	}
 
-#ifndef CRISPY_TRUECOLOR
-    if (palette_to_set)
-    {
-        SDL_SetPaletteColors(screenbuffer->format->palette, palette, 0, 256);
-        palette_to_set = false;
-
-        if (vid_vga_porch_flash)
-        {
-            // "flash" the pillars/letterboxes with palette changes, emulating
-            // VGA "porch" behaviour (GitHub issue #832)
-            SDL_SetRenderDrawColor(renderer, palette[0].r, palette[0].g,
-                palette[0].b, SDL_ALPHA_OPAQUE);
-        }
-    }
-
-    // Blit from the paletted 8-bit screen buffer to the intermediate
-    // 32-bit RGBA buffer that we can load into the texture.
-
-    SDL_LowerBlit(screenbuffer, &blit_rect, argbbuffer, &blit_rect);
-#endif
-
     // Update the intermediate texture with the contents of the RGBA buffer.
 
     SDL_UpdateTexture(texture, NULL, argbbuffer->pixels, argbbuffer->pitch);
@@ -1287,9 +1266,6 @@ static void SetVideoMode(void)
 {
     int w, h;
     int x = 0, y = 0;
-#ifndef CRISPY_TRUECOLOR
-    unsigned int rmask, gmask, bmask, amask;
-#endif
     int bpp;
     int window_flags = 0, renderer_flags = 0;
     SDL_DisplayMode mode;
@@ -1462,7 +1438,6 @@ static void SetVideoMode(void)
         argbbuffer = SDL_CreateRGBSurface(0,
                                           SCREENWIDTH, SCREENHEIGHT, bpp,
                                           rmask, gmask, bmask, amask);
-#ifdef CRISPY_TRUECOLOR
 
 		// Red palette
         SDL_FillRect(argbbuffer, NULL, I_MapRGB(255, 224, 224));
@@ -1518,7 +1493,7 @@ static void SetVideoMode(void)
         SDL_FillRect(argbbuffer, NULL, I_MapRGB(0, 255, 0));
         palette_14 = SDL_CreateTextureFromSurface(renderer, argbbuffer);
         SDL_SetTextureBlendMode(palette_14, SDL_BLENDMODE_ADD);
-#endif
+
         SDL_FillRect(argbbuffer, NULL, 0);
     }
 
@@ -1623,9 +1598,6 @@ void I_GetScreenDimensions (void)
 void I_InitGraphics(void)
 {
     SDL_Event dummy;
-#ifndef CRISPY_TRUECOLOR
-    byte *doompal;
-#endif
     char *env;
 
     // Pass through the XSCREENSAVER_WINDOW environment variable to 
@@ -1853,7 +1825,7 @@ void I_BindVideoVariables(void)
     M_BindIntVariable("mouse_enable",                  &usemouse);
     M_BindIntVariable("mouse_grab",                    &mouse_grab);
 }
-#ifdef CRISPY_TRUECOLOR
+
 const pixel_t I_BlendAdd (const pixel_t bg, const pixel_t fg)
 {
 	uint32_t r, g, b;
@@ -1942,5 +1914,3 @@ const float I_SaturationPercent[100] =
     0.066000f, 0.059400f, 0.052800f, 0.046200f, 0.039600f,
     0.033000f, 0.026400f, 0.019800f, 0.013200f, 0
 };
-
-#endif

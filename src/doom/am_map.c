@@ -1038,11 +1038,7 @@ static void AM_shadeBackground (void)
 
         for (int y = 0; y < SCREENWIDTH * height ; y++)
         {
-#ifndef CRISPY_TRUECOLOR
-            I_VideoBuffer[y] = colormaps[((automap_shading + 3) * 2) * 256 + I_VideoBuffer[y]];
-#else
             I_VideoBuffer[y] = I_BlendDark(I_VideoBuffer[y], I_ShadeFactor[automap_shading]);
-#endif
         }
 }
 
@@ -1238,11 +1234,7 @@ static void AM_drawFline_Vanilla (fline_t *fl, int color)
     }
 
 #define PUTDOT_RAW(xx,yy,cc) I_VideoBuffer[(yy)*f_w+(flipscreenwidth[xx])]=(cc)
-#ifndef CRISPY_TRUECOLOR
-#define PUTDOT(xx,yy,cc) PUTDOT_RAW(xx,yy,cc)
-#else
 #define PUTDOT(xx,yy,cc) PUTDOT_RAW(xx,yy,(pal_color[(cc)]))
-#endif
 
     dx = fl->b.x - fl->a.x;
     ax = 2 * (dx<0 ? -dx : dx);

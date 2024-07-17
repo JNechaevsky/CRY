@@ -1213,11 +1213,6 @@ void R_InitData (void)
     printf (".");    
     R_InitHSVColors ();
     printf (".");    
-#ifndef CRISPY_TRUECOLOR
-    // [JN] Compose translucency tables.
-    V_InitTransMaps ();
-    printf (".");
-#endif
 }
 
 

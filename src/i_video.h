@@ -90,15 +90,11 @@ void I_ShutdownGraphics(void);
 void I_RenderReadPixels (byte **data, int *w, int *h);
 
 // Takes full 8 bit values.
-#ifndef CRISPY_TRUECOLOR
-void I_SetPalette (byte* palette);
-int I_GetPaletteIndex(int r, int g, int b);
-#else
 void I_SetPalette (int palette);
 extern const pixel_t I_MapRGB (const uint8_t r, const uint8_t g, const uint8_t b);
 extern const int I_ShadeFactor[];
 extern const float I_SaturationPercent[];
-#endif
+
 void I_FinishUpdate (void);
 
 void I_ReadScreen (pixel_t* scr);

@@ -341,11 +341,7 @@ void R_DrawFuzzColumn (void)
 	//  a pixel that is either one column
 	//  left or right of the current one.
 	// Add index from colormap to index.
-#ifndef CRISPY_TRUECOLOR
-	*dest = colormaps[6*256+dest[SCREENWIDTH*fuzzoffset[fuzzpos]]]; 
-#else
 	*dest = I_BlendDark(dest[SCREENWIDTH*fuzzoffset[fuzzpos]], 0xD3);
-#endif
 
 	// Clamp table lookup index.
 	if (++fuzzpos == FUZZTABLE) 
@@ -361,11 +357,7 @@ void R_DrawFuzzColumn (void)
     // draw one extra line using only pixels of that line and the one above
     if (cutoff)
     {
-#ifndef CRISPY_TRUECOLOR
-	*dest = colormaps[6*256+dest[SCREENWIDTH*(fuzzoffset[fuzzpos]-FUZZOFF)/2]];
-#else
 	*dest = I_BlendDark(dest[SCREENWIDTH*(fuzzoffset[fuzzpos]-FUZZOFF)/2], 0xD3);
-#endif
     }
 } 
 
@@ -421,13 +413,8 @@ void R_DrawFuzzColumnLow (void)
 	//  a pixel that is either one column
 	//  left or right of the current one.
 	// Add index from colormap to index.
-#ifndef CRISPY_TRUECOLOR
-	*dest = colormaps[6*256+dest[SCREENWIDTH*fuzzoffset[fuzzpos]]];
-	*dest2 = colormaps[6*256+dest2[SCREENWIDTH*fuzzoffset[fuzzpos]]];
-#else
 	*dest = I_BlendDark(dest[SCREENWIDTH*fuzzoffset[fuzzpos]], 0xD3);
 	*dest2 = I_BlendDark(dest2[SCREENWIDTH*fuzzoffset[fuzzpos]], 0xD3);
-#endif
 
 	// Clamp table lookup index.
 	if (++fuzzpos == FUZZTABLE) 
@@ -451,13 +438,8 @@ void R_DrawFuzzColumnLow (void)
     // draw one extra line using only pixels of that line and the one above
     if (cutoff)
     {
-#ifndef CRISPY_TRUECOLOR
-	*dest = colormaps[6*256+dest[SCREENWIDTH*(fuzzoffset[fuzzpos]-FUZZOFF)/2]];
-	*dest2 = colormaps[6*256+dest2[SCREENWIDTH*(fuzzoffset[fuzzpos]-FUZZOFF)/2]];
-#else
 	*dest = I_BlendDark(dest[SCREENWIDTH*(fuzzoffset[fuzzpos]-FUZZOFF)/2], 0xD3);
 	*dest2 = I_BlendDark(dest2[SCREENWIDTH*(fuzzoffset[fuzzpos]-FUZZOFF)/2], 0xD3);
-#endif
     }
 } 
  
@@ -607,13 +589,10 @@ void R_DrawTLColumn (void)
     {
         // [crispy] brightmaps
         const byte source = dc_source[frac>>FRACBITS];
-#ifndef CRISPY_TRUECOLOR
         // [JN] Draw full bright sprites with different functions, depending on user's choice.
-        *dest = blendfunc[(*dest<<8)+dc_colormap[dc_brightmap[source]][source]];
-#else
         const pixel_t destrgb = dc_colormap[dc_brightmap[source]][source];
         *dest = blendfunc(*dest, destrgb);
-#endif
+
 	dest += SCREENWIDTH;
 	frac += fracstep;
     } while (count--);
@@ -655,15 +634,11 @@ void R_DrawTLColumnLow (void)
     {
 	// [crispy] brightmaps
 	const byte source = dc_source[frac>>FRACBITS];    
-#ifndef CRISPY_TRUECOLOR
 	// [JN] Draw full bright sprites with different functions, depending on user's choice.
-	*dest = blendfunc[(*dest<<8)+dc_colormap[dc_brightmap[source]][source]];
-	*dest2 = blendfunc[(*dest2<<8)+dc_colormap[dc_brightmap[source]][source]];
-#else
 	const pixel_t destrgb = dc_colormap[dc_brightmap[source]][source];
 	*dest = blendfunc(*dest, destrgb);
 	*dest2 = blendfunc(*dest2, destrgb);
-#endif
+
 	dest += SCREENWIDTH;
 	dest2 += SCREENWIDTH;
 	frac += fracstep;
@@ -691,14 +666,11 @@ void R_DrawTLFuzzColumn (void)
 
     do
     {
-#ifndef CRISPY_TRUECOLOR
         // actual translucency map lookup taken from boom202s/R_DRAW.C:255
-        *dest = fuzzmap[(*dest<<8)+dc_colormap[0][dc_source[frac>>FRACBITS]]];
-#else
         const pixel_t destrgb = dc_colormap[0][dc_source[frac>>FRACBITS]];
 
        *dest = I_BlendFuzz(*dest, destrgb);
-#endif
+
         dest += SCREENWIDTH;
         frac += fracstep;
     } while (count--);
@@ -728,17 +700,11 @@ void R_DrawTLFuzzColumnLow (void)
 
     do
     {
-#ifndef CRISPY_TRUECOLOR
-        const pixel_t source = dc_colormap[0][dc_source[frac>>FRACBITS]];
-
-        *dest = fuzzmap[(*dest<<8)+source];
-        *dest2 = fuzzmap[(*dest2<<8)+source];
-#else
         const pixel_t destrgb = dc_colormap[0][dc_source[frac>>FRACBITS]];
 
        *dest = I_BlendFuzz(*dest, destrgb);
        *dest2 = I_BlendFuzz(*dest2, destrgb);
-#endif
+
         dest += SCREENWIDTH;
         dest2 += SCREENWIDTH;
         frac += fracstep;
@@ -766,14 +732,11 @@ void R_DrawTransTLFuzzColumn (void)
 
     do
     {
-#ifndef CRISPY_TRUECOLOR
         // actual translucency map lookup taken from boom202s/R_DRAW.C:255
-        *dest = fuzzmap[(*dest<<8)+dc_colormap[0][dc_translation[dc_source[frac>>FRACBITS]]]];
-#else
         const pixel_t destrgb = dc_colormap[0][dc_translation[dc_source[frac>>FRACBITS]]];
 
        *dest = I_BlendFuzz(*dest, destrgb);
-#endif
+
         dest += SCREENWIDTH;
         frac += fracstep;
     } while (count--);
@@ -803,17 +766,11 @@ void R_DrawTransTLFuzzColumnLow (void)
 
     do
     {
-#ifndef CRISPY_TRUECOLOR
-        const pixel_t source = dc_colormap[0][dc_translation[dc_source[frac>>FRACBITS]]];
-
-        *dest = fuzzmap[(*dest<<8)+source];
-        *dest2 = fuzzmap[(*dest2<<8)+source];
-#else
         const pixel_t destrgb = dc_colormap[0][dc_translation[dc_source[frac>>FRACBITS]]];
 
        *dest = I_BlendFuzz(*dest, destrgb);
        *dest2 = I_BlendFuzz(*dest2, destrgb);
-#endif
+
         dest += SCREENWIDTH;
         dest2 += SCREENWIDTH;
         frac += fracstep;
