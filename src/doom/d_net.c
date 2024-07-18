@@ -118,7 +118,6 @@ static void LoadGameSettings(net_gamesettings_t *settings)
     nomonsters = settings->nomonsters;
     fastparm = settings->fast_monsters;
     respawnparm = settings->respawn_monsters;
-    timelimit = settings->timelimit;
     consoleplayer = settings->consoleplayer;
 
     if (lowres_turn)
@@ -150,65 +149,10 @@ static void SaveGameSettings(net_gamesettings_t *settings)
     settings->nomonsters = nomonsters;
     settings->fast_monsters = fastparm;
     settings->respawn_monsters = respawnparm;
-    settings->timelimit = timelimit;
 
     settings->lowres_turn = (M_ParmExists("-record")
                          && !M_ParmExists("-longtics"))
                           || M_ParmExists("-shorttics");
-}
-
-static void InitConnectData(net_connect_data_t *connect_data)
-{
-    boolean shorttics;
-
-    connect_data->max_players = MAXPLAYERS;
-
-    //
-    // Connect data
-    //
-
-    // Game type fields:
-
-    connect_data->gamemode = gamemode;
-    connect_data->gamemission = gamemission;
-
-    //!
-    // @category demo
-    //
-    // Play with low turning resolution to emulate demo recording.
-    //
-
-    shorttics = M_ParmExists("-shorttics");
-
-    // Are we recording a demo? Possibly set lowres turn mode
-
-    connect_data->lowres_turn = (M_ParmExists("-record")
-                             && !M_ParmExists("-longtics"))
-                              || shorttics;
-
-    // Are we playing with the Freedoom IWAD?
-
-    connect_data->is_freedoom = W_CheckNumForName("FREEDOOM") >= 0;
-}
-
-void D_ConnectNetGame(void)
-{
-    net_connect_data_t connect_data;
-
-    InitConnectData(&connect_data);
-
-    //!
-    // @category net
-    //
-    // Start the game playing as though in a netgame with a single
-    // player.  This can also be used to play back single player netgame
-    // demos.
-    //
-
-    if (M_CheckParm("-solo-net") > 0)
-    {
-        netgame = true;
-    }
 }
 
 //

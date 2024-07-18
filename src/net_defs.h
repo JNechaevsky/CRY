@@ -29,29 +29,11 @@
 // This is the maximum supported by the networking code; individual games
 // have their own values for MAXPLAYERS that can be smaller.
 
-#define NET_MAXPLAYERS 8
+#define NET_MAXPLAYERS 2
 
 // Networking and tick handling related.
 
 #define BACKUPTICS 128
-
-typedef struct _net_module_s net_module_t;
-typedef struct _net_packet_s net_packet_t;
-typedef struct _net_addr_s net_addr_t;
-typedef struct _net_context_s net_context_t;
-
-// Settings specified when the client connects to the server.
-
-typedef struct
-{
-    int gamemode;
-    int gamemission;
-    int lowres_turn;
-    int drone;
-    int max_players;
-    int is_freedoom;
-    int player_class;
-} net_connect_data_t;
 
 // Game settings sent by client to server when initiating game start,
 // and received from the server by clients when the game starts.
@@ -70,19 +52,13 @@ typedef struct
     int gameversion;
     int lowres_turn;
     int new_sync;
-    int timelimit;
     int loadgame;
-    int random;  // [Strife only]
 
     // These fields are only used by the server when sending a game
     // start message:
 
     int num_players;
     int consoleplayer;
-
-    // Hexen player classes:
-
-    int player_classes[NET_MAXPLAYERS];
 
 } net_gamesettings_t;
 

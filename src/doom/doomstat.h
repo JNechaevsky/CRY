@@ -89,9 +89,6 @@ extern  skill_t         gameskill;
 extern  int		gameepisode;
 extern  int		gamemap;
 
-// If non-zero, exit the level after this number of minutes
-extern  int             timelimit;
-
 // Nightmare mode flag, single player.
 extern  boolean         respawnmonsters;
 
@@ -100,9 +97,6 @@ extern  boolean	netgame;
 
 // 0=Cooperative; 1=Deathmatch; 2=Altdeath
 extern int deathmatch;
-
-// Start single player game with items spawns as in cooperative netgame.
-extern boolean coop_spawns;
 
 // -------------------------
 // Internal parameters for sound rendering.

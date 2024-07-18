@@ -634,15 +634,6 @@ void D_DoomMain (void)
     if (M_CheckParm ("-dm3"))
 	deathmatch = 3;
 
-   
-    //!
-    // @category game
-    //
-    // Start single player game with items spawns as in cooperative netgame.
-    //
-
-    coop_spawns = M_CheckParm ("-coop_spawns");
-
     // Auto-detect the configuration dir.
 
     M_SetConfigDir(NULL);
@@ -691,15 +682,9 @@ void D_DoomMain (void)
 
     if (iwadfile == NULL)
     {
-        i_error_safe = true;
-        I_Error("Game mode indeterminate, no IWAD file was found.\n"
-                "Try to do following:\n"
-                "- Copy IWAD file into the folder with executable file.\n"
-                "- Drag and drop IWAD file onto executable file.\n"
-                "- Specifying one with the '-iwad' command line parameter.\n\n"
-                "Valid IWAD files are:\n"
-                "doom1.wad, doom.wad, doom2.wad, plutonia.wad, tnt.wad,\n"
-                "freedoom1.wad or freedoom2.wad");
+        i_error_safe = false;
+        I_Error("IWAD file yaguar-doom.wad not found.\n"
+                "Make sure it's in the same folder as the yaguar-doom executable.");
     }
 
     modifiedgame = false;
@@ -816,37 +801,6 @@ void D_DoomMain (void)
     {
 	startskill = myargv[p+1][0]-'1';
 	autostart = true;
-    }
-
-    timelimit = 0;
-
-    //! 
-    // @arg <n>
-    // @category net
-    // @vanilla
-    //
-    // For multiplayer games: exit each level after n minutes.
-    //
-
-    p = M_CheckParmWithArgs("-timer", 1);
-
-    if (p)
-    {
-	timelimit = atoi(myargv[p+1]);
-    }
-
-    //!
-    // @category net
-    // @vanilla
-    //
-    // Austin Virtual Gaming: end levels after 20 minutes.
-    //
-
-    p = M_CheckParm ("-avg");
-
-    if (p)
-    {
-	timelimit = 20;
     }
 
     //!
