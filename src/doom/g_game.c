@@ -945,6 +945,10 @@ void G_DoLoadLevel (void)
     memset (gamekeydown, 0, sizeof(gamekeydown));
     joyxmove = joyymove = joystrafemove = 0;
     mousex = mousey = 0;
+    memset(&localview, 0, sizeof(localview)); // [crispy]
+    memset(&carry, 0, sizeof(carry)); // [crispy]
+    memset(&prevcarry, 0, sizeof(prevcarry)); // [crispy]
+    memset(&basecmd, 0, sizeof(basecmd)); // [crispy]
     sendpause = sendsave = paused = false;
     memset(mousearray, 0, sizeof(mousearray));
     memset(joyarray, 0, sizeof(joyarray));
