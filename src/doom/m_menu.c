@@ -2291,7 +2291,7 @@ static menuitem_t ID_Menu_MouseBinds[]=
 {
     { M_SWTC, "FIRE/ATTACK",               M_Bind_M_FireAttack,   'f' },
     { M_SWTC, "MOVE FORWARD",              M_Bind_M_MoveForward,  'm' },
-    { M_SWTC, "SPEED ON",                  M_Bind_M_SpeedOn,     's' },
+    { M_SWTC, "SPEED ON",                  M_Bind_M_SpeedOn,      's' },
     { M_SWTC, "STRAFE ON",                 M_Bind_M_StrafeOn,     's' },
     { M_SWTC, "MOVE BACKWARD",             M_Bind_M_MoveBackward, 'm' },
     { M_SWTC, "USE",                       M_Bind_M_Use,          'u' },
@@ -2370,7 +2370,7 @@ static void M_Bind_M_PrevWeapon (int choice)
 
 static void M_Bind_M_NextWeapon (int choice)
 {
-    M_StartMouseBind(1008);  // mousebnextweapon
+    M_StartMouseBind(1009);  // mousebnextweapon
 }
 
 static void M_Bind_M_ResetResponse (int key)
@@ -5622,6 +5622,8 @@ static char *M_NameMouseBind (int itemSetOn, int btn)
             case  0:  return  "LEFT BUTTON";    break;
             case  1:  return  "RIGHT BUTTON";   break;
             case  2:  return  "MIDDLE BUTTON";  break;
+            case  3:  return  "WHEEL UP";       break;
+            case  4:  return  "WHEEL DOWN";     break;
             default:  return  other_button;     break;
         }
     }
