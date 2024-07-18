@@ -245,9 +245,6 @@ extern void G_ClearSavename (void);
 // if true, load all graphics at level load
 extern  boolean         precache;
 
-// [JN] If ture, various map-specific fixes will be applied in vanilla map.
-extern boolean canmodify;
-
 // wipegamestate can be set to -1
 //  to force a wipe on the next draw
 extern  gamestate_t     wipegamestate;

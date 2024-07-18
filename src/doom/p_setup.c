@@ -67,6 +67,7 @@ int		numsides;
 side_t*		sides;
 
 static int      totallines;
+static boolean  canmodify;
 
 // BLOCKMAP
 // Created from axis aligned bounding box
@@ -445,16 +446,19 @@ void P_LoadSectors (int lump)
         // [crispy] inhibit sector interpolation during the 0th gametic
         ss->oldgametic = -1;
 
-        // [JN] Inject color tables into sectors.
-        for (int j = 0; sectorcolor[j].map != -1; j++)
+        // [JN] Inject color tables into the sectors of IWAD levels.
+        if (canmodify)
         {
-            if (i == sectorcolor[j].sector && gamemap == sectorcolor[j].map)
+            for (int j = 0; sectorcolor[j].map != -1; j++)
             {
-                if (sectorcolor[j].color)
+                if (i == sectorcolor[j].sector && gamemap == sectorcolor[j].map)
                 {
-                    ss->color = sectorcolor[j].color;
+                    if (sectorcolor[j].color)
+                    {
+                        ss->color = sectorcolor[j].color;
+                    }
+                    break;
                 }
-                break;
             }
         }
     }
@@ -1325,6 +1329,10 @@ P_SetupLevel
 
     lumpnum = W_GetNumForName (lumpname);
 	
+    // [JN] Check for modified map to allow injection of colored lighting.
+    // Adaptaken from DOOM Retro, thanks Brad Harding!
+    canmodify = W_CheckMultipleLumps(lumpname) == 1;
+
     // [JN] Set per-level sector colors table.
     P_SetSectorColorTable(map);
 
