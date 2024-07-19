@@ -321,6 +321,12 @@ const byte *R_BrightmapForSprite (const int type)
             case SPR_FSKU:
             // Pile of Skulls and Candles
             case SPR_POL3:
+            // Berserk Pack
+            case SPR_PSTR:
+            // Radiation Shielding Suit
+            case SPR_SUIT:
+            // Computer Area Map
+            case SPR_PMAP:
             {
                 return fullbright;
                 break;
