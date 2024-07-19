@@ -1030,6 +1030,7 @@ static const sectorcolor_t sectorcolor_map07[] =
     {    7,     13,    0x4F5D8B },
     {    7,     14,    0x311A59 },
     {    7,     15,    0x311A59 },
+    {    7,     16,    0x4F5D8B },
     {    7,     17,    0x55B828 },
     {    7,     27,    0x55B828 },
     {    7,     28,    0x55B828 },

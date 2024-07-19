@@ -204,12 +204,9 @@ R_RenderMaskedSegRange
 	
     lightnum = (frontsector->lightlevel >> LIGHTSEGSHIFT)+(extralight * LIGHTBRIGHT);
 
-    if (lightnum < 0)		
-	walllights = scalelight[0];
-    else if (lightnum >= LIGHTLEVELS)
-	walllights = scalelight[LIGHTLEVELS-1];
-    else
-	walllights = scalelight[lightnum];
+    // [JN] Colorize masked or 2-sided textures drawing,
+    // though they are not appearing on vanilla Jaguar levels.
+    walllights = R_ColoredSegsColorize(lightnum, frontsector->color);
 
     maskedtexturecol = ds->maskedtexturecol;
 
