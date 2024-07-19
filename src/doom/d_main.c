@@ -555,9 +555,10 @@ void D_DoomMain (void)
 
 #ifdef _WIN32
     // [JN] Print colorized title.
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), BACKGROUND_BLUE
-                           | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE
-                           | FOREGROUND_INTENSITY);
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 
+                            BACKGROUND_RED | BACKGROUND_GREEN |
+                            FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE |
+                            FOREGROUND_INTENSITY);
 
     for (p = 0 ; p < 26 ; p++) printf(" ");
     printf(PACKAGE_FULLNAME);
