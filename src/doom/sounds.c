@@ -44,7 +44,7 @@ musicinfo_t S_music[] =
     MUSIC("map07"),
     MUSIC("map08"),
     MUSIC("map09"),
-	MUSIC("map10"),
+    MUSIC("map10"),
     MUSIC("map11"),
     MUSIC("map12"),
     MUSIC("map13"),
@@ -54,15 +54,12 @@ musicinfo_t S_music[] =
     MUSIC("map17"),
     MUSIC("map18"),
     MUSIC("map19"),
-	MUSIC("map20"),
+    MUSIC("map20"),
     MUSIC("map21"),
     MUSIC("map22"),
     MUSIC("map23"),
-    MUSIC("map24"),
-    MUSIC("map25"),
-    MUSIC("map26"),
     MUSIC("intro"),
-	MUSIC("inter"),
+    MUSIC("inter"),
 };
 
 
@@ -182,13 +179,5 @@ sfxinfo_t S_sfx[] =
   SOUND("skesit", 70),
   SOUND("skeatk", 70),
   SOUND("radio",  60),
-  // [crispy] additional BOOM and MBF states, sprites and code pointers
-  SOUND("dgsit",  98),
-  SOUND("dgatk",  70),
-  SOUND("dgact", 120),
-  SOUND("dgdth",  70),
-  SOUND("dgpain", 96),
-  // [crispy] play DSSECRET if available
-  SOUND("secret",  60),
 };
 

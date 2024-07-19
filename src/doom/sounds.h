@@ -45,7 +45,7 @@ typedef enum
     mus_map07,
     mus_map08,
     mus_map09,
-	mus_map10,
+    mus_map10,
     mus_map11,
     mus_map12,
     mus_map13,
@@ -55,15 +55,12 @@ typedef enum
     mus_map17,
     mus_map18,
     mus_map19,
-	mus_map20,
+    mus_map20,
     mus_map21,
     mus_map22,
     mus_map23,
-    mus_map24,
-    mus_map25,
-    mus_map26,
     mus_intro,
-	mus_inter,
+    mus_inter,
     NUMMUSIC,
 } musicenum_t;
 
@@ -178,14 +175,6 @@ typedef enum
     sfx_skesit,
     sfx_skeatk,
     sfx_radio,
-    // [crispy] additional BOOM and MBF states, sprites and code pointers
-    sfx_dgsit,
-    sfx_dgatk,
-    sfx_dgact,
-    sfx_dgdth,
-    sfx_dgpain,
-    // [crispy] play DSSECRET if available
-    sfx_secret,
     NUMSFX
 } sfxenum_t;
 
