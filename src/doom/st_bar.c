@@ -129,6 +129,13 @@ boolean st_fullupdate = true;
 // [JN] Array for holding buffered background of status bar.
 static int stbar_bg[5];
 
+// [JN] Is status bar background on?
+static boolean st_background_on;
+
+// [JN] Pointer to patch drawing functions to decide
+// whether or not to use shadow casting for digits and keys.
+static void (*drawpatchfunc)(int x, int y, patch_t *patch);
+
 // =============================================================================
 // CHEAT SEQUENCE PACKAGE
 // =============================================================================
@@ -985,6 +992,7 @@ void ST_Ticker (void)
     // refresh everything if this is him coming back to life
     ST_updateFaceWidget();
 
+    st_background_on = dp_screen_size <= 10 || (automapactive && !automap_overlay);
     st_randomnumber = M_Random();
     st_oldhealth = plyr->health;
 
@@ -999,6 +1007,16 @@ void ST_Ticker (void)
     IDWidget.x = plyr->mo->x >> FRACBITS;
     IDWidget.y = plyr->mo->y >> FRACBITS;
     IDWidget.ang = plyr->mo->angle / ANG1;
+
+    // [JN] Which patch drawing function to use for digits and keys?
+    if (st_background_on)
+    {
+        drawpatchfunc = V_DrawPatch;
+    }
+    else
+    {
+        drawpatchfunc = V_DrawShadowedPatchOptional;
+    }
 
     // [JN] Update blinking key or skull timer.
     for (int i = 0 ; i < 3 ; i++)
@@ -1118,7 +1136,7 @@ static void ST_DrawBigNumber (int val, const int x, const int y, byte *table)
 
         // [JN] Draw minus symbol with respection of digits placement.
         // However, values below -10 requires some correction in "x" placement.
-        V_DrawShadowedPatchOptional(xpos + (val <= 9 ? 20 : 5) - 4, y, tallminus);
+        drawpatchfunc(xpos + (val <= 9 ? 20 : 5) - 4, y, tallminus);
     }
     if (val > 999)
     {
@@ -1127,7 +1145,7 @@ static void ST_DrawBigNumber (int val, const int x, const int y, byte *table)
 
     if (val > 99)
     {
-        V_DrawShadowedPatchOptional(xpos - 4, y, tallnum[val / 100]);
+        drawpatchfunc(xpos - 4, y, tallnum[val / 100]);
     }
 
     val = val % 100;
@@ -1135,13 +1153,13 @@ static void ST_DrawBigNumber (int val, const int x, const int y, byte *table)
 
     if (val > 9 || oldval > 99)
     {
-        V_DrawShadowedPatchOptional(xpos - 4, y, tallnum[val / 10]);
+        drawpatchfunc(xpos - 4, y, tallnum[val / 10]);
     }
 
     val = val % 10;
     xpos += 14;
 
-    V_DrawShadowedPatchOptional(xpos - 4, y, tallnum[val]);
+    drawpatchfunc(xpos - 4, y, tallnum[val]);
     
     dp_translation = NULL;
 }
@@ -1154,7 +1172,7 @@ static void ST_DrawBigNumber (int val, const int x, const int y, byte *table)
 static void ST_DrawPercent (const int x, const int y, byte *table)
 {
     dp_translation = table;
-    V_DrawShadowedPatchOptional(x, y, tallpercent);
+    drawpatchfunc(x, y, tallpercent);
     dp_translation = NULL;
 }
 
@@ -1230,9 +1248,6 @@ static void ST_UpdateElementsBackground (void)
 
 void ST_Drawer (boolean force)
 {
-    const boolean st_background_on = 
-                    dp_screen_size <= 10 || (automapactive && !automap_overlay);
-
     if (force)
     {
     // [JN] Wide status bar.
@@ -1328,26 +1343,26 @@ void ST_Drawer (boolean force)
                 const int yy = plyr->tryopen[2] ? 163 :  // red key
                                plyr->tryopen[0] ? 175 :  // blue key
                                                   187 ;  // yellow key
-                V_DrawPatch(124 - wide_x, yy, keys[i + st_keyorskull[i]]);
+                drawpatchfunc(124 - wide_x, yy, keys[i + st_keyorskull[i]]);
             }
         }
     }
 
     // Keys (in order of Jaguar Doom)
     if (plyr->cards[it_redskull])
-    V_DrawPatch(124 - wide_x, 163, keys[5]);
+    drawpatchfunc(124 - wide_x, 163, keys[5]);
     else if (plyr->cards[it_redcard])
-    V_DrawPatch(124 - wide_x, 163, keys[2]);
+    drawpatchfunc(124 - wide_x, 163, keys[2]);
 
     if (plyr->cards[it_blueskull])
-    V_DrawPatch(124 - wide_x, 175, keys[3]);
+    drawpatchfunc(124 - wide_x, 175, keys[3]);
     else if (plyr->cards[it_bluecard])
-    V_DrawPatch(124 - wide_x, 175, keys[0]);
+    drawpatchfunc(124 - wide_x, 175, keys[0]);
 
     if (plyr->cards[it_yellowskull])
-    V_DrawPatch(124 - wide_x, 187, keys[4]);
+    drawpatchfunc(124 - wide_x, 187, keys[4]);
     else if (plyr->cards[it_yellowcard])
-    V_DrawPatch(124 - wide_x, 187, keys[1]);
+    drawpatchfunc(124 - wide_x, 187, keys[1]);
 
     // Player face background
     if (dp_screen_size == 11 || dp_screen_size == 13)
