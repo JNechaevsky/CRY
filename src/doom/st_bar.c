@@ -1365,7 +1365,7 @@ void ST_Drawer (boolean force)
     drawpatchfunc(124 - wide_x, 187, keys[1]);
 
     // Player face background
-    if (dp_screen_size == 11 || dp_screen_size == 13)
+    if ((dp_screen_size == 11 || dp_screen_size == 13) && !st_background_on)
     {
         V_DrawPatch(143, 163, faceback);
     }
