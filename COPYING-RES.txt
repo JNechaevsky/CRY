@@ -1,6 +1,9 @@
 * IWAD contents Copyright(C) 1994 Id Software, Inc.
   Licensed to Atari Corporation.
 
+* M_TITLE background art made from Adrian Carmack's sketch
+  published by John Romero and extended to 32:9 widescreen mode.
+
 * Yaguar icon is created from "Jaguar head icon.svg" vector graphics,
   created by Julian Herzog and released under GNU Free Documentation License.
   https://commons.wikimedia.org/wiki/File:Jaguar_head_icon.svg
