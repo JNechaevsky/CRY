@@ -84,7 +84,6 @@ int main(int argc, char **argv)
     M_AddLooseFiles();
 #endif
 
-    M_FindResponseFile();
     M_SetExeDir();
 
     // [JN] Use current time as seed for random generator.

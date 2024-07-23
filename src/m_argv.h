@@ -40,7 +40,6 @@ int M_CheckParm (const char* check);
 // following the specified argument.
 int M_CheckParmWithArgs(const char *check, int num_args);
 
-void M_FindResponseFile(void);
 void M_AddLooseFiles(void);
 
 // Parameter has been specified?
