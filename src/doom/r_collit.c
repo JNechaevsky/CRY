@@ -30,94 +30,94 @@
 // =============================================================================
 
 // Main colormaps
-lighttable_t   *colormaps_EEC06B;  // Bright yellow/gold
-lighttable_t   *colormaps_D97C45;  // Middle yellow/gold (also E29A56)
-lighttable_t   *colormaps_FF7F7F;  // Bright red
-lighttable_t   *colormaps_55B828;  // Bright green
-lighttable_t   *colormaps_BBE357;  // Slime green
-lighttable_t   *colormaps_949DB9;  // Bright desaturated blue (also 6B779E)
-lighttable_t   *colormaps_2A2F6B;  // Middle desaturated blue (also 032149)
-lighttable_t   *colormaps_50ADAC;  // Middle cyan (also 31A29F)
-lighttable_t   *colormaps_CCE4A5;  // Middle green-yellow
-lighttable_t   *colormaps_CCEA5F;  // Bright green-yellow
-lighttable_t   *colormaps_B30202;  // Middle red
-lighttable_t   *colormaps_B87A15;  // Middle orange
-lighttable_t   *colormaps_FFD000;  // Middle yellow
-lighttable_t   *colormaps_FFDE4C;  // Middle-bright yellow
-lighttable_t   *colormaps_FFF588;  // Bright yellow
-lighttable_t   *colormaps_043E8B;  // Un-darked cyanic blue
-lighttable_t   *colormaps_5B4318;  // Dark brown (also 74561F)
-lighttable_t   *colormaps_4F5D8B;  // Dark cyanic blue 2
-lighttable_t   *colormaps_D46D3D;  // Middle orange 2
-lighttable_t   *colormaps_04918B;  // Middle saturated cyan
-lighttable_t   *colormaps_FF3030;  // Bright saturated red
-lighttable_t   *colormaps_311A59;  // Un-darked magenta
-lighttable_t   *colormaps_FFAFAF;  // Brighter red (also FFCECE)
-lighttable_t   *colormaps_ECB866;  // Bright orange
-lighttable_t   *colormaps_C63F23;  // Middle orange 3
-lighttable_t   *colormaps_9BC8CD;  // Bright cyan
-lighttable_t   *colormaps_666666;  // Special green (final level)
-lighttable_t   *colormaps_777777;  // Special red (final level)
+static lighttable_t   *colormaps_EEC06B;  // Bright yellow/gold
+static lighttable_t   *colormaps_D97C45;  // Middle yellow/gold (also E29A56)
+static lighttable_t   *colormaps_FF7F7F;  // Bright red
+static lighttable_t   *colormaps_55B828;  // Bright green
+static lighttable_t   *colormaps_BBE357;  // Slime green
+static lighttable_t   *colormaps_949DB9;  // Bright desaturated blue (also 6B779E)
+static lighttable_t   *colormaps_2A2F6B;  // Middle desaturated blue (also 032149)
+static lighttable_t   *colormaps_50ADAC;  // Middle cyan (also 31A29F)
+static lighttable_t   *colormaps_CCE4A5;  // Middle green-yellow
+static lighttable_t   *colormaps_CCEA5F;  // Bright green-yellow
+static lighttable_t   *colormaps_B30202;  // Middle red
+static lighttable_t   *colormaps_B87A15;  // Middle orange
+static lighttable_t   *colormaps_FFD000;  // Middle yellow
+static lighttable_t   *colormaps_FFDE4C;  // Middle-bright yellow
+static lighttable_t   *colormaps_FFF588;  // Bright yellow
+static lighttable_t   *colormaps_043E8B;  // Un-darked cyanic blue
+static lighttable_t   *colormaps_5B4318;  // Dark brown (also 74561F)
+static lighttable_t   *colormaps_4F5D8B;  // Dark cyanic blue 2
+static lighttable_t   *colormaps_D46D3D;  // Middle orange 2
+static lighttable_t   *colormaps_04918B;  // Middle saturated cyan
+static lighttable_t   *colormaps_FF3030;  // Bright saturated red
+static lighttable_t   *colormaps_311A59;  // Un-darked magenta
+static lighttable_t   *colormaps_FFAFAF;  // Brighter red (also FFCECE)
+static lighttable_t   *colormaps_ECB866;  // Bright orange
+static lighttable_t   *colormaps_C63F23;  // Middle orange 3
+static lighttable_t   *colormaps_9BC8CD;  // Bright cyan
+static lighttable_t   *colormaps_666666;  // Special green (final level)
+static lighttable_t   *colormaps_777777;  // Special red (final level)
 
 // Visplane light tables
-lighttable_t ***zlight_EEC06B = NULL;
-lighttable_t ***zlight_D97C45 = NULL;
-lighttable_t ***zlight_FF7F7F = NULL;
-lighttable_t ***zlight_55B828 = NULL;
-lighttable_t ***zlight_BBE357 = NULL;
-lighttable_t ***zlight_949DB9 = NULL;
-lighttable_t ***zlight_2A2F6B = NULL;
-lighttable_t ***zlight_50ADAC = NULL;
-lighttable_t ***zlight_CCE4A5 = NULL;
-lighttable_t ***zlight_CCEA5F = NULL;
-lighttable_t ***zlight_B30202 = NULL;
-lighttable_t ***zlight_B87A15 = NULL;
-lighttable_t ***zlight_FFD000 = NULL;
-lighttable_t ***zlight_FFDE4C = NULL;
-lighttable_t ***zlight_FFF588 = NULL;
-lighttable_t ***zlight_043E8B = NULL;
-lighttable_t ***zlight_5B4318 = NULL;
-lighttable_t ***zlight_4F5D8B = NULL;
-lighttable_t ***zlight_D46D3D = NULL;
-lighttable_t ***zlight_04918B = NULL;
-lighttable_t ***zlight_FF3030 = NULL;
-lighttable_t ***zlight_311A59 = NULL;
-lighttable_t ***zlight_FFAFAF = NULL;
-lighttable_t ***zlight_ECB866 = NULL;
-lighttable_t ***zlight_C63F23 = NULL;
-lighttable_t ***zlight_9BC8CD = NULL;
-lighttable_t ***zlight_666666 = NULL;
-lighttable_t ***zlight_777777 = NULL;
+static lighttable_t ***zlight_EEC06B = NULL;
+static lighttable_t ***zlight_D97C45 = NULL;
+static lighttable_t ***zlight_FF7F7F = NULL;
+static lighttable_t ***zlight_55B828 = NULL;
+static lighttable_t ***zlight_BBE357 = NULL;
+static lighttable_t ***zlight_949DB9 = NULL;
+static lighttable_t ***zlight_2A2F6B = NULL;
+static lighttable_t ***zlight_50ADAC = NULL;
+static lighttable_t ***zlight_CCE4A5 = NULL;
+static lighttable_t ***zlight_CCEA5F = NULL;
+static lighttable_t ***zlight_B30202 = NULL;
+static lighttable_t ***zlight_B87A15 = NULL;
+static lighttable_t ***zlight_FFD000 = NULL;
+static lighttable_t ***zlight_FFDE4C = NULL;
+static lighttable_t ***zlight_FFF588 = NULL;
+static lighttable_t ***zlight_043E8B = NULL;
+static lighttable_t ***zlight_5B4318 = NULL;
+static lighttable_t ***zlight_4F5D8B = NULL;
+static lighttable_t ***zlight_D46D3D = NULL;
+static lighttable_t ***zlight_04918B = NULL;
+static lighttable_t ***zlight_FF3030 = NULL;
+static lighttable_t ***zlight_311A59 = NULL;
+static lighttable_t ***zlight_FFAFAF = NULL;
+static lighttable_t ***zlight_ECB866 = NULL;
+static lighttable_t ***zlight_C63F23 = NULL;
+static lighttable_t ***zlight_9BC8CD = NULL;
+static lighttable_t ***zlight_666666 = NULL;
+static lighttable_t ***zlight_777777 = NULL;
 
 // Segment/sprite light tables
-lighttable_t ***scalelight_EEC06B = NULL;
-lighttable_t ***scalelight_D97C45 = NULL;
-lighttable_t ***scalelight_FF7F7F = NULL;
-lighttable_t ***scalelight_55B828 = NULL;
-lighttable_t ***scalelight_BBE357 = NULL;
-lighttable_t ***scalelight_949DB9 = NULL;
-lighttable_t ***scalelight_2A2F6B = NULL;
-lighttable_t ***scalelight_50ADAC = NULL;
-lighttable_t ***scalelight_CCE4A5 = NULL;
-lighttable_t ***scalelight_CCEA5F = NULL;
-lighttable_t ***scalelight_B30202 = NULL;
-lighttable_t ***scalelight_B87A15 = NULL;
-lighttable_t ***scalelight_FFD000 = NULL;
-lighttable_t ***scalelight_FFDE4C = NULL;
-lighttable_t ***scalelight_FFF588 = NULL;
-lighttable_t ***scalelight_043E8B = NULL;
-lighttable_t ***scalelight_5B4318 = NULL;
-lighttable_t ***scalelight_4F5D8B = NULL;
-lighttable_t ***scalelight_D46D3D = NULL;
-lighttable_t ***scalelight_04918B = NULL;
-lighttable_t ***scalelight_FF3030 = NULL;
-lighttable_t ***scalelight_311A59 = NULL;
-lighttable_t ***scalelight_FFAFAF = NULL;
-lighttable_t ***scalelight_ECB866 = NULL;
-lighttable_t ***scalelight_C63F23 = NULL;
-lighttable_t ***scalelight_9BC8CD = NULL;
-lighttable_t ***scalelight_666666 = NULL;
-lighttable_t ***scalelight_777777 = NULL;
+static lighttable_t ***scalelight_EEC06B = NULL;
+static lighttable_t ***scalelight_D97C45 = NULL;
+static lighttable_t ***scalelight_FF7F7F = NULL;
+static lighttable_t ***scalelight_55B828 = NULL;
+static lighttable_t ***scalelight_BBE357 = NULL;
+static lighttable_t ***scalelight_949DB9 = NULL;
+static lighttable_t ***scalelight_2A2F6B = NULL;
+static lighttable_t ***scalelight_50ADAC = NULL;
+static lighttable_t ***scalelight_CCE4A5 = NULL;
+static lighttable_t ***scalelight_CCEA5F = NULL;
+static lighttable_t ***scalelight_B30202 = NULL;
+static lighttable_t ***scalelight_B87A15 = NULL;
+static lighttable_t ***scalelight_FFD000 = NULL;
+static lighttable_t ***scalelight_FFDE4C = NULL;
+static lighttable_t ***scalelight_FFF588 = NULL;
+static lighttable_t ***scalelight_043E8B = NULL;
+static lighttable_t ***scalelight_5B4318 = NULL;
+static lighttable_t ***scalelight_4F5D8B = NULL;
+static lighttable_t ***scalelight_D46D3D = NULL;
+static lighttable_t ***scalelight_04918B = NULL;
+static lighttable_t ***scalelight_FF3030 = NULL;
+static lighttable_t ***scalelight_311A59 = NULL;
+static lighttable_t ***scalelight_FFAFAF = NULL;
+static lighttable_t ***scalelight_ECB866 = NULL;
+static lighttable_t ***scalelight_C63F23 = NULL;
+static lighttable_t ***scalelight_9BC8CD = NULL;
+static lighttable_t ***scalelight_666666 = NULL;
+static lighttable_t ***scalelight_777777 = NULL;
 
 
 // =============================================================================
