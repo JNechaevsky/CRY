@@ -659,7 +659,10 @@ void R_InitLightTables (void)
     //  for each level / distance combination.
     for (i=0 ; i< LIGHTLEVELS ; i++)
     {
+	scalelight[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
 	zlight[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
+	// [JN] Colored segments initialization.
+	R_ColoredScLightMAXLIGHTSCALE(i);
 	// [JN] Colored visplanes initialization.
 	R_ColoredZLightMAXLIGHTZ(i);
 
@@ -855,9 +858,6 @@ void R_ExecuteSetViewSize (void)
     //  for each level / scale combination.
     for (i=0 ; i< LIGHTLEVELS ; i++)
     {
-	scalelight[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-	// [JN] Colored segments initialization.
-	R_ColoredScLightMAXLIGHTSCALE(i);
 
 	startmap = ((LIGHTLEVELS-LIGHTBRIGHT-i)*2)*NUMCOLORMAPS/LIGHTLEVELS;
 	for (j=0 ; j<MAXLIGHTSCALE ; j++)
