@@ -21,6 +21,7 @@
 
 
 
+#include <stdlib.h>
 
 #include "doomdef.h"
 
@@ -1001,7 +1002,7 @@ void R_InitBuffer (int width, int height)
 
     if (background_buffer != NULL)
     {
-        Z_Free(background_buffer);
+        free(background_buffer);
         background_buffer = NULL;
     }
 } 
@@ -1034,7 +1035,7 @@ void R_FillBackScreen (void)
     if (background_buffer == NULL)
     {
         const int size = SCREENWIDTH * (SCREENHEIGHT - SBARHEIGHT);
-        background_buffer = Z_Malloc(size * sizeof(*background_buffer), PU_STATIC, NULL);
+        background_buffer = malloc(size * sizeof(*background_buffer));
     }
 
     // Draw screen and bezel; this is done to a separate screen buffer.
@@ -1108,7 +1109,7 @@ void R_DrawViewBorder (void)
     int ofs;
     int i;
 
-    if (scaledviewwidth == SCREENWIDTH)
+    if (scaledviewwidth == SCREENWIDTH || background_buffer == NULL)
     {
         return;
     }
