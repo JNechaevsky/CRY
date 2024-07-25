@@ -314,11 +314,6 @@ static const int ST_cheat_massacre (boolean explode)
                     P_DamageMobj(mo, NULL, NULL, amount);
                     killcount++;
                 }
-                if (mo->type == MT_PAIN)
-                {
-                    A_PainDie(mo);
-                    P_SetMobjState(mo, S_PAIN_DIE6);
-                }
             }
         }
     }

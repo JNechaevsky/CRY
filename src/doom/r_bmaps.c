@@ -313,14 +313,8 @@ const byte *R_BrightmapForSprite (const int type)
             case SPR_SMRT:
             // Short Blue Torch
             case SPR_SMBT:
-            // Tall Technocolumn
-            case SPR_TLMP:
-            // Short Technocolumn
-            case SPR_TLP2:
             // Floating Skull Rock
             case SPR_FSKU:
-            // Pile of Skulls and Candles
-            case SPR_POL3:
             // Berserk Pack
             case SPR_PSTR:
             // Radiation Shielding Suit

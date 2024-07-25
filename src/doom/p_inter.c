@@ -397,13 +397,6 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
         CT_SetMessage(player, GOTSUPER, false, NULL);
         break;
 	
-        case SPR_MEGA:
-        player->health = 200;
-        player->mo->health = player->health;
-        P_GiveArmor (player, 2);
-        CT_SetMessage(player, "MegaSphere!", false, NULL);
-        break;
-
         // cards
         // leave cards for everyone
         case SPR_BKEY:
@@ -742,17 +735,12 @@ P_KillMobj
     // during the death frame of a thing.
     switch (target->type)
     {
-      case MT_WOLFSS:
       case MT_POSSESSED:
 	item = MT_CLIP;
 	break;
 	
       case MT_SHOTGUY:
 	item = MT_SHOTGUN;
-	break;
-	
-      case MT_CHAINGUY:
-	item = MT_CHAINGUN;
 	break;
 	
       default:
