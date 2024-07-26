@@ -85,6 +85,7 @@ typedef struct
 // The set of channels available
 
 static channel_t *channels;
+static degenmobj_t *sobjs;
 
 // Maximum volume of a sound effect.
 // Internal default is max out of 0-15.
@@ -140,6 +141,7 @@ void S_Init(int sfxVolume, int musicVolume)
     // (the maximum numer of sounds rendered
     // simultaneously) within zone memory.
     channels = Z_Malloc(MAX_SND_CHANNELS*sizeof(channel_t), PU_STATIC, 0);
+    sobjs = Z_Malloc(MAX_SND_CHANNELS*sizeof(degenmobj_t), PU_STATIC, 0);
 
     // Free all channels for use
     for (i=0 ; i<MAX_SND_CHANNELS ; i++)
@@ -299,6 +301,34 @@ void S_StopSound(mobj_t *origin)
         {
             S_StopChannel(cnum);
             break;
+        }
+    }
+}
+
+// [crispy] removed map objects may finish their sounds
+// When map objects are removed from the map by P_RemoveMobj(), instead of
+// stopping their sounds, their coordinates are transfered to "sound objects"
+// so stereo positioning and distance calculations continue to work even after
+// the corresponding map object has already disappeared.
+// Thanks to jeff-d and kb1 for discussing this feature and the former for the
+// original implementation idea: https://www.doomworld.com/vb/post/1585325
+void S_UnlinkSound(mobj_t *origin)
+{
+    int cnum;
+
+    if (origin)
+    {
+        for (cnum=0 ; cnum<snd_channels ; cnum++)
+        {
+            if (channels[cnum].sfxinfo && channels[cnum].origin == origin)
+            {
+                degenmobj_t *const sobj = &sobjs[cnum];
+                sobj->x = origin->x;
+                sobj->y = origin->y;
+                sobj->z = origin->z;
+                channels[cnum].origin = (mobj_t *) sobj;
+                break;
+            }
         }
     }
 }
