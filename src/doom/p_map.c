@@ -369,9 +369,7 @@ boolean PIT_CheckThing (mobj_t* thing)
 	    return true;		// underneath
 		
 	if (tmthing->target 
-         && (tmthing->target->type == thing->type || 
-	    (tmthing->target->type == MT_KNIGHT && thing->type == MT_BRUISER)||
-	    (tmthing->target->type == MT_BRUISER && thing->type == MT_KNIGHT) ) )
+         && (tmthing->target->type == thing->type) )
 	{
 	    // Don't hit same species as originator.
 	    if (thing == tmthing->target)
@@ -1516,12 +1514,6 @@ boolean PIT_RadiusAttack (mobj_t* thing)
 	
     if (!(thing->flags & MF_SHOOTABLE) )
 	return true;
-
-    // Boss spider and cyborg
-    // take no damage from concussion.
-    if (thing->type == MT_CYBORG
-	|| thing->type == MT_SPIDER)
-	return true;	
 		
     dx = abs(thing->x - bombspot->x);
     dy = abs(thing->y - bombspot->y);

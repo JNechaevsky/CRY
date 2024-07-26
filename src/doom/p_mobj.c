@@ -641,8 +641,7 @@ void P_MobjThinker (mobj_t* mobj)
 
     // [JN] Set amplitude of floating powerups:
     if (phys_floating_powerups
-    && (mobj->type == MT_MEGA       // Megasphere
-    ||  mobj->type == MT_MISC12     // Supercharge
+    && (mobj->type == MT_MISC12     // Supercharge
     ||  mobj->type == MT_INV        // Invulnerability
     ||  mobj->type == MT_INS))      // Partial invisibility
     {
@@ -818,8 +817,7 @@ P_SpawnMobjSafe
     // [JN] Set floating z value of floating powerups
     // to actual mobj z coord and randomize amplitude
     // so they will spawn at random height.
-    if (mobj->type == MT_MEGA    // Megasphere
-    ||  mobj->type == MT_MISC12  // Supercharge
+    if (mobj->type == MT_MISC12  // Supercharge
     ||  mobj->type == MT_INV     // Invulnerability
     ||  mobj->type == MT_INS)    // Partial invisibility
     {

@@ -565,8 +565,7 @@ static void R_ProjectSprite (mobj_t* thing)
 
     // [JN] Apply amplitude to floating powerups:
     if (phys_floating_powerups
-    && (thing->type == MT_MEGA       // Megasphere
-    ||  thing->type == MT_MISC12     // Supercharge
+    && (thing->type == MT_MISC12     // Supercharge
     ||  thing->type == MT_INV        // Invulnerability
     ||  thing->type == MT_INS))      // Partial invisibility
     {
@@ -786,18 +785,8 @@ static void R_ProjectSprite (mobj_t* thing)
         (thing->type == MT_BLOOD || thing->state - states == S_GIBS) &&
         thing->target)
     {
-	// [crispy] Thorn Things in Hacx bleed green blood
-	if (gamemission == pack_hacx)
-	{
-	    if (thing->target->type == MT_BABY)
-	    {
-		vis->translation = cr[CR_RED2GREEN];
-	    }
-	}
-	else
-	{
 	    // [crispy] Barons of Hell and Hell Knights bleed green blood
-	    if (thing->target->type == MT_BRUISER || thing->target->type == MT_KNIGHT)
+	    if (thing->target->type == MT_BRUISER)
 	    {
 		vis->translation = cr[CR_RED2GREEN];
 	    }
@@ -807,7 +796,6 @@ static void R_ProjectSprite (mobj_t* thing)
 	    {
 		vis->translation = cr[CR_RED2BLUE];
 	    }
-	}
     }
 
     // [crispy] translucent sprites

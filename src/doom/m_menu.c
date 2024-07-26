@@ -4550,7 +4550,7 @@ boolean M_Responder (event_t* ev)
 
     if (key != 0 && key == key_menu_screenshot)
     {
-	S_StartSound(NULL,sfx_tink);    // [JN] Add audible feedback
+	S_StartSound(NULL,sfx_itemup);    // [JN] Add audible feedback
 	G_ScreenShot ();
 	return true;
     }
