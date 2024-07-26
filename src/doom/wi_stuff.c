@@ -44,20 +44,20 @@ static int bcnt;			// used for timing of background animation
 static int sp_state;		// state of drawing/counting
 
 // stats counters
-static int cnt_kills[MAXPLAYERS];
-static int cnt_items[MAXPLAYERS];
-static int cnt_secret[MAXPLAYERS];
-static int cnt_time;
+static int cnt_kills;
+static int cnt_items;
+static int cnt_scrts;
+static int cnt_ltime;
 static int cnt_pause;
 
- // specifies current state
-static stateenum_t	state;
+// specifies current state
+static stateenum_t state;
 
 // contains information passed into intermission
-static wbstartstruct_t*	wbs;
+static wbstartstruct_t *wbs;
 
 // wbs->plyr[]
-static wbplayerstruct_t* plrs;
+static wbplayerstruct_t *plrs;
 
 // Graphics
 static patch_t *colon;		// ":" graphics
@@ -209,9 +209,8 @@ static void WI_initStats (void)
 {
 	state = StatCount;
 	acceleratestage = 0;
-	sp_state = 1;
-	cnt_kills[0] = cnt_items[0] = cnt_secret[0] = -1;
-	cnt_time = -1;
+	sp_state = 2;
+	cnt_kills = cnt_items = cnt_scrts = cnt_ltime = 0;
 	cnt_pause = TICRATE;
 }
 
@@ -222,45 +221,55 @@ static void WI_initStats (void)
 
 static void WI_updateStats (void)
 {
+	const int cnt_max_kills = (plrs[me].skills * 100) / wbs->maxkills;
+	const int cnt_max_items = (plrs[me].sitems * 100) / wbs->maxitems;
+	const int cnt_max_scrts = (plrs[me].ssecret * 100) / wbs->maxsecret;
+	const int cnt_max_time  = (plrs[me].stime / TICRATE);
+
 	if (acceleratestage && sp_state != 10)
 	{
 		acceleratestage = 0;
-		cnt_kills[0] = (plrs[me].skills * 100) / wbs->maxkills;
-		cnt_items[0] = (plrs[me].sitems * 100) / wbs->maxitems;
-		cnt_secret[0] = (plrs[me].ssecret * 100) / wbs->maxsecret;
-		cnt_time = plrs[me].stime / TICRATE;
-		// S_StartSound(0, sfx_barexp);
+		cnt_kills = cnt_max_kills;
+		cnt_items = cnt_max_items;
+		cnt_scrts = cnt_max_scrts;
+		cnt_ltime = cnt_max_time;
 		sp_state = 10;
 	}
 
 	// [JN] Jaguar: count everything simultaneously.
 	if (sp_state == 2)
 	{
-		cnt_kills[0] += 2;
-		cnt_items[0] += 2;
-		cnt_secret[0] += 2;
-		cnt_time += 3;  // [JN] Count time 2x faster
+		// [JN] Jaguar: don't start counting imidetelly and count slower.
+		if (bcnt > 12 && bcnt & 1)
+		{
+			if (cnt_kills  < cnt_max_kills)
+				cnt_kills += 2;
+			if (cnt_kills  > cnt_max_kills)
+				cnt_kills  = cnt_max_kills;
 
-		// [JN] Don't go higher than 100%
-		if (cnt_kills[0] >= (plrs[me].skills * 100) / wbs->maxkills)
-			cnt_kills[0] = (plrs[me].skills * 100) / wbs->maxkills;
+			if (cnt_items  < cnt_max_items)
+				cnt_items += 2;
+			if (cnt_items  > cnt_max_items)
+				cnt_items  = cnt_max_items;
 
-		if (cnt_items[0] >= (plrs[me].sitems * 100) / wbs->maxitems)
-			cnt_items[0] = (plrs[me].sitems * 100) / wbs->maxitems;
+			if (cnt_scrts  < cnt_max_scrts)
+				cnt_scrts += 2;
+			if (cnt_scrts  > cnt_max_scrts)
+				cnt_scrts  = cnt_max_scrts;
 
-		if (cnt_secret[0] >= (plrs[me].ssecret * 100) / wbs->maxsecret)
-			cnt_secret[0] = (plrs[me].ssecret * 100) / wbs->maxsecret;
-
-		if (cnt_time >= plrs[me].stime / TICRATE)
-			cnt_time = plrs[me].stime / TICRATE;
+			if (cnt_ltime  < cnt_max_time)
+				cnt_ltime += 4;  // [JN] Count time 2x faster
+			if (cnt_ltime  > cnt_max_time)
+				cnt_ltime  = cnt_max_time;
+        }
 
 		// [JN] Now, if all countings performed, ready to go to next level.
 		// If not performed, i.e. still counting, pressing 'use' will
 		// finish counting and allows to go to next level. Any questions?
-		if (cnt_kills[0] == (plrs[me].skills * 100) / wbs->maxkills
-		&&  cnt_items[0] == (plrs[me].sitems * 100) / wbs->maxitems
-		&&  cnt_secret[0] == (plrs[me].ssecret * 100) / wbs->maxsecret
-		&&  cnt_time == plrs[me].stime / TICRATE)
+		if (cnt_kills == cnt_max_kills
+		&&  cnt_items == cnt_max_items
+		&&  cnt_scrts == cnt_max_scrts
+		&&  cnt_ltime == cnt_max_time)
 		{
 			sp_state = 10;
 		}
@@ -291,7 +300,7 @@ static void WI_drawStats (void)
 {
 	char str[128];
 	// [crispy] draw total time after level time and par time
-	const int ttime = wbs->totaltimes / TICRATE;
+	const int cnt_ttime = wbs->totaltimes / TICRATE;
 
 	V_DrawPatchFullScreen(W_CacheLumpName(("M_TITLE"), PU_CACHE), false);
 
@@ -305,24 +314,24 @@ static void WI_drawStats (void)
 
 	// Kills
 	M_WriteTextBig(71, 51, "Kills", NULL);
-	WI_drawPercent(ORIGWIDTH - SP_STATSX, 51, cnt_kills[0]);
+	WI_drawPercent(ORIGWIDTH - SP_STATSX, 51, cnt_kills);
 
 	// Items
 	M_WriteTextBig(66, 69, "Items", NULL);
-	WI_drawPercent(ORIGWIDTH - SP_STATSX, 69, cnt_items[0]);
+	WI_drawPercent(ORIGWIDTH - SP_STATSX, 69, cnt_items);
 
 	// Secrets
 	M_WriteTextBig(30, 87, "Secrets", NULL);
-	WI_drawPercent(ORIGWIDTH - SP_STATSX, 87, cnt_secret[0]);
+	WI_drawPercent(ORIGWIDTH - SP_STATSX, 87, cnt_scrts);
 
 	// Time
 	M_WriteTextBig(74, 111, "Time", NULL);
-	WI_drawTime(ORIGWIDTH - SP_STATSX, 114, cnt_time, true);
+	WI_drawTime(ORIGWIDTH - SP_STATSX, 114, cnt_ltime, true);
 
 	// Total time. Show total time only after level time is counted.
 	M_WriteTextBig(59, 129, "Total", NULL);
-	if (cnt_time == plrs[me].stime / TICRATE)
-	WI_drawTime(ORIGWIDTH - SP_STATSX, 132, ttime, false);
+	if (cnt_ltime == plrs[me].stime / TICRATE)
+	WI_drawTime(ORIGWIDTH - SP_STATSX, 132, cnt_ttime, false);
 
 	// Draws which level you are entering...
 	// Don't draw "Entering Military Base" after finishing map 23.
