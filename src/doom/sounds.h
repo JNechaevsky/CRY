@@ -59,6 +59,7 @@ typedef enum
     mus_map21,
     mus_map22,
     mus_map23,
+    mus_map24,
     mus_intro,
     mus_inter,
     NUMMUSIC,
