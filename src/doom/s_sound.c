@@ -538,7 +538,7 @@ void S_StartSound(void *origin_p, int sfx_id)
     {
         pitch += 8 - (M_Random()&15);
     }
-    else if (sfx_id != sfx_itemup && sfx_id != sfx_tink)
+    else if (sfx_id != sfx_itemup)
     {
         pitch += 16 - (M_Random()&31);
     }
