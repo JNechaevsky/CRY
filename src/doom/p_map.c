@@ -852,6 +852,11 @@ boolean PTR_SlideTraverse (intercept_t* in)
 		
     li = in->d.line;
     
+    // [JN] Jaguar: no blocky sliding across diagonal two sided lines.
+    // Treat two sided linedefs as single sided for smooth sliding.
+    if (li->flags & ML_BLOCKING && li->flags & ML_TWOSIDED)
+	goto isblocking;
+
     if ( ! (li->flags & ML_TWOSIDED) )
     {
 	if (P_PointOnLineSide (slidemo->x, slidemo->y, li))
