@@ -1046,6 +1046,8 @@ static const sectorcolor_t sectorcolor_map07[] =
     {    7,     31,    0x55B828 },
     {    7,     35,    0xFFF588 },
     {    7,     38,    0xFFF588 },
+    {    7,     47,    0xFFF588 },
+    {    7,     48,    0xFFF588 },
     {    7,     53,    0xBBE357 },
     {    7,     54,    0xBBE357 },
     {    7,     55,    0x55B828 },
@@ -1080,6 +1082,7 @@ static const sectorcolor_t sectorcolor_map07[] =
     {    7,    143,    0xFFF588 },
     {    7,    144,    0x043E8B },
     {    7,    145,    0x043E8B },
+    {    7,    146,    0xFFF588 },
     SECTORCOLOR_END
 };
 
@@ -1096,9 +1099,13 @@ static const sectorcolor_t sectorcolor_map08[] =
     {    8,      7,    0xFF3030 },
     {    8,     12,    0xD97C45 },
     {    8,     13,    0xD97C45 },
+    {    8,     16,    0xFFAFAF },
     {    8,     30,    0x043E8B },
+    {    8,     51,    0xB30202 },
     {    8,     52,    0x4F5D8B },
     {    8,     53,    0xB30202 },
+    {    8,     70,    0xB30202 },
+    {    8,     76,    0xB30202 },
     SECTORCOLOR_END
 };
 
@@ -1200,6 +1207,7 @@ static const sectorcolor_t sectorcolor_map10[] =
     {   10,     64,    0x043E8B },
     {   10,     65,    0x043E8B },
     {   10,     68,    0x50ADAC },
+    {   10,     70,    0xFFF588 },
     {   10,     78,    0x9BC8CD },
     {   10,     79,    0x9BC8CD },
     {   10,     81,    0xFF7F7F },
@@ -1257,6 +1265,7 @@ static const sectorcolor_t sectorcolor_map11[] =
     {   11,     60,    0x55B828 },
     {   11,     62,    0x55B828 },
     {   11,     67,    0xFF7F7F },
+    {   11,     69,    0xEEC06B },
     {   11,     83,    0x043E8B },
     {   11,     84,    0xFFAFAF },
     {   11,     90,    0xD97C45 },
