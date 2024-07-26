@@ -1,4 +1,5 @@
 //
+// Copyright(C) 2015-2024 Fabian Greffrath
 // Copyright(C) 2013-2024 Brad Harding
 // Copyright(C) 2024 Julia Nechaevskaya
 //
