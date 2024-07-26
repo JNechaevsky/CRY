@@ -110,7 +110,7 @@ state_t	states[NUMSTATES] = {
 	{SPR_BFGG,0,20,{A_BFGsound},S_BFG2},  /* S_BFG1 */
 	{SPR_BFGG,1,10,{A_GunFlash},S_BFG3},   /* S_BFG2 */
 	{SPR_BFGG,1,10,{A_FireBFG},S_BFG4},    /* S_BFG3 */
-	{SPR_BFGG,1,10,{A_ReFire},S_BFG}, /* S_BFG4 */
+	{SPR_BFGG,1,20,{A_ReFire},S_BFG}, /* S_BFG4 */
 	{SPR_BFGF,32768,11,{A_Light1},S_BFGFLASH2},    /* S_BFGFLASH1 */
 	{SPR_BFGF,32769,6,{A_Light2},S_LIGHTDONE},    /* S_BFGFLASH2 */
 	{SPR_BLUD,2,8,{NULL},S_BLOOD2},   /* S_BLOOD1 */
