@@ -418,13 +418,15 @@ state_t	states[NUMSTATES] = {
 	{SPR_PINS,32769,6,{NULL},S_PINS3},    /* S_PINS2 */
 	{SPR_PINS,32770,6,{NULL},S_PINS4},    /* S_PINS3 */
 	{SPR_PINS,32771,6,{NULL},S_PINS}, /* S_PINS4 */
-	{SPR_SUIT,32768,-1,{NULL},S_NULL},    /* S_SUIT */
-	{SPR_PMAP,32768,6,{NULL},S_PMAP2},    /* S_PMAP */
-	{SPR_PMAP,32769,6,{NULL},S_PMAP3},    /* S_PMAP2 */
-	{SPR_PMAP,32770,6,{NULL},S_PMAP4},    /* S_PMAP3 */
-	{SPR_PMAP,32771,6,{NULL},S_PMAP5},    /* S_PMAP4 */
-	{SPR_PMAP,32770,6,{NULL},S_PMAP6},    /* S_PMAP5 */
-	{SPR_PMAP,32769,6,{NULL},S_PMAP}, /* S_PMAP6 */
+	// [JN] Disable full bright for Radiation Suit, use brightmap instead.
+	{SPR_SUIT,0,-1,{NULL},S_NULL},    /* S_SUIT */
+	// [JN] Disable full bright for Computer Map, use brightmap instead.
+	{SPR_PMAP,0,6,{NULL},S_PMAP2},    /* S_PMAP */
+	{SPR_PMAP,1,6,{NULL},S_PMAP3},    /* S_PMAP2 */
+	{SPR_PMAP,2,6,{NULL},S_PMAP4},    /* S_PMAP3 */
+	{SPR_PMAP,3,6,{NULL},S_PMAP5},    /* S_PMAP4 */
+	{SPR_PMAP,2,6,{NULL},S_PMAP6},    /* S_PMAP5 */
+	{SPR_PMAP,1,6,{NULL},S_PMAP}, /* S_PMAP6 */
 	{SPR_PVIS,32768,6,{NULL},S_PVIS2},    /* S_PVIS */
 	{SPR_PVIS,1,6,{NULL},S_PVIS}, /* S_PVIS2 */
 	{SPR_CLIP,0,-1,{NULL},S_NULL},    /* S_CLIP */
@@ -2233,7 +2235,7 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	100,		/* mass */
 	0,		/* damage */
 	sfx_None,		/* activesound */
-	MF_SPAWNCEILING|MF_NOGRAVITY		/* flags */
+	MF_SPAWNCEILING|MF_NOGRAVITY|MF_FLIPPABLE		/* flags */
 	},
 	
 	{		/* MT_MISC43 */
@@ -2458,7 +2460,7 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	100,		/* mass */
 	0,		/* damage */
 	sfx_None,		/* activesound */
-	0		/* flags */
+	0|MF_FLIPPABLE		/* flags */
 	},
 	
 	{		/* MT_MISC52 */
