@@ -509,14 +509,11 @@ typedef enum
     // Hmm ???.
     MF_TRANSSHIFT	= 26,
 
-    // [NS] Beta projectile bouncing.
-    MF_BOUNCES		= 0x20000000,
-
     // [crispy] randomly flip corpse, blood and death animation sprites
-    MF_FLIPPABLE        = 0x40000000,
+    MF_FLIPPABLE        = 0x20000000,
 
     // [crispy] translucent sprite
-    MF_TRANSLUCENT      = (int)0x80000000
+    MF_TRANSLUCENT      = 0x40000000
 
 } mobjflag_t;
 
