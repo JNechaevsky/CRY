@@ -23,9 +23,6 @@
 
 boolean W_ParseCommandLine(void);
 
-int W_MergeDump (const char *file);
-int W_LumpDump (const char *lumpname);
-
 // Autoload all .wad files from the given directory:
 void W_AutoLoadWADs(const char *path);
 
