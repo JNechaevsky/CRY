@@ -20,7 +20,7 @@
 #pragma once
 
 
-#define singleplayer (!demorecording && !demoplayback && !netgame)
+#define singleplayer (!demorecording && !demoplayback)
 
 
 //

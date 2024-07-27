@@ -72,6 +72,5 @@ extern void G_WriteDemoTiccmd (ticcmd_t *cmd);
 extern boolean speedkeydown (void);
 
 // [JN] Fast forward to next level while demo playback.
-extern boolean netdemo; 
 extern boolean demo_gotonextlvl;
 extern void G_DemoGoToNextLevel (boolean start);

@@ -3286,13 +3286,6 @@ static void M_LoadSelect(int choice)
 //
 static void M_LoadGame (int choice)
 {
-    // [crispy] allow loading game while multiplayer demo playback
-    if (netgame && !demoplayback)
-    {
-	M_StartMessage(LOADNET,NULL,false);
-	return;
-    }
-	
     M_SetupNextMenu(&LoadDef);
     M_ReadSaveStrings();
 }
@@ -3463,13 +3456,6 @@ static void M_QuickSave(void)
 //
 static void M_QuickLoad(void)
 {
-    // [crispy] allow quickloading game while multiplayer demo playback
-    if (netgame && !demoplayback)
-    {
-	M_StartMessage(QLOADNET,NULL,false);
-	return;
-    }
-	
     if (quickSaveSlot < 0)
     {
 	// [crispy] allow quickload before quicksave
@@ -3582,12 +3568,6 @@ static void M_DrawNewGame (void)
 
 static void M_NewGame(int choice)
 {
-    if (netgame && !demoplayback)
-    {
-	M_StartMessage(NEWGAME,NULL,false);
-	return;
-    }
-	
 	M_SetupNextMenu(&NewDef);
 }
 
@@ -3638,12 +3618,6 @@ static void M_EndGame(int choice)
     if (!usergame)
     {
 	S_StartSound(NULL,sfx_oof);
-	return;
-    }
-	
-    if (netgame)
-    {
-	M_StartMessage(NETEND,NULL,false);
 	return;
     }
 	
@@ -4644,7 +4618,7 @@ boolean M_Responder (event_t* ev)
         // [crispy] those two can be considered as shortcuts for the IDCLEV cheat
         // and should be treated as such, i.e. add "if (!netgame)"
         // [JN] Hovewer, allow while multiplayer demos.
-        else if ((!netgame || netdemo) && key != 0 && key == key_reloadlevel)
+        else if (key != 0 && key == key_reloadlevel)
         {
             if (demoplayback)
             {
@@ -4662,7 +4636,7 @@ boolean M_Responder (event_t* ev)
             if (G_ReloadLevel())
             return true;
         }
-        else if ((!netgame || netdemo) && key != 0 && key == key_nextlevel)
+        else if (key != 0 && key == key_nextlevel)
         {
             if (demoplayback)
             {

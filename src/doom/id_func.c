@@ -306,7 +306,7 @@ void ID_LeftWidgets (void)
             yy -= 9;
         }
 
-        // Level / DeathMatch timer. Time gathered in G_Ticker.
+        // Level timer. Time gathered in G_Ticker.
         if (widget_time == 1
         || (widget_time == 2 && automapactive))
         {

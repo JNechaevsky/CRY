@@ -434,8 +434,6 @@ void D_DoomLoop (void)
     I_SetGrabMouseCallback(D_GrabMouseCallback);
     I_RegisterWindowIcon(doom_data, doom_w, doom_h);
     I_InitGraphics();
-    // [JN] Calculate status bar elements background buffers.
-    ST_InitElementsBackground();
 
     TryRunTics();
 
@@ -603,66 +601,9 @@ void D_DoomMain (void)
 
     fastparm = M_CheckParm ("-fast");
 
-    //!
-    // @category net
-    // @vanilla
-    //
-    // Start a deathmatch game.
-    //
-
-    if (M_CheckParm ("-deathmatch"))
-	deathmatch = 1;
-
-    //!
-    // @category net
-    // @vanilla
-    //
-    // Start a deathmatch 2.0 game.  Weapons do not stay in place and
-    // all items respawn after 30 seconds.
-    //
-
-    if (M_CheckParm ("-altdeath"))
-	deathmatch = 2;
-
-    //!
-    // @category net
-    // @vanilla
-    //
-    // Start a deathmatch 3.0 game.  Weapons stay in place and
-    // all items respawn after 30 seconds.
-    //
-
-    if (M_CheckParm ("-dm3"))
-	deathmatch = 3;
-
     // Auto-detect the configuration dir.
 
     M_SetConfigDir(NULL);
-
-    //!
-    // @arg <x>
-    // @vanilla
-    //
-    // Turbo mode.  The player's speed is multiplied by x%.  If unspecified,
-    // x defaults to 200.  Values are rounded up to 10 and down to 400.
-    //
-
-    if ( (p=M_CheckParm ("-turbo")) )
-    {
-	int     scale = 200;
-	
-	if (p<myargc-1)
-	    scale = atoi (myargv[p+1]);
-	if (scale < 10)
-	    scale = 10;
-	if (scale > 400)
-	    scale = 400;
-        printf("turbo scale: %i%%\n", scale);
-	forwardmove[0] = forwardmove[0]*scale/100;
-	forwardmove[1] = forwardmove[1]*scale/100;
-	sidemove[0] = sidemove[0]*scale/100;
-	sidemove[1] = sidemove[1]*scale/100;
-    }
     
     // Load configuration files before initialising other subsystems.
     printf("M_LoadDefaults: Load system defaults.\n");
@@ -864,6 +805,8 @@ void D_DoomMain (void)
 
     printf("ST_Init: Init status bar.\n");
     ST_Init ();
+    // [JN] Calculate status bar elements background buffers.
+    ST_InitElementsBackground();
 
     printf("WI_Init: Init intermission screen data.\n");
     WI_Init ();
@@ -914,7 +857,7 @@ void D_DoomMain (void)
 	
     if (gameaction != ga_loadgame )
     {
-		if (autostart || netgame)
+		if (autostart)
 			G_InitNew (startskill, startepisode, startmap);
 		else
 		{

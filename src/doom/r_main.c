@@ -966,9 +966,7 @@ static inline boolean CheckLocalView(const player_t *player)
     // Don't use localview if the player just teleported.
     !player->mo->reactiontime &&
     // Don't use localview if a demo is playing or recording.
-    !demoplayback && !demorecording &&
-    // Don't use localview during a netgame (single-player only).
-    !netgame
+    !demoplayback && !demorecording
   );
 }
 

@@ -97,8 +97,6 @@ boolean         timingdemo;             // if true, exit with report on completi
 boolean         nodrawers;              // for comparative timing purposes 
 int             starttime;          	// for comparative timing purposes  	 
  
-int             deathmatch;           	// only if started as net death 
-boolean         netgame;                // only true if packets are broadcast 
 boolean         playeringame[MAXPLAYERS]; 
 player_t        players[MAXPLAYERS]; 
 
@@ -115,7 +113,6 @@ boolean         demorecording;
 boolean         longtics;               // cph's doom 1.91 longtics hack
 boolean         lowres_turn;            // low resolution turning for longtics
 boolean         demoplayback; 
-boolean		netdemo; 
 byte*		demobuffer;
 byte*		demo_p;
 byte*		demoend; 
@@ -402,11 +399,6 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
 	// needed for net games
     cmd->consistancy = consistancy[consoleplayer][maketic%BACKUPTICS]; 
  	
-	// [JN] Deny all player control events while active menu 
-	// in multiplayer to eliminate movement and camera rotation.
- 	if (netgame && menuactive)
- 	return;
-
  	// RestlessRodent -- If spectating then the player loses all input
  	memmove(&spect, cmd, sizeof(spect));
  	// [JN] Allow saving and pausing while spectating.
@@ -908,7 +900,7 @@ void G_DoLoadLevel (void)
         {
             G_PlayerReborn(0);
         }
-        else if ((demoplayback || netdemo) /*&& !singledemo*/)
+        else if (demoplayback)
         {
             // no-op - silently ignore pistolstart when playing demo from the
             // demo reel
@@ -1055,27 +1047,6 @@ boolean G_Responder (event_t* ev)
         return true;
     }
  
-    // allow spy mode changes even during the demo
-    if (gamestate == GS_LEVEL && ev->type == ev_keydown 
-     && ev->data1 == key_spy && (singledemo || !deathmatch) )
-    {
-	// spy mode 
-	do 
-	{ 
-	    displayplayer++; 
-	    if (displayplayer == MAXPLAYERS) 
-		displayplayer = 0; 
-	} while (!playeringame[displayplayer] && displayplayer != consoleplayer); 
-    // [JN] Refresh status bar.
-    st_fullupdate = true;
-    // [JN] Update sound values for appropriate player.
-	S_UpdateSounds(players[displayplayer].mo);
-	// [JN] Re-init automap variables for correct player arrow angle.
-	if (automapactive)
-	AM_initVariables();
-	return true; 
-    }
-    
     // any other key pops up menu if in demos
     if (gameaction == ga_nothing && !singledemo && 
 	(demoplayback || gamestate == GS_DEMOSCREEN) 
@@ -1165,12 +1136,6 @@ boolean G_Responder (event_t* ev)
     // [JN] CRL - Toggle spectator mode.
     if (ev->data1 == key_spectator)
     {
-        // Disallow spectator mode in live multiplayer game due to its cheat nature.
-        if (netgame && !demoplayback)
-        {
-            CT_SetMessage(&players[consoleplayer], ID_SPECTATOR_NA_N , false, NULL);
-            return true;
-        }
         crl_spectating ^= 1;
         CT_SetMessage(&players[consoleplayer], crl_spectating ?
                        ID_SPECTATOR_ON : ID_SPECTATOR_OFF, false, NULL);
@@ -1191,11 +1156,6 @@ boolean G_Responder (event_t* ev)
             CT_SetMessage(&players[consoleplayer], ID_FREEZE_NA_P , false, NULL);
             return true;
         }   
-        if (netgame)
-        {
-            CT_SetMessage(&players[consoleplayer], ID_FREEZE_NA_N , false, NULL);
-            return true;
-        }
         crl_freeze ^= 1;
         CT_SetMessage(&players[consoleplayer], crl_freeze ?
                        ID_FREEZE_ON : ID_FREEZE_OFF, false, NULL);
@@ -1215,11 +1175,6 @@ boolean G_Responder (event_t* ev)
         if (demoplayback)
         {
             CT_SetMessage(&players[consoleplayer], ID_NOTARGET_NA_P , false, NULL);
-            return true;
-        }
-        if (netgame)
-        {
-            CT_SetMessage(&players[consoleplayer], ID_NOTARGET_NA_N , false, NULL);
             return true;
         }
         player->cheats ^= CF_NOTARGET;
@@ -1242,11 +1197,6 @@ boolean G_Responder (event_t* ev)
         if (demoplayback)
         {
             CT_SetMessage(&players[consoleplayer], ID_BUDDHA_NA_P , false, NULL);
-            return true;
-        }
-        if (netgame)
-        {
-            CT_SetMessage(&players[consoleplayer], ID_BUDDHA_NA_N , false, NULL);
             return true;
         }
         player->cheats ^= CF_BUDDHA;
@@ -1299,14 +1249,6 @@ void G_PrepTiccmd (void)
     const boolean strafe = gamekeydown[key_strafe] ||
         mousebuttons[mousebstrafe] || joybuttons[joybstrafe];
 
-    // [JN] Deny camera rotation/looking while active menu in multiplayer.
-    if (netgame && menuactive)
-    {
-        mousex = 0;
-        mousey = 0;
-        return;
-    }
-
     if (mousex && !strafe)
     {
         localview.rawangle -= CalcMouseAngle(mousex);
@@ -1340,7 +1282,6 @@ static void G_ReadGameParms (void)
 void G_Ticker (void) 
 { 
     int		i;
-    int		buf; 
     ticcmd_t*	cmd;
     
     // do player reborns if needed
@@ -1394,16 +1335,12 @@ void G_Ticker (void)
     }
     
     // [crispy] demo sync of revenant tracers and RNG (from prboom-plus)
-    if (paused & 2 || (!demoplayback && menuactive && !netgame))
+    if (paused & 2 || (!demoplayback && menuactive))
     {
         demostarttic++;
     }
     else
     {     
-    // get commands, check consistancy,
-    // and build new consistancy check
-    buf = (gametic/ticdup)%BACKUPTICS; 
- 
     for (i=0 ; i<MAXPLAYERS ; i++)
     {
 	if (playeringame[i]) 
@@ -1417,20 +1354,6 @@ void G_Ticker (void)
 	    // [crispy] do not record tics while still playing back in demo continue mode
 	    if (demorecording && !demoplayback)
 		G_WriteDemoTiccmd (cmd);
-	    
-	    if (netgame && !netdemo && !(gametic%ticdup) ) 
-	    { 
-		if (gametic > BACKUPTICS 
-		    && consistancy[i][buf] != cmd->consistancy) 
-		{ 
-		    I_Error ("consistency failure (%i should be %i)",
-			     cmd->consistancy, consistancy[i][buf]); 
-		} 
-		if (players[i].mo) 
-		    consistancy[i][buf] = players[i].mo->x; 
-		else 
-		    consistancy[i][buf] = rndindex; 
-	    } 
 	}
     }
     
@@ -1488,7 +1411,7 @@ void G_Ticker (void)
 
     // [crispy] no pause at intermission screen during demo playback 
     // to avoid desyncs (from prboom-plus)
-    if ((paused & 2 || (!demoplayback && menuactive && !netgame)) 
+    if ((paused & 2 || (!demoplayback && menuactive)) 
         && gamestate == GS_INTERMISSION)
     {
     return;
@@ -1829,15 +1752,6 @@ void G_DoLoadGame (void)
 { 
     int savedleveltime;
 	 
-    // [crispy] loaded game must always be single player.
-    // Needed for ability to use a further game loading, as well as
-    // cheat codes and other single player only specifics.
-    if (startloadgame == -1)
-    {
-	netdemo = false;
-	netgame = false;
-	deathmatch = false;
-    }
     gameaction = ga_nothing; 
 	 
     save_stream = M_fopen(savename, "rb");
@@ -2035,9 +1949,6 @@ void G_DoNewGame (void)
 {
     idmusnum = -1;  // [JN] Andrey Budko: allow new level's music to be loaded
     demoplayback = false; 
-    netdemo = false;
-    netgame = false;
-    deathmatch = false;
     // [crispy] reset game speed after demo fast-forward
     singletics = false;
     playeringame[1] = playeringame[2] = playeringame[3] = 0;
@@ -2166,7 +2077,7 @@ void G_ReadDemoTiccmd (ticcmd_t* cmd)
     // [crispy] if demo playback is quit by pressing 'q',
     // stay in the game, hand over controls to the player and
     // continue recording the demo under a different name
-    if (gamekeydown[key_demo_quit] && singledemo && !netgame)
+    if (gamekeydown[key_demo_quit] && singledemo)
     {
 	byte *actualbuffer = demobuffer;
 	char *actualname = M_StringDuplicate(defdemoname);
@@ -2389,9 +2300,8 @@ void G_BeginRecording (void)
     *demo_p++ = gameskill; 
     *demo_p++ = gameepisode; 
     *demo_p++ = gamemap; 
-    if (longtics || gameversion > exe_doom_1_2)
+    if (longtics)
     {
-        *demo_p++ = deathmatch; 
         *demo_p++ = respawnparm;
         *demo_p++ = fastparm;
         *demo_p++ = nomonsters;
@@ -2541,7 +2451,6 @@ void G_DoPlayDemo (void)
     map = *demo_p++; 
     if (!olddemo)
     {
-        deathmatch = *demo_p++;
         respawnparm = *demo_p++;
         fastparm = *demo_p++;
         nomonsters = *demo_p++;
@@ -2549,7 +2458,6 @@ void G_DoPlayDemo (void)
     }
     else
     {
-        deathmatch = 0;
         respawnparm = 0;
         fastparm = 0;
         nomonsters = 0;
@@ -2560,11 +2468,8 @@ void G_DoPlayDemo (void)
     for (i=0 ; i<MAXPLAYERS ; i++) 
 	playeringame[i] = *demo_p++; 
 
-    if (playeringame[1] || M_CheckParm("-solo-net") > 0
-                        || M_CheckParm("-netdemo") > 0)
+    if (playeringame[1])
     {
-	netgame = true;
-	netdemo = true;
 	// [crispy] impossible to continue a multiplayer demo
 	demorecording = false;
     }
@@ -2803,9 +2708,6 @@ boolean G_CheckDemoStatus (void)
     { 
         W_ReleaseLumpName(defdemoname);
 	demoplayback = false; 
-	netdemo = false;
-	netgame = false;
-	deathmatch = false;
 	playeringame[1] = playeringame[2] = playeringame[3] = 0;
 	// [crispy] leave game parameters intact when continuing a demo
 	if (!demorecording)

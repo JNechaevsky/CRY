@@ -140,144 +140,102 @@ P_GiveAmmo
     return true;
 }
 
+/* 
+=================== 
+= 
+= P_GiveWeapon
+=
+= The weapon name may have a MF_DROPPED flag ored in
+=================== 
+*/ 
 
-// [crispy] show weapon pickup messages in multiplayer games
-const char *const WeaponPickupMessages[NUMWEAPONS] =
-{
-	NULL, // wp_fist
-	NULL, // wp_pistol
-	GOTSHOTGUN,
-	GOTCHAINGUN,
-	GOTLAUNCHER,
-	GOTPLASMA,
-	GOTBFG9000,
-	GOTCHAINSAW,
-};
-
-//
-// P_GiveWeapon
-// The weapon name may have a MF_DROPPED flag ored in.
-//
-boolean
-P_GiveWeapon
-( player_t*	player,
-  weapontype_t	weapon,
-  boolean	dropped )
+boolean P_GiveWeapon (player_t *player, weapontype_t weapon, boolean dropped)
 {
     boolean	gaveammo;
     boolean	gaveweapon;
 	
-    if (netgame
-	&& (deathmatch!=2)
-	 && !dropped )
-    {
-	// leave placed weapons forever on net games
+	if (weaponinfo[weapon].ammo != am_noammo)
+	{	/* give one clip with a dropped weapon, two clips with a found weapon */
+		if (dropped)
+			gaveammo = P_GiveAmmo (player, weaponinfo[weapon].ammo, 1);
+		else
+			gaveammo = P_GiveAmmo (player, weaponinfo[weapon].ammo, 2);
+	}
+	else
+		gaveammo = false;
+	
 	if (player->weaponowned[weapon])
-	    return false;
-
-	player->bonuscount += BONUSADD;
-	player->weaponowned[weapon] = true;
-
-	if (deathmatch)
-	    P_GiveAmmo (player, weaponinfo[weapon].ammo, 5);
+		gaveweapon = false;
 	else
-	    P_GiveAmmo (player, weaponinfo[weapon].ammo, 2);
-	player->pendingweapon = weapon;
-	// [crispy] show weapon pickup messages in multiplayer games
-	CT_SetMessage(player, WeaponPickupMessages[weapon], false, NULL);
-
-	if (player == &players[displayplayer])
-	    S_StartSound (NULL, sfx_wpnup);
-	return false;
-    }
+	{
+		gaveweapon = true;
+		player->weaponowned[weapon] = true;
+		player->pendingweapon = weapon;
+	}
 	
-    if (weaponinfo[weapon].ammo != am_noammo)
-    {
-	// give one clip with a dropped weapon,
-	// two clips with a found weapon
-	if (dropped)
-	    gaveammo = P_GiveAmmo (player, weaponinfo[weapon].ammo, 1);
-	else
-	    gaveammo = P_GiveAmmo (player, weaponinfo[weapon].ammo, 2);
-    }
-    else
-	gaveammo = false;
-	
-    if (player->weaponowned[weapon])
-	gaveweapon = false;
-    else
-    {
-	gaveweapon = true;
-	player->weaponowned[weapon] = true;
-	player->pendingweapon = weapon;
-    }
-	
-    return (gaveweapon || gaveammo);
+	return (gaveweapon || gaveammo);
 }
 
- 
+/* 
+=================== 
+= 
+= P_GiveBody
+=
+= Returns false if the body isn't needed at all
+=================== 
+*/ 
 
-//
-// P_GiveBody
-// Returns false if the body isn't needed at all
-//
-boolean
-P_GiveBody
-( player_t*	player,
-  int		num )
+boolean P_GiveBody (player_t *player, int num)
 {
-    if (player->health >= MAXHEALTH)
-	return false;
+	if (player->health >= MAXHEALTH)
+		return false;
 		
-    player->health += num;
-    if (player->health > MAXHEALTH)
-	player->health = MAXHEALTH;
-    player->mo->health = player->health;
+	player->health += num;
+	if (player->health > MAXHEALTH)
+		player->health = MAXHEALTH;
+	player->mo->health = player->health;
 	
-    return true;
+	return true;
 }
 
+/* 
+=================== 
+= 
+= P_GiveArmor
+=
+= Returns false if the armor is worse than the current armor
+=================== 
+*/ 
 
-
-//
-// P_GiveArmor
-// Returns false if the armor is worse
-// than the current armor.
-//
-boolean
-P_GiveArmor
-( player_t*	player,
-  int		armortype )
+boolean P_GiveArmor (player_t *player, int armortype)
 {
-    int		hits;
+	int		hits;
 	
-    hits = armortype*100;
-    if (player->armorpoints >= hits)
-	return false;	// don't pick up
+	hits = armortype*100;
+	if (player->armorpoints >= hits)
+		return false;		/* don't pick up */
 		
-    player->armortype = armortype;
-    player->armorpoints = hits;
+	player->armortype = armortype;
+	player->armorpoints = hits;
 	
-    return true;
+	return true;
 }
 
+/* 
+=================== 
+= 
+= P_GiveCard
+=
+=================== 
+*/ 
 
-
-//
-// P_GiveCard
-//
-void
-P_GiveCard
-( player_t*	player,
-  card_t	card )
+void P_GiveCard (player_t *player, card_t card)
 {
-    if (player->cards[card])
-	return;
-    
-    player->bonuscount += netgame ? BONUSADD : 0; // [crispy] Fix "Key pickup resets palette"
-    player->cards[card] = 1;
+	if (player->cards[card])
+		return;		
+	player->bonuscount = BONUSADD;
+	player->cards[card] = 1;
 }
-
 
 //
 // P_GivePower
@@ -403,7 +361,6 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
         if (!player->cards[it_bluecard])
             CT_SetMessage(player, "You pick up a blue keycard.", false, NULL);
         P_GiveCard (player, it_bluecard);
-        if (!netgame)
             break;
         return;
 	
@@ -411,7 +368,6 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
         if (!player->cards[it_yellowcard])
             CT_SetMessage(player, "You pick up a yellow keycard.", false, NULL);
         P_GiveCard (player, it_yellowcard);
-        if (!netgame)
             break;
         return;
 	
@@ -419,7 +375,6 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
         if (!player->cards[it_redcard])
             CT_SetMessage(player, "You pick up a red keycard.", false, NULL);
         P_GiveCard (player, it_redcard);
-        if (!netgame)
             break;
         return;
 	
@@ -427,7 +382,6 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
         if (!player->cards[it_blueskull])
             CT_SetMessage(player, "You pick up a blue skull key.", false, NULL);
         P_GiveCard (player, it_blueskull);
-        if (!netgame)
             break;
         return;
 	
@@ -435,7 +389,6 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
         if (!player->cards[it_yellowskull])
             CT_SetMessage(player, "You pick up a yellow skull key.", false, NULL);
         P_GiveCard (player, it_yellowskull);
-        if (!netgame)
             break;
         return;
 	
@@ -443,7 +396,6 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
         if (!player->cards[it_redskull])
             CT_SetMessage(player, "You pick up a red skull key.", false, NULL);
         P_GiveCard (player, it_redskull);
-        if (!netgame)
             break;
         return;
 	
@@ -669,7 +621,7 @@ P_KillMobj
             source->player->frags[target->player-players]++;
         }
     }
-    else if (!netgame && (target->flags & MF_COUNTKILL))
+    else if (target->flags & MF_COUNTKILL)
     {
         // count all monster deaths,
         // even those caused by other monsters

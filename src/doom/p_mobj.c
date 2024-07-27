@@ -888,11 +888,6 @@ void P_RespawnSpecials (void)
     
     int			i;
 
-    // only respawn items in deathmatch
-    // AX: deathmatch 3 is a Crispy-specific change
-    if (deathmatch != 2 && deathmatch != 3)
-	return;	// 
-
     // nothing left to respawn?
     if (iquehead == iquetail)
 	return;		
@@ -955,8 +950,6 @@ void P_SpawnPlayer (mapthing_t* mthing)
     fixed_t		z;
 
     mobj_t*		mobj;
-
-    int			i;
 
     // [JN] Stop fast forward after entering new level while demo playback.
     if (demo_gotonextlvl)
@@ -1022,11 +1015,6 @@ void P_SpawnPlayer (mapthing_t* mthing)
 
     // setup gun psprite
     P_SetupPsprites (p);
-    
-    // give all cards in death match mode
-    if (deathmatch)
-	for (i=0 ; i<NUMCARDS ; i++)
-	    p->cards[i] = true;
 			
     if (mthing->type-1 == consoleplayer)
     {
@@ -1050,17 +1038,6 @@ void P_SpawnMapThing (mapthing_t* mthing)
     fixed_t		y;
     fixed_t		z;
 		
-    // count deathmatch start positions
-    if (mthing->type == 11)
-    {
-	if (deathmatch_p < &deathmatchstarts[10])
-	{
-	    memcpy (deathmatch_p, mthing, sizeof(*mthing));
-	    deathmatch_p++;
-	}
-	return;
-    }
-
     if (mthing->type <= 0)
     {
         // Thing type 0 is actually "player -1 start".  
@@ -1075,14 +1052,13 @@ void P_SpawnMapThing (mapthing_t* mthing)
 	// save spots for respawning in network games
 	playerstarts[mthing->type-1] = *mthing;
 	playerstartsingame[mthing->type-1] = true;
-	if (!deathmatch)
 	    P_SpawnPlayer (mthing);
 
 	return;
     }
 
     // check for apropriate skill level
-    if (!netgame && (mthing->options & 16) )
+    if (mthing->options & 16)
 	return;
 		
     if (gameskill == sk_baby)
@@ -1108,10 +1084,6 @@ void P_SpawnMapThing (mapthing_t* mthing)
 		 mthing->x, mthing->y);
 	return;
     }
-		
-    // don't spawn keycards and players in deathmatch
-    if (deathmatch && mobjinfo[i].flags & MF_NOTDMATCH)
-	return;
 		
     // don't spawn any monsters if -nomonsters
     if (nomonsters
@@ -1149,7 +1121,7 @@ void P_SpawnMapThing (mapthing_t* mthing)
     ||  mobj->info->spawnstate == S_PLAY_XDIE9)
     {
         // [crispy] randomly colorize space marine corpse objects
-        if (!netgame && vis_colored_blood)
+        if (vis_colored_blood)
         {
             mobj->flags |= (ID_RealRandom() & 3) << MF_TRANSSHIFT;
         }

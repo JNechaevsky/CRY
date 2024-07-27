@@ -109,7 +109,6 @@ static void LoadGameSettings(net_gamesettings_t *settings)
 {
     unsigned int i;
 
-    deathmatch = settings->deathmatch;
     startepisode = settings->episode;
     startmap = settings->map;
     startskill = settings->skill;
@@ -140,7 +139,6 @@ static void SaveGameSettings(net_gamesettings_t *settings)
     // Fill in game settings structure with appropriate parameters
     // for the new game
 
-    settings->deathmatch = deathmatch;
     settings->episode = startepisode;
     settings->map = startmap;
     settings->skill = startskill;
@@ -162,11 +160,6 @@ static void SaveGameSettings(net_gamesettings_t *settings)
 void D_CheckNetGame (void)
 {
     net_gamesettings_t settings;
-
-    if (netgame)
-    {
-        autostart = true;
-    }
 
     D_RegisterLoopCallbacks(&doom_loop_interface);
 

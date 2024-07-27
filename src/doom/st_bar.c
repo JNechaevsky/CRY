@@ -336,9 +336,6 @@ boolean ST_Responder (event_t *ev)
     // if a user keypress...
     if (ev->type == ev_keydown)
     {
-        // [JN] Allow cheats in Nightmare, as it was done in old released
-        // version of Chocorenderlimits, but still disallow in netgame.
-        if (!netgame /*&& gameskill != sk_nightmare*/)
         {
             // [JN] If user types "id", activate timer to prevent
             // other than typing actions in G_Responder.
@@ -564,8 +561,7 @@ boolean ST_Responder (event_t *ev)
                 CT_SetMessage(plyr, buf, false, NULL);
             }
             // [JN] IDDT cheating, moved from am_map.c
-            else if ((!deathmatch || gameversion <= exe_doom_1_8)
-            && cht_CheckCheat(&cheat_amap, ev->data2))
+            else if (cht_CheckCheat(&cheat_amap, ev->data2))
             {
                 iddt_cheating = (iddt_cheating + 1) % 3;
                 plyr->cheatTics = 1;
@@ -632,7 +628,7 @@ boolean ST_Responder (event_t *ev)
         }
 
         // 'clev' change-level cheat
-        if (!netgame && cht_CheckCheat(&cheat_clev, ev->data2))
+        if (cht_CheckCheat(&cheat_clev, ev->data2))
         {
             char  buf[3];
             int   epsd;

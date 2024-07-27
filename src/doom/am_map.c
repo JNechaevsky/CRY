@@ -530,16 +530,6 @@ void AM_LevelInit (boolean reinit)
     scale_ftom = FixedDiv(FRACUNIT, scale_mtof);
 
     f_h_old = f_h;
-
-    // [JN] If running Deathmatch mode, mark all automap lines as mapped
-    // so they will appear initially. DM mode is not about map reveal.
-    if (deathmatch)
-    {
-        for (int i = 0 ; i < numlines ; i++)
-        {
-            lines[i].flags |= ML_MAPPED;
-        }
-    }
 }
 
 // -----------------------------------------------------------------------------
