@@ -501,8 +501,7 @@ void S_StartSound(void *origin_p, int sfx_id)
     int cnum;
     int volume;
 
-    // [JN] Do not play sound while demo-warp.
-    if (nodrawers || demowarp || !snd_SfxVolume)
+    if (!snd_SfxVolume)
     {
         return;
     }

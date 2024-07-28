@@ -112,19 +112,11 @@ extern int musicVolume;
 //  in: /usr/include/linux/soundcard.h
 extern int snd_MusicDevice;
 extern int snd_SfxDevice;
-// Config file? Same disclaimer as above.
-extern int snd_DesiredMusicDevice;
-extern int snd_DesiredSfxDevice;
 
 
 // -------------------------
 // Status flags for refresh.
 //
-
-// Depending on view size - no status bar?
-// Note that there is no way to disable the
-//  status bar explicitely.
-extern  boolean statusbaractive;
 
 extern  boolean automapactive;	// In AutoMap mode?
 extern  boolean	menuactive;	// Menu overlayed?
@@ -242,7 +234,6 @@ extern  gamestate_t     wipegamestate;
 
 extern  int             mouseSensitivity;
 
-extern  int             bodyqueslot;
 
 
 

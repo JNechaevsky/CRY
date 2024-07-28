@@ -106,17 +106,10 @@ static void LoadGameSettings(net_gamesettings_t *settings)
     startmap = settings->map;
     startskill = settings->skill;
     startloadgame = settings->loadgame;
-    lowres_turn = settings->lowres_turn;
     nomonsters = settings->nomonsters;
     fastparm = settings->fast_monsters;
     respawnparm = settings->respawn_monsters;
     consoleplayer = settings->consoleplayer;
-
-    if (lowres_turn)
-    {
-        printf("NOTE: Turning resolution is reduced; this is probably "
-               "because there is a client recording a Vanilla demo.\n");
-    }
 
     for (i = 0; i < MAXPLAYERS; ++i)
     {
@@ -140,10 +133,6 @@ static void SaveGameSettings(net_gamesettings_t *settings)
     settings->nomonsters = nomonsters;
     settings->fast_monsters = fastparm;
     settings->respawn_monsters = respawnparm;
-
-    settings->lowres_turn = (M_ParmExists("-record")
-                         && !M_ParmExists("-longtics"))
-                          || M_ParmExists("-shorttics");
 }
 
 //

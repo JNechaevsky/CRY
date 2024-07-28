@@ -4617,7 +4617,6 @@ boolean M_Responder (event_t* ev)
         }
         // [crispy] those two can be considered as shortcuts for the IDCLEV cheat
         // and should be treated as such, i.e. add "if (!netgame)"
-        // [JN] Hovewer, allow while multiplayer demos.
         else if (key != 0 && key == key_reloadlevel)
         {
             if (G_ReloadLevel())

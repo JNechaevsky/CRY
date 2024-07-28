@@ -671,8 +671,6 @@ void D_DoomMain (void)
     {
         startmap = atoi (myargv[p+1]);
         autostart = true;
-        // [crispy] if used with -playdemo, fast-forward demo up to the desired map
-        demowarp = startmap;
     }
 
     // Check for load game parameter
@@ -730,40 +728,6 @@ void D_DoomMain (void)
     // [JN] Show startup process time.
     printf("Startup process took %d ms.\n", SDL_GetTicks() - starttime);
 
-/*
-    //!
-    // @arg <x>
-    // @category demo
-    // @vanilla
-    //
-    // Record a demo named x.lmp.
-    //
-
-    p = M_CheckParmWithArgs("-record", 1);
-
-    if (p)
-    {
-	G_RecordDemo (myargv[p+1]);
-	autostart = true;
-    }
-
-    p = M_CheckParmWithArgs("-playdemo", 1);
-    if (p)
-    {
-	singledemo = true;              // quit after one demo
-	G_DeferedPlayDemo (demolumpname);
-	D_DoomLoop ();  // never returns
-    }
-    demowarp = 0; // [crispy] we don't play a demo, so don't skip maps
-	
-    p = M_CheckParmWithArgs("-timedemo", 1);
-    if (p)
-    {
-	G_TimeDemo (demolumpname);
-	D_DoomLoop ();  // never returns
-    }
-*/
-	
     if (startloadgame >= 0)
     {
         M_StringCopy(file, P_SaveGameFile(startloadgame), sizeof(file));

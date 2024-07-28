@@ -93,9 +93,7 @@ boolean         sendpause;             	// send a pause event next tic
 boolean         sendsave;             	// send a save event next tic 
 boolean         usergame;               // ok to save / end game 
  
-boolean         timingdemo;             // if true, exit with report on completion 
 boolean         nodrawers;              // for comparative timing purposes 
-int             starttime;          	// for comparative timing purposes  	 
  
 boolean         playeringame[MAXPLAYERS]; 
 player_t        players[MAXPLAYERS]; 
@@ -105,14 +103,6 @@ int             displayplayer;          // view being displayed
 int             levelstarttic;          // gametic at level start 
 int             totalkills, totalitems, totalsecret;    // for intermission 
 int             totalleveltimes;        // [crispy] CPhipps - total time for all completed levels
-int             demostarttic;           // [crispy] fix revenant internal demo bug
- 
-boolean         longtics;               // cph's doom 1.91 longtics hack
-boolean         lowres_turn;            // low resolution turning for longtics
-byte*		demobuffer;
-byte*		demo_p;
-byte*		demoend; 
-boolean         singledemo;            	// quit after playing a demo from cmdline 
  
 boolean         precache = true;        // if true, load all graphics at start 
 
@@ -212,11 +202,6 @@ static char     savedescription[32];
  
 static ticcmd_t basecmd; // [crispy]
 
-#define	BODYQUESIZE	32
-
-mobj_t*		bodyque[BODYQUESIZE]; 
-int		bodyqueslot; 
- 
 // [JN] Determinates speed of camera Z-axis movement in spectator mode.
 static int      crl_camzspeed;
 
@@ -299,12 +284,6 @@ static int CarryError(double value, const double *prevcarry, double *carry)
 
 static short CarryAngle(double angle)
 {
-    if (lowres_turn && fabs(angle + prevcarry.angle) < 128)
-    {
-        carry.angle = angle + prevcarry.angle;
-        return 0;
-    }
-    else
     {
         return CarryError(angle, &prevcarry.angle, &carry.angle);
     }
@@ -787,32 +766,6 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
 	cmd->sidemove = -cmd->sidemove;
     }
 
-    // low-res turning
-
-    if (lowres_turn)
-    {
-        signed short desired_angleturn;
-
-        desired_angleturn = cmd->angleturn;
-
-        // round angleturn to the nearest 256 unit boundary
-        // for recording demos with single byte values for turn
-
-        cmd->angleturn = (desired_angleturn + 128) & 0xff00;
-
-        if (angle)
-        {
-            localview.ticangleturn = cmd->angleturn - mousex_angleturn;
-        }
-
-        // Carry forward the error from the reduced resolution to the
-        // next tic, so that successive small movements can accumulate.
-
-        prevcarry.angle += gp_flip_levels ?
-                            cmd->angleturn - desired_angleturn :
-                            desired_angleturn - cmd->angleturn;
-    }
-    
     // If spectating, send the movement commands instead
     if (crl_spectating && !menuactive)
     	CRL_ImpulseCamera(cmd->forwardmove, cmd->sidemove, cmd->angleturn); 
