@@ -51,23 +51,13 @@ extern const byte C_666666[];
 extern const byte C_777777[];
 
 
-// Main colormaps initialization functions
+// Composing functions
 extern void R_AllocateColoredColormaps (void);
-extern void R_InitColoredColormaps (const byte k, const float scale, const int j);
+extern void R_GenerateColoredColormaps (const byte k, const float scale, const int j);
 
-// Colored visplanes initialization functions
-extern void R_ColoredZLightFreeI (const int i);
-extern void R_ColoredZLightFree (void);
-extern void R_ColoredZLightMalloc (void);
-extern void R_ColoredZLightMAXLIGHTZ (const int i);
-extern void R_ColoredZLightLevels (const int i, const int j, const int level);
-
-// Colored segments/sprites initialization functions
-extern void R_ColoredScLightFreeI (const int i);
-extern void R_ColoredScLightFree (void);
-extern void R_ColoredScLightMalloc (void);
-extern void R_ColoredScLightMAXLIGHTSCALE (int i);
-extern void R_ColoredScLightLevels (const int i, const int j, const int level);
+// Initialization functions
+extern void R_InitColoredLightTables (void);
+extern void R_GenerateColoredSClights (const int width);
 
 // Coloring lookup tables
 extern lighttable_t **R_ColoredVisplanesColorize (const int light, const int color);

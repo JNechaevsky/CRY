@@ -621,12 +621,8 @@ void R_InitLightTables (void)
 	for (i = 0; i < LIGHTLEVELS; i++)
 	{
 		free(scalelight[i]);
-		// [JN] Colored segments initialization.
-		R_ColoredScLightFreeI(i);
 	}
 	free(scalelight);
-	// [JN] Colored segments initialization.
-	R_ColoredScLightFree();
     }
 
     if (scalelightfixed)
@@ -639,21 +635,13 @@ void R_InitLightTables (void)
 	for (i = 0; i < LIGHTLEVELS; i++)
 	{
 		free(zlight[i]);
-		// [JN] Colored visplanes initialization.
-		R_ColoredZLightFreeI(i);
 	}
 	free(zlight);
-	// [JN] Colored visplanes initialization.
-	R_ColoredZLightFree();
     }
 
     scalelight = malloc(LIGHTLEVELS * sizeof(*scalelight));
     scalelightfixed = malloc(MAXLIGHTSCALE * sizeof(*scalelightfixed));
     zlight = malloc(LIGHTLEVELS * sizeof(*zlight));
-    // [JN] Colored segments initialization.
-    R_ColoredScLightMalloc();
-    // [JN] Colored visplanes initialization.
-    R_ColoredZLightMalloc();
 
     // Calculate the light levels to use
     //  for each level / distance combination.
@@ -661,10 +649,6 @@ void R_InitLightTables (void)
     {
 	scalelight[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
 	zlight[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-	// [JN] Colored segments initialization.
-	R_ColoredScLightMAXLIGHTSCALE(i);
-	// [JN] Colored visplanes initialization.
-	R_ColoredZLightMAXLIGHTZ(i);
 
 	startmap = ((LIGHTLEVELS-LIGHTBRIGHT-i)*2)*NUMCOLORMAPS/LIGHTLEVELS;
 	for (j=0 ; j<MAXLIGHTZ ; j++)
@@ -680,10 +664,11 @@ void R_InitLightTables (void)
 		level = NUMCOLORMAPS-1;
 
 	    zlight[i][j] = colormaps + level*256;
-	    // [JN] Colored visplanes initialization.
-	    R_ColoredZLightLevels(i, j, level);
 	}
     }
+    
+    // [JN] Initialize and generate colored scalelights and zlights. 
+    R_InitColoredLightTables();
 }
 
 //
@@ -871,10 +856,11 @@ void R_ExecuteSetViewSize (void)
 		level = NUMCOLORMAPS-1;
 
 	    scalelight[i][j] = colormaps + level*256;
-	    // [JN] Colored segments initialization.
-	    R_ColoredScLightLevels(i, j, level);
 	}
     }
+
+    // [JN] (Re-)generate colored scalelight levels.
+    R_GenerateColoredSClights(viewwidth_nonwide);
 
     // [crispy] lookup table for horizontal screen coordinates
     for (i = 0, j = SCREENWIDTH - 1; i < SCREENWIDTH; i++, j--)

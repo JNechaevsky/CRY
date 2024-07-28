@@ -123,40 +123,42 @@ static lighttable_t ***scalelight_777777 = NULL;
 
 // =============================================================================
 //
-//                   MAIN COLORMAPS INITIALIZATION FUNCTIONS
+//                             COMPOSING FUNCTIONS
 //
 // =============================================================================
 
 void R_AllocateColoredColormaps (void)
 {
-    colormaps_EEC06B = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_D97C45 = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_FF7F7F = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_55B828 = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_BBE357 = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_949DB9 = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_2A2F6B = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_50ADAC = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_CCE4A5 = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_CCEA5F = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_B30202 = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_B87A15 = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_FFD000 = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_FFDE4C = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_FFF588 = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_043E8B = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_5B4318 = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_4F5D8B = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_D46D3D = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_04918B = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_FF3030 = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_311A59 = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_FFAFAF = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_ECB866 = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_C63F23 = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_9BC8CD = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_666666 = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-    colormaps_777777 = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
+    const size_t lighttable_size = (NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t);
+
+    colormaps_EEC06B = malloc(lighttable_size);
+    colormaps_D97C45 = malloc(lighttable_size);
+    colormaps_FF7F7F = malloc(lighttable_size);
+    colormaps_55B828 = malloc(lighttable_size);
+    colormaps_BBE357 = malloc(lighttable_size);
+    colormaps_949DB9 = malloc(lighttable_size);
+    colormaps_2A2F6B = malloc(lighttable_size);
+    colormaps_50ADAC = malloc(lighttable_size);
+    colormaps_CCE4A5 = malloc(lighttable_size);
+    colormaps_CCEA5F = malloc(lighttable_size);
+    colormaps_B30202 = malloc(lighttable_size);
+    colormaps_B87A15 = malloc(lighttable_size);
+    colormaps_FFD000 = malloc(lighttable_size);
+    colormaps_FFDE4C = malloc(lighttable_size);
+    colormaps_FFF588 = malloc(lighttable_size);
+    colormaps_043E8B = malloc(lighttable_size);
+    colormaps_5B4318 = malloc(lighttable_size);
+    colormaps_4F5D8B = malloc(lighttable_size);
+    colormaps_D46D3D = malloc(lighttable_size);
+    colormaps_04918B = malloc(lighttable_size);
+    colormaps_FF3030 = malloc(lighttable_size);
+    colormaps_311A59 = malloc(lighttable_size);
+    colormaps_FFAFAF = malloc(lighttable_size);
+    colormaps_ECB866 = malloc(lighttable_size);
+    colormaps_C63F23 = malloc(lighttable_size);
+    colormaps_9BC8CD = malloc(lighttable_size);
+    colormaps_666666 = malloc(lighttable_size);
+    colormaps_777777 = malloc(lighttable_size);
 }
 
 static int r_clrmp_color, g_clrmp_color, b_clrmp_color;
@@ -170,7 +172,7 @@ static void R_InitColoredColormap (const byte k, const float scale, const byte *
     colormap_name[j] = 0xff000000 | (r_clrmp_color << 16) | (g_clrmp_color << 8) | b_clrmp_color;
 }
 
-void R_InitColoredColormaps (const byte k, const float scale, const int j)
+void R_GenerateColoredColormaps (const byte k, const float scale, const int j)
 {
     R_InitColoredColormap(k, scale, C_EEC06B, colormaps_EEC06B, j);
     R_InitColoredColormap(k, scale, C_D97C45, colormaps_D97C45, j);
@@ -204,334 +206,361 @@ void R_InitColoredColormaps (const byte k, const float scale, const int j)
 
 // =============================================================================
 //
-//                  COLORED VISPLANES INITIALIZATION FUNCTIONS
+//                          INITIALIZATION FUNCTIONS
 //
 // =============================================================================
 
-void R_ColoredZLightFreeI (const int i)
+#define DISTMAP 2
+
+void R_InitColoredLightTables (void)
 {
-    free(zlight_EEC06B[i]);
-    free(zlight_D97C45[i]);
-    free(zlight_FF7F7F[i]);
-    free(zlight_55B828[i]);
-    free(zlight_BBE357[i]);
-    free(zlight_949DB9[i]);
-    free(zlight_2A2F6B[i]);
-    free(zlight_50ADAC[i]);
-    free(zlight_CCE4A5[i]);
-    free(zlight_CCEA5F[i]);
-    free(zlight_B30202[i]);
-    free(zlight_B87A15[i]);
-    free(zlight_FFD000[i]);
-    free(zlight_FFDE4C[i]);
-    free(zlight_FFF588[i]);
-    free(zlight_043E8B[i]);
-    free(zlight_5B4318[i]);
-    free(zlight_4F5D8B[i]);
-    free(zlight_D46D3D[i]);
-    free(zlight_04918B[i]);
-    free(zlight_FF3030[i]);
-    free(zlight_311A59[i]);
-    free(zlight_FFAFAF[i]);
-    free(zlight_ECB866[i]);
-    free(zlight_C63F23[i]);
-    free(zlight_9BC8CD[i]);
-    free(zlight_666666[i]);
-    free(zlight_777777[i]);
+    int i, j;
+    int level, startmap, scale;
+    const size_t sclight_size     = LIGHTLEVELS * sizeof(*scalelight);
+    const size_t sclight_size_max = MAXLIGHTSCALE * sizeof(**scalelight);
+    const size_t zlight_size      = LIGHTLEVELS * sizeof(*zlight);
+    const size_t zlight_size_max  = MAXLIGHTZ * sizeof(**zlight);
+
+    if (scalelight_EEC06B)
+    {
+        for (i = 0 ; i < LIGHTLEVELS ; i++)
+        {
+            free(scalelight_EEC06B[i]);
+            free(scalelight_D97C45[i]);
+            free(scalelight_FF7F7F[i]);
+            free(scalelight_55B828[i]);
+            free(scalelight_BBE357[i]);
+            free(scalelight_949DB9[i]);
+            free(scalelight_2A2F6B[i]);
+            free(scalelight_50ADAC[i]);
+            free(scalelight_CCE4A5[i]);
+            free(scalelight_CCEA5F[i]);
+            free(scalelight_B30202[i]);
+            free(scalelight_B87A15[i]);
+            free(scalelight_FFD000[i]);
+            free(scalelight_FFDE4C[i]);
+            free(scalelight_FFF588[i]);
+            free(scalelight_043E8B[i]);
+            free(scalelight_5B4318[i]);
+            free(scalelight_4F5D8B[i]);
+            free(scalelight_D46D3D[i]);
+            free(scalelight_04918B[i]);
+            free(scalelight_FF3030[i]);
+            free(scalelight_311A59[i]);
+            free(scalelight_FFAFAF[i]);
+            free(scalelight_ECB866[i]);
+            free(scalelight_C63F23[i]);
+            free(scalelight_9BC8CD[i]);
+            free(scalelight_666666[i]);
+            free(scalelight_777777[i]);
+        }
+        free(scalelight_EEC06B);
+        free(scalelight_D97C45);
+        free(scalelight_FF7F7F);
+        free(scalelight_55B828);
+        free(scalelight_BBE357);
+        free(scalelight_949DB9);
+        free(scalelight_2A2F6B);
+        free(scalelight_50ADAC);
+        free(scalelight_CCE4A5);
+        free(scalelight_CCEA5F);
+        free(scalelight_B30202);
+        free(scalelight_B87A15);
+        free(scalelight_FFD000);
+        free(scalelight_FFDE4C);
+        free(scalelight_FFF588);
+        free(scalelight_043E8B);
+        free(scalelight_5B4318);
+        free(scalelight_4F5D8B);
+        free(scalelight_D46D3D);
+        free(scalelight_04918B);
+        free(scalelight_FF3030);
+        free(scalelight_311A59);
+        free(scalelight_FFAFAF);
+        free(scalelight_ECB866);
+        free(scalelight_C63F23);
+        free(scalelight_9BC8CD);
+        free(scalelight_666666);
+        free(scalelight_777777);
+    }
+
+    if (zlight_EEC06B)
+    {
+        for (i = 0; i < LIGHTLEVELS; i++)
+        {
+            free(zlight_EEC06B[i]);
+            free(zlight_D97C45[i]);
+            free(zlight_FF7F7F[i]);
+            free(zlight_55B828[i]);
+            free(zlight_BBE357[i]);
+            free(zlight_949DB9[i]);
+            free(zlight_2A2F6B[i]);
+            free(zlight_50ADAC[i]);
+            free(zlight_CCE4A5[i]);
+            free(zlight_CCEA5F[i]);
+            free(zlight_B30202[i]);
+            free(zlight_B87A15[i]);
+            free(zlight_FFD000[i]);
+            free(zlight_FFDE4C[i]);
+            free(zlight_FFF588[i]);
+            free(zlight_043E8B[i]);
+            free(zlight_5B4318[i]);
+            free(zlight_4F5D8B[i]);
+            free(zlight_D46D3D[i]);
+            free(zlight_04918B[i]);
+            free(zlight_FF3030[i]);
+            free(zlight_311A59[i]);
+            free(zlight_FFAFAF[i]);
+            free(zlight_ECB866[i]);
+            free(zlight_C63F23[i]);
+            free(zlight_9BC8CD[i]);
+            free(zlight_666666[i]);
+            free(zlight_777777[i]);
+        }
+        free(zlight_EEC06B);
+        free(zlight_D97C45);
+        free(zlight_FF7F7F);
+        free(zlight_55B828);
+        free(zlight_BBE357);
+        free(zlight_949DB9);
+        free(zlight_2A2F6B);
+        free(zlight_50ADAC);
+        free(zlight_CCE4A5);
+        free(zlight_CCEA5F);
+        free(zlight_B30202);
+        free(zlight_B87A15);
+        free(zlight_FFD000);
+        free(zlight_FFDE4C);
+        free(zlight_FFF588);
+        free(zlight_043E8B);
+        free(zlight_5B4318);
+        free(zlight_4F5D8B);
+        free(zlight_D46D3D);
+        free(zlight_04918B);
+        free(zlight_FF3030);
+        free(zlight_311A59);
+        free(zlight_FFAFAF);
+        free(zlight_ECB866);
+        free(zlight_C63F23);
+        free(zlight_9BC8CD);
+        free(zlight_666666);
+        free(zlight_777777);
+    }
+    
+    scalelight_EEC06B = malloc(sclight_size);
+    scalelight_D97C45 = malloc(sclight_size);
+    scalelight_FF7F7F = malloc(sclight_size);
+    scalelight_55B828 = malloc(sclight_size);
+    scalelight_BBE357 = malloc(sclight_size);
+    scalelight_949DB9 = malloc(sclight_size);
+    scalelight_2A2F6B = malloc(sclight_size);
+    scalelight_50ADAC = malloc(sclight_size);
+    scalelight_CCE4A5 = malloc(sclight_size);
+    scalelight_CCEA5F = malloc(sclight_size);
+    scalelight_B30202 = malloc(sclight_size);
+    scalelight_B87A15 = malloc(sclight_size);
+    scalelight_FFD000 = malloc(sclight_size);
+    scalelight_FFDE4C = malloc(sclight_size);
+    scalelight_FFF588 = malloc(sclight_size);
+    scalelight_043E8B = malloc(sclight_size);
+    scalelight_5B4318 = malloc(sclight_size);
+    scalelight_4F5D8B = malloc(sclight_size);
+    scalelight_D46D3D = malloc(sclight_size);
+    scalelight_04918B = malloc(sclight_size);
+    scalelight_FF3030 = malloc(sclight_size);
+    scalelight_311A59 = malloc(sclight_size);
+    scalelight_FFAFAF = malloc(sclight_size);
+    scalelight_ECB866 = malloc(sclight_size);
+    scalelight_C63F23 = malloc(sclight_size);
+    scalelight_9BC8CD = malloc(sclight_size);
+    scalelight_666666 = malloc(sclight_size);
+    scalelight_777777 = malloc(sclight_size);
+
+    zlight_EEC06B = malloc(zlight_size);
+    zlight_D97C45 = malloc(zlight_size);
+    zlight_FF7F7F = malloc(zlight_size);
+    zlight_55B828 = malloc(zlight_size);
+    zlight_BBE357 = malloc(zlight_size);
+    zlight_949DB9 = malloc(zlight_size);
+    zlight_2A2F6B = malloc(zlight_size);
+    zlight_50ADAC = malloc(zlight_size);
+    zlight_CCE4A5 = malloc(zlight_size);
+    zlight_CCEA5F = malloc(zlight_size);
+    zlight_B30202 = malloc(zlight_size);
+    zlight_B87A15 = malloc(zlight_size);
+    zlight_FFD000 = malloc(zlight_size);
+    zlight_FFDE4C = malloc(zlight_size);
+    zlight_FFF588 = malloc(zlight_size);
+    zlight_043E8B = malloc(zlight_size);
+    zlight_5B4318 = malloc(zlight_size);
+    zlight_4F5D8B = malloc(zlight_size);
+    zlight_D46D3D = malloc(zlight_size);
+    zlight_04918B = malloc(zlight_size);
+    zlight_FF3030 = malloc(zlight_size);
+    zlight_311A59 = malloc(zlight_size);
+    zlight_FFAFAF = malloc(zlight_size);
+    zlight_ECB866 = malloc(zlight_size);
+    zlight_C63F23 = malloc(zlight_size);
+    zlight_9BC8CD = malloc(zlight_size);
+    zlight_666666 = malloc(zlight_size);
+    zlight_777777 = malloc(zlight_size);
+
+    // Calculate the light levels to use for each level / distance combination.
+    for (i = 0 ; i < LIGHTLEVELS ; i++)
+    {
+        scalelight_EEC06B[i] = malloc(sclight_size_max);
+        scalelight_D97C45[i] = malloc(sclight_size_max);
+        scalelight_FF7F7F[i] = malloc(sclight_size_max);
+        scalelight_55B828[i] = malloc(sclight_size_max);
+        scalelight_BBE357[i] = malloc(sclight_size_max);
+        scalelight_949DB9[i] = malloc(sclight_size_max);
+        scalelight_2A2F6B[i] = malloc(sclight_size_max);
+        scalelight_50ADAC[i] = malloc(sclight_size_max);
+        scalelight_CCE4A5[i] = malloc(sclight_size_max);
+        scalelight_CCEA5F[i] = malloc(sclight_size_max);
+        scalelight_B30202[i] = malloc(sclight_size_max);
+        scalelight_B87A15[i] = malloc(sclight_size_max);
+        scalelight_FFD000[i] = malloc(sclight_size_max);
+        scalelight_FFDE4C[i] = malloc(sclight_size_max);
+        scalelight_FFF588[i] = malloc(sclight_size_max);
+        scalelight_043E8B[i] = malloc(sclight_size_max);
+        scalelight_5B4318[i] = malloc(sclight_size_max);
+        scalelight_4F5D8B[i] = malloc(sclight_size_max);
+        scalelight_D46D3D[i] = malloc(sclight_size_max);
+        scalelight_04918B[i] = malloc(sclight_size_max);
+        scalelight_FF3030[i] = malloc(sclight_size_max);
+        scalelight_311A59[i] = malloc(sclight_size_max);
+        scalelight_FFAFAF[i] = malloc(sclight_size_max);
+        scalelight_ECB866[i] = malloc(sclight_size_max);
+        scalelight_C63F23[i] = malloc(sclight_size_max);
+        scalelight_9BC8CD[i] = malloc(sclight_size_max);
+        scalelight_666666[i] = malloc(sclight_size_max);
+        scalelight_777777[i] = malloc(sclight_size_max);
+
+        zlight_EEC06B[i] = malloc(zlight_size_max);
+        zlight_D97C45[i] = malloc(zlight_size_max);
+        zlight_FF7F7F[i] = malloc(zlight_size_max);
+        zlight_55B828[i] = malloc(zlight_size_max);
+        zlight_BBE357[i] = malloc(zlight_size_max);
+        zlight_949DB9[i] = malloc(zlight_size_max);
+        zlight_2A2F6B[i] = malloc(zlight_size_max);
+        zlight_50ADAC[i] = malloc(zlight_size_max);
+        zlight_CCE4A5[i] = malloc(zlight_size_max);
+        zlight_CCEA5F[i] = malloc(zlight_size_max);
+        zlight_B30202[i] = malloc(zlight_size_max);
+        zlight_B87A15[i] = malloc(zlight_size_max);
+        zlight_FFD000[i] = malloc(zlight_size_max);
+        zlight_FFDE4C[i] = malloc(zlight_size_max);
+        zlight_FFF588[i] = malloc(zlight_size_max);
+        zlight_043E8B[i] = malloc(zlight_size_max);
+        zlight_5B4318[i] = malloc(zlight_size_max);
+        zlight_4F5D8B[i] = malloc(zlight_size_max);
+        zlight_D46D3D[i] = malloc(zlight_size_max);
+        zlight_04918B[i] = malloc(zlight_size_max);
+        zlight_FF3030[i] = malloc(zlight_size_max);
+        zlight_311A59[i] = malloc(zlight_size_max);
+        zlight_FFAFAF[i] = malloc(zlight_size_max);
+        zlight_ECB866[i] = malloc(zlight_size_max);
+        zlight_C63F23[i] = malloc(zlight_size_max);
+        zlight_9BC8CD[i] = malloc(zlight_size_max);
+        zlight_666666[i] = malloc(zlight_size_max);
+        zlight_777777[i] = malloc(zlight_size_max);
+
+        for (j = 0 ; j < MAXLIGHTZ ; j++)
+        {
+            startmap = ((LIGHTLEVELS - LIGHTBRIGHT - i) * 2) * NUMCOLORMAPS / LIGHTLEVELS;
+            scale = FixedDiv ((ORIGWIDTH / 2 * FRACUNIT), (j + 1) << LIGHTZSHIFT);
+            scale >>= LIGHTSCALESHIFT;
+            level = startmap - scale / DISTMAP;
+
+            if (level < 0)
+            level = 0;
+
+            if (level >= NUMCOLORMAPS)
+            level = NUMCOLORMAPS - 1;
+
+            zlight_EEC06B[i][j] = colormaps_EEC06B + level*256;
+            zlight_D97C45[i][j] = colormaps_D97C45 + level*256;
+            zlight_FF7F7F[i][j] = colormaps_FF7F7F + level*256;
+            zlight_55B828[i][j] = colormaps_55B828 + level*256;
+            zlight_BBE357[i][j] = colormaps_BBE357 + level*256;
+            zlight_949DB9[i][j] = colormaps_949DB9 + level*256;
+            zlight_2A2F6B[i][j] = colormaps_2A2F6B + level*256;
+            zlight_50ADAC[i][j] = colormaps_50ADAC + level*256;
+            zlight_CCE4A5[i][j] = colormaps_CCE4A5 + level*256;
+            zlight_CCEA5F[i][j] = colormaps_CCEA5F + level*256;
+            zlight_B30202[i][j] = colormaps_B30202 + level*256;
+            zlight_B87A15[i][j] = colormaps_B87A15 + level*256;
+            zlight_FFD000[i][j] = colormaps_FFD000 + level*256;
+            zlight_FFDE4C[i][j] = colormaps_FFDE4C + level*256;
+            zlight_FFF588[i][j] = colormaps_FFF588 + level*256;
+            zlight_043E8B[i][j] = colormaps_043E8B + level*256;
+            zlight_5B4318[i][j] = colormaps_5B4318 + level*256;
+            zlight_4F5D8B[i][j] = colormaps_4F5D8B + level*256;
+            zlight_D46D3D[i][j] = colormaps_D46D3D + level*256;
+            zlight_04918B[i][j] = colormaps_04918B + level*256;
+            zlight_FF3030[i][j] = colormaps_FF3030 + level*256;
+            zlight_311A59[i][j] = colormaps_311A59 + level*256;
+            zlight_FFAFAF[i][j] = colormaps_FFAFAF + level*256;
+            zlight_ECB866[i][j] = colormaps_ECB866 + level*256;
+            zlight_C63F23[i][j] = colormaps_C63F23 + level*256;
+            zlight_9BC8CD[i][j] = colormaps_9BC8CD + level*256;
+            zlight_666666[i][j] = colormaps_666666 + level*256;
+            zlight_777777[i][j] = colormaps_777777 + level*256;
+        }
+    }
 }
 
-void R_ColoredZLightFree (void)
+void R_GenerateColoredSClights (const int width)
 {
-    free(zlight_EEC06B);
-    free(zlight_D97C45);
-    free(zlight_FF7F7F);
-    free(zlight_55B828);
-    free(zlight_BBE357);
-    free(zlight_949DB9);
-    free(zlight_2A2F6B);
-    free(zlight_50ADAC);
-    free(zlight_CCE4A5);
-    free(zlight_CCEA5F);
-    free(zlight_B30202);
-    free(zlight_B87A15);
-    free(zlight_FFD000);
-    free(zlight_FFDE4C);
-    free(zlight_FFF588);
-    free(zlight_043E8B);
-    free(zlight_5B4318);
-    free(zlight_4F5D8B);
-    free(zlight_D46D3D);
-    free(zlight_04918B);
-    free(zlight_FF3030);
-    free(zlight_311A59);
-    free(zlight_FFAFAF);
-    free(zlight_ECB866);
-    free(zlight_C63F23);
-    free(zlight_9BC8CD);
-    free(zlight_666666);
-    free(zlight_777777);
-}
+    int i, j;
+    int level, startmap; 
 
-void R_ColoredZLightMalloc (void)
-{
-    zlight_EEC06B = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_D97C45 = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_FF7F7F = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_55B828 = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_BBE357 = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_949DB9 = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_2A2F6B = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_50ADAC = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_CCE4A5 = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_CCEA5F = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_B30202 = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_B87A15 = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_FFD000 = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_FFDE4C = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_FFF588 = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_043E8B = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_5B4318 = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_4F5D8B = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_D46D3D = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_04918B = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_FF3030 = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_311A59 = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_FFAFAF = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_ECB866 = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_C63F23 = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_9BC8CD = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_666666 = malloc(LIGHTLEVELS * sizeof(*zlight));
-    zlight_777777 = malloc(LIGHTLEVELS * sizeof(*zlight));
-}
+    // Calculate the light levels to use for each level / scale combination.
+    for (i = 0 ; i < LIGHTLEVELS ; i++)
+    {
+        startmap = ((LIGHTLEVELS-LIGHTBRIGHT-i)*2)*NUMCOLORMAPS/LIGHTLEVELS;
 
-void R_ColoredZLightMAXLIGHTZ (const int i)
-{
-    zlight_EEC06B[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_D97C45[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_FF7F7F[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_55B828[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_BBE357[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_949DB9[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_2A2F6B[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_50ADAC[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_CCE4A5[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_CCEA5F[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_B30202[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_B87A15[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_FFD000[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_FFDE4C[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_FFF588[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_043E8B[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_5B4318[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_4F5D8B[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_D46D3D[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_04918B[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_FF3030[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_311A59[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_FFAFAF[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_ECB866[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_C63F23[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_9BC8CD[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_666666[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-    zlight_777777[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-}
+        for (j = 0 ; j < MAXLIGHTSCALE ; j++)
+        {
+            level = startmap - j * NONWIDEWIDTH / (width << detailshift) / DISTMAP;
 
-void R_ColoredZLightLevels (const int i, const int j, const int level)
-{
-    zlight_EEC06B[i][j] = colormaps_EEC06B + level*256;
-    zlight_D97C45[i][j] = colormaps_D97C45 + level*256;
-    zlight_FF7F7F[i][j] = colormaps_FF7F7F + level*256;
-    zlight_55B828[i][j] = colormaps_55B828 + level*256;
-    zlight_BBE357[i][j] = colormaps_BBE357 + level*256;
-    zlight_949DB9[i][j] = colormaps_949DB9 + level*256;
-    zlight_2A2F6B[i][j] = colormaps_2A2F6B + level*256;
-    zlight_50ADAC[i][j] = colormaps_50ADAC + level*256;
-    zlight_CCE4A5[i][j] = colormaps_CCE4A5 + level*256;
-    zlight_CCEA5F[i][j] = colormaps_CCEA5F + level*256;
-    zlight_B30202[i][j] = colormaps_B30202 + level*256;
-    zlight_B87A15[i][j] = colormaps_B87A15 + level*256;
-    zlight_FFD000[i][j] = colormaps_FFD000 + level*256;
-    zlight_FFDE4C[i][j] = colormaps_FFDE4C + level*256;
-    zlight_FFF588[i][j] = colormaps_FFF588 + level*256;
-    zlight_043E8B[i][j] = colormaps_043E8B + level*256;
-    zlight_5B4318[i][j] = colormaps_5B4318 + level*256;
-    zlight_4F5D8B[i][j] = colormaps_4F5D8B + level*256;
-    zlight_D46D3D[i][j] = colormaps_D46D3D + level*256;
-    zlight_04918B[i][j] = colormaps_04918B + level*256;
-    zlight_FF3030[i][j] = colormaps_FF3030 + level*256;
-    zlight_311A59[i][j] = colormaps_311A59 + level*256;
-    zlight_FFAFAF[i][j] = colormaps_FFAFAF + level*256;
-    zlight_ECB866[i][j] = colormaps_ECB866 + level*256;
-    zlight_C63F23[i][j] = colormaps_C63F23 + level*256;
-    zlight_9BC8CD[i][j] = colormaps_9BC8CD + level*256;
-    zlight_666666[i][j] = colormaps_666666 + level*256;
-    zlight_777777[i][j] = colormaps_777777 + level*256;
-}
+            if (level < 0)
+            level = 0;
+    
+            if (level >= NUMCOLORMAPS)
+            level = NUMCOLORMAPS-1;
 
-// =============================================================================
-//
-//              COLORED SEGMENTS/SPRITES INITIALIZATION FUNCTIONS
-//
-// =============================================================================
-
-void R_ColoredScLightFreeI (const int i)
-{
-    free(scalelight_EEC06B[i]);
-    free(scalelight_D97C45[i]);
-    free(scalelight_FF7F7F[i]);
-    free(scalelight_55B828[i]);
-    free(scalelight_BBE357[i]);
-    free(scalelight_949DB9[i]);
-    free(scalelight_2A2F6B[i]);
-    free(scalelight_50ADAC[i]);
-    free(scalelight_CCE4A5[i]);
-    free(scalelight_CCEA5F[i]);
-    free(scalelight_B30202[i]);
-    free(scalelight_B87A15[i]);
-    free(scalelight_FFD000[i]);
-    free(scalelight_FFDE4C[i]);
-    free(scalelight_FFF588[i]);
-    free(scalelight_043E8B[i]);
-    free(scalelight_5B4318[i]);
-    free(scalelight_4F5D8B[i]);
-    free(scalelight_D46D3D[i]);
-    free(scalelight_04918B[i]);
-    free(scalelight_FF3030[i]);
-    free(scalelight_311A59[i]);
-    free(scalelight_FFAFAF[i]);
-    free(scalelight_ECB866[i]);
-    free(scalelight_C63F23[i]);
-    free(scalelight_9BC8CD[i]);
-    free(scalelight_666666[i]);
-    free(scalelight_777777[i]);
-}
-
-void R_ColoredScLightFree (void)
-{
-    free(scalelight_EEC06B);
-    free(scalelight_D97C45);
-    free(scalelight_FF7F7F);
-    free(scalelight_55B828);
-    free(scalelight_BBE357);
-    free(scalelight_949DB9);
-    free(scalelight_2A2F6B);
-    free(scalelight_50ADAC);
-    free(scalelight_CCE4A5);
-    free(scalelight_CCEA5F);
-    free(scalelight_B30202);
-    free(scalelight_B87A15);
-    free(scalelight_FFD000);
-    free(scalelight_FFDE4C);
-    free(scalelight_FFF588);
-    free(scalelight_043E8B);
-    free(scalelight_5B4318);
-    free(scalelight_4F5D8B);
-    free(scalelight_D46D3D);
-    free(scalelight_04918B);
-    free(scalelight_FF3030);
-    free(scalelight_311A59);
-    free(scalelight_FFAFAF);
-    free(scalelight_ECB866);
-    free(scalelight_C63F23);
-    free(scalelight_9BC8CD);
-    free(scalelight_666666);
-    free(scalelight_777777);
-}
-
-void R_ColoredScLightMalloc (void)
-{
-    scalelight_EEC06B = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_D97C45 = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_FF7F7F = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_55B828 = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_BBE357 = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_949DB9 = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_2A2F6B = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_50ADAC = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_CCE4A5 = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_CCEA5F = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_B30202 = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_B87A15 = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_FFD000 = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_FFDE4C = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_FFF588 = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_043E8B = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_5B4318 = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_4F5D8B = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_D46D3D = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_04918B = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_FF3030 = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_311A59 = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_FFAFAF = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_ECB866 = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_C63F23 = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_9BC8CD = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_666666 = malloc(LIGHTLEVELS * sizeof(*scalelight));
-    scalelight_777777 = malloc(LIGHTLEVELS * sizeof(*scalelight));
-}
-
-void R_ColoredScLightMAXLIGHTSCALE (int i)
-{
-    scalelight_EEC06B[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_D97C45[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_FF7F7F[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_55B828[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_BBE357[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_949DB9[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_2A2F6B[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_50ADAC[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_CCE4A5[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_CCEA5F[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_B30202[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_B87A15[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_FFD000[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_FFDE4C[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_FFF588[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_043E8B[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_5B4318[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_4F5D8B[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_D46D3D[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_04918B[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_FF3030[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_311A59[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_FFAFAF[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_ECB866[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_C63F23[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_9BC8CD[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_666666[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-    scalelight_777777[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-}
-
-void R_ColoredScLightLevels (const int i, const int j, const int level)
-{
-    scalelight_EEC06B[i][j] = colormaps_EEC06B + level*256;
-    scalelight_D97C45[i][j] = colormaps_D97C45 + level*256;
-    scalelight_FF7F7F[i][j] = colormaps_FF7F7F + level*256;
-    scalelight_55B828[i][j] = colormaps_55B828 + level*256;
-    scalelight_BBE357[i][j] = colormaps_BBE357 + level*256;
-    scalelight_949DB9[i][j] = colormaps_949DB9 + level*256;
-    scalelight_2A2F6B[i][j] = colormaps_2A2F6B + level*256;
-    scalelight_50ADAC[i][j] = colormaps_50ADAC + level*256;
-    scalelight_CCE4A5[i][j] = colormaps_CCE4A5 + level*256;
-    scalelight_CCEA5F[i][j] = colormaps_CCEA5F + level*256;
-    scalelight_B30202[i][j] = colormaps_B30202 + level*256;
-    scalelight_B87A15[i][j] = colormaps_B87A15 + level*256;
-    scalelight_FFD000[i][j] = colormaps_FFD000 + level*256;
-    scalelight_FFDE4C[i][j] = colormaps_FFDE4C + level*256;
-    scalelight_FFF588[i][j] = colormaps_FFF588 + level*256;
-    scalelight_043E8B[i][j] = colormaps_043E8B + level*256;
-    scalelight_5B4318[i][j] = colormaps_5B4318 + level*256;
-    scalelight_4F5D8B[i][j] = colormaps_4F5D8B + level*256;
-    scalelight_D46D3D[i][j] = colormaps_D46D3D + level*256;
-    scalelight_04918B[i][j] = colormaps_04918B + level*256;
-    scalelight_FF3030[i][j] = colormaps_FF3030 + level*256;
-    scalelight_311A59[i][j] = colormaps_311A59 + level*256;
-    scalelight_FFAFAF[i][j] = colormaps_FFAFAF + level*256;
-    scalelight_ECB866[i][j] = colormaps_ECB866 + level*256;
-    scalelight_C63F23[i][j] = colormaps_C63F23 + level*256;
-    scalelight_9BC8CD[i][j] = colormaps_9BC8CD + level*256;
-    scalelight_666666[i][j] = colormaps_666666 + level*256;
-    scalelight_777777[i][j] = colormaps_777777 + level*256;
+            scalelight_EEC06B[i][j] = colormaps_EEC06B + level*256;
+            scalelight_D97C45[i][j] = colormaps_D97C45 + level*256;
+            scalelight_FF7F7F[i][j] = colormaps_FF7F7F + level*256;
+            scalelight_55B828[i][j] = colormaps_55B828 + level*256;
+            scalelight_BBE357[i][j] = colormaps_BBE357 + level*256;
+            scalelight_949DB9[i][j] = colormaps_949DB9 + level*256;
+            scalelight_2A2F6B[i][j] = colormaps_2A2F6B + level*256;
+            scalelight_50ADAC[i][j] = colormaps_50ADAC + level*256;
+            scalelight_CCE4A5[i][j] = colormaps_CCE4A5 + level*256;
+            scalelight_CCEA5F[i][j] = colormaps_CCEA5F + level*256;
+            scalelight_B30202[i][j] = colormaps_B30202 + level*256;
+            scalelight_B87A15[i][j] = colormaps_B87A15 + level*256;
+            scalelight_FFD000[i][j] = colormaps_FFD000 + level*256;
+            scalelight_FFDE4C[i][j] = colormaps_FFDE4C + level*256;
+            scalelight_FFF588[i][j] = colormaps_FFF588 + level*256;
+            scalelight_043E8B[i][j] = colormaps_043E8B + level*256;
+            scalelight_5B4318[i][j] = colormaps_5B4318 + level*256;
+            scalelight_4F5D8B[i][j] = colormaps_4F5D8B + level*256;
+            scalelight_D46D3D[i][j] = colormaps_D46D3D + level*256;
+            scalelight_04918B[i][j] = colormaps_04918B + level*256;
+            scalelight_FF3030[i][j] = colormaps_FF3030 + level*256;
+            scalelight_311A59[i][j] = colormaps_311A59 + level*256;
+            scalelight_FFAFAF[i][j] = colormaps_FFAFAF + level*256;
+            scalelight_ECB866[i][j] = colormaps_ECB866 + level*256;
+            scalelight_C63F23[i][j] = colormaps_C63F23 + level*256;
+            scalelight_9BC8CD[i][j] = colormaps_9BC8CD + level*256;
+            scalelight_666666[i][j] = colormaps_666666 + level*256;
+            scalelight_777777[i][j] = colormaps_777777 + level*256;
+        }
+    }
 }
 
 // =============================================================================

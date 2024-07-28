@@ -1106,7 +1106,7 @@ void R_InitColormaps (void)
 			b = gammatable[vid_gamma][crypal[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
 
 			// [JN] Generate colored colormaps.
-			R_InitColoredColormaps(k, scale, j);
+			R_GenerateColoredColormaps(k, scale, j);
 
 			colormaps[j++] = 0xff000000 | (r << 16) | (g << 8) | b;
 		}
