@@ -212,10 +212,15 @@ void R_GenerateColoredColormaps (const byte k, const float scale, const int j)
 
 #define DISTMAP 2
 
+static const int start_map[] = {
+    60, 58, 56, 54, 52, 50, 48, 46, 44, 42, 40, 38, 36, 34, 32,
+    30, 28, 26, 24, 22, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2, 0, -2, 
+};
+
 void R_InitColoredLightTables (void)
 {
     int i, j;
-    int level, startmap, scale;
+    int level, scale;
     const size_t sclight_size     = LIGHTLEVELS * sizeof(*scalelight);
     const size_t sclight_size_max = MAXLIGHTSCALE * sizeof(**scalelight);
     const size_t zlight_size      = LIGHTLEVELS * sizeof(*zlight);
@@ -468,11 +473,8 @@ void R_InitColoredLightTables (void)
 
         for (j = 0 ; j < MAXLIGHTZ ; j++)
         {
-            startmap = ((LIGHTLEVELS - LIGHTBRIGHT - i) * 2) * NUMCOLORMAPS / LIGHTLEVELS;
-            scale = FixedDiv ((ORIGWIDTH / 2 * FRACUNIT), (j + 1) << LIGHTZSHIFT);
-            scale >>= LIGHTSCALESHIFT;
-
-            level = BETWEEN(0, NUMCOLORMAPS - 1, startmap - scale / DISTMAP) * 256;
+            scale = (FixedDiv ((ORIGWIDTH / 2 * FRACUNIT), (j + 1) << LIGHTZSHIFT)) >> LIGHTSCALESHIFT;
+            level = BETWEEN(0, NUMCOLORMAPS - 1, start_map[i] - scale / DISTMAP) * 256;
 
             zlight_EEC06B[i][j] = colormaps_EEC06B + level;
             zlight_D97C45[i][j] = colormaps_D97C45 + level;
@@ -509,16 +511,14 @@ void R_InitColoredLightTables (void)
 void R_GenerateColoredSClights (const int width)
 {
     int i, j;
-    int level, startmap; 
+    int level; 
 
     // Calculate the light levels to use for each level / scale combination.
     for (i = 0 ; i < LIGHTLEVELS ; i++)
     {
-        startmap = ((LIGHTLEVELS-LIGHTBRIGHT-i)*2)*NUMCOLORMAPS/LIGHTLEVELS;
-
         for (j = 0 ; j < MAXLIGHTSCALE ; j++)
         {
-            level = BETWEEN(0, NUMCOLORMAPS-1, startmap - j * NONWIDEWIDTH / (width << detailshift) / DISTMAP) * 256;
+            level = BETWEEN(0, NUMCOLORMAPS-1, start_map[i] - j * NONWIDEWIDTH / (width << detailshift) / DISTMAP) * 256;
 
             scalelight_EEC06B[i][j] = colormaps_EEC06B + level;
             scalelight_D97C45[i][j] = colormaps_D97C45 + level;
