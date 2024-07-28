@@ -38,7 +38,7 @@ static int     *y;
 
 // [JN] Function pointers to different wipe effects.
 static void (*wipe_init) (void);
-static const int (*wipe_do) (int ticks);
+static boolean (*wipe_do) (int ticks);
 
 // [crispy] Additional fail-safe counter for performing crossfade effect.
 static int fade_counter;
@@ -91,7 +91,7 @@ static void wipe_initLoading (void)
     }
 }
 
-static const int wipe_doLoading (int ticks)
+static boolean wipe_doLoading (int ticks)
 {
     const int delay = 12 * vid_resolution;
     const int width = SCREENWIDTH/2;
@@ -152,7 +152,7 @@ static void wipe_initMelt (void)
     }
 }
 
-static const int wipe_doMelt (int ticks)
+static boolean wipe_doMelt (int ticks)
 {
     int j;
     int dy;
@@ -231,7 +231,7 @@ static void wipe_initCrossfade (void)
     fade_counter = 32;
 }
 
-static const int wipe_doCrossfade (const int ticks)
+static boolean wipe_doCrossfade (int ticks)
 {
     pixel_t   *cur_screen = wipe_scr;
     pixel_t   *end_screen = wipe_scr_end;
@@ -298,7 +298,7 @@ void wipe_EndScreen (void)
 // wipe_ScreenWipe
 // -----------------------------------------------------------------------------
 
-const int wipe_ScreenWipe (const int ticks)
+boolean wipe_ScreenWipe (const int ticks)
 {
     // when zero, stop the wipe
     static boolean go = false;

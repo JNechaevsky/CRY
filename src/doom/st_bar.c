@@ -21,7 +21,6 @@
 
 
 #include <stdio.h>
-#include <ctype.h>  // isdigit
 
 #include "i_swap.h" // [crispy] SHORT()
 #include "i_system.h"
@@ -234,7 +233,7 @@ static void cht_GetParam (cheatseq_t *cht, char *buffer)
 // cht_CheckCheatSP
 // [crispy] restrict cheat usage
 // -----------------------------------------------------------------------------
-static const inline int cht_CheckCheatSP (cheatseq_t *cht, char key)
+static inline boolean cht_CheckCheatSP (cheatseq_t *cht, char key)
 {
     if (!cht_CheckCheat(cht, key))
     {
@@ -295,7 +294,7 @@ static void GiveBackpack (boolean give)
 // [crispy] adapted from boom202s/M_CHEAT.C:467-498
 // -----------------------------------------------------------------------------
 
-static const int ST_cheat_massacre (boolean explode)
+static int ST_cheat_massacre (boolean explode)
 {
     int killcount = 0;
     thinker_t *th;
@@ -682,7 +681,7 @@ boolean ST_Responder (event_t *ev)
 // ST_calcPainOffset
 // -----------------------------------------------------------------------------
 
-static const int ST_calcPainOffset (void)
+static int ST_calcPainOffset (void)
 {
     int        health;
     static int lastcalc;
