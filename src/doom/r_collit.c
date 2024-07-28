@@ -471,42 +471,37 @@ void R_InitColoredLightTables (void)
             startmap = ((LIGHTLEVELS - LIGHTBRIGHT - i) * 2) * NUMCOLORMAPS / LIGHTLEVELS;
             scale = FixedDiv ((ORIGWIDTH / 2 * FRACUNIT), (j + 1) << LIGHTZSHIFT);
             scale >>= LIGHTSCALESHIFT;
-            level = startmap - scale / DISTMAP;
 
-            if (level < 0)
-            level = 0;
+            level = BETWEEN(0, NUMCOLORMAPS - 1, startmap - scale / DISTMAP) * 256;
 
-            if (level >= NUMCOLORMAPS)
-            level = NUMCOLORMAPS - 1;
-
-            zlight_EEC06B[i][j] = colormaps_EEC06B + level*256;
-            zlight_D97C45[i][j] = colormaps_D97C45 + level*256;
-            zlight_FF7F7F[i][j] = colormaps_FF7F7F + level*256;
-            zlight_55B828[i][j] = colormaps_55B828 + level*256;
-            zlight_BBE357[i][j] = colormaps_BBE357 + level*256;
-            zlight_949DB9[i][j] = colormaps_949DB9 + level*256;
-            zlight_2A2F6B[i][j] = colormaps_2A2F6B + level*256;
-            zlight_50ADAC[i][j] = colormaps_50ADAC + level*256;
-            zlight_CCE4A5[i][j] = colormaps_CCE4A5 + level*256;
-            zlight_CCEA5F[i][j] = colormaps_CCEA5F + level*256;
-            zlight_B30202[i][j] = colormaps_B30202 + level*256;
-            zlight_B87A15[i][j] = colormaps_B87A15 + level*256;
-            zlight_FFD000[i][j] = colormaps_FFD000 + level*256;
-            zlight_FFDE4C[i][j] = colormaps_FFDE4C + level*256;
-            zlight_FFF588[i][j] = colormaps_FFF588 + level*256;
-            zlight_043E8B[i][j] = colormaps_043E8B + level*256;
-            zlight_5B4318[i][j] = colormaps_5B4318 + level*256;
-            zlight_4F5D8B[i][j] = colormaps_4F5D8B + level*256;
-            zlight_D46D3D[i][j] = colormaps_D46D3D + level*256;
-            zlight_04918B[i][j] = colormaps_04918B + level*256;
-            zlight_FF3030[i][j] = colormaps_FF3030 + level*256;
-            zlight_311A59[i][j] = colormaps_311A59 + level*256;
-            zlight_FFAFAF[i][j] = colormaps_FFAFAF + level*256;
-            zlight_ECB866[i][j] = colormaps_ECB866 + level*256;
-            zlight_C63F23[i][j] = colormaps_C63F23 + level*256;
-            zlight_9BC8CD[i][j] = colormaps_9BC8CD + level*256;
-            zlight_666666[i][j] = colormaps_666666 + level*256;
-            zlight_777777[i][j] = colormaps_777777 + level*256;
+            zlight_EEC06B[i][j] = colormaps_EEC06B + level;
+            zlight_D97C45[i][j] = colormaps_D97C45 + level;
+            zlight_FF7F7F[i][j] = colormaps_FF7F7F + level;
+            zlight_55B828[i][j] = colormaps_55B828 + level;
+            zlight_BBE357[i][j] = colormaps_BBE357 + level;
+            zlight_949DB9[i][j] = colormaps_949DB9 + level;
+            zlight_2A2F6B[i][j] = colormaps_2A2F6B + level;
+            zlight_50ADAC[i][j] = colormaps_50ADAC + level;
+            zlight_CCE4A5[i][j] = colormaps_CCE4A5 + level;
+            zlight_CCEA5F[i][j] = colormaps_CCEA5F + level;
+            zlight_B30202[i][j] = colormaps_B30202 + level;
+            zlight_B87A15[i][j] = colormaps_B87A15 + level;
+            zlight_FFD000[i][j] = colormaps_FFD000 + level;
+            zlight_FFDE4C[i][j] = colormaps_FFDE4C + level;
+            zlight_FFF588[i][j] = colormaps_FFF588 + level;
+            zlight_043E8B[i][j] = colormaps_043E8B + level;
+            zlight_5B4318[i][j] = colormaps_5B4318 + level;
+            zlight_4F5D8B[i][j] = colormaps_4F5D8B + level;
+            zlight_D46D3D[i][j] = colormaps_D46D3D + level;
+            zlight_04918B[i][j] = colormaps_04918B + level;
+            zlight_FF3030[i][j] = colormaps_FF3030 + level;
+            zlight_311A59[i][j] = colormaps_311A59 + level;
+            zlight_FFAFAF[i][j] = colormaps_FFAFAF + level;
+            zlight_ECB866[i][j] = colormaps_ECB866 + level;
+            zlight_C63F23[i][j] = colormaps_C63F23 + level;
+            zlight_9BC8CD[i][j] = colormaps_9BC8CD + level;
+            zlight_666666[i][j] = colormaps_666666 + level;
+            zlight_777777[i][j] = colormaps_777777 + level;
         }
     }
 }
@@ -523,42 +518,36 @@ void R_GenerateColoredSClights (const int width)
 
         for (j = 0 ; j < MAXLIGHTSCALE ; j++)
         {
-            level = startmap - j * NONWIDEWIDTH / (width << detailshift) / DISTMAP;
+            level = BETWEEN(0, NUMCOLORMAPS-1, startmap - j * NONWIDEWIDTH / (width << detailshift) / DISTMAP) * 256;
 
-            if (level < 0)
-            level = 0;
-    
-            if (level >= NUMCOLORMAPS)
-            level = NUMCOLORMAPS-1;
-
-            scalelight_EEC06B[i][j] = colormaps_EEC06B + level*256;
-            scalelight_D97C45[i][j] = colormaps_D97C45 + level*256;
-            scalelight_FF7F7F[i][j] = colormaps_FF7F7F + level*256;
-            scalelight_55B828[i][j] = colormaps_55B828 + level*256;
-            scalelight_BBE357[i][j] = colormaps_BBE357 + level*256;
-            scalelight_949DB9[i][j] = colormaps_949DB9 + level*256;
-            scalelight_2A2F6B[i][j] = colormaps_2A2F6B + level*256;
-            scalelight_50ADAC[i][j] = colormaps_50ADAC + level*256;
-            scalelight_CCE4A5[i][j] = colormaps_CCE4A5 + level*256;
-            scalelight_CCEA5F[i][j] = colormaps_CCEA5F + level*256;
-            scalelight_B30202[i][j] = colormaps_B30202 + level*256;
-            scalelight_B87A15[i][j] = colormaps_B87A15 + level*256;
-            scalelight_FFD000[i][j] = colormaps_FFD000 + level*256;
-            scalelight_FFDE4C[i][j] = colormaps_FFDE4C + level*256;
-            scalelight_FFF588[i][j] = colormaps_FFF588 + level*256;
-            scalelight_043E8B[i][j] = colormaps_043E8B + level*256;
-            scalelight_5B4318[i][j] = colormaps_5B4318 + level*256;
-            scalelight_4F5D8B[i][j] = colormaps_4F5D8B + level*256;
-            scalelight_D46D3D[i][j] = colormaps_D46D3D + level*256;
-            scalelight_04918B[i][j] = colormaps_04918B + level*256;
-            scalelight_FF3030[i][j] = colormaps_FF3030 + level*256;
-            scalelight_311A59[i][j] = colormaps_311A59 + level*256;
-            scalelight_FFAFAF[i][j] = colormaps_FFAFAF + level*256;
-            scalelight_ECB866[i][j] = colormaps_ECB866 + level*256;
-            scalelight_C63F23[i][j] = colormaps_C63F23 + level*256;
-            scalelight_9BC8CD[i][j] = colormaps_9BC8CD + level*256;
-            scalelight_666666[i][j] = colormaps_666666 + level*256;
-            scalelight_777777[i][j] = colormaps_777777 + level*256;
+            scalelight_EEC06B[i][j] = colormaps_EEC06B + level;
+            scalelight_D97C45[i][j] = colormaps_D97C45 + level;
+            scalelight_FF7F7F[i][j] = colormaps_FF7F7F + level;
+            scalelight_55B828[i][j] = colormaps_55B828 + level;
+            scalelight_BBE357[i][j] = colormaps_BBE357 + level;
+            scalelight_949DB9[i][j] = colormaps_949DB9 + level;
+            scalelight_2A2F6B[i][j] = colormaps_2A2F6B + level;
+            scalelight_50ADAC[i][j] = colormaps_50ADAC + level;
+            scalelight_CCE4A5[i][j] = colormaps_CCE4A5 + level;
+            scalelight_CCEA5F[i][j] = colormaps_CCEA5F + level;
+            scalelight_B30202[i][j] = colormaps_B30202 + level;
+            scalelight_B87A15[i][j] = colormaps_B87A15 + level;
+            scalelight_FFD000[i][j] = colormaps_FFD000 + level;
+            scalelight_FFDE4C[i][j] = colormaps_FFDE4C + level;
+            scalelight_FFF588[i][j] = colormaps_FFF588 + level;
+            scalelight_043E8B[i][j] = colormaps_043E8B + level;
+            scalelight_5B4318[i][j] = colormaps_5B4318 + level;
+            scalelight_4F5D8B[i][j] = colormaps_4F5D8B + level;
+            scalelight_D46D3D[i][j] = colormaps_D46D3D + level;
+            scalelight_04918B[i][j] = colormaps_04918B + level;
+            scalelight_FF3030[i][j] = colormaps_FF3030 + level;
+            scalelight_311A59[i][j] = colormaps_311A59 + level;
+            scalelight_FFAFAF[i][j] = colormaps_FFAFAF + level;
+            scalelight_ECB866[i][j] = colormaps_ECB866 + level;
+            scalelight_C63F23[i][j] = colormaps_C63F23 + level;
+            scalelight_9BC8CD[i][j] = colormaps_9BC8CD + level;
+            scalelight_666666[i][j] = colormaps_666666 + level;
+            scalelight_777777[i][j] = colormaps_777777 + level;
         }
     }
 }
