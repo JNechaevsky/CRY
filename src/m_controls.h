@@ -51,6 +51,7 @@ extern int key_nextlevel;   // [crispy]
 extern int key_reloadlevel; // [crispy]
 extern int key_demospeed;   // [crispy]
 extern int key_flip_levels; // [crispy]
+extern int key_widget_enable;
 
 // RestlessRodent -- CRL (Special modes)
 

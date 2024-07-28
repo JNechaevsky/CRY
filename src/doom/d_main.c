@@ -245,7 +245,7 @@ static void D_Display (void)
             AM_LevelNameDrawer();
 
             // [JN] Do not draw any widgets if not in game level.
-            // if (widget_enable) <- TODO
+            if (widget_enable)
             {
                 // [JN] Left widgets are available while active game level.
                 if (dp_screen_size < 15)
@@ -319,7 +319,7 @@ static void D_Display (void)
     }
 
     // [JN] Draw right widgets in any states except finale text screens.
-    // if (widget_enable) <- TODO
+    if (widget_enable)
     {
         if (gamestate != GS_FINALE)
         {
