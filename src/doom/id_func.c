@@ -122,16 +122,16 @@ void ID_LeftWidgets (void)
         if (widget_time == 1
         || (widget_time == 2 && automapactive))
         {
-            M_WriteText(0 - WIDESCREENDELTA, 45, "TIME", cr[CR_GRAY]);
-            M_WriteText(0 - WIDESCREENDELTA, 54, ID_Level_Time, cr[CR_LIGHTGRAY]);
+            M_WriteText(0 - WIDESCREENDELTA, 40, "TIME", cr[CR_GRAY]);
+            M_WriteText(0 - WIDESCREENDELTA, 49, ID_Level_Time, cr[CR_LIGHTGRAY]);
         }
 
         // Total time. Time gathered in G_Ticker.
         if (widget_totaltime == 1
         || (widget_totaltime == 2 && automapactive))
         {
-            M_WriteText(0 - WIDESCREENDELTA, 63, "TOTAL", cr[CR_GRAY]);
-            M_WriteText(0 - WIDESCREENDELTA, 72, ID_Total_Time, cr[CR_LIGHTGRAY]);
+            M_WriteText(0 - WIDESCREENDELTA, 58, "TOTAL", cr[CR_GRAY]);
+            M_WriteText(0 - WIDESCREENDELTA, 67, ID_Total_Time, cr[CR_LIGHTGRAY]);
         }
 
         // Player coords
@@ -140,16 +140,16 @@ void ID_LeftWidgets (void)
         {
             char str[128];
 
-            M_WriteText(0 - WIDESCREENDELTA, 90, "X:", cr[CR_GRAY]);
-            M_WriteText(0 - WIDESCREENDELTA, 99, "Y:", cr[CR_GRAY]);
-            M_WriteText(0 - WIDESCREENDELTA, 108, "ANG:", cr[CR_GRAY]);
+            M_WriteText(0 - WIDESCREENDELTA, 80, "X:", cr[CR_GRAY]);
+            M_WriteText(0 - WIDESCREENDELTA, 89, "Y:", cr[CR_GRAY]);
+            M_WriteText(0 - WIDESCREENDELTA, 98, "ANG:", cr[CR_GRAY]);
 
             sprintf(str, "%d", IDWidget.x);
-            M_WriteText(0 - WIDESCREENDELTA + 16, 90, str, cr[CR_GREEN]);
+            M_WriteText(0 - WIDESCREENDELTA + 16, 80, str, cr[CR_GREEN]);
             sprintf(str, "%d", IDWidget.y);
-            M_WriteText(0 - WIDESCREENDELTA + 16, 99, str, cr[CR_GREEN]);
+            M_WriteText(0 - WIDESCREENDELTA + 16, 89, str, cr[CR_GREEN]);
             sprintf(str, "%d", IDWidget.ang);
-            M_WriteText(0 - WIDESCREENDELTA + 32, 108, str, cr[CR_GREEN]);
+            M_WriteText(0 - WIDESCREENDELTA + 32, 98, str, cr[CR_GREEN]);
         }
 
         // Render counters
@@ -161,24 +161,24 @@ void ID_LeftWidgets (void)
             char vis[32];
 
             // Sprites
-            M_WriteText(0 - WIDESCREENDELTA, 124, "SPR:", cr[CR_GRAY]);
+            M_WriteText(0 - WIDESCREENDELTA, 111, "SPR:", cr[CR_GRAY]);
             M_snprintf(spr, 16, "%d", IDRender.numsprites);
-            M_WriteText(32 - WIDESCREENDELTA, 124, spr, cr[CR_GREEN]);
+            M_WriteText(32 - WIDESCREENDELTA, 111, spr, cr[CR_GREEN]);
 
             // Segments (256 max)
-            M_WriteText(0 - WIDESCREENDELTA, 133, "SEG:", cr[CR_GRAY]);
+            M_WriteText(0 - WIDESCREENDELTA, 120, "SEG:", cr[CR_GRAY]);
             M_snprintf(seg, 16, "%d", IDRender.numsegs);
-            M_WriteText(32 - WIDESCREENDELTA, 133, seg, cr[CR_GREEN]);
+            M_WriteText(32 - WIDESCREENDELTA, 120, seg, cr[CR_GREEN]);
 
             // Openings
-            M_WriteText(0 - WIDESCREENDELTA, 142, "OPN:", cr[CR_GRAY]);
+            M_WriteText(0 - WIDESCREENDELTA, 129, "OPN:", cr[CR_GRAY]);
             M_snprintf(opn, 16, "%d", IDRender.numopenings);
-            M_WriteText(32 - WIDESCREENDELTA, 142, opn, cr[CR_GREEN]);
+            M_WriteText(32 - WIDESCREENDELTA, 129, opn, cr[CR_GREEN]);
 
             // Planes
-            M_WriteText(0 - WIDESCREENDELTA, 151, "PLN:", cr[CR_GRAY]);
+            M_WriteText(0 - WIDESCREENDELTA, 138, "PLN:", cr[CR_GRAY]);
             M_snprintf(vis, 32, "%d", IDRender.numplanes);
-            M_WriteText(32 - WIDESCREENDELTA, 151, vis, cr[CR_GREEN]);
+            M_WriteText(32 - WIDESCREENDELTA, 138, vis, cr[CR_GREEN]);
         }
     }
     //
