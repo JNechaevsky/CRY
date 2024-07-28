@@ -107,12 +107,8 @@ int             totalkills, totalitems, totalsecret;    // for intermission
 int             totalleveltimes;        // [crispy] CPhipps - total time for all completed levels
 int             demostarttic;           // [crispy] fix revenant internal demo bug
  
-char           *demoname;
-const char     *orig_demoname; // [crispy] the name originally chosen for the demo, i.e. without "-00000"
-boolean         demorecording; 
 boolean         longtics;               // cph's doom 1.91 longtics hack
 boolean         lowres_turn;            // low resolution turning for longtics
-boolean         demoplayback; 
 byte*		demobuffer;
 byte*		demo_p;
 byte*		demoend; 
@@ -224,20 +220,7 @@ int		bodyqueslot;
 // [JN] Determinates speed of camera Z-axis movement in spectator mode.
 static int      crl_camzspeed;
 
-// [crispy] store last cmd to track joins
-static ticcmd_t* last_cmd = NULL;
  
-int G_CmdChecksum (ticcmd_t* cmd) 
-{ 
-    size_t		i;
-    int		sum = 0; 
-	 
-    for (i=0 ; i< sizeof(*cmd)/4 - 1 ; i++) 
-	sum += ((int *)cmd)[i]; 
-		 
-    return sum; 
-} 
-
 static boolean WeaponSelectable(weapontype_t weapon)
 {
     // Can't select a weapon if we don't own it.
@@ -784,8 +767,8 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
     if (sendpause) 
     { 
 	sendpause = false; 
-	// [crispy] ignore un-pausing in menus during demo recording
-	if (!(menuactive && demorecording && paused) && gameaction != ga_loadgame)
+
+	if (gameaction != ga_loadgame)
 	{
 	cmd->buttons = BT_SPECIAL | BTS_PAUSE; 
 	}
@@ -896,27 +879,7 @@ void G_DoLoadLevel (void)
     // [JN] Pistol start game mode.
     if (gp_pistol_start)
     {
-        if (singleplayer)
-        {
-            G_PlayerReborn(0);
-        }
-        else if (demoplayback)
-        {
-            // no-op - silently ignore pistolstart when playing demo from the
-            // demo reel
-            // [JN] Do not rely on "singledemo" here to allow to play multiple
-            // levels demo with Pistol start mode enabled.
-        }
-        else
-        {
-            const char message[] = "Pistol start game mode is not supported"
-                                   " for demos and network play. Please disable"
-                                   " Pistol start mode in Gameplay Features"
-                                   " menu.";
-            if (!demo_p) demorecording = false;
-            i_error_safe = true;
-            I_Error(message);
-        }
+        G_PlayerReborn(0);
     }
 
     P_SetupLevel (gameepisode, gamemap);    
@@ -1025,32 +988,9 @@ static void SetMouseButtons(unsigned int buttons_mask)
 // 
 boolean G_Responder (event_t* ev) 
 { 
-    // [crispy] demo pause (from prboom-plus)
-    if (gameaction == ga_nothing && 
-        (demoplayback || gamestate == GS_INTERMISSION))
-    {
-        if (ev->type == ev_keydown && ev->data1 == key_pause)
-        {
-            if (paused ^= 2)
-                S_PauseSound();
-            else
-                S_ResumeSound();
-            return true;
-        }
-    }
-
-    // [crispy] demo fast-forward
-    if (ev->type == ev_keydown && ev->data1 == key_demospeed && 
-        (demoplayback || gamestate == GS_DEMOSCREEN))
-    {
-        singletics = !singletics;
-        return true;
-    }
- 
     // any other key pops up menu if in demos
-    if (gameaction == ga_nothing && !singledemo && 
-	(demoplayback || gamestate == GS_DEMOSCREEN) 
-	) 
+    if (gameaction == ga_nothing
+	&&  gamestate == GS_DEMOSCREEN)
     { 
 	if (ev->type == ev_keydown ||  
 	    (ev->type == ev_mouse && ev->data1) || 
@@ -1156,17 +1096,6 @@ boolean G_Responder (event_t* ev)
     // [JN] CRL - Toggle freeze mode.
     if (ev->data1 == key_freeze)
     {
-        // Allow freeze only in single player game, otherwise desyncs may occur.
-        if (demorecording)
-        {
-            CT_SetMessage(&players[consoleplayer], ID_FREEZE_NA_R , false, NULL);
-            return true;
-        }            
-        if (demoplayback)
-        {
-            CT_SetMessage(&players[consoleplayer], ID_FREEZE_NA_P , false, NULL);
-            return true;
-        }   
         crl_freeze ^= 1;
         CT_SetMessage(&players[consoleplayer], crl_freeze ?
                        ID_FREEZE_ON : ID_FREEZE_OFF, false, NULL);
@@ -1177,17 +1106,6 @@ boolean G_Responder (event_t* ev)
     {
         player_t *player = &players[consoleplayer];
 
-        // Allow notarget only in single player game, otherwise desyncs may occur.
-        if (demorecording)
-        {
-            CT_SetMessage(&players[consoleplayer], ID_NOTARGET_NA_R , false, NULL);
-            return true;
-        }
-        if (demoplayback)
-        {
-            CT_SetMessage(&players[consoleplayer], ID_NOTARGET_NA_P , false, NULL);
-            return true;
-        }
         player->cheats ^= CF_NOTARGET;
         P_ForgetPlayer(player);
         CT_SetMessage(player, player->cheats & CF_NOTARGET ?
@@ -1199,17 +1117,6 @@ boolean G_Responder (event_t* ev)
     {
         player_t *player = &players[consoleplayer];
 
-        // Allow notarget only in single player game, otherwise desyncs may occur.
-        if (demorecording)
-        {
-            CT_SetMessage(&players[consoleplayer], ID_BUDDHA_NA_R , false, NULL);
-            return true;
-        }
-        if (demoplayback)
-        {
-            CT_SetMessage(&players[consoleplayer], ID_BUDDHA_NA_P , false, NULL);
-            return true;
-        }
         player->cheats ^= CF_BUDDHA;
         CT_SetMessage(player, player->cheats & CF_BUDDHA ?
                       ID_BUDDHA_ON : ID_BUDDHA_OFF, false, NULL);
@@ -1324,9 +1231,6 @@ void G_Ticker (void)
 	  case ga_savegame: 
 	    G_DoSaveGame (); 
 	    break; 
-	  case ga_playdemo: 
-	    G_DoPlayDemo (); 
-	    break; 
 	  case ga_completed: 
 	    G_DoCompleted (); 
 	    break; 
@@ -1345,13 +1249,6 @@ void G_Ticker (void)
 	} 
     }
     
-    // [crispy] demo sync of revenant tracers and RNG (from prboom-plus)
-    if (paused & 2 || (!demoplayback && menuactive))
-    {
-        demostarttic++;
-    }
-    else
-    {     
     for (i=0 ; i<MAXPLAYERS ; i++)
     {
 	if (playeringame[i]) 
@@ -1359,21 +1256,9 @@ void G_Ticker (void)
 	    cmd = &players[i].cmd; 
 
 	    memcpy(cmd, &netcmds[i], sizeof(ticcmd_t));
-
-	    if (demoplayback) 
-		G_ReadDemoTiccmd (cmd); 
-	    // [crispy] do not record tics while still playing back in demo continue mode
-	    if (demorecording && !demoplayback)
-		G_WriteDemoTiccmd (cmd);
 	}
     }
     
-    // [crispy] increase demo tics counter
-    if (demoplayback || demorecording)
-    {
-	    defdemotics++;
-    }
-
     // check for special buttons
     for (i=0 ; i<MAXPLAYERS ; i++)
     {
@@ -1394,9 +1279,6 @@ void G_Ticker (void)
 		    break; 
 					 
 		  case BTS_SAVEGAME: 
-		    // [crispy] never override savegames by demo playback
-		    if (demoplayback)
-			break;
 		    if (!savedescription[0]) 
                     {
                         M_StringCopy(savedescription, "NET GAME",
@@ -1406,27 +1288,14 @@ void G_Ticker (void)
 		    savegameslot =  
 			(players[i].cmd.buttons & BTS_SAVEMASK)>>BTS_SAVESHIFT; 
 		    gameaction = ga_savegame; 
-		    // [crispy] un-pause immediately after saving
-		    // (impossible to send save and pause specials within the same tic)
-		    if (demorecording && paused)
-			sendpause = true;
 		    break; 
 		} 
 	    } 
 	}
     }
-    }
 
     oldgamestate = gamestate;
     oldleveltime = realleveltime;
-
-    // [crispy] no pause at intermission screen during demo playback 
-    // to avoid desyncs (from prboom-plus)
-    if ((paused & 2 || (!demoplayback && menuactive)) 
-        && gamestate == GS_INTERMISSION)
-    {
-    return;
-    }
     
     // do main actions
     switch (gamestate) 
@@ -1822,7 +1691,7 @@ void G_DoLoadGame (void)
     // then prevent holded "use" button to work for next few tics.
     // This fixes imidiate pressing on wall upon reloading
     // a save game, if "use" button is kept pressed.
-    if (singleplayer && gp_death_use_action == 1)
+    if (gp_death_use_action == 1)
 	players[consoleplayer].usedown = true;
 } 
  
@@ -1943,25 +1812,12 @@ G_DeferedInitNew
     d_map = map; 
     G_ClearSavename();
     gameaction = ga_newgame; 
-
-    // [crispy] if a new game is started during demo recording, start a new demo
-    if (demorecording)
-    {
-	G_CheckDemoStatus();
-	Z_Free(demoname);
-
-	G_RecordDemo(orig_demoname);
-	G_BeginRecording();
-    }
 } 
 
 
 void G_DoNewGame (void) 
 {
     idmusnum = -1;  // [JN] Andrey Budko: allow new level's music to be loaded
-    demoplayback = false; 
-    // [crispy] reset game speed after demo fast-forward
-    singletics = false;
     playeringame[1] = playeringame[2] = playeringame[3] = 0;
     // [crispy] do not reset -respawn, -fast and -nomonsters parameters
     /*
@@ -2046,7 +1902,6 @@ G_InitNew
 
 	usergame = true;                // will be set false if a demo
 	paused = false;
-	demoplayback = false;
 	automapactive = false;
 	gameepisode = episode;
 	gamemap = map;
@@ -2054,757 +1909,9 @@ G_InitNew
 
 	// [crispy] CPhipps - total time for all completed levels
 	totalleveltimes = 0;
-	defdemotics = 0;
-	demostarttic = gametic; // [crispy] fix revenant internal demo bug
 
 	// [JN] jff 4/16/98 force marks on automap cleared every new level start
 	AM_clearMarks();
 
     G_DoLoadLevel ();
 }
-
-
-//
-// DEMO RECORDING 
-// 
-#define DEMOMARKER		0x80
-
-// [crispy] demo progress bar and timer widget
-int defdemotics = 0, deftotaldemotics;
-// [crispy] moved here
-static const char *defdemoname;
-
-void G_ReadDemoTiccmd (ticcmd_t* cmd) 
-{ 
-    if (*demo_p == DEMOMARKER) 
-    {
-	last_cmd = cmd; // [crispy] remember last cmd to track joins
-
-	// end of demo data stream 
-	G_CheckDemoStatus (); 
-	return; 
-    } 
-
-    // [crispy] if demo playback is quit by pressing 'q',
-    // stay in the game, hand over controls to the player and
-    // continue recording the demo under a different name
-    if (gamekeydown[key_demo_quit] && singledemo)
-    {
-	byte *actualbuffer = demobuffer;
-	char *actualname = M_StringDuplicate(defdemoname);
-
-	gamekeydown[key_demo_quit] = false;
-
-	// [crispy] find a new name for the continued demo
-	G_RecordDemo(actualname);
-	free(actualname);
-
-	// [crispy] discard the newly allocated demo buffer
-	Z_Free(demobuffer);
-	demobuffer = actualbuffer;
-
-	last_cmd = cmd; // [crispy] remember last cmd to track joins
-
-	// [crispy] continue recording
-	G_CheckDemoStatus();
-	return;
-    }
-
-    cmd->forwardmove = ((signed char)*demo_p++); 
-    cmd->sidemove = ((signed char)*demo_p++); 
-
-    // If this is a longtics demo, read back in higher resolution
-
-    if (longtics)
-    {
-        cmd->angleturn = *demo_p++;
-        cmd->angleturn |= (*demo_p++) << 8;
-    }
-    else
-    {
-        cmd->angleturn = ((unsigned char) *demo_p++)<<8; 
-    }
-
-    cmd->buttons = (unsigned char)*demo_p++; 
-} 
-
-// Increase the size of the demo buffer to allow unlimited demos
-
-static void IncreaseDemoBuffer(void)
-{
-    int current_length;
-    byte *new_demobuffer;
-    byte *new_demop;
-    int new_length;
-
-    // Find the current size
-
-    current_length = demoend - demobuffer;
-    
-    // Generate a new buffer twice the size
-    new_length = current_length * 2;
-    
-    new_demobuffer = Z_Malloc(new_length, PU_STATIC, 0);
-    new_demop = new_demobuffer + (demo_p - demobuffer);
-
-    // Copy over the old data
-
-    memcpy(new_demobuffer, demobuffer, current_length);
-
-    // Free the old buffer and point the demo pointers at the new buffer.
-
-    Z_Free(demobuffer);
-
-    demobuffer = new_demobuffer;
-    demo_p = new_demop;
-    demoend = demobuffer + new_length;
-}
-
-void G_WriteDemoTiccmd (ticcmd_t* cmd) 
-{ 
-    byte *demo_start;
-
-    if (gamekeydown[key_demo_quit])           // press q to end demo recording 
-	G_CheckDemoStatus (); 
-
-    demo_start = demo_p;
-
-    *demo_p++ = cmd->forwardmove; 
-    *demo_p++ = cmd->sidemove; 
-
-    // If this is a longtics demo, record in higher resolution
- 
-    if (longtics)
-    {
-        *demo_p++ = (cmd->angleturn & 0xff);
-        *demo_p++ = (cmd->angleturn >> 8) & 0xff;
-    }
-    else
-    {
-        *demo_p++ = cmd->angleturn >> 8; 
-    }
-
-    *demo_p++ = cmd->buttons; 
-
-    // reset demo pointer back
-    demo_p = demo_start;
-
-    if (demo_p > demoend - 16)
-    {
-        // [crispy] unconditionally disable savegame and demo limits
-        /*
-        if (vanilla_demo_limit)
-        {
-            // no more space 
-            G_CheckDemoStatus (); 
-            return; 
-        }
-        else
-        */
-        {
-            // Vanilla demo limit disabled: unlimited
-            // demo lengths!
-
-            IncreaseDemoBuffer();
-        }
-    } 
-	
-    G_ReadDemoTiccmd (cmd);         // make SURE it is exactly the same 
-} 
- 
- 
- 
-//
-// G_RecordDemo
-//
-void G_RecordDemo (const char *name)
-{
-    size_t demoname_size;
-    int i;
-    int maxsize;
-
-    // [crispy] demo file name suffix counter
-    static unsigned int j = 0;
-    FILE *fp = NULL;
-
-    // [crispy] the name originally chosen for the demo, i.e. without "-00000"
-    if (!orig_demoname)
-    {
-	orig_demoname = name;
-    }
-
-    usergame = false;
-    demoname_size = strlen(name) + 5 + 6; // [crispy] + 6 for "-00000"
-    demoname = Z_Malloc(demoname_size, PU_STATIC, NULL);
-    M_snprintf(demoname, demoname_size, "%s.lmp", name);
-
-    // [crispy] prevent overriding demos by adding a file name suffix
-    for ( ; j <= 99999 && (fp = fopen(demoname, "rb")) != NULL; j++)
-    {
-	M_snprintf(demoname, demoname_size, "%s-%05d.lmp", name, j);
-	fclose (fp);
-    }
-
-    maxsize = 0x20000;
-
-    //!
-    // @arg <size>
-    // @category demo
-    // @vanilla
-    //
-    // Specify the demo buffer size (KiB)
-    //
-
-    i = M_CheckParmWithArgs("-maxdemo", 1);
-    if (i)
-	maxsize = atoi(myargv[i+1])*1024;
-    demobuffer = Z_Malloc (maxsize,PU_STATIC,NULL); 
-    demoend = demobuffer + maxsize;
-	
-    demorecording = true; 
-} 
-
-// Get the demo version code appropriate for the version set in gameversion.
-int G_VanillaVersionCode(void)
-{
-    switch (gameversion)
-    {
-        case exe_doom_1_666:
-            return 106;
-        case exe_doom_1_7:
-            return 107;
-        case exe_doom_1_8:
-            return 108;
-        case exe_doom_1_9:
-        default:  // All other versions are variants on v1.9:
-            return 109;
-    }
-}
-
-void G_BeginRecording (void) 
-{ 
-    int             i; 
-
-    demo_p = demobuffer;
-
-    //!
-    // @category demo
-    //
-    // Record a high resolution "Doom 1.91" demo.
-    //
-
-    longtics = D_NonVanillaRecord(M_ParmExists("-longtics"),
-                                  "Doom 1.91 demo format");
-
-    // If not recording a longtics demo, record in low res
-    lowres_turn = !longtics;
-
-    if (longtics)
-    {
-        *demo_p++ = DOOM_191_VERSION;
-    }
-    else if (gameversion > exe_doom_1_2)
-    {
-        *demo_p++ = G_VanillaVersionCode();
-    }
-
-    *demo_p++ = gameskill; 
-    *demo_p++ = gameepisode; 
-    *demo_p++ = gamemap; 
-    if (longtics)
-    {
-        *demo_p++ = respawnparm;
-        *demo_p++ = fastparm;
-        *demo_p++ = nomonsters;
-        *demo_p++ = consoleplayer;
-    }
-	 
-    for (i=0 ; i<MAXPLAYERS ; i++) 
-	*demo_p++ = playeringame[i]; 		 
-} 
- 
-
-//
-// G_PlayDemo 
-//
-
- 
-void G_DeferedPlayDemo(const char *name)
-{ 
-    defdemoname = name; 
-    gameaction = ga_playdemo; 
-
-    // [crispy] fast-forward demo up to the desired map
-    // in demo warp mode or to the end of the demo in continue mode
-    if (demowarp || demorecording)
-    {
-	nodrawers = true;
-	singletics = true;
-    }
-} 
-
-// Generate a string describing a demo version
-
-static const char *DemoVersionDescription(int version)
-{
-    static char resultbuf[16];
-
-    switch (version)
-    {
-        case 104:
-            return "v1.4";
-        case 105:
-            return "v1.5";
-        case 106:
-            return "v1.6/v1.666";
-        case 107:
-            return "v1.7/v1.7a";
-        case 108:
-            return "v1.8";
-        case 109:
-            return "v1.9";
-        case 111:
-            return "v1.91 hack demo?";
-        default:
-            break;
-    }
-
-    // Unknown version.  Perhaps this is a pre-v1.4 IWAD?  If the version
-    // byte is in the range 0-4 then it can be a v1.0-v1.2 demo.
-
-    if (version >= 0 && version <= 4)
-    {
-        return "v1.0/v1.1/v1.2";
-    }
-    else
-    {
-        M_snprintf(resultbuf, sizeof(resultbuf),
-                   "%i.%i (unknown)", version / 100, version % 100);
-        return resultbuf;
-    }
-}
-
-void G_DoPlayDemo (void)
-{
-    skill_t skill;
-    int i, lumpnum, episode, map;
-    int demoversion;
-    boolean olddemo = false;
-    int lumplength; // [crispy]
-
-    // [crispy] in demo continue mode free the obsolete demo buffer
-    // of size 'maxsize' previously allocated in G_RecordDemo()
-    if (demorecording)
-    {
-        Z_Free(demobuffer);
-    }
-
-    lumpnum = W_GetNumForName(defdemoname);
-    gameaction = ga_nothing;
-    demobuffer = W_CacheLumpNum(lumpnum, PU_STATIC);
-    demo_p = demobuffer;
-
-    // [crispy] ignore empty demo lumps
-    lumplength = W_LumpLength(lumpnum);
-    if (lumplength < 0xd)
-    {
-	demoplayback = true;
-	G_CheckDemoStatus();
-	return;
-    }
-
-    demoversion = *demo_p++;
-
-    if (demoversion >= 0 && demoversion <= 4)
-    {
-        olddemo = true;
-        demo_p--;
-    }
-
-    longtics = false;
-
-    // Longtics demos use the modified format that is generated by cph's
-    // hacked "v1.91" doom exe. This is a non-vanilla extension.
-    if (D_NonVanillaPlayback(demoversion == DOOM_191_VERSION, lumpnum,
-                             "Doom 1.91 demo format"))
-    {
-        longtics = true;
-    }
-    else if (demoversion != G_VanillaVersionCode() &&
-             !(gameversion <= exe_doom_1_2 && olddemo))
-    {
-        const char *message = "Demo is from a different game version!\n"
-                              "(read %i, should be %i)\n"
-                              "\n"
-                              "*** You may need to upgrade your version "
-                                  "of Doom to v1.9. ***\n"
-                              "    See: https://www.doomworld.com/classicdoom"
-                                        "/info/patches.php\n"
-                              "    This appears to be %s.";
-
-        if (singledemo)
-        I_Error(message, demoversion, G_VanillaVersionCode(),
-                         DemoVersionDescription(demoversion));
-        // [crispy] make non-fatal
-        else
-        {
-        fprintf(stderr, message, demoversion, G_VanillaVersionCode(),
-                         DemoVersionDescription(demoversion));
-	fprintf(stderr, "\n");
-	demoplayback = true;
-	G_CheckDemoStatus();
-	return;
-        }
-    }
-
-    skill = *demo_p++; 
-    episode = *demo_p++; 
-    map = *demo_p++; 
-    if (!olddemo)
-    {
-        respawnparm = *demo_p++;
-        fastparm = *demo_p++;
-        nomonsters = *demo_p++;
-        consoleplayer = *demo_p++;
-    }
-    else
-    {
-        respawnparm = 0;
-        fastparm = 0;
-        nomonsters = 0;
-        consoleplayer = 0;
-    }
-    
-        
-    for (i=0 ; i<MAXPLAYERS ; i++) 
-	playeringame[i] = *demo_p++; 
-
-    if (playeringame[1])
-    {
-	// [crispy] impossible to continue a multiplayer demo
-	demorecording = false;
-    }
-
-    // don't spend a lot of time in loadlevel 
-    precache = false;
-    // [crispy] support playing demos from savegames
-    if (startloadgame >= 0)
-    {
-	M_StringCopy(savename, P_SaveGameFile(startloadgame), sizeof(savename));
-	G_DoLoadGame();
-    }
-    else
-    {
-    G_InitNew (skill, episode, map); 
-    }
-    precache = true; 
-    starttime = I_GetTime (); 
-    demostarttic = gametic; // [crispy] fix revenant internal demo bug
-
-    usergame = false; 
-    demoplayback = true; 
-
-    // [crispy] demo progress bar
-    {
-	int i, numplayersingame = 0;
-	byte *demo_ptr = demo_p;
-
-	for (i = 0; i < MAXPLAYERS; i++)
-	{
-	    if (playeringame[i])
-	    {
-		numplayersingame++;
-	    }
-	}
-
-	deftotaldemotics = defdemotics = 0;
-
-	while (*demo_ptr != DEMOMARKER && (demo_ptr - demobuffer) < lumplength)
-	{
-	    demo_ptr += numplayersingame * (longtics ? 5 : 4);
-	    deftotaldemotics++;
-	}
-    }
-} 
-
-//
-// G_TimeDemo 
-//
-void G_TimeDemo (char* name) 
-{
-    //!
-    // @category video
-    // @vanilla
-    //
-    // Disable rendering the screen entirely.
-    //
-
-    nodrawers = M_CheckParm ("-nodraw");
-
-    timingdemo = true; 
-    singletics = true; 
-
-    defdemoname = name; 
-    gameaction = ga_playdemo; 
-} 
- 
-#define DEMO_FOOTER_SEPARATOR "\n"
-#define NUM_DEMO_FOOTER_LUMPS 4
-
-static size_t WriteCmdLineLump(MEMFILE *stream)
-{
-    int i;
-    long pos;
-    char *tmp, **filenames;
-
-    filenames = W_GetWADFileNames();
-
-    pos = mem_ftell(stream);
-
-    tmp = M_StringJoin("-iwad \"", M_BaseName(filenames[0]), "\"", NULL);
-    mem_fputs(tmp, stream);
-    free(tmp);
-
-    if (filenames[1])
-    {
-        mem_fputs(" -file", stream);
-
-        for (i = 1; filenames[i]; i++)
-        {
-            tmp = M_StringJoin(" \"", M_BaseName(filenames[i]), "\"", NULL);
-            mem_fputs(tmp, stream);
-            free(tmp);
-        }
-    }
-
-/*
-    filenames = DEH_GetFileNames();
-
-    if (filenames)
-    {
-        mem_fputs(" -deh", stream);
-
-        for (i = 0; filenames[i]; i++)
-        {
-            tmp = M_StringJoin(" \"", M_BaseName(filenames[i]), "\"", NULL);
-            mem_fputs(tmp, stream);
-            free(tmp);
-        }
-    }
-*/
-
-    switch (gameversion)
-    {
-        case exe_doom_1_2:
-            mem_fputs(" -complevel 0", stream);
-            break;
-        case exe_doom_1_666:
-            mem_fputs(" -complevel 1", stream);
-            break;
-        case exe_doom_1_9:
-            mem_fputs(" -complevel 2", stream);
-            break;
-        case exe_ultimate:
-            mem_fputs(" -complevel 3", stream);
-            break;
-        case exe_final:
-            mem_fputs(" -complevel 4", stream);
-            break;
-        default:
-            break;
-    }
-
-    if (M_CheckParm("-solo-net"))
-    {
-        mem_fputs(" -solo-net", stream);
-    }
-
-    return mem_ftell(stream) - pos;
-}
-
-static void WriteFileInfo(const char *name, size_t size, MEMFILE *stream)
-{
-    filelump_t fileinfo = { 0 };
-    static long filepos = sizeof(wadinfo_t);
-
-    fileinfo.filepos = LONG(filepos);
-    fileinfo.size = LONG(size);
-
-    if (name)
-    {
-        size_t len = strnlen(name, 8);
-        if (len < 8)
-        {
-            len++;
-        }
-        memcpy(fileinfo.name, name, len);
-    }
-
-    mem_fwrite(&fileinfo, 1, sizeof(fileinfo), stream);
-
-    filepos += size;
-}
-
-static void G_AddDemoFooter(void)
-{
-    byte *data;
-    size_t size;
-
-    MEMFILE *stream = mem_fopen_write();
-
-    wadinfo_t header = { "PWAD" };
-    header.numlumps = LONG(NUM_DEMO_FOOTER_LUMPS);
-    mem_fwrite(&header, 1, sizeof(header), stream);
-
-    mem_fputs(PACKAGE_FULLNAME, stream);  // [JN] Use full port name.
-    mem_fputs(DEMO_FOOTER_SEPARATOR, stream);
-    size = WriteCmdLineLump(stream);
-    mem_fputs(DEMO_FOOTER_SEPARATOR, stream);
-
-    header.infotableofs = LONG(mem_ftell(stream));
-    mem_fseek(stream, 0, MEM_SEEK_SET);
-    mem_fwrite(&header, 1, sizeof(header), stream);
-    mem_fseek(stream, 0, MEM_SEEK_END);
-
-    WriteFileInfo("PORTNAME", strlen(PACKAGE_STRING), stream);
-    WriteFileInfo(NULL, strlen(DEMO_FOOTER_SEPARATOR), stream);
-    WriteFileInfo("CMDLINE", size, stream);
-    WriteFileInfo(NULL, strlen(DEMO_FOOTER_SEPARATOR), stream);
-
-    mem_get_buf(stream, (void **)&data, &size);
-
-    while (demo_p > demoend - size)
-    {
-        IncreaseDemoBuffer();
-    }
-
-    memcpy(demo_p, data, size);
-    demo_p += size;
-
-    mem_fclose(stream);
-}
- 
-/* 
-=================== 
-= 
-= G_CheckDemoStatus 
-= 
-= Called after a death or level completion to allow demos to be cleaned up 
-= Returns true if a new demo loop action will take place 
-=================== 
-*/ 
- 
-boolean G_CheckDemoStatus (void) 
-{ 
-    // [crispy] catch the last cmd to track joins
-    ticcmd_t* cmd = last_cmd;
-    last_cmd = NULL;
-
-    if (timingdemo)
-    {
-        const int endtime = I_GetTime();
-        const int realtics = endtime - starttime;
-        const float fps = ((float)gametic * TICRATE) / realtics;
-
-        // Prevent recursive calls
-        timingdemo = false;
-        demoplayback = false;
-
-        i_error_safe = true;
-        I_Error ("Timed %i gametics in %i realtics.\n"
-                 "Average fps: %f", gametic, realtics, fps);
-    } 
-	 
-    if (demoplayback) 
-    { 
-        W_ReleaseLumpName(defdemoname);
-	demoplayback = false; 
-	playeringame[1] = playeringame[2] = playeringame[3] = 0;
-	// [crispy] leave game parameters intact when continuing a demo
-	if (!demorecording)
-	{
-	respawnparm = false;
-	fastparm = false;
-	nomonsters = false;
-	}
-	consoleplayer = 0;
-        
-        // [crispy] in demo continue mode increase the demo buffer and
-        // continue recording once we are done with playback
-        if (demorecording)
-        {
-            demoend = demo_p;
-            IncreaseDemoBuffer();
-
-            nodrawers = false;
-            singletics = false;
-
-            // [crispy] start music for the current level
-            if (gamestate == GS_LEVEL)
-            {
-                S_Start();
-            }
-
-            // [crispy] record demo join
-            if (cmd != NULL)
-            {
-                cmd->buttons |= BT_JOIN;
-            }
-
-            return true;
-        }
-
-        if (singledemo) 
-            I_Quit (); 
-        else 
-            D_AdvanceDemo (); 
-
-	return true; 
-    } 
- 
-    if (demorecording) 
-    { 
-	boolean success;
-	char *msg;
-
-	*demo_p++ = DEMOMARKER; 
-	G_AddDemoFooter();
-	success = M_WriteFile (demoname, demobuffer, demo_p - demobuffer);
-	msg = success ? "Demo %s recorded%c" : "Failed to record Demo %s%c";
-	Z_Free (demobuffer); 
-	demorecording = false; 
-	// [crispy] if a new game is started during demo recording, start a new demo
-	if (gameaction != ga_newgame)
-	{
-	    i_error_safe = true;
-	    I_Error (msg, demoname, '\0');
-	}
-	else
-	{
-	    fprintf(stderr, msg, demoname, '\n');
-	}
-    } 
-	 
-    return false; 
-} 
- 
-//
-// G_DemoGoToNextLevel
-// [JN] Fast forward to next level while demo playback.
-//
-
-boolean demo_gotonextlvl;
-
-void G_DemoGoToNextLevel (boolean start)
-{
-    // Disable screen rendering while fast forwarding.
-    nodrawers = start;
-
-    // Switch to fast tics running mode if not in -timedemo.
-    if (!timingdemo)
-    {
-        singletics = start;
-    }
-} 
- 
- 

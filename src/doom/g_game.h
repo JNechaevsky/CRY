@@ -30,23 +30,16 @@ extern boolean G_Responder (event_t *ev);
 void G_FastResponder (void); // [crispy]
 void G_PrepTiccmd (void); // [crispy]
 
-extern char *demoname;
-extern int   demostarttic; // [crispy] fix revenant internal demo
-
 extern fixed_t forwardmove[2];
 extern fixed_t sidemove[2];
 
-extern int G_VanillaVersionCode(void);
 
-extern void G_BeginRecording (void);
 extern void G_BuildTiccmd (ticcmd_t *cmd, int maketic); 
 extern void G_DeferedInitNew (skill_t skill, int episode, int map);
-extern void G_DeferedPlayDemo (const char* name);
 extern void G_DoCompleted (void); 
 extern void G_DoLoadGame (void);
 extern void G_DoLoadLevel (void); 
 extern void G_DoNewGame (void); 
-extern void G_DoSelectiveGame (int choice); 
 extern void G_DoPlayDemo (void); 
 extern void G_DoReborn (int playernum); 
 extern void G_DoSaveGame (void); 
@@ -56,21 +49,12 @@ extern void G_DrawMouseSpeedBox (void);
 extern void G_ExitLevel (void);
 extern void G_InitNew (skill_t skill, int episode, int map);
 extern void G_LoadGame (char *name);
-extern void G_PlayDemo (char *name);
 extern void G_PlayerReborn (int player);
-extern void G_ReadDemoTiccmd (ticcmd_t *cmd); 
-extern void G_RecordDemo (const char *name);
 extern void G_SaveGame (int slot, char *description);
 extern void G_ScreenShot (void);
 extern void G_SecretExitLevel (void);
 extern void G_Ticker (void);
-extern void G_TimeDemo (char *name);
 extern void G_WorldDone (void);
-extern void G_WriteDemoTiccmd (ticcmd_t *cmd); 
 
 // [crispy] holding down the "Run" key may trigger special behavior
 extern boolean speedkeydown (void);
-
-// [JN] Fast forward to next level while demo playback.
-extern boolean demo_gotonextlvl;
-extern void G_DemoGoToNextLevel (boolean start);

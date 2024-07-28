@@ -171,10 +171,6 @@ extern  int	totalleveltimes; // [crispy] CPhipps - total time for all completed 
 // Disable save/end game?
 extern  boolean	usergame;
 
-//?
-extern  boolean	demoplayback;
-extern  boolean	demorecording;
-
 // Round angleturn in ticcmds to the nearest 256.  This is used when
 // recording Vanilla demos in netgames.
 

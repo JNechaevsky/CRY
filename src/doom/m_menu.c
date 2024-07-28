@@ -1772,8 +1772,8 @@ static menuitem_t ID_Menu_Keybinds_2[]=
     { M_SWTC, "MOUSE LOOK",              M_Bind_MouseLook,      'm' },
     { M_SWTC, "VERTICAL MOUSE MOVEMENT", M_Bind_NoVert,         'v' },
     { M_SKIP, "", 0, '\0'},
-    { M_SWTC, "RESTART LEVEL/DEMO",      M_Bind_RestartLevel,   'g' },
-    { M_SWTC, "GO TO NEXT LEVEL",        M_Bind_NextLevel,      'd' },
+    { M_SWTC, "RESTART LEVEL",           M_Bind_RestartLevel,   'r' },
+    { M_SWTC, "GO TO NEXT LEVEL",        M_Bind_NextLevel,      'g' },
     { M_SWTC, "DEMO FAST-FORWARD",       M_Bind_FastForward,    'd' },
     { M_SWTC, "FLIP LEVEL HORIZONTALLY", M_Bind_FlipLevels,     'f' },
     { M_SWTC, "TOGGLE EXTENDED HUD",     M_Bind_ExtendedHUD,    't' },
@@ -4115,11 +4115,6 @@ static int G_ReloadLevel (void)
 
     if (gamestate == GS_LEVEL || gamestate == GS_INTERMISSION)
     {
-        // [crispy] restart demos from the map they were started
-        if (demorecording)
-        {
-            gamemap = startmap;
-        }
         G_DeferedInitNew(gameskill, gameepisode, gamemap);
         result = true;
     }
@@ -4647,32 +4642,11 @@ boolean M_Responder (event_t* ev)
         // [JN] Hovewer, allow while multiplayer demos.
         else if (key != 0 && key == key_reloadlevel)
         {
-            if (demoplayback)
-            {
-                if (demowarp)
-                {
-                    // [JN] Enable screen render back before replaying.
-                    nodrawers = false;
-                    singletics = false;
-                }
-                // [JN] Replay demo lump or file.
-                G_DoPlayDemo();
-                return true;
-            }
-            else
             if (G_ReloadLevel())
             return true;
         }
         else if (key != 0 && key == key_nextlevel)
         {
-            if (demoplayback)
-            {
-                // [JN] Go to next level.
-                demo_gotonextlvl = true;
-                G_DemoGoToNextLevel(true);
-                return true;
-            }
-            else
             if (G_GotoNextLevel())
             return true;
         }

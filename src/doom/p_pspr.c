@@ -696,7 +696,7 @@ void P_BulletSlope (mobj_t*	mo)
 {
     angle_t	an;
     
-    if (singleplayer && compat_vertical_aiming == 1)
+    if (compat_vertical_aiming == 1)
     {
     bulletslope = PLAYER_SLOPE(mo->player);
     bulletslope /= P_SlopeFOVCorrecton();
@@ -715,7 +715,7 @@ void P_BulletSlope (mobj_t*	mo)
 	{
 	    an -= 2<<26;
 	    bulletslope = P_AimLineAttack (mo, an, 16*64*FRACUNIT, false);
-	    if (singleplayer && compat_vertical_aiming == 2)
+	    if (compat_vertical_aiming == 2)
 	    {
 	        bulletslope = PLAYER_SLOPE(mo->player);
 	        bulletslope /= P_SlopeFOVCorrecton();

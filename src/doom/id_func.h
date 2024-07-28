@@ -20,9 +20,6 @@
 #pragma once
 
 
-#define singleplayer (!demorecording && !demoplayback)
-
-
 //
 // Data types
 //
@@ -74,14 +71,6 @@ extern void ID_DrawTargetsHealth (void);
 //
 
 extern void ID_DrawCrosshair (void);
-
-//
-// [crispy] demo progress bar and timer widget
-//
-
-extern void ID_DemoTimer (const int time);
-extern void ID_DemoBar (void);
-extern int  defdemotics, deftotaldemotics;
 
 //
 // Spectator Mode

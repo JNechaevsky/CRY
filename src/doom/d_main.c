@@ -251,16 +251,6 @@ static void D_Display (void)
                 if (dp_screen_size < 15)
                 ID_LeftWidgets();
 
-                // [crispy] demo timer widget
-                if (demoplayback && (demo_timer == 1 || demo_timer == 3))
-                {
-                    ID_DemoTimer(demo_timerdir ? (deftotaldemotics - defdemotics) : defdemotics);
-                }
-                else if (demorecording && (demo_timer == 2 || demo_timer == 3))
-                {
-                    ID_DemoTimer(leveltime);
-                }
-
                 // [JN] Target's health widget.
                 // Actual health values are gathered in G_Ticker.
                 if (widget_health)
@@ -324,12 +314,6 @@ static void D_Display (void)
         if (gamestate != GS_FINALE)
         {
             ID_RightWidgets();
-        }
-
-        // [crispy] Demo Timer widget
-        if (demoplayback && demo_bar)
-        {
-            ID_DemoBar();
         }
     }
 
@@ -416,7 +400,7 @@ boolean D_GrabMouseCallback(void)
 
     // only grab mouse when playing levels (but not demos)
 
-    return (gamestate == GS_LEVEL) && ((!demoplayback && !advancedemo));
+    return (gamestate == GS_LEVEL);
 }
 
 //
@@ -424,9 +408,6 @@ boolean D_GrabMouseCallback(void)
 //
 void D_DoomLoop (void)
 {
-    if (demorecording)
-	G_BeginRecording ();
-
     main_loop_started = true;
 
     I_SetWindowTitle("Yaguar Doom");
@@ -535,11 +516,6 @@ static boolean D_AddFile(char *filename)
     return handle != NULL;
 }
 
-static void G_CheckDemoStatusAtExit (void)
-{
-    G_CheckDemoStatus();
-}
-
 
 //
 // D_DoomMain
@@ -548,7 +524,6 @@ void D_DoomMain (void)
 {
     int p;
     char file[256];
-    char demolumpname[9];
     const int starttime = SDL_GetTicks();
 
 #ifdef _WIN32
@@ -639,72 +614,10 @@ void D_DoomMain (void)
     //D_IdentifyVersion();
 	gamemode = commercial;
     gamemission = doom2;
-	//InitGameVersion();
 	gameversion = exe_doom_1_9;
 	
     // Load PWAD files.
     modifiedgame = W_ParseCommandLine();
-
-    //!
-    // @arg <demo>
-    // @category demo
-    // @vanilla
-    //
-    // Play back the demo named demo.lmp.
-    //
-
-    p = M_CheckParmWithArgs ("-playdemo", 1);
-
-    if (!p)
-    {
-        //!
-        // @arg <demo>
-        // @category demo
-        // @vanilla
-        //
-        // Play back the demo named demo.lmp, determining the framerate
-        // of the screen.
-        //
-	p = M_CheckParmWithArgs("-timedemo", 1);
-
-    }
-
-    if (p)
-    {
-        char *uc_filename = strdup(myargv[p + 1]);
-        M_ForceUppercase(uc_filename);
-
-        // With Vanilla you have to specify the file without extension,
-        // but make that optional.
-        if (M_StringEndsWith(uc_filename, ".LMP"))
-        {
-            M_StringCopy(file, myargv[p + 1], sizeof(file));
-        }
-        else
-        {
-            snprintf(file, sizeof(file), "%s.lmp", myargv[p+1]);
-        }
-
-        free(uc_filename);
-
-        if (D_AddFile(file))
-        {
-            M_StringCopy(demolumpname, lumpinfo[numlumps - 1]->name,
-                         sizeof(demolumpname));
-        }
-        else
-        {
-            // If file failed to load, still continue trying to play
-            // the demo in the same way as Vanilla Doom.  This makes
-            // tricks like "-playdemo demo1" possible.
-
-            M_StringCopy(demolumpname, myargv[p + 1], sizeof(demolumpname));
-        }
-
-        printf("Playing demo %s.\n", file);
-    }
-
-    I_AtExit(G_CheckDemoStatusAtExit, true);
 
     // Generate the WAD hash table.  Speed things up a bit.
     W_GenerateHashTable();
@@ -817,6 +730,7 @@ void D_DoomMain (void)
     // [JN] Show startup process time.
     printf("Startup process took %d ms.\n", SDL_GetTicks() - starttime);
 
+/*
     //!
     // @arg <x>
     // @category demo
@@ -848,6 +762,7 @@ void D_DoomMain (void)
 	G_TimeDemo (demolumpname);
 	D_DoomLoop ();  // never returns
     }
+*/
 	
     if (startloadgame >= 0)
     {

@@ -235,7 +235,7 @@ void P_MovePlayer (player_t* player)
             cmd->lookdir = MLOOKUNIT * 5 * look;
         }
     }
-    if (!menuactive && !demoplayback)
+    if (!menuactive)
     {
 	player->lookdir = BETWEEN(-LOOKDIRMIN * MLOOKUNIT,
 	                          LOOKDIRMAX * MLOOKUNIT,
@@ -299,11 +299,6 @@ void P_DeathThink (player_t* player)
 
     if (player->cmd.buttons & BT_USE)
     {
-        if (demorecording || demoplayback)
-        {
-            player->playerstate = PST_REBORN;
-        }
-        else
         {
             // [JN] "On death action", mostly taken from Crispy Doom and Woof.
             switch (gp_death_use_action)

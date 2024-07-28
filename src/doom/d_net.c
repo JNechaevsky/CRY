@@ -60,13 +60,6 @@ static void PlayerQuitGame(player_t *player)
     CT_SetMessage(&players[consoleplayer], exitmsg, true, NULL);
     // [crispy] don't interpolate players who left the game
     player->mo->interp = false;
-
-    // TODO: check if it is sensible to do this:
-
-    if (demorecording) 
-    {
-        G_CheckDemoStatus ();
-    }
 }
 
 static void RunTic(ticcmd_t *cmds, boolean *ingame)
@@ -77,7 +70,7 @@ static void RunTic(ticcmd_t *cmds, boolean *ingame)
 
     for (i = 0; i < MAXPLAYERS; ++i)
     {
-        if (!demoplayback && playeringame[i] && !ingame[i])
+        if (playeringame[i] && !ingame[i])
         {
             PlayerQuitGame(&players[i]);
         }

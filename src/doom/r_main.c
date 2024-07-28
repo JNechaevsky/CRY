@@ -950,9 +950,7 @@ static inline boolean CheckLocalView(const player_t *player)
     // Don't use localview if the player is dead.
     player->playerstate != PST_DEAD &&
     // Don't use localview if the player just teleported.
-    !player->mo->reactiontime &&
-    // Don't use localview if a demo is playing or recording.
-    !demoplayback && !demorecording
+    !player->mo->reactiontime
   );
 }
 

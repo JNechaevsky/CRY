@@ -330,14 +330,6 @@ void ID_RightWidgets (void)
 {
     int yy = 0;
 
-    // [JN] If demo timer is active and running,
-    // shift FPS and time widgets one line down.
-    if ((demoplayback && (demo_timer == 1 || demo_timer == 3))
-    ||  (demorecording && (demo_timer == 2 || demo_timer == 3)))
-    {
-        yy += 9;
-    }
-
     // [JN] FPS counter
     if (vid_showfps)
     {
@@ -580,63 +572,6 @@ void ID_DrawCrosshair (void)
     dp_translation = ID_CrosshairColor(xhair_color);
     V_DrawPatch(xx, yy, ID_CrosshairShape());
     dp_translation = NULL;
-}
-
-// =============================================================================
-//
-//                             Demo enhancements
-//
-// =============================================================================
-
-// -----------------------------------------------------------------------------
-// ID_DemoTimer
-//  [crispy] Demo Timer widget
-// -----------------------------------------------------------------------------
-
-void ID_DemoTimer (const int time)
-{
-    const int hours = time / (3600 * TICRATE);
-    const int mins = time / (60 * TICRATE) % 60;
-    const float secs = (float)(time % (60 * TICRATE)) / TICRATE;
-    char n[16];
-    int x = 237;
-
-    if (hours)
-    {
-        M_snprintf(n, sizeof(n), "%02i:%02i:%05.02f", hours, mins, secs);
-    }
-    else
-    {
-        M_snprintf(n, sizeof(n), "%02i:%05.02f", mins, secs);
-        x += 20;
-    }
-
-    M_WriteText(x + WIDESCREENDELTA, 9, n, cr[CR_LIGHTGRAY]);
-}
-
-// -----------------------------------------------------------------------------
-// ID_DemoBar
-//  [crispy] print a bar indicating demo progress at the bottom of the screen
-// -----------------------------------------------------------------------------
-
-void ID_DemoBar (void)
-{
-    static boolean colors_set = false;
-    static int black = 0;
-    static int white = 0;
-    const int i = SCREENWIDTH * defdemotics / deftotaldemotics;
-
-    // [JN] Don't rely on palette indexes,
-    // try to find nearest colors instead.
-    if (!colors_set)
-    {
-        black = I_MapRGB(0, 0, 0);
-        white = I_MapRGB(255, 255, 255);
-        colors_set = true;
-    }
-
-    V_DrawHorizLine(0, SCREENHEIGHT - 2, i, black); // [crispy] black
-    V_DrawHorizLine(0, SCREENHEIGHT - 1, i, white); // [crispy] white
 }
 
 // =============================================================================
