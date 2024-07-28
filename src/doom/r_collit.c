@@ -653,38 +653,42 @@ lighttable_t **R_ColoredSegsColorize (const int lightnum, const int color)
 
 lighttable_t *R_ColoredSprColorize (const int color)
 {
-    switch (color)
+    if (vis_colored_lighting)
     {
-        case 0xEEC06B:  return colormaps_EEC06B;  break;
-        case 0xD97C45:  return colormaps_D97C45;  break;
-        case 0xFF7F7F:  return colormaps_FF7F7F;  break;
-        case 0x55B828:  return colormaps_55B828;  break;
-        case 0xBBE357:  return colormaps_BBE357;  break;
-        case 0x949DB9:  return colormaps_949DB9;  break;
-        case 0x2A2F6B:  return colormaps_2A2F6B;  break;
-        case 0x50ADAC:  return colormaps_50ADAC;  break;
-        case 0xCCE4A5:  return colormaps_CCE4A5;  break;
-        case 0xCCEA5F:  return colormaps_CCEA5F;  break;
-        case 0xB30202:  return colormaps_B30202;  break;
-        case 0xB87A15:  return colormaps_B87A15;  break;
-        case 0xFFD000:  return colormaps_FFD000;  break;
-        case 0xFFDE4C:  return colormaps_FFDE4C;  break;
-        case 0xFFF588:  return colormaps_FFF588;  break;
-        case 0x043E8B:  return colormaps_043E8B;  break;
-        case 0x5B4318:  return colormaps_5B4318;  break;
-        case 0x4F5D8B:  return colormaps_4F5D8B;  break;
-        case 0xD46D3D:  return colormaps_D46D3D;  break;
-        case 0x04918B:  return colormaps_04918B;  break;
-        case 0xFF3030:  return colormaps_FF3030;  break;
-        case 0x311A59:  return colormaps_311A59;  break;
-        case 0xFFAFAF:  return colormaps_FFAFAF;  break;
-        case 0xECB866:  return colormaps_C63F23;  break;
-        case 0xC63F23:  return colormaps_ECB866;  break;
-        case 0x9BC8CD:  return colormaps_9BC8CD;  break;
-        case 0x666666:  return colormaps_666666;  break;
-        case 0x777777:  return colormaps_777777;  break;
-        default:        return colormaps;         break;
+        switch (color)
+        {
+            case 0xEEC06B:  return colormaps_EEC06B;  break;
+            case 0xD97C45:  return colormaps_D97C45;  break;
+            case 0xFF7F7F:  return colormaps_FF7F7F;  break;
+            case 0x55B828:  return colormaps_55B828;  break;
+            case 0xBBE357:  return colormaps_BBE357;  break;
+            case 0x949DB9:  return colormaps_949DB9;  break;
+            case 0x2A2F6B:  return colormaps_2A2F6B;  break;
+            case 0x50ADAC:  return colormaps_50ADAC;  break;
+            case 0xCCE4A5:  return colormaps_CCE4A5;  break;
+            case 0xCCEA5F:  return colormaps_CCEA5F;  break;
+            case 0xB30202:  return colormaps_B30202;  break;
+            case 0xB87A15:  return colormaps_B87A15;  break;
+            case 0xFFD000:  return colormaps_FFD000;  break;
+            case 0xFFDE4C:  return colormaps_FFDE4C;  break;
+            case 0xFFF588:  return colormaps_FFF588;  break;
+            case 0x043E8B:  return colormaps_043E8B;  break;
+            case 0x5B4318:  return colormaps_5B4318;  break;
+            case 0x4F5D8B:  return colormaps_4F5D8B;  break;
+            case 0xD46D3D:  return colormaps_D46D3D;  break;
+            case 0x04918B:  return colormaps_04918B;  break;
+            case 0xFF3030:  return colormaps_FF3030;  break;
+            case 0x311A59:  return colormaps_311A59;  break;
+            case 0xFFAFAF:  return colormaps_FFAFAF;  break;
+            case 0xECB866:  return colormaps_C63F23;  break;
+            case 0xC63F23:  return colormaps_ECB866;  break;
+            case 0x9BC8CD:  return colormaps_9BC8CD;  break;
+            case 0x666666:  return colormaps_666666;  break;
+            case 0x777777:  return colormaps_777777;  break;
+        }
     }
+
+    return colormaps;
 }
 
 // =============================================================================

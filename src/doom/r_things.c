@@ -743,16 +743,9 @@ static void R_ProjectSprite (mobj_t* thing)
     // with full brightness to represent vanilla Jaguar effect.
     if (!vis_brightmaps)
     {
-        if (vis_colored_lighting)
-        {
-            // [JN] Colorize sprite drawing.
-            vis->colormap[0] = vis->colormap[1]
-                             = R_ColoredSprColorize(thing->subsector->sector->color);
-        }
-        else
-        {
-            vis->colormap[0] = vis->colormap[1] = colormaps;
-        }
+        // [JN] Colorize sprite drawing.
+        vis->colormap[0] = vis->colormap[1]
+                         = R_ColoredSprColorize(thing->subsector->sector->color);
     }
     else
     {
@@ -764,17 +757,9 @@ static void R_ProjectSprite (mobj_t* thing)
         }
         else
         {
-            if (vis_colored_lighting)
-            {
-                // [JN] Colorize sprite drawing.
-                vis->colormap[0] = spritelights[index];
-                vis->colormap[1] = R_ColoredSprColorize(thing->subsector->sector->color);
-            }
-            else
-            {
-                vis->colormap[0] = spritelights[index];
-                vis->colormap[1] = colormaps;
-            }
+            vis->colormap[0] = spritelights[index];
+            // [JN] Colorize brightmapped sprite drawing.
+            vis->colormap[1] = R_ColoredSprColorize(thing->subsector->sector->color);
         }
     }	
     }
