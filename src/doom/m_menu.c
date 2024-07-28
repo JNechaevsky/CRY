@@ -731,7 +731,6 @@ static void M_ShadeBackground (void)
     }
 }
 
-/*
 static void M_FillBackground (void)
 {
     const byte *src = W_CacheLumpName("FLOOR4_8", PU_CACHE);
@@ -739,7 +738,6 @@ static void M_FillBackground (void)
 
     V_FillFlat(0, SCREENHEIGHT, 0, SCREENWIDTH, src, dest);
 }
-*/
 
 enum
 {
@@ -1738,7 +1736,10 @@ static void M_Bind_Use (int choice)
 
 static void M_Draw_ID_Keybinds_1 (void)
 {
+    st_fullupdate = true;
     Keybinds_Cur = 0;
+
+    M_FillBackground();
 
     M_WriteTextCentered(9, "MOVEMENT", cr[CR_YELLOW]);
 
@@ -1852,7 +1853,10 @@ static void M_Bind_BuddhaMode (int choice)
 
 static void M_Draw_ID_Keybinds_2 (void)
 {
+    st_fullupdate = true;
     Keybinds_Cur = 1;
+
+    M_FillBackground();
 
     M_WriteTextCentered(9, "ADVANCED MOVEMENT", cr[CR_YELLOW]);
 
@@ -1964,7 +1968,10 @@ static void M_Bind_NextWeapon (int choice)
 
 static void M_Draw_ID_Keybinds_3 (void)
 {
+    st_fullupdate = true;
     Keybinds_Cur = 2;
+
+    M_FillBackground();
 
     M_WriteTextCentered(9, "WEAPONS", cr[CR_YELLOW]);
 
@@ -2069,7 +2076,10 @@ static void M_Bind_ClearMarks (int choice)
 
 static void M_Draw_ID_Keybinds_4 (void)
 {
+    st_fullupdate = true;
     Keybinds_Cur = 3;
+
+    M_FillBackground();
 
     M_WriteTextCentered(9, "AUTOMAP", cr[CR_YELLOW]);
 
@@ -2183,7 +2193,10 @@ static void M_Bind_MultiplayerSpy (int choice)
 }
 static void M_Draw_ID_Keybinds_5 (void)
 {
+    st_fullupdate = true;
     Keybinds_Cur = 4;
+
+    M_FillBackground();
 
     M_WriteTextCentered(9, "FUNCTION KEYS", cr[CR_YELLOW]);
 
@@ -2269,7 +2282,10 @@ static void M_Bind_Reset (int choice)
 
 static void M_Draw_ID_Keybinds_6 (void)
 {
+    st_fullupdate = true;
     Keybinds_Cur = 5;
+
+    M_FillBackground();
 
     M_WriteTextCentered(9, "SHORTCUT KEYS", cr[CR_YELLOW]);
 
@@ -2394,6 +2410,10 @@ static void M_Bind_M_Reset (int choice)
 
 static void M_Draw_ID_MouseBinds (void)
 {
+    st_fullupdate = true;
+
+    M_FillBackground();
+
     M_WriteTextCentered(9, "MOUSE BINDINGS", cr[CR_YELLOW]);
 
     M_DrawBindButton(0, 18, mousebfire);
@@ -5551,13 +5571,18 @@ static void M_DrawBindKey (int itemNum, int yPos, int key)
 
 static void M_DrawBindFooter (char *pagenum, boolean drawPages)
 {
-    M_WriteTextCentered(143, "PRESS ENTER TO BIND, DEL TO CLEAR",  cr[CR_MENU_DARK1]);
+    const char *string = "PRESS ENTER TO BIND, DEL TO CLEAR";
 
     if (drawPages)
     {
-        M_WriteText(ID_MENU_LEFTOFFSET, 152, "< PGUP", cr[CR_MENU_DARK3]);
-        M_WriteTextCentered(152, M_StringJoin("PAGE ", pagenum, "/6", NULL), cr[CR_MENU_DARK2]);
-        M_WriteText(M_ItemRightAlign("PGDN >"), 152, "PGDN >", cr[CR_MENU_DARK3]);
+        M_WriteTextCentered(171, string, cr[CR_MENU_DARK1]);
+        M_WriteText(ID_MENU_LEFTOFFSET, 180, "< PGUP", cr[CR_MENU_DARK3]);
+        M_WriteTextCentered(180, M_StringJoin("PAGE ", pagenum, "/6", NULL), cr[CR_MENU_DARK2]);
+        M_WriteText(M_ItemRightAlign("PGDN >"), 180, "PGDN >", cr[CR_MENU_DARK3]);
+    }
+    else
+    {
+        M_WriteTextCentered(180, string, cr[CR_MENU_DARK1]);
     }
 }
 
