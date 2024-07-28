@@ -69,7 +69,6 @@ void D_StartGameLoop(void);
 void D_StartNetGame(net_gamesettings_t *settings,
                     netgame_startup_callback_t callback);
 
-extern boolean singletics;
 extern int gametic, ticdup;
 extern int oldgametic;   // [JN] Invoke certain actions independently from uncapped framerate.
 extern int oldleveltime; // [crispy] check if leveltime keeps tickin'

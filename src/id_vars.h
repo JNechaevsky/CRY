@@ -103,12 +103,6 @@ extern int phys_breathing;
 extern int gp_flip_levels;
 extern int gp_death_use_action;
 
-// Demos
-extern int demo_timer;
-extern int demo_timerdir;
-extern int demo_bar;
-extern int demo_internal;
-
 // Compatibility-breaking
 extern int compat_blockmap_fix;
 extern int compat_vertical_aiming;

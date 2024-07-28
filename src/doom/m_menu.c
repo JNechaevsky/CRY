@@ -484,7 +484,6 @@ static void M_Bind_MouseLook (int choice);
 static void M_Bind_NoVert (int choice);
 static void M_Bind_RestartLevel (int choice);
 static void M_Bind_NextLevel (int choice);
-static void M_Bind_FastForward (int choice);
 static void M_Bind_FlipLevels (int choice);
 static void M_Bind_ExtendedHUD (int choice);
 static void M_Bind_SpectatorMode (int choice);
@@ -534,7 +533,6 @@ static void M_Draw_ID_Keybinds_6 (void);
 static void M_Bind_Pause (int choice);
 static void M_Bind_SaveScreenshot (int choice);
 static void M_Bind_LastMessage (int choice);
-static void M_Bind_FinishDemo (int choice);
 static void M_Bind_Reset (int choice);
 
 static void M_Choose_ID_MouseBinds (int choice);
@@ -1772,9 +1770,8 @@ static menuitem_t ID_Menu_Keybinds_2[]=
     { M_SWTC, "MOUSE LOOK",              M_Bind_MouseLook,      'm' },
     { M_SWTC, "VERTICAL MOUSE MOVEMENT", M_Bind_NoVert,         'v' },
     { M_SKIP, "", 0, '\0'},
-    { M_SWTC, "RESTART LEVEL/DEMO",      M_Bind_RestartLevel,   'g' },
-    { M_SWTC, "GO TO NEXT LEVEL",        M_Bind_NextLevel,      'd' },
-    { M_SWTC, "DEMO FAST-FORWARD",       M_Bind_FastForward,    'd' },
+    { M_SWTC, "RESTART LEVEL",           M_Bind_RestartLevel,   'r' },
+    { M_SWTC, "GO TO NEXT LEVEL",        M_Bind_NextLevel,      'g' },
     { M_SWTC, "FLIP LEVEL HORIZONTALLY", M_Bind_FlipLevels,     'f' },
     { M_SWTC, "TOGGLE EXTENDED HUD",     M_Bind_ExtendedHUD,    't' },
     { M_SKIP, "", 0, '\0'},
@@ -1822,39 +1819,34 @@ static void M_Bind_NextLevel (int choice)
     M_StartBind(204);  // key_nextlevel
 }
 
-static void M_Bind_FastForward (int choice)
-{
-    M_StartBind(205);  // key_demospeed
-}
-
 static void M_Bind_FlipLevels (int choice)
 {
-    M_StartBind(206);  // key_flip_levels
+    M_StartBind(205);  // key_flip_levels
 }
 
 static void M_Bind_ExtendedHUD (int choice)
 {
-    M_StartBind(207);  // key_widget_enable
+    M_StartBind(206);  // key_widget_enable
 }
 
 static void M_Bind_SpectatorMode (int choice)
 {
-    M_StartBind(208);  // key_spectator
+    M_StartBind(207);  // key_spectator
 }
 
 static void M_Bind_FreezeMode (int choice)
 {
-    M_StartBind(209);  // key_freeze
+    M_StartBind(208);  // key_freeze
 }
 
 static void M_Bind_NotargetMode (int choice)
 {
-    M_StartBind(210);  // key_notarget
+    M_StartBind(209);  // key_notarget
 }
 
 static void M_Bind_BuddhaMode (int choice)
 {
-    M_StartBind(211);  // key_buddha
+    M_StartBind(210);  // key_buddha
 }
 
 static void M_Draw_ID_Keybinds_2 (void)
@@ -1874,16 +1866,15 @@ static void M_Draw_ID_Keybinds_2 (void)
 
     M_DrawBindKey(4, 54, key_reloadlevel);
     M_DrawBindKey(5, 63, key_nextlevel);
-    M_DrawBindKey(6, 72, key_demospeed);
-    M_DrawBindKey(7, 81, key_flip_levels);
-    M_DrawBindKey(8, 90, key_widget_enable);
+    M_DrawBindKey(6, 72, key_flip_levels);
+    M_DrawBindKey(7, 81, key_widget_enable);
 
-    M_WriteTextCentered(99, "SPECIAL MODES", cr[CR_YELLOW]);
+    M_WriteTextCentered(90, "SPECIAL MODES", cr[CR_YELLOW]);
 
-    M_DrawBindKey(10, 108, key_spectator);
-    M_DrawBindKey(11, 117, key_freeze);
-    M_DrawBindKey(12, 126, key_notarget);
-    M_DrawBindKey(13, 135, key_buddha);
+    M_DrawBindKey(9, 99, key_spectator);
+    M_DrawBindKey(10, 108, key_freeze);
+    M_DrawBindKey(11, 117, key_notarget);
+    M_DrawBindKey(12, 126, key_buddha);
 
     M_DrawBindFooter("2", true);
 }
@@ -2232,7 +2223,6 @@ static menuitem_t ID_Menu_Keybinds_6[]=
     { M_SWTC, "PAUSE GAME",                M_Bind_Pause,          'p' },
     { M_SWTC, "SAVE A SCREENSHOT",         M_Bind_SaveScreenshot, 's' },
     { M_SWTC, "DISPLAY LAST MESSAGE",      M_Bind_LastMessage,    'd' },
-    { M_SWTC, "FINISH DEMO RECORDING",     M_Bind_FinishDemo,     'f' },
     { M_SKIP, "", 0, '\0' },
     { M_SWTC, "RESET BINDINGS TO DEFAULT", M_Bind_Reset,          'r' },
 };
@@ -2261,11 +2251,6 @@ static void M_Bind_SaveScreenshot (int choice)
 static void M_Bind_LastMessage (int choice)
 {
     M_StartBind(602);  // key_message_refresh
-}
-
-static void M_Bind_FinishDemo (int choice)
-{
-    M_StartBind(603);  // key_demo_quit
 }
 
 static void M_Bind_ResetResponse (int key)
@@ -2299,9 +2284,8 @@ static void M_Draw_ID_Keybinds_6 (void)
     M_DrawBindKey(0, 18, key_pause);
     M_DrawBindKey(1, 27, key_menu_screenshot);
     M_DrawBindKey(2, 36, key_message_refresh);
-    M_DrawBindKey(3, 45, key_demo_quit);
 
-    M_WriteTextCentered(54, "RESET", cr[CR_YELLOW]);
+    M_WriteTextCentered(45, "RESET", cr[CR_YELLOW]);
 
     M_DrawBindFooter("6", true);
 }
@@ -3111,12 +3095,6 @@ static void M_ID_ApplyResetHook (void)
     gp_revealed_secrets = 0;
     gp_flip_levels = 0;
     gp_death_use_action = 0;
-
-    // Demos
-    demo_timer = 0;
-    demo_timerdir = 0;
-    demo_bar = 0;
-    demo_internal = 1;
 
     // Compatibility-breaking
     compat_blockmap_fix = 0;
@@ -4115,11 +4093,6 @@ static int G_ReloadLevel (void)
 
     if (gamestate == GS_LEVEL || gamestate == GS_INTERMISSION)
     {
-        // [crispy] restart demos from the map they were started
-        if (demorecording)
-        {
-            gamemap = startmap;
-        }
         G_DeferedInitNew(gameskill, gameepisode, gamemap);
         result = true;
     }
@@ -4644,35 +4617,13 @@ boolean M_Responder (event_t* ev)
         }
         // [crispy] those two can be considered as shortcuts for the IDCLEV cheat
         // and should be treated as such, i.e. add "if (!netgame)"
-        // [JN] Hovewer, allow while multiplayer demos.
         else if (key != 0 && key == key_reloadlevel)
         {
-            if (demoplayback)
-            {
-                if (demowarp)
-                {
-                    // [JN] Enable screen render back before replaying.
-                    nodrawers = false;
-                    singletics = false;
-                }
-                // [JN] Replay demo lump or file.
-                G_DoPlayDemo();
-                return true;
-            }
-            else
             if (G_ReloadLevel())
             return true;
         }
         else if (key != 0 && key == key_nextlevel)
         {
-            if (demoplayback)
-            {
-                // [JN] Go to next level.
-                demo_gotonextlvl = true;
-                G_DemoGoToNextLevel(true);
-                return true;
-            }
-            else
             if (G_GotoNextLevel())
             return true;
         }
@@ -5216,7 +5167,6 @@ static void M_CheckBind (int key)
     if (key_novert == key)           key_novert           = 0;
     if (key_reloadlevel == key)      key_reloadlevel      = 0;
     if (key_nextlevel == key)        key_nextlevel        = 0;
-    if (key_demospeed == key)        key_demospeed        = 0;
     if (key_flip_levels == key)      key_flip_levels      = 0;
     if (key_widget_enable == key)    key_widget_enable    = 0;
     if (key_spectator == key)        key_spectator        = 0;
@@ -5266,7 +5216,6 @@ static void M_CheckBind (int key)
     if (key_pause == key)            key_pause            = 0;
     if (key_menu_screenshot == key)  key_menu_screenshot  = 0;
     if (key_message_refresh == key)  key_message_refresh  = 0;
-    if (key_demo_quit == key)        key_demo_quit        = 0;
 }
 
 // -----------------------------------------------------------------------------
@@ -5297,13 +5246,12 @@ static void M_DoBind (int keynum, int key)
         case 202:  key_novert = key;            break;
         case 203:  key_reloadlevel = key;       break;
         case 204:  key_nextlevel = key;         break;
-        case 205:  key_demospeed = key;         break;
-        case 206:  key_flip_levels = key;       break;
-        case 207:  key_widget_enable = key;     break;
-        case 208:  key_spectator = key;         break;
-        case 209:  key_freeze = key;            break;
-        case 210:  key_notarget = key;          break;
-        case 211:  key_buddha = key;            break;
+        case 205:  key_flip_levels = key;       break;
+        case 206:  key_widget_enable = key;     break;
+        case 207:  key_spectator = key;         break;
+        case 208:  key_freeze = key;            break;
+        case 209:  key_notarget = key;          break;
+        case 210:  key_buddha = key;            break;
         // Page 3  
         case 300:  key_weapon1 = key;           break;
         case 301:  key_weapon2 = key;           break;
@@ -5343,7 +5291,6 @@ static void M_DoBind (int keynum, int key)
         case 600:  key_pause = key;             break;
         case 601:  key_menu_screenshot = key;   break;
         case 602:  key_message_refresh = key;   break;
-        case 603:  key_demo_quit = key;         break;
     }
 }
 
@@ -5382,14 +5329,13 @@ static void M_ClearBind (int itemOn)
             // Special keys title
             case 4:   key_reloadlevel = 0;      break;
             case 5:   key_nextlevel = 0;        break;
-            case 6:   key_demospeed = 0;        break;
-            case 7:   key_flip_levels = 0;      break;
-            case 8:   key_widget_enable = 0;    break;
+            case 6:   key_flip_levels = 0;      break;
+            case 7:   key_widget_enable = 0;    break;
             // Special modes title
-            case 10:  key_spectator = 0;        break;
-            case 11:  key_freeze = 0;           break;
-            case 12:  key_notarget = 0;         break;
-            case 13:  key_buddha = 0;           break;
+            case 9:   key_spectator = 0;        break;
+            case 10:  key_freeze = 0;           break;
+            case 11:  key_notarget = 0;         break;
+            case 12:  key_buddha = 0;           break;
         }
     }
     if (currentMenu == &ID_Def_Keybinds_3)
@@ -5449,7 +5395,6 @@ static void M_ClearBind (int itemOn)
             case 0:   key_pause = 0;            break;
             case 1:   key_menu_screenshot = 0;  break;
             case 2:   key_message_refresh = 0;  break;
-            case 3:   key_demo_quit = 0;        break;
         }
     }
 }
@@ -5479,7 +5424,6 @@ static void M_ResetBinds (void)
     key_novert = 0;
     key_reloadlevel = 0;
     key_nextlevel = 0;
-    key_demospeed = 0;
     key_flip_levels = 0;
     key_widget_enable = 0;
     key_spectator = 0;
@@ -5525,7 +5469,6 @@ static void M_ResetBinds (void)
     key_pause = KEY_PAUSE;
     key_menu_screenshot = KEY_PRTSCR;
     key_message_refresh = KEY_ENTER;
-    key_demo_quit = 'q';
 }
 
 // -----------------------------------------------------------------------------

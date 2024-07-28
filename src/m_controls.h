@@ -49,7 +49,6 @@ extern int key_novert;
 
 extern int key_nextlevel;   // [crispy]
 extern int key_reloadlevel; // [crispy]
-extern int key_demospeed;   // [crispy]
 extern int key_flip_levels; // [crispy]
 extern int key_widget_enable;
 
@@ -110,7 +109,6 @@ extern int key_spy;
 extern int key_pause;
 extern int key_menu_screenshot;
 extern int key_message_refresh;
-extern int key_demo_quit;
 
 // Special menu keys, not available for rebinding
 

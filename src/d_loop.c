@@ -75,11 +75,6 @@ int oldleveltime; // [crispy] check if leveltime keeps tickin'
 // [JN] used by player, render and interpolation. Always ticking.
 int realleveltime;
 
-// When set to true, a single tic is run each time TryRunTics() is called.
-// This is used for -timedemo mode.
-
-boolean singletics = false;
-
 // Index of the local player.
 
 static int localplayer;
@@ -188,12 +183,6 @@ void NetUpdate (void)
     int nowtime;
     int newtics;
     int	i;
-
-    // If we are running with singletics (timing a demo), this
-    // is all done separately.
-
-    if (singletics)
-        return;
 
     // check time
     nowtime = GetAdjustedTime() / ticdup;
@@ -433,17 +422,7 @@ void TryRunTics (void)
     realtics = entertic - oldentertics;
     oldentertics = entertic;
 
-    // in singletics mode, run a single tic every time this function
-    // is called.
-
-    if (singletics)
-    {
-        BuildNewTic();
-    }
-    else
-    {
-        NetUpdate ();
-    }
+    NetUpdate ();
 
     lowtic = GetLowTic();
 

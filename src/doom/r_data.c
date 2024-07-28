@@ -1315,11 +1315,6 @@ void R_PrecacheLevel (void)
     int i;
     byte *hitlist;
 
-    if (demoplayback)
-    {
-        return;
-    }
-
     {
         const int size = numflats > numsprites ? numflats : numsprites;
         hitlist = malloc(numtextures > size ? numtextures : size);

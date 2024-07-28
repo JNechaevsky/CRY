@@ -635,7 +635,7 @@ void P_MobjThinker (mobj_t* mobj)
 
     // [JN] killough 9/12/98: objects fall off ledges if they are hanging off
     // slightly push off of ledge if hanging more than halfway off
-    if (singleplayer && phys_torque)
+    if (phys_torque)
     {
         if (!(mobj->flags & MF_NOGRAVITY)  // Only objects which fall
         &&  (mobj->flags & MF_CORPSE)      // [JN] And only for corpses
@@ -877,13 +877,6 @@ void P_SpawnPlayer (mapthing_t* mthing)
     fixed_t		z;
 
     mobj_t*		mobj;
-
-    // [JN] Stop fast forward after entering new level while demo playback.
-    if (demo_gotonextlvl)
-    {
-        demo_gotonextlvl = false;
-        G_DemoGoToNextLevel(false);
-    }
 
     if (mthing->type == 0)
     {
@@ -1275,7 +1268,7 @@ P_SpawnPlayerMissile
     
     // see which target is to be aimed at
     an = source->angle;
-    if (singleplayer && compat_vertical_aiming == 1)
+    if (compat_vertical_aiming == 1)
     {
 	slope = PLAYER_SLOPE(source->player);
 	slope /= P_SlopeFOVCorrecton();
@@ -1298,7 +1291,7 @@ P_SpawnPlayerMissile
 	if (!linetarget)
 	{
 	    an = source->angle;
-	    if (singleplayer && compat_vertical_aiming == 2)
+	    if (compat_vertical_aiming == 2)
 	    {
 	    slope = PLAYER_SLOPE(source->player);
 	      slope /= P_SlopeFOVCorrecton();

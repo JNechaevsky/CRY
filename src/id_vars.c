@@ -130,14 +130,7 @@ int gp_revealed_secrets = 0;
 int gp_flip_levels = 0;
 int gp_death_use_action = 0;
 
-// Demos
-int demo_timer = 0;
-int demo_timerdir = 0;
-int demo_bar = 0;
-int demo_internal = 1;
-
 // Compatibility-breaking
-
 int compat_blockmap_fix = 0;
 int compat_vertical_aiming = 0;
 
@@ -247,12 +240,6 @@ void ID_BindVariables (void)
     M_BindIntVariable("gp_revealed_secrets",            &gp_revealed_secrets);
     M_BindIntVariable("gp_flip_levels",                 &gp_flip_levels);
     M_BindIntVariable("gp_death_use_action",            &gp_death_use_action);
-    
-    // Demos
-    M_BindIntVariable("demo_timer",                     &demo_timer);
-    M_BindIntVariable("demo_timerdir",                  &demo_timerdir);
-    M_BindIntVariable("demo_bar",                       &demo_bar);
-    M_BindIntVariable("demo_internal",                  &demo_internal);
     
     M_BindIntVariable("compat_blockmap_fix",            &compat_blockmap_fix);
     M_BindIntVariable("compat_vertical_aiming",         &compat_vertical_aiming);

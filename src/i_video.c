@@ -188,12 +188,6 @@ boolean screenvisible = true;
 
 int id_fps_value;
 
-// [JN] Moved to upper level to prevent following while demo warp:
-// - prevent force frame rate uncapping after demo warp
-// - disk icon drawing
-// - palette changing
-int demowarp;
-
 // If this is true, the screen is rendered but not blitted to the
 // video buffer.
 
@@ -932,7 +926,7 @@ void I_FinishUpdate (void)
 
     SDL_RenderPresent(renderer);
 
-    if (vid_uncapped_fps && !singletics)
+    if (vid_uncapped_fps)
     {
         // Limit framerate
         if (vid_fpslimit >= TICRATE)
@@ -981,12 +975,6 @@ void I_ReadScreen (pixel_t* scr)
 //
 void I_SetPalette (int palette)
 {
-    // [JN] Don't change palette while demo warp.
-    if (demowarp)
-    {
-        return;
-    }
-    
     switch (palette)
     {
 		case 0:		curpane = NULL;			break;
@@ -1350,7 +1338,7 @@ static void SetVideoMode(void)
     }
 
     // Turn on vsync if we aren't in a -timedemo
-    if ((!singletics && mode.refresh_rate > 0) || demowarp)
+    if (mode.refresh_rate > 0)
     {
         if (vid_vsync) // [crispy] uncapped vsync
         {

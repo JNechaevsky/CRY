@@ -60,13 +60,6 @@ static void PlayerQuitGame(player_t *player)
     CT_SetMessage(&players[consoleplayer], exitmsg, true, NULL);
     // [crispy] don't interpolate players who left the game
     player->mo->interp = false;
-
-    // TODO: check if it is sensible to do this:
-
-    if (demorecording) 
-    {
-        G_CheckDemoStatus ();
-    }
 }
 
 static void RunTic(ticcmd_t *cmds, boolean *ingame)
@@ -77,7 +70,7 @@ static void RunTic(ticcmd_t *cmds, boolean *ingame)
 
     for (i = 0; i < MAXPLAYERS; ++i)
     {
-        if (!demoplayback && playeringame[i] && !ingame[i])
+        if (playeringame[i] && !ingame[i])
         {
             PlayerQuitGame(&players[i]);
         }
@@ -113,17 +106,10 @@ static void LoadGameSettings(net_gamesettings_t *settings)
     startmap = settings->map;
     startskill = settings->skill;
     startloadgame = settings->loadgame;
-    lowres_turn = settings->lowres_turn;
     nomonsters = settings->nomonsters;
     fastparm = settings->fast_monsters;
     respawnparm = settings->respawn_monsters;
     consoleplayer = settings->consoleplayer;
-
-    if (lowres_turn)
-    {
-        printf("NOTE: Turning resolution is reduced; this is probably "
-               "because there is a client recording a Vanilla demo.\n");
-    }
 
     for (i = 0; i < MAXPLAYERS; ++i)
     {
@@ -147,10 +133,6 @@ static void SaveGameSettings(net_gamesettings_t *settings)
     settings->nomonsters = nomonsters;
     settings->fast_monsters = fastparm;
     settings->respawn_monsters = respawnparm;
-
-    settings->lowres_turn = (M_ParmExists("-record")
-                         && !M_ParmExists("-longtics"))
-                          || M_ParmExists("-shorttics");
 }
 
 //

@@ -83,78 +83,15 @@ enum
     FILETYPE_UNKNOWN = 0x0,
     FILETYPE_IWAD =    0x2,
     FILETYPE_PWAD =    0x4,
-    FILETYPE_DEH =     0x8,
-    FILETYPE_DEMO =    0x10,
-    FILETYPE_CONFIG =  0x20,
+    FILETYPE_CONFIG =  0x8,
 };
-
-static boolean FileIsDemoLump(const char *filename)
-{
-    FILE *handle;
-    int count, ver;
-    byte buf[12], *p = buf;
-
-    handle = M_fopen(filename, "rb");
-
-    if (handle == NULL)
-    {
-        return false;
-    }
-
-    count = fread(buf, 1, sizeof(buf), handle);
-    fclose(handle);
-
-    if (count != sizeof(buf))
-    {
-        return false;
-    }
-
-    ver = *p++;
-
-    if (ver >= 0 && ver <= 4) // v1.0/v1.1/v1.2
-    {
-        p--;
-    }
-    else
-    {
-        switch (ver)
-        {
-            case 104: // v1.4
-            case 105: // v1.5
-            case 106: // v1.6/v1.666
-            case 107: // v1.7/v1.7a
-            case 108: // v1.8
-            case 109: // v1.9
-            case 111: // v1.91 hack
-                break;
-            default:
-                return false;
-                break;
-        }
-    }
-
-    if (*p++ > 5) // skill
-    {
-        return false;
-    }
-    if (*p++ > 9) // episode
-    {
-        return false;
-    }
-    if (*p++ > 99) // map
-    {
-        return false;
-    }
-
-    return true;
-}
 
 static int GuessFileType(const char *name)
 {
     int ret = FILETYPE_UNKNOWN;
     const char *base;
     char *lower;
-    static boolean iwad_found = false, demo_found = false;
+    static boolean iwad_found = false;
 
     base = M_BaseName(name);
     lower = M_StringDuplicate(base);
@@ -170,27 +107,6 @@ static int GuessFileType(const char *name)
     else if (M_StringEndsWith(lower, ".wad"))
     {
         ret = FILETYPE_PWAD;
-    }
-    else if (M_StringEndsWith(lower, ".lmp"))
-    {
-        // only ever add one argument to the -playdemo parameter
-
-        if (demo_found == false && FileIsDemoLump(name))
-        {
-            ret = FILETYPE_DEMO;
-            demo_found = true;
-        }
-        else
-        {
-            ret = FILETYPE_PWAD;
-        }
-    }
-    else if (M_StringEndsWith(lower, ".deh") ||
-             M_StringEndsWith(lower, ".bex") || // [crispy] *.bex
-             M_StringEndsWith(lower, ".hhe") ||
-             M_StringEndsWith(lower, ".seh"))
-    {
-        ret = FILETYPE_DEH;
     }
     else if (M_StringEndsWith(lower, ".ini")) // [JN] *.ini config files
     {
@@ -275,18 +191,6 @@ void M_AddLooseFiles(void)
     {
         arguments[myargc].str = M_StringDuplicate("-merge");
         arguments[myargc].type = FILETYPE_PWAD - 1;
-        myargc++;
-    }
-    if (types & FILETYPE_DEH)
-    {
-        arguments[myargc].str = M_StringDuplicate("-deh");
-        arguments[myargc].type = FILETYPE_DEH - 1;
-        myargc++;
-    }
-    if (types & FILETYPE_DEMO)
-    {
-        arguments[myargc].str = M_StringDuplicate("-playdemo");
-        arguments[myargc].type = FILETYPE_DEMO - 1;
         myargc++;
     }
     if (types & FILETYPE_CONFIG)

@@ -184,7 +184,6 @@ void P_Ticker (void)
 		
     // pause if in menu and at least one tic has been run
     if (menuactive
-	 && !demoplayback
 	 && players[consoleplayer].viewz != 1)
     {
 	return;

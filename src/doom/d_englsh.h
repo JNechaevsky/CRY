@@ -23,20 +23,13 @@
 #define PRESSKEY 	"press a key."
 #define PRESSYN 	"press y or n."
 #define QUITMSG	"are you sure you want to\nquit this great game?"
-#define LOADNET 	"you can't do load while in a net game!\n\n"PRESSKEY
-#define QLOADNET	"you can't quickload during a netgame!\n\n"PRESSKEY
 #define QSAVESPOT	"you haven't picked a quicksave slot yet!\n\n"PRESSKEY
 #define SAVEDEAD 	"you can't save if you aren't playing!\n\n"PRESSKEY
 #define QSPROMPT 	"quicksave over your game named\n\n'%s'?\n\n"PRESSYN
 #define QLPROMPT	"do you want to quickload the game named\n\n'%s'?\n\n"PRESSYN
 
-#define NEWGAME	\
-"you can't start a new game\n"\
-"while in a network game.\n\n"PRESSKEY
-
 #define MSGOFF	"Messages OFF"
 #define MSGON		"Messages ON"
-#define NETEND	"you can't end a netgame!\n\n"PRESSKEY
 #define ENDGAME	"are you sure you want to end the game?\n\n"PRESSYN
 
 #define DOSY		"(press y to quit.)"
@@ -186,25 +179,15 @@ PRESSYN
 
 #define ID_SPECTATOR_ON    "SPECTATOR MODE ON"
 #define ID_SPECTATOR_OFF   "SPECTATOR MODE OFF"
-#define ID_SPECTATOR_NA_N  "SPECTATING NOT AVAILABLE IN MULTIPLAYER GAME"
 
 #define ID_FREEZE_ON       "FREEZE MODE ON"
 #define ID_FREEZE_OFF      "FREEZE MODE OFF"
-#define ID_FREEZE_NA_R     "FREEZE NOT AVAILABLE IN DEMO RECORDING"
-#define ID_FREEZE_NA_P     "FREEZE NOT AVAILABLE IN DEMO PLAYING"
-#define ID_FREEZE_NA_N     "FREEZE NOT AVAILABLE IN MULTIPLAYER GAME"
 
 #define ID_NOTARGET_ON     "NOTARGET MODE ON"
 #define ID_NOTARGET_OFF    "NOTARGET MODE OFF"
-#define ID_NOTARGET_NA_R   "NOTARGET NOT AVAILABLE IN DEMO RECORDING"
-#define ID_NOTARGET_NA_P   "NOTARGET NOT AVAILABLE IN DEMO PLAYING"
-#define ID_NOTARGET_NA_N   "NOTARGET NOT AVAILABLE IN MULTIPLAYER GAME"
 
 #define ID_BUDDHA_ON        "BUDDHA MODE ON"
 #define ID_BUDDHA_OFF       "BUDDHA MODE OFF"
-#define ID_BUDDHA_NA_R      "BUDDHA NOT AVAILABLE IN DEMO RECORDING"
-#define ID_BUDDHA_NA_P      "BUDDHA NOT AVAILABLE IN DEMO PLAYING"
-#define ID_BUDDHA_NA_N      "BUDDHA NOT AVAILABLE IN MULTIPLAYER GAME"
 
 #define ID_AUTOMAPROTATE_ON     "ROTATE MODE ON"
 #define ID_AUTOMAPROTATE_OFF    "ROTATE MODE OFF"

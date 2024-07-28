@@ -239,12 +239,7 @@ static inline boolean cht_CheckCheatSP (cheatseq_t *cht, char key)
     {
         return false;
     }
-    else
-    if (!singleplayer)
-    {
-        // plyr->message = "Cheater!";
-        return false;
-    }
+
     return true;
 }
 
@@ -651,21 +646,6 @@ boolean ST_Responder (event_t *ev)
             }
 
             // So be it.
-            // [crisp] allow IDCLEV during demo playback and warp to the requested map
-            if (demoplayback)
-            {
-                demowarp = map;
-                nodrawers = true;
-                singletics = true;
-
-                if (map <= gamemap)
-                {
-                    G_DoPlayDemo();
-                }
-
-                return true;
-            }
-            else
             {
                 plyr->cheatTics = 1;
                 CT_SetMessage(plyr, STSTR_CLEV, false, NULL);
