@@ -61,7 +61,6 @@ int key_novert     = 0;
 
 int key_reloadlevel = 0; // [crispy]
 int key_nextlevel   = 0; // [crispy]
-int key_demospeed   = 0; // [crispy]
 int key_flip_levels = 0; // [crispy]
 int key_widget_enable = 0;
 
@@ -122,7 +121,6 @@ int key_spy           = KEY_F12;
 int key_pause           = KEY_PAUSE;
 int key_menu_screenshot = KEY_PRTSCR;
 int key_message_refresh = KEY_ENTER;
-int key_demo_quit       = 'q';
 
 // Special menu keys, not available for rebinding
 
@@ -212,7 +210,6 @@ void M_BindControls (void)
 
     M_BindIntVariable("key_reloadlevel",     &key_reloadlevel); // [crispy]
     M_BindIntVariable("key_nextlevel",       &key_nextlevel);   // [crispy]
-    M_BindIntVariable("key_demospeed",       &key_demospeed);   // [crispy]
     M_BindIntVariable("key_flip_levels",     &key_flip_levels); // [crispy]
     M_BindIntVariable("key_widget_enable",   &key_widget_enable);
 
@@ -282,7 +279,6 @@ void M_BindControls (void)
         RegisterHotKey(NULL, 2, 0, VK_SNAPSHOT);
     }
 #endif
-    M_BindIntVariable("key_demo_quit",          &key_demo_quit);
 
     // Special menu keys, not available for rebinding
 

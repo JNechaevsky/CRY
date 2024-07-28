@@ -257,7 +257,6 @@ static default_t	doom_defaults_list[] =
     // Special keys
     CONFIG_VARIABLE_KEY(key_reloadlevel),
     CONFIG_VARIABLE_KEY(key_nextlevel),
-    CONFIG_VARIABLE_KEY(key_demospeed),
     CONFIG_VARIABLE_KEY(key_flip_levels),
     CONFIG_VARIABLE_KEY(key_widget_enable),
 
@@ -313,7 +312,6 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_KEY(key_pause),
     CONFIG_VARIABLE_KEY(key_menu_screenshot),
     CONFIG_VARIABLE_KEY(key_message_refresh),
-    CONFIG_VARIABLE_KEY(key_demo_quit),
 
     // Special menu keys, not available for rebinding
     CONFIG_VARIABLE_KEY(key_menu_activate),
@@ -456,12 +454,6 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_INT(gp_revealed_secrets),
     CONFIG_VARIABLE_INT(gp_flip_levels),
     CONFIG_VARIABLE_INT(gp_death_use_action),
-
-    // Demos
-    CONFIG_VARIABLE_INT(demo_timer),
-    CONFIG_VARIABLE_INT(demo_timerdir),
-    CONFIG_VARIABLE_INT(demo_bar),
-    CONFIG_VARIABLE_INT(demo_internal),
 
     // Compatibility-breaking
     CONFIG_VARIABLE_INT(compat_blockmap_fix),
