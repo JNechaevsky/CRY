@@ -201,7 +201,6 @@ void P_Ticker (void)
     if (!crl_freeze)
     {
     P_UpdateSpecials ();
-    P_RespawnSpecials ();
 
     // for par times
     leveltime++;	

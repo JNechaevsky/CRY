@@ -834,28 +834,9 @@ P_SpawnMobj
 //
 // P_RemoveMobj
 //
-mapthing_t	itemrespawnque[ITEMQUESIZE];
-int		itemrespawntime[ITEMQUESIZE];
-int		iquehead;
-int		iquetail;
-
 
 void P_RemoveMobj (mobj_t* mobj)
 {
-    if ((mobj->flags & MF_SPECIAL)
-	&& !(mobj->flags & MF_DROPPED)
-	&& (mobj->type != MT_INV)
-	&& (mobj->type != MT_INS))
-    {
-	itemrespawnque[iquehead] = mobj->spawnpoint;
-	itemrespawntime[iquehead] = leveltime;
-	iquehead = (iquehead+1)&(ITEMQUESIZE-1);
-
-	// lose one off the end?
-	if (iquehead == iquetail)
-	    iquetail = (iquetail+1)&(ITEMQUESIZE-1);
-    }
-	
     // unlink from sector and block lists
     P_UnsetThingPosition (mobj);
     
@@ -870,60 +851,6 @@ void P_RemoveMobj (mobj_t* mobj)
     P_RemoveThinker ((thinker_t*)mobj);
 }
 
-
-
-
-//
-// P_RespawnSpecials
-//
-void P_RespawnSpecials (void)
-{
-    fixed_t		x;
-    fixed_t		y;
-    fixed_t		z;
-    
-    subsector_t*	ss; 
-    mobj_t*		mo;
-    mapthing_t*		mthing;
-    
-    int			i;
-
-    // nothing left to respawn?
-    if (iquehead == iquetail)
-	return;		
-
-    // wait at least 30 seconds
-    if (leveltime - itemrespawntime[iquetail] < 30*TICRATE)
-	return;			
-
-    mthing = &itemrespawnque[iquetail];
-	
-    x = mthing->x << FRACBITS; 
-    y = mthing->y << FRACBITS; 
-	  
-    // spawn a teleport fog at the new spot
-    ss = R_PointInSubsector (x,y); 
-    mo = P_SpawnMobj (x, y, ss->sector->floorheight , MT_IFOG); 
-    S_StartSound (mo, sfx_itmbk);
-
-    // find which type to spawn
-
-    // [JN] killough 8/23/98: use table for faster lookup
-    i = P_FindDoomedNum(mthing->type);
-    
-    // spawn it
-    if (mobjinfo[i].flags & MF_SPAWNCEILING)
-	z = ONCEILINGZ;
-    else
-	z = ONFLOORZ;
-
-    mo = P_SpawnMobj (x,y,z, i);
-    mo->spawnpoint = *mthing;	
-    mo->angle = ANG45 * (mthing->angle/45);
-
-    // pull it from the que
-    iquetail = (iquetail+1)&(ITEMQUESIZE-1);
-}
 
 
 

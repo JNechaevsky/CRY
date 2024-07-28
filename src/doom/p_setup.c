@@ -1310,9 +1310,6 @@ P_SetupLevel
     bodyqueslot = 0;
     P_LoadThings (lumpnum+ML_THINGS);
     
-    // clear special respawning que
-    iquehead = iquetail = 0;		
-	
     // set up world state
     P_SpawnSpecials ();
 	

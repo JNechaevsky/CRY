@@ -484,11 +484,6 @@ extern void    P_SpawnPuff (fixed_t x, fixed_t y, fixed_t z);
 extern void    P_SpawnPuffSafe (fixed_t x, fixed_t y, fixed_t z, boolean safe);
 extern void    P_RespawnSpecials (void);
 
-extern mapthing_t itemrespawnque[ITEMQUESIZE];
-extern int        itemrespawntime[ITEMQUESIZE];
-extern int        iquehead;
-extern int        iquetail;
-
 // -----------------------------------------------------------------------------
 // P_PLATS
 // -----------------------------------------------------------------------------
