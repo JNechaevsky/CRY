@@ -1038,6 +1038,12 @@ void P_SpawnMapThing (mapthing_t* mthing)
     fixed_t		y;
     fixed_t		z;
 		
+    // [JN] Ignore deathmatch start positions.
+    if (mthing->type == 11)
+    {
+	return;
+    }
+
     if (mthing->type <= 0)
     {
         // Thing type 0 is actually "player -1 start".  
