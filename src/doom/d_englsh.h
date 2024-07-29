@@ -77,10 +77,8 @@
 
 #define GOTINVUL	"Invulnerability!"
 #define GOTBERSERK	"Berserk!"
-#define GOTINVIS	"Partial Invisibility"
 #define GOTSUIT	"Radiation Shielding Suit"
 #define GOTMAP	"Computer Area Map"
-#define GOTVISOR	"Light Amplification Visor"
 
 #define GOTCLIP	"You pick up a clip."
 #define GOTCLIPBOX	"You pick up a box of bullets."
@@ -144,7 +142,7 @@
 #define STSTR_NCON		"No Clipping Mode ON"
 #define STSTR_NCOFF		"No Clipping Mode OFF"
 
-#define STSTR_BEHOLD	"inVuln, Str, Inviso, Rad, Allmap, or Lite-amp"
+#define STSTR_BEHOLD	"inVuln, Str, Rad or Allmap"
 #define STSTR_BEHOLDX	"Power-up Toggled"
 
 #define STSTR_CHOPPERS	"... doesn't suck - GM"

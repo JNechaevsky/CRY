@@ -237,51 +237,37 @@ void P_GiveCard (player_t *player, card_t card)
 	player->cards[card] = 1;
 }
 
-//
-// P_GivePower
-//
-boolean
-P_GivePower
-( player_t*	player,
-  int /*powertype_t*/	power )
+/* 
+=================== 
+= 
+= P_GivePower
+=
+=================== 
+*/ 
+boolean P_GivePower (player_t *player, int /*powertype_t*/ power)
 {
-    if (power == pw_invulnerability)
-    {
-	player->powers[power] = INVULNTICS;
-	return true;
-    }
-    
-    if (power == pw_invisibility)
-    {
-	player->powers[power] = INVISTICS;
-	player->mo->flags |= MF_SHADOW;
-	return true;
-    }
-    
-    if (power == pw_infrared)
-    {
-	player->powers[power] = INFRATICS;
-	return true;
-    }
-    
-    if (power == pw_ironfeet)
-    {
-	player->powers[power] = IRONTICS;
-	return true;
-    }
-    
-    if (power == pw_strength)
-    {
-	P_GiveBody (player, 100);
+	if (power == pw_invulnerability)
+	{
+		player->powers[power] = INVULNTICS;
+		return true;
+	}
+	if (power == pw_ironfeet)
+	{
+		player->powers[power] = IRONTICS;
+		return true;
+	}
+	if (power == pw_strength)
+	{
+		P_GiveBody (player, 100);
+		player->powers[power] = 1;
+		return true;
+	}
+	
+	if (player->powers[power])
+		return false;		/* already got it */
+		
 	player->powers[power] = 1;
 	return true;
-    }
-	
-    if (player->powers[power])
-	return false;	// already got it
-		
-    player->powers[power] = 1;
-    return true;
 }
 
 // -----------------------------------------------------------------------------
@@ -433,9 +419,6 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
         break;
 	
         case SPR_PINS:
-        if (!P_GivePower (player, pw_invisibility))
-            return;
-        CT_SetMessage(player, GOTINVIS, false, NULL);
         break;
 
         case SPR_SUIT:
@@ -451,9 +434,6 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
         break;
 	
         case SPR_PVIS:
-        if (!P_GivePower (player, pw_infrared))
-            return;
-        CT_SetMessage(player, GOTVISOR, false, NULL);
         break;
 	
         // ammo
@@ -633,7 +613,7 @@ P_KillMobj
 	// [JN] & [crispy] Reset the yellow bonus palette when the player dies
 	target->player->bonuscount = 0;
 	// [JN] & [crispy] Remove the effect of the inverted palette when the player dies
-	target->player->fixedcolormap = target->player->powers[pw_infrared] ? 1 : 0;
+	target->player->fixedcolormap = 0;
 
 	if (target->player == &players[consoleplayer]
 	    && automapactive)

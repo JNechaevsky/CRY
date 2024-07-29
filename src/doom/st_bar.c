@@ -163,14 +163,12 @@ static cheatseq_t cheat_freeze = CHEAT("freeze", 0);
 static cheatseq_t cheat_notarget = CHEAT("notarget", 0);
 static cheatseq_t cheat_buddha = CHEAT("buddha", 0);
 
-cheatseq_t cheat_powerup[7] =
+cheatseq_t cheat_powerup[] =
 {
     CHEAT("idbeholdv", 0),
     CHEAT("idbeholds", 0),
-    CHEAT("idbeholdi", 0),
     CHEAT("idbeholdr", 0),
     CHEAT("idbeholda", 0),
-    CHEAT("idbeholdl", 0),
     CHEAT("idbehold", 0),
 };
 
@@ -508,7 +506,7 @@ boolean ST_Responder (event_t *ev)
             }
 
             // 'behold?' power-up cheats
-            for (i = 0 ; i < 6 ; i++)
+            for (i = 0 ; i < 4 ; i++)
             {
                 if (cht_CheckCheatSP(&cheat_powerup[i], ev->data2))
                 {
@@ -530,7 +528,7 @@ boolean ST_Responder (event_t *ev)
                 }
             }
             // 'behold' power-up menu
-            if (cht_CheckCheatSP(&cheat_powerup[6], ev->data2))
+            if (cht_CheckCheatSP(&cheat_powerup[4], ev->data2))
             {
                 CT_SetMessage(plyr, STSTR_BEHOLD, false, NULL);
             }

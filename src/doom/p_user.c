@@ -478,13 +478,6 @@ void P_PlayerThink (player_t* player)
     if (player->powers[pw_invulnerability])
 	player->powers[pw_invulnerability]--;
 
-    if (player->powers[pw_invisibility])
-	if (! --player->powers[pw_invisibility] )
-	    player->mo->flags &= ~MF_SHADOW;
-			
-    if (player->powers[pw_infrared])
-	player->powers[pw_infrared]--;
-		
     if (player->powers[pw_ironfeet])
 	player->powers[pw_ironfeet]--;
 		
@@ -501,18 +494,6 @@ void P_PlayerThink (player_t* player)
 	if (player->powers[pw_invulnerability] > 4*32
 	    || (player->powers[pw_invulnerability]&8) )
 	    player->fixedcolormap = INVERSECOLORMAP;
-	else
-	    // [crispy] Visor effect when Invulnerability is fading out
-	    player->fixedcolormap = player->powers[pw_infrared] ? 1 : 0;
-    }
-    else if (player->powers[pw_infrared])	
-    {
-	if (player->powers[pw_infrared] > 4*32
-	    || (player->powers[pw_infrared]&8) )
-	{
-	    // almost full bright
-	    player->fixedcolormap = 1;
-	}
 	else
 	    player->fixedcolormap = 0;
     }

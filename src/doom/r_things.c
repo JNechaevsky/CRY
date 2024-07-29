@@ -966,23 +966,7 @@ static void R_DrawPSprite (pspdef_t* psp)
 
     vis->patch = lump;
 
-    if (viewplayer->powers[pw_invisibility] > 4*32
-	|| viewplayer->powers[pw_invisibility] & 8)
-    {
-	// shadow draw
-	if (vis_improved_fuzz == 1)
-	{
-	    vis->colormap[0] = vis->colormap[1] = NULL;
-	}
-	else
-	{
-	    // [JN] Account invulnerability effect for translucent fuzz.
-	    vis->colormap[0] = vis->colormap[1] = fixedcolormap ? 
-                                              fixedcolormap : spritelights[MAXLIGHTSCALE-1];
-	    vis->mobjflags |= MF_SHADOW;
-	}
-    }
-    else if (fixedcolormap)
+    if (fixedcolormap)
     {
 	// fixed color
 	vis->colormap[0] = vis->colormap[1] = fixedcolormap;
