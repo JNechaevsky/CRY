@@ -920,6 +920,7 @@ static const sectorcolor_t sectorcolor_map05[] =
     {    5,      3,    0xBBE357 },
     {    5,      6,    0x043E8B },
     {    5,      7,    0x043E8B },
+    {    5,      8,    0x4F5D8B },
     {    5,      9,    0x4F5D8B },
     {    5,     10,    0xFF7F7F },
     {    5,     11,    0xFF7F7F },
