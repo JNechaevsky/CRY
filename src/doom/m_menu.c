@@ -3668,14 +3668,19 @@ static void M_QuitDOOM(int choice)
 
 static void M_ChangeDetail(int choice)
 {
-    dp_detail_level ^= 1;
-
-    R_SetViewSize (dp_screen_size, dp_detail_level);
-
-    if (!dp_detail_level)
-	CT_SetMessage(&players[consoleplayer], DETAILHI, false, NULL);
+    if (vid_resolution == 1)
+    {
+        CT_SetMessage(&players[consoleplayer], DETAILNA, false, NULL);
+    }
     else
-	CT_SetMessage(&players[consoleplayer], DETAILLO, false, NULL);
+    {
+        dp_detail_level ^= 1;
+
+        R_SetViewSize (dp_screen_size, dp_detail_level);
+
+        CT_SetMessage(&players[consoleplayer],
+                      dp_detail_level ? DETAILLO : DETAILHI, false, NULL);
+    }
 }
 
 

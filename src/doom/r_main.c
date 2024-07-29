@@ -758,7 +758,15 @@ void R_ExecuteSetViewSize (void)
 	}
     }
     
-    detailshift = setdetail;
+    // [JN] Enforce LOW detail for 1x resolution to represent vanilla render.
+    if (vid_resolution == 1)
+    {
+    detailshift = 1;
+    }
+    else
+    {
+    detailshift = setdetail;        
+    }
     viewwidth = scaledviewwidth>>detailshift;
     viewwidth_nonwide = scaledviewwidth_nonwide>>detailshift;
 	

@@ -36,6 +36,7 @@
 
 #define DETAILHI	"High detail"
 #define DETAILLO	"Low detail"
+#define DETAILNA	"Not available in 1x resolution"
 
 #define GAMMALVL05  "GAMMA CORRECTION LEVEL 0.50"
 #define GAMMALVL055 "GAMMA CORRECTION LEVEL 0.55"
