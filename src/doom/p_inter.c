@@ -614,11 +614,6 @@ P_KillMobj
         {
             source->player->killcount++;	
         }
-
-        if (target->player)
-        {
-            source->player->frags[target->player-players]++;
-        }
     }
     else if (target->flags & MF_COUNTKILL)
     {
@@ -629,9 +624,6 @@ P_KillMobj
     
     if (target->player)
     {
-	// count environment kills against you
-	if (!source)	
-	    target->player->frags[target->player-players]++;
 			
 	target->flags &= ~MF_SOLID;
 	target->player->playerstate = PST_DEAD;

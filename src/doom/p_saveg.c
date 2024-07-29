@@ -707,12 +707,6 @@ static void saveg_read_player_t(player_t *str)
     // boolean backpack;
     str->backpack = saveg_read32();
 
-    // int frags[MAXPLAYERS];
-    for (i=0; i<MAXPLAYERS; ++i)
-    {
-        str->frags[i] = saveg_read32();
-    }
-
     // weapontype_t readyweapon;
     str->readyweapon = saveg_read_enum();
 
@@ -840,12 +834,6 @@ static void saveg_write_player_t(player_t *str)
 
     // boolean backpack;
     saveg_write32(str->backpack);
-
-    // int frags[MAXPLAYERS];
-    for (i=0; i<MAXPLAYERS; ++i)
-    {
-        saveg_write32(str->frags[i]);
-    }
 
     // weapontype_t readyweapon;
     saveg_write_enum(str->readyweapon);

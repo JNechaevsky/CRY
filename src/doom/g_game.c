@@ -826,7 +826,6 @@ void G_DoLoadLevel (void)
     { 
 	if (playeringame[i] && players[i].playerstate == PST_DEAD) 
 	    players[i].playerstate = PST_REBORN; 
-	memset (players[i].frags,0,sizeof(players[i].frags)); 
     } 
 		 
     // [JN] Pistol start game mode.
@@ -1381,12 +1380,10 @@ void G_PlayerReborn (int player)
 { 
     player_t*	p; 
     int		i; 
-    int		frags[MAXPLAYERS]; 
     int		killcount;
     int		itemcount;
     int		secretcount; 
 	 
-    memcpy (frags,players[player].frags,sizeof(frags)); 
     killcount = players[player].killcount; 
     itemcount = players[player].itemcount; 
     secretcount = players[player].secretcount; 
@@ -1394,7 +1391,6 @@ void G_PlayerReborn (int player)
     p = &players[player]; 
     memset (p, 0, sizeof(*p)); 
  
-    memcpy (players[player].frags, frags, sizeof(players[player].frags)); 
     players[player].killcount = killcount; 
     players[player].itemcount = itemcount; 
     players[player].secretcount = secretcount; 
@@ -1511,7 +1507,6 @@ void G_DoCompleted (void)
 	wminfo.maxkills = totalkills; 
 	wminfo.maxitems = totalitems; 
 	wminfo.maxsecret = totalsecret; 
-	wminfo.maxfrags = 0; 
     wminfo.pnum = consoleplayer; 
  
     for (i=0 ; i<MAXPLAYERS ; i++) 
@@ -1521,8 +1516,6 @@ void G_DoCompleted (void)
 	wminfo.plyr[i].sitems = players[i].itemcount; 
 	wminfo.plyr[i].ssecret = players[i].secretcount; 
 	wminfo.plyr[i].stime = leveltime; 
-	memcpy (wminfo.plyr[i].frags, players[i].frags 
-		, sizeof(wminfo.plyr[i].frags)); 
     } 
  
     // [crispy] CPhipps - total time for all completed levels

@@ -1234,7 +1234,7 @@ P_SetupLevel
     // [JN] Indicate level loading time in console.
     const int starttime = I_GetTimeMS();
 	
-    totalkills = totalitems = totalsecret = wminfo.maxfrags = 0;
+    totalkills = totalitems = totalsecret = 0;
     for (i=0 ; i<MAXPLAYERS ; i++)
     {
 	players[i].killcount = players[i].secretcount = players[i].itemcount = 0;
