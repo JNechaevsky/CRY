@@ -40,42 +40,8 @@
 
 ticcmd_t *netcmds;
 
-// Called when a player leaves the game
-
-static void PlayerQuitGame(player_t *player)
-{
-    static char exitmsg[80];
-    unsigned int player_num;
-
-    player_num = player - players;
-
-    // Do this the same way as Vanilla Doom does, to allow dehacked
-    // replacements of this message
-
-    M_StringCopy(exitmsg, "Player 1 left the game", sizeof(exitmsg));
-
-    exitmsg[7] += player_num;
-
-    playeringame[player_num] = false;
-    CT_SetMessage(&players[consoleplayer], exitmsg, true, NULL);
-    // [crispy] don't interpolate players who left the game
-    player->mo->interp = false;
-}
-
 static void RunTic(ticcmd_t *cmds, boolean *ingame)
 {
-    unsigned int i;
-
-    // Check for player quits.
-
-    for (i = 0; i < MAXPLAYERS; ++i)
-    {
-        if (playeringame[i] && !ingame[i])
-        {
-            PlayerQuitGame(&players[i]);
-        }
-    }
-
     netcmds = cmds;
 
     // check that there are players in the game.  if not, we cannot
@@ -129,7 +95,6 @@ static void SaveGameSettings(net_gamesettings_t *settings)
     settings->map = startmap;
     settings->skill = startskill;
     settings->loadgame = startloadgame;
-    settings->gameversion = gameversion;
     settings->nomonsters = nomonsters;
     settings->fast_monsters = fastparm;
     settings->respawn_monsters = respawnparm;

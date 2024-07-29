@@ -593,7 +593,7 @@ void D_DoomMain (void)
     I_AtExit(M_SaveDefaults, true); // [crispy] always save configuration at exit
 
     // Find main IWAD file and load it.
-    iwadfile = D_FindIWAD(IWAD_MASK_DOOM, &gamemission);
+    iwadfile = D_FindWADByName("yaguar-doom.wad");
 
     // None found?
 
@@ -608,13 +608,6 @@ void D_DoomMain (void)
 
     printf("W_Init: Init WADfiles.\n");
     D_AddFile(iwadfile);
-
-    // Now that we've loaded the IWAD, we can figure out what gamemission
-    // we're playing and which version of Vanilla Doom we need to emulate.
-    //D_IdentifyVersion();
-	gamemode = commercial;
-    gamemission = doom2;
-	gameversion = exe_doom_1_9;
 	
     // Load PWAD files.
     modifiedgame = W_ParseCommandLine();
