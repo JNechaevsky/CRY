@@ -226,9 +226,6 @@ typedef struct
     int		maxitems;
     int		maxsecret;
     int		maxfrags;
-
-    // the par time
-    int		partime;
     
     // index of this player in game
     int		pnum;	

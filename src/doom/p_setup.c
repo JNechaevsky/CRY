@@ -1235,7 +1235,6 @@ P_SetupLevel
     const int starttime = I_GetTimeMS();
 	
     totalkills = totalitems = totalsecret = wminfo.maxfrags = 0;
-    wminfo.partime = 180;
     for (i=0 ; i<MAXPLAYERS ; i++)
     {
 	players[i].killcount = players[i].secretcount = players[i].itemcount = 0;
