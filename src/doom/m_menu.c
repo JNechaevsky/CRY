@@ -974,10 +974,10 @@ static int DefSkillColor (const int skill)
 
 static char *const DefSkillName[5] = 
 {
-    "IMTYTD" ,
-    "HNTR"   ,
-    "HMP"    ,
-    "UV"     ,
+    "IAW" ,
+    "NTR" ,
+    "HMP" ,
+    "UV"  ,
     "NM"     
 };
 
