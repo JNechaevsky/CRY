@@ -318,13 +318,13 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
         case SPR_ARM1:
         if (!P_GiveArmor (player, 1))
             return;
-        CT_SetMessage(player, "You pick up the armor.", false, NULL);
+        CT_SetMessage(player, GOTARMOR, false, NULL);
         break;
 
         case SPR_ARM2:
         if (!P_GiveArmor (player, 2))
             return;
-        CT_SetMessage(player, "You got the MegaArmor!", false, NULL);
+        CT_SetMessage(player, GOTMEGA, false, NULL);
         break;
 
         // bonus items
@@ -334,7 +334,7 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
         if (player->health > 200)
             player->health = 200;
         player->mo->health = player->health;
-        CT_SetMessage(player, "You pick up a health bonus.", false, NULL);
+        CT_SetMessage(player, GOTHTHBONUS, false, NULL);
         break;
 	
         case SPR_BON2:
@@ -344,7 +344,7 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
             player->armorpoints = 200;
         if (!player->armortype)
             player->armortype = 1;
-        CT_SetMessage(player, "You pick up an armor bonus.", false, NULL);
+        CT_SetMessage(player, GOTARMBONUS, false, NULL);
         break;
 
         case SPR_SOUL:
@@ -359,42 +359,42 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
         // leave cards for everyone
         case SPR_BKEY:
         if (!player->cards[it_bluecard])
-            CT_SetMessage(player, "You pick up a blue keycard.", false, NULL);
+            CT_SetMessage(player, GOTBLUECARD, false, NULL);
         P_GiveCard (player, it_bluecard);
             break;
         return;
 	
         case SPR_YKEY:
         if (!player->cards[it_yellowcard])
-            CT_SetMessage(player, "You pick up a yellow keycard.", false, NULL);
+            CT_SetMessage(player, GOTYELWCARD, false, NULL);
         P_GiveCard (player, it_yellowcard);
             break;
         return;
 	
         case SPR_RKEY:
         if (!player->cards[it_redcard])
-            CT_SetMessage(player, "You pick up a red keycard.", false, NULL);
+            CT_SetMessage(player, GOTREDCARD, false, NULL);
         P_GiveCard (player, it_redcard);
             break;
         return;
 	
         case SPR_BSKU:
         if (!player->cards[it_blueskull])
-            CT_SetMessage(player, "You pick up a blue skull key.", false, NULL);
+            CT_SetMessage(player, GOTBLUESKUL, false, NULL);
         P_GiveCard (player, it_blueskull);
             break;
         return;
 	
         case SPR_YSKU:
         if (!player->cards[it_yellowskull])
-            CT_SetMessage(player, "You pick up a yellow skull key.", false, NULL);
+            CT_SetMessage(player, GOTYELWSKUL, false, NULL);
         P_GiveCard (player, it_yellowskull);
             break;
         return;
 	
         case SPR_RSKU:
         if (!player->cards[it_redskull])
-            CT_SetMessage(player, "You pick up a red skull key.", false, NULL);
+            CT_SetMessage(player, GOTREDSKULL, false, NULL);
         P_GiveCard (player, it_redskull);
             break;
         return;
@@ -403,7 +403,7 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
         case SPR_STIM:
         if (!P_GiveBody (player, 10))
             return;
-        CT_SetMessage(player, "You pick up a stimpack.", false, NULL);
+        CT_SetMessage(player, GOTSTIM, false, NULL);
         break;
 	
         case SPR_MEDI:
@@ -411,9 +411,9 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
             return;
         // [JN] Fix for "Medikit that you really needed!"
         if (player->health < 50)
-            CT_SetMessage(player, "You pick up a medikit that you REALLY need!", false, NULL);
+            CT_SetMessage(player, GOTMEDINEED, false, NULL);
         else
-            CT_SetMessage(player, "You pick up a medikit.", false, NULL);
+            CT_SetMessage(player, GOTMEDIKIT, false, NULL);
         break;
 
 	
@@ -421,13 +421,13 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
         case SPR_PINV:
         if (!P_GivePower (player, pw_invulnerability))
             return;
-        CT_SetMessage(player, "Invulnerability!", false, NULL);
+        CT_SetMessage(player, GOTINVUL, false, NULL);
         break;
 	
         case SPR_PSTR:
         if (!P_GivePower (player, pw_strength))
             return;
-        CT_SetMessage(player, "Berserk!", false, NULL);
+        CT_SetMessage(player, GOTBERSERK, false, NULL);
         if (player->readyweapon != wp_fist)
             player->pendingweapon = wp_fist;
         break;
@@ -435,25 +435,25 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
         case SPR_PINS:
         if (!P_GivePower (player, pw_invisibility))
             return;
-        CT_SetMessage(player, "Partial Invisibility", false, NULL);
+        CT_SetMessage(player, GOTINVIS, false, NULL);
         break;
 
         case SPR_SUIT:
         if (!P_GivePower (player, pw_ironfeet))
             return;
-        CT_SetMessage(player, "Radiation Shielding Suit", false, NULL);
+        CT_SetMessage(player, GOTSUIT, false, NULL);
         break;
 
         case SPR_PMAP:
         if (!P_GivePower (player, pw_allmap))
             return;
-        CT_SetMessage(player, "Computer Area Map", false, NULL);
+        CT_SetMessage(player, GOTMAP, false, NULL);
         break;
 	
         case SPR_PVIS:
         if (!P_GivePower (player, pw_infrared))
             return;
-        CT_SetMessage(player, "Light Amplification Visor", false, NULL);
+        CT_SetMessage(player, GOTVISOR, false, NULL);
         break;
 	
         // ammo
@@ -468,49 +468,49 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
             if (!P_GiveAmmo (player,am_clip,1))
             return;
         }
-        CT_SetMessage(player, "Picked up a clip.", false, NULL);
+        CT_SetMessage(player, GOTCLIP, false, NULL);
         break;
 	
         case SPR_AMMO:
         if (!P_GiveAmmo (player, am_clip,5))
             return;
-        CT_SetMessage(player, "Picked up a box of bullets.", false, NULL);
+        CT_SetMessage(player, GOTCLIPBOX, false, NULL);
         break;
 	
         case SPR_ROCK:
         if (!P_GiveAmmo (player, am_misl,1))
             return;
-        CT_SetMessage(player, "Picked up a rocket.", false, NULL);
+        CT_SetMessage(player, GOTROCKET, false, NULL);
         break;
 
         case SPR_BROK:
         if (!P_GiveAmmo (player, am_misl,5))
             return;
-        CT_SetMessage(player, "Picked up a box of rockets.", false, NULL);
+        CT_SetMessage(player, GOTROCKBOX, false, NULL);
         break;
 	
         case SPR_CELL:
         if (!P_GiveAmmo (player, am_cell,1))
             return;
-        CT_SetMessage(player, "Picked up an energy cell.", false, NULL);
+        CT_SetMessage(player, GOTCELL, false, NULL);
         break;
 	
         case SPR_CELP:
         if (!P_GiveAmmo (player, am_cell,5))
             return;
-        CT_SetMessage(player, "Picked up an energy cell pack.", false, NULL);
+        CT_SetMessage(player, GOTCELLBOX, false, NULL);
         break;
 	
         case SPR_SHEL:
         if (!P_GiveAmmo (player, am_shell,1))
             return;
-        CT_SetMessage(player, "Picked up 4 shotgun shells.", false, NULL);
+        CT_SetMessage(player, GOTSHELLS, false, NULL);
         break;
 	
         case SPR_SBOX:
         if (!P_GiveAmmo (player, am_shell,5))
             return;
-        CT_SetMessage(player, "Picked up a box of shotgun shells.", false, NULL);
+        CT_SetMessage(player, GOTSHELLBOX, false, NULL);
         break;
 	
         case SPR_BPAK:
@@ -522,43 +522,42 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
         }
         for (i=0 ; i<NUMAMMO ; i++)
             P_GiveAmmo (player, i, 1);
-        CT_SetMessage(player, "Picked up a backpack full of ammo!", false, NULL);
+        CT_SetMessage(player, GOTBACKPACK, false, NULL);
         break;
 	
         // weapons
         case SPR_BFUG:
         if (!P_GiveWeapon (player, wp_bfg, false) )
             return;
-        CT_SetMessage(player, "You got the BFG9000!  Oh, yes.", false, NULL);
+        CT_SetMessage(player, GOTBFG9000, false, NULL);
         sound = sfx_wpnup;	
         break;
 	
         case SPR_MGUN:
-            if (!P_GiveWeapon(player, wp_chaingun,
-                            (special->flags & MF_DROPPED) != 0))
-                return;
-        CT_SetMessage(player, "You got the chaingun!", false, NULL);
+        if (!P_GiveWeapon (player, wp_chaingun, false) )
+            return;
+        CT_SetMessage(player, GOTCHAINGUN, false, NULL);
         sound = sfx_wpnup;	
         break;
 	
         case SPR_CSAW:
         if (!P_GiveWeapon (player, wp_chainsaw, false) )
             return;
-        CT_SetMessage(player, "A chainsaw!  Find some meat!", false, NULL);
+        CT_SetMessage(player, GOTCHAINSAW, false, NULL);
         sound = sfx_wpnup;	
         break;
 	
         case SPR_LAUN:
         if (!P_GiveWeapon (player, wp_missile, false) )
             return;
-        CT_SetMessage(player, "You got the rocket launcher!", false, NULL);
+        CT_SetMessage(player, GOTLAUNCHER, false, NULL);
         sound = sfx_wpnup;	
         break;
 	
         case SPR_PLAS:
         if (!P_GiveWeapon (player, wp_plasma, false) )
             return;
-        CT_SetMessage(player, "You got the plasma gun!", false, NULL);
+        CT_SetMessage(player, GOTPLASMA, false, NULL);
         sound = sfx_wpnup;	
         break;
 	
@@ -566,7 +565,7 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
             if (!P_GiveWeapon(player, wp_shotgun,
                             (special->flags & MF_DROPPED) != 0))
                 return;
-        CT_SetMessage(player, "You got the shotgun!", false, NULL);
+        CT_SetMessage(player, GOTSHOTGUN, false, NULL);
         sound = sfx_wpnup;	
         break;
 		
