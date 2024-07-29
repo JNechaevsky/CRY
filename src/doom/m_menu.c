@@ -2661,7 +2661,7 @@ static void M_Draw_ID_Gameplay_1 (void)
     M_WriteTextCentered(9, "VISUAL", cr[CR_YELLOW]);
 
     // Brightmaps
-    sprintf(str, vis_brightmaps ? "ON" : "OFF");
+    sprintf(str, vis_brightmaps ? "ON" : "DEFAULT");
     M_WriteText (M_ItemRightAlign(str), 18, str,
                  M_Item_Glow(0, vis_brightmaps ? GLOW_GREEN : GLOW_DARKRED));
 
@@ -2875,7 +2875,7 @@ static void M_Draw_ID_Gameplay_2 (void)
 
     // Weapon attack alignment
     sprintf(str, phys_weapon_alignment == 1 ? "BOBBING" :
-                 phys_weapon_alignment == 2 ? "CENTERED" : "ORIGINAL");
+                 phys_weapon_alignment == 2 ? "CENTERED" : "STATIC");
     M_WriteText (M_ItemRightAlign(str), 72, str,
                  M_Item_Glow(6, phys_weapon_alignment == 2 ? GLOW_DARKRED : GLOW_GREEN));
 

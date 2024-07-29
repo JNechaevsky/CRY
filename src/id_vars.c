@@ -34,7 +34,7 @@ int crl_freeze = 0;
 // Video options
 //
 
-int vid_resolution = 2;
+int vid_resolution = 1;
 int vid_widescreen = 0;
 int vid_uncapped_fps = 0;
 int vid_fpslimit = 0;
