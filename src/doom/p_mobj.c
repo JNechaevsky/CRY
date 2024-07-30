@@ -430,6 +430,8 @@ void P_ZMovement (mobj_t* mo)
 		// and utter appropriate sound.
 		mo->player->deltaviewheight = mo->momz>>3;
 		// [crispy] squat down weapon sprite as well
+		// [JN] ... but only for "bobbing" attack alignment.
+		if (phys_weapon_alignment == 1)
 		mo->player->psp_dy_max = mo->momz>>2;
 		// [JN] Only alive player makes "oof" sound.
 		if (mo->health > 0)
