@@ -1086,6 +1086,8 @@ void R_InitColormaps (void)
 	byte *const crypal = W_CacheLumpName("CRYPAL", PU_STATIC);
 	byte *const invulpal = W_CacheLumpName("INVULPAL", PU_STATIC);
 	byte *const colormap = W_CacheLumpName("COLORMAP", PU_STATIC);
+	// [JN] Which palette to use for in-game rendering, CRYPAL or PLAYPAL?
+	byte *const pal_pointer = dp_cry_palette ? crypal : playpal;
 
 	if (!colormaps)
 	{
@@ -1101,9 +1103,9 @@ void R_InitColormaps (void)
 		{
 			const byte k = colormap[i];
 
-			r = gammatable[vid_gamma][crypal[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			g = gammatable[vid_gamma][crypal[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			b = gammatable[vid_gamma][crypal[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			r = gammatable[vid_gamma][pal_pointer[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			g = gammatable[vid_gamma][pal_pointer[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			b = gammatable[vid_gamma][pal_pointer[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
 
 			// [JN] Generate colored colormaps.
 			R_GenerateColoredColormaps(k, scale, j);

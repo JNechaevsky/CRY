@@ -527,7 +527,7 @@ static void M_Bind_ToggleMessages (int choice);
 static void M_Bind_QuickLoad (int choice);
 static void M_Bind_QuitGame (int choice);
 static void M_Bind_ToggleGamma (int choice);
-static void M_Bind_MultiplayerSpy (int choice);
+static void M_Bind_TogglePalette (int choice);
 
 static void M_Draw_ID_Keybinds_6 (void);
 static void M_Bind_Pause (int choice);
@@ -2112,7 +2112,7 @@ static menuitem_t ID_Menu_Keybinds_5[]=
     { M_SWTC, "QUICK LOAD",      M_Bind_QuickLoad,      'q' },
     { M_SWTC, "QUIT GAME",       M_Bind_QuitGame,       'q' },
     { M_SWTC, "TOGGLE GAMMA",    M_Bind_ToggleGamma,    't' },
-    { M_SWTC, "MULTIPLAYER SPY", M_Bind_MultiplayerSpy, 'm' },
+    { M_SWTC, "TOGGLE PALETTE",  M_Bind_TogglePalette,  't' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
@@ -2185,9 +2185,9 @@ static void M_Bind_ToggleGamma (int choice)
     M_StartBind(510);  // key_menu_gamma
 }
 
-static void M_Bind_MultiplayerSpy (int choice)
+static void M_Bind_TogglePalette (int choice)
 {
-    M_StartBind(511);  // key_spy
+    M_StartBind(511);  // key_menu_palette
 }
 static void M_Draw_ID_Keybinds_5 (void)
 {
@@ -2209,7 +2209,7 @@ static void M_Draw_ID_Keybinds_5 (void)
     M_DrawBindKey(8, 90, key_menu_qload);
     M_DrawBindKey(9, 99, key_menu_quit);
     M_DrawBindKey(10, 108, key_menu_gamma);
-    M_DrawBindKey(11, 117, key_spy);
+    M_DrawBindKey(11, 117, key_menu_palette);
 
     M_DrawBindFooter("5", true);
 }
@@ -3016,6 +3016,7 @@ static void M_ID_ApplyResetHook (void)
 
     dp_screen_size = 10;
     dp_detail_level = 0;
+    dp_cry_palette = 1;
     vid_gamma = 10;
     vid_fov = 90;
     dp_menu_shading = 0;
@@ -4646,6 +4647,16 @@ boolean M_Responder (event_t* ev)
         return true;
     }
 
+    // [JN] Allow to change gamma while active menu.
+    if (key == key_menu_palette)    // [JN] Palette toggle.
+    {
+        dp_cry_palette ^= 1;
+        R_InitColormaps();
+        CT_SetMessage(&players[consoleplayer],
+                      dp_cry_palette ? ID_CRYPAL_ON : ID_CRYPAL_OFF, false, NULL);
+        return true;
+    }
+
     // Pop-up menu?
     if (!menuactive)
     {
@@ -5216,7 +5227,7 @@ static void M_CheckBind (int key)
     if (key_menu_qload == key)       key_menu_qload       = 0;
     if (key_menu_quit == key)        key_menu_quit        = 0;
     if (key_menu_gamma == key)       key_menu_gamma       = 0;
-    if (key_spy == key)              key_spy              = 0;
+    if (key_menu_palette == key)     key_menu_palette     = 0;
     // Page 6
     if (key_pause == key)            key_pause            = 0;
     if (key_menu_screenshot == key)  key_menu_screenshot  = 0;
@@ -5291,7 +5302,7 @@ static void M_DoBind (int keynum, int key)
         case 508:  key_menu_qload = key;        break;
         case 509:  key_menu_quit = key;         break;
         case 510:  key_menu_gamma = key;        break;
-        case 511:  key_spy = key;               break;
+        case 511:  key_menu_palette = key;      break;
         // Page 6  
         case 600:  key_pause = key;             break;
         case 601:  key_menu_screenshot = key;   break;
@@ -5390,7 +5401,7 @@ static void M_ClearBind (int itemOn)
             case 8:   key_menu_qload = 0;       break;
             case 9:   key_menu_quit = 0;        break;
             case 10:  key_menu_gamma = 0;       break;
-            case 11:  key_spy = 0;              break;
+            case 11:  key_menu_palette = 0;     break;
         }
     }
     if (currentMenu == &ID_Def_Keybinds_6)
@@ -5469,7 +5480,7 @@ static void M_ResetBinds (void)
     key_menu_qload = KEY_F9;
     key_menu_quit = KEY_F10;
     key_menu_gamma = KEY_F11;
-    key_spy = KEY_F12;
+    key_menu_palette = KEY_F12;
     // Page 6
     key_pause = KEY_PAUSE;
     key_menu_screenshot = KEY_PRTSCR;

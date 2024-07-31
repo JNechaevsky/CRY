@@ -177,6 +177,7 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_INT(vid_fov),
     CONFIG_VARIABLE_INT(dp_screen_size),
     CONFIG_VARIABLE_INT(dp_detail_level),
+    CONFIG_VARIABLE_INT(dp_cry_palette),
     CONFIG_VARIABLE_INT(dp_menu_shading),
     CONFIG_VARIABLE_INT(dp_level_brightness),
 
@@ -309,7 +310,7 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_KEY(key_menu_qload),
     CONFIG_VARIABLE_KEY(key_menu_quit),
     CONFIG_VARIABLE_KEY(key_menu_gamma),
-    CONFIG_VARIABLE_KEY(key_spy),
+    CONFIG_VARIABLE_KEY(key_menu_palette),
 
     // Shortcut keys
     CONFIG_VARIABLE_KEY(key_pause),

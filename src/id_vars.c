@@ -49,6 +49,7 @@ int vid_screenwipe = 1;
 
 int dp_screen_size = 10;
 int dp_detail_level = 0;  // Blocky mode (0 = high, 1 = normal)
+int dp_cry_palette = 1;
 int vid_gamma = 10;
 int vid_fov = 90;
 int dp_menu_shading = 0;
@@ -160,6 +161,7 @@ void ID_BindVariables (void)
 
     M_BindIntVariable("dp_screen_size",                 &dp_screen_size);
     M_BindIntVariable("dp_detail_level",                &dp_detail_level);
+    M_BindIntVariable("dp_cry_palette",                 &dp_cry_palette);
     M_BindIntVariable("vid_gamma",                      &vid_gamma);
     M_BindIntVariable("vid_fov",                        &vid_fov);
     M_BindIntVariable("dp_menu_shading",                &dp_menu_shading);

@@ -21,34 +21,34 @@
 
 
 // Colored colormap lumps
-extern const byte C_EEC06B[];
-extern const byte C_D97C45[];
-extern const byte C_FF7F7F[];
-extern const byte C_55B828[];
-extern const byte C_BBE357[];
-extern const byte C_949DB9[];
-extern const byte C_2A2F6B[];
-extern const byte C_50ADAC[];
-extern const byte C_CCE4A5[];
-extern const byte C_CCEA5F[];
-extern const byte C_B30202[];
-extern const byte C_B87A15[];
-extern const byte C_FFD000[];
-extern const byte C_FFDE4C[];
-extern const byte C_FFF588[];
-extern const byte C_043E8B[];
-extern const byte C_5B4318[];
-extern const byte C_4F5D8B[];
-extern const byte C_D46D3D[];
-extern const byte C_04918B[];
-extern const byte C_FF3030[];
-extern const byte C_311A59[];
-extern const byte C_FFAFAF[];
-extern const byte C_ECB866[];
-extern const byte C_C63F23[];
-extern const byte C_9BC8CD[];
-extern const byte C_666666[];
-extern const byte C_777777[];
+extern const byte C_EEC06B_CRY[], C_EEC06B_DOOM[];
+extern const byte C_D97C45_CRY[], C_D97C45_DOOM[];
+extern const byte C_FF7F7F_CRY[], C_FF7F7F_DOOM[];
+extern const byte C_55B828_CRY[], C_55B828_DOOM[];
+extern const byte C_BBE357_CRY[], C_BBE357_DOOM[];
+extern const byte C_949DB9_CRY[], C_949DB9_DOOM[];
+extern const byte C_2B3BFF_CRY[], C_2B3BFF_DOOM[];
+extern const byte C_50ADAC_CRY[], C_50ADAC_DOOM[];
+extern const byte C_CCE4A5_CRY[], C_CCE4A5_DOOM[];
+extern const byte C_CCEA5F_CRY[], C_CCEA5F_DOOM[];
+extern const byte C_B30202_CRY[], C_B30202_DOOM[];
+extern const byte C_B87A15_CRY[], C_B87A15_DOOM[];
+extern const byte C_FFD000_CRY[], C_FFD000_DOOM[];
+extern const byte C_FFDE4C_CRY[], C_FFDE4C_DOOM[];
+extern const byte C_FFF588_CRY[], C_FFF588_DOOM[];
+extern const byte C_3089FF_CRY[], C_3089FF_DOOM[];
+extern const byte C_A88139_CRY[], C_A88139_DOOM[];
+extern const byte C_7084C4_CRY[], C_7084C4_DOOM[];
+extern const byte C_D46D3D_CRY[], C_D46D3D_DOOM[];
+extern const byte C_05A8A0_CRY[], C_05A8A0_DOOM[];
+extern const byte C_FF3030_CRY[], C_FF3030_DOOM[];
+extern const byte C_6435B5_CRY[], C_6435B5_DOOM[];
+extern const byte C_FFAFAF_CRY[], C_FFAFAF_DOOM[];
+extern const byte C_ECB866_CRY[], C_ECB866_DOOM[];
+extern const byte C_C63F23_CRY[], C_C63F23_DOOM[];
+extern const byte C_9BC8CD_CRY[], C_9BC8CD_DOOM[];
+extern const byte C_666666_CRY[], C_666666_DOOM[];
+extern const byte C_777777_CRY[], C_777777_DOOM[];
 
 
 // Composing functions
