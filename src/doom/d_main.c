@@ -609,6 +609,27 @@ void D_DoomMain (void)
     printf("W_Init: Init WADfiles.\n");
     D_AddFile(iwadfile);
 	
+    //!
+    // @category mod
+    //
+    // Disable auto-loading of .wad and .deh files.
+    //
+    if (!M_ParmExists("-noautoload"))
+    {
+        char *autoload_dir;
+
+        // common auto-loaded files for all Doom flavors
+
+        // [JN] Since there are no IWADs, use straight "autoload" folder.
+        {
+            autoload_dir = M_GetAutoloadDir("");
+            if (autoload_dir != NULL)
+            {
+                W_AutoLoadWADs(autoload_dir);
+                free(autoload_dir);
+            }
+        }
+    }
     // Load PWAD files.
     modifiedgame = W_ParseCommandLine();
 

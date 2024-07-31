@@ -49,6 +49,8 @@
 
 const char *configdir;
 
+static char *autoload_path = "";
+
 // Default filenames for configuration files.
 
 static const char *default_main_config;
@@ -134,6 +136,7 @@ static default_t	doom_defaults_list[] =
     // Autoload
     //
 
+    CONFIG_VARIABLE_STRING(autoload_path),
     CONFIG_VARIABLE_STRING(savegames_path),
     CONFIG_VARIABLE_STRING(screenshots_path),
 
@@ -815,6 +818,9 @@ void M_LoadDefaults (void)
 {
     int i;
 
+    // This variable is a special snowflake for no good reason.
+    M_BindStringVariable("autoload_path", &autoload_path);
+
     // check for a custom default file
 
     //!
@@ -1115,6 +1121,51 @@ char *M_GetSaveGameDir(const char *iwadname)
     }
 
     return savegamedir;
+}
+
+//
+// Calculate the path to the directory for autoloaded WADs/DEHs.
+// Creates the directory as necessary.
+//
+char *M_GetAutoloadDir(const char *iwadname)
+{
+    char *result;
+
+    if (autoload_path == NULL || strlen(autoload_path) == 0)
+    {
+        char *prefdir;
+
+#ifdef _WIN32
+        // [JN] On Windows, create "autoload" directory in program folder.
+        prefdir = M_StringDuplicate(exedir);
+#else
+        // [JN] On other OSes use system home folder.
+        prefdir = SDL_GetPrefPath("", PACKAGE_TARNAME);
+#endif
+
+        if (prefdir == NULL)
+        {
+            printf("M_GetAutoloadDir: SDL_GetPrefPath failed\n");
+            return NULL;
+        }
+        autoload_path = M_StringJoin(prefdir, "autoload", NULL);
+#ifdef _WIN32
+        // [JN] Note: prefdir not gathered via SDL_GetPrefPath,
+        // so just use system "free" function, not SDL_free.
+        free(prefdir);
+#else
+        SDL_free(prefdir);
+#endif
+    }
+
+    M_MakeDirectory(autoload_path);
+
+    result = M_StringJoin(autoload_path, DIR_SEPARATOR_S, iwadname, NULL);
+    M_MakeDirectory(result);
+
+    // TODO: Add README file
+
+    return result;
 }
 
 void M_SetScreenshotDir (void)
