@@ -114,7 +114,7 @@ int key_menu_messages = KEY_F8;
 int key_menu_qload    = KEY_F9;
 int key_menu_quit     = KEY_F10;
 int key_menu_gamma    = KEY_F11;
-int key_spy           = KEY_F12;
+int key_menu_palette  = KEY_F12;
 
 // Shortcut keys
 
@@ -263,7 +263,7 @@ void M_BindControls (void)
     M_BindIntVariable("key_menu_qload",         &key_menu_qload);
     M_BindIntVariable("key_menu_quit",          &key_menu_quit);
     M_BindIntVariable("key_menu_gamma",         &key_menu_gamma);
-    M_BindIntVariable("key_spy",                &key_spy);
+    M_BindIntVariable("key_menu_palette",       &key_menu_palette);
 
     // Shortcut keys
 

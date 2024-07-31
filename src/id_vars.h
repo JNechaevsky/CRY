@@ -39,6 +39,7 @@ extern int msg_text_shadows;
 
 // Display
 extern int dp_detail_level;
+extern int dp_cry_palette;
 extern int dp_menu_shading;
 extern int dp_level_brightness;
 
