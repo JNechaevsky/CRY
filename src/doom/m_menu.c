@@ -4648,17 +4648,12 @@ boolean M_Responder (event_t* ev)
     }
 
     // [JN] Allow to change gamma while active menu.
-    if (key == key_menu_palette)    // gamma toggle
+    if (key == key_menu_palette)    // [JN] Palette toggle.
     {
         dp_cry_palette ^= 1;
         R_InitColormaps();
         CT_SetMessage(&players[consoleplayer],
                       dp_cry_palette ? ID_CRYPAL_ON : ID_CRYPAL_OFF, false, NULL);
-        // [JN] TODO - recalculate colored lighting.
-        // I_SetPalette (st_palette);
-        // R_InitColormaps();
-        // R_FillBackScreen();
-        // st_fullupdate = true;
         return true;
     }
 
