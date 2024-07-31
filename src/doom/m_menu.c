@@ -442,8 +442,15 @@ static void M_ID_VSync (int choice);
 static void M_ID_ShowFPS (int choice);
 static void M_ID_PixelScaling (int choice);
 static void M_ID_ScreenWipe (int choice);
+
+static void M_Choose_ID_Display (int choice);
+static void M_Draw_ID_Display (void);
 static void M_ID_Gamma (int choice);
+static void M_ID_CRYPalette (int choice);
 static void M_ID_FOV (int choice);
+static void M_ID_MenuShading (int choice);
+static void M_ID_LevelBrightness (int choice);
+static void M_ID_MessagesAlignment (int choice);
 static void M_ID_TextShadows (int choice);
 static void M_ID_LocalTime (int choice);
 
@@ -989,6 +996,7 @@ static char *const DefSkillName[5] =
 static menuitem_t ID_Menu_Main[]=
 {
     { M_SWTC, "Video",       M_Choose_ID_Video,    'v' },
+    { M_SWTC, "Display",     M_Choose_ID_Display,  'd' },
     { M_SWTC, "Audio",       M_Choose_ID_Sound,    'a' },
     { M_SWTC, "Controls",    M_Choose_ID_Controls, 'c' },
     { M_SWTC, "Widgets",     M_Choose_ID_Widgets,  'w' },
@@ -999,7 +1007,7 @@ static menuitem_t ID_Menu_Main[]=
 
 static menu_t ID_Def_Main =
 {
-    7,
+    8,
     &MainDef,
     ID_Menu_Main,
     M_Draw_ID_Main,
@@ -1032,17 +1040,11 @@ static menuitem_t ID_Menu_Video[]=
     { M_LFRT, "SHOW FPS COUNTER",     M_ID_ShowFPS,       's' },
     { M_LFRT, "PIXEL SCALING",        M_ID_PixelScaling,  'p' },
     { M_LFRT, "SCREEN WIPE EFFECT",   M_ID_ScreenWipe,    's' },
-    { M_SKIP, "", 0, '\0' },
-    { M_LFRT, "GAMMA-CORRECTION",     M_ID_Gamma,         'g' },
-    { M_LFRT, "FIELD OF VIEW",        M_ID_FOV,           'f' },
-    { M_LFRT, "MESSAGES ENABLED",     M_ChangeMessages,   'm' },
-    { M_LFRT, "TEXT CASTS SHADOWS",   M_ID_TextShadows,   't' },
-    { M_LFRT, "LOCAL TIME",           M_ID_LocalTime,     'l' },
 };
 
 static menu_t ID_Def_Video =
 {
-    14,
+    8,
     &ID_Def_Main,
     ID_Menu_Video,
     M_Draw_ID_Video,
@@ -1122,36 +1124,6 @@ static void M_Draw_ID_Video (void)
     M_WriteText (M_ItemRightAlign(str), 81, str,
                  M_Item_Glow(7, vid_screenwipe == 1 ? GLOW_DARKRED : GLOW_GREEN));
 
-    M_WriteTextCentered(90, "DISPLAY OPTIONS", cr[CR_YELLOW]);
-
-    // Gamma-correction slider and num
-    strcpy(str, gammalvls[vid_gamma][1]);
-    M_WriteText (M_ItemRightAlign(str), 99, str,
-                          M_Item_Glow(9, vid_gamma  > 10 ? GLOW_GREEN :
-                                         vid_gamma == 10 ? GLOW_DARKRED : GLOW_RED));
-
-    // Field of View
-    sprintf(str, "%d", vid_fov);
-    M_WriteText (M_ItemRightAlign(str), 108, str,
-                 M_Item_Glow(10, vid_fov == 135 || vid_fov == 45 ? GLOW_YELLOW :
-                                 vid_fov == 90 ? GLOW_DARKRED : GLOW_GREEN));
-
-    // Messages enabled
-    sprintf(str, msg_show ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 117, str,
-                 M_Item_Glow(11, msg_show ? GLOW_DARKRED : GLOW_GREEN));
-
-    // Text casts shadows
-    sprintf(str, msg_text_shadows ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 126, str, 
-                 M_Item_Glow(12, msg_text_shadows ? GLOW_GREEN : GLOW_DARKRED));
-
-    // Local time
-    sprintf(str, msg_local_time == 1 ? "12-HOUR FORMAT" :
-                 msg_local_time == 2 ? "24-HOUR FORMAT" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 135, str, 
-                 M_Item_Glow(13, msg_local_time ? GLOW_GREEN : GLOW_DARKRED));
-
     // [JN] Print current resolution. Shamelessly taken from Nugget Doom!
     if (itemOn == 0 || itemOn == 1)
     {
@@ -1163,7 +1135,7 @@ static void M_Draw_ID_Video (void)
         M_snprintf(height, 8, "%d", (vid_aspect_ratio_correct == 1 ? ORIGHEIGHT_4_3 : ORIGHEIGHT) * vid_resolution);
         resolution = M_StringJoin("CURRENT RESOLUTION: ", width, "x", height, NULL);
 
-        M_WriteTextCentered(147, resolution, cr[CR_LIGHTGRAY_DARK1]);
+        M_WriteTextCentered(143, resolution, cr[CR_LIGHTGRAY_DARK1]);
     }
 }
 
@@ -1294,6 +1266,101 @@ static void M_ID_ScreenWipe (int choice)
     vid_screenwipe = M_INT_Slider(vid_screenwipe, 0, 3, choice, false);
 }
 
+// -----------------------------------------------------------------------------
+// Display options
+// -----------------------------------------------------------------------------
+
+static menuitem_t ID_Menu_Display[]=
+{
+    { M_LFRT, "GAMMA-CORRECTION",        M_ID_Gamma,             'g' },
+    { M_SKIP, "", 0, '\0' },
+    { M_SKIP, "", 0, '\0' },
+    { M_LFRT, "EMULATE CRY PALETTE",     M_ID_CRYPalette,        'e' },
+    { M_LFRT, "FIELD OF VIEW",           M_ID_FOV,               'f' },
+    { M_LFRT, "MENU BACKGROUND SHADING", M_ID_MenuShading,       'm' },
+    { M_LFRT, "EXTRA LEVEL BRIGHTNESS",  M_ID_LevelBrightness,   'e' },
+    { M_SKIP, "", 0, '\0' },
+    { M_LFRT, "MESSAGES ENABLED",        M_ChangeMessages,       'm' },
+    { M_LFRT, "MESSAGES ALIGNMENT",      M_ID_MessagesAlignment, 'm' },
+    { M_LFRT, "TEXT CASTS SHADOWS",      M_ID_TextShadows,       't' },
+    { M_LFRT, "LOCAL TIME",              M_ID_LocalTime,         'l' },
+};
+
+static menu_t ID_Def_Display =
+{
+    12,
+    &ID_Def_Main,
+    ID_Menu_Display,
+    M_Draw_ID_Display,
+    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET_SML,
+    0,
+    true, false, false,
+};
+
+static void M_Choose_ID_Display (int choice)
+{
+    M_SetupNextMenu (&ID_Def_Display);
+}
+
+static void M_Draw_ID_Display (void)
+{
+    char str[32];
+
+    M_WriteTextCentered(9, "DISPLAY OPTIONS", cr[CR_YELLOW]);
+
+    // Gamma-correction slider and num
+    M_DrawThermo(46, 27, 15, vid_gamma, 0);
+    M_WriteText (184, 30, gammalvls[vid_gamma][1],
+                          M_Item_Glow(0, GLOW_UNCOLORED));
+
+    // Emulate CRY palette
+    sprintf(str, dp_cry_palette ? "ON" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 45, str,
+                 M_Item_Glow(3, dp_cry_palette ? GLOW_GREEN : GLOW_DARKRED));
+
+    // Field of View
+    sprintf(str, "%d", vid_fov);
+    M_WriteText (M_ItemRightAlign(str), 54, str,
+                 M_Item_Glow(4, vid_fov == 135 || vid_fov == 45 ? GLOW_YELLOW :
+                                vid_fov == 90 ? GLOW_DARKRED : GLOW_GREEN));
+
+    // Background shading
+    sprintf(str, dp_menu_shading ? "%d" : "OFF", dp_menu_shading);
+    M_WriteText (M_ItemRightAlign(str), 63, str,
+                 M_Item_Glow(5, dp_menu_shading == 12 ? GLOW_YELLOW :
+                                dp_menu_shading  >  0 ? GLOW_GREEN  : GLOW_DARKRED));
+
+    // Extra level brightness
+    sprintf(str, dp_level_brightness ? "%d" : "OFF", dp_level_brightness);
+    M_WriteText (M_ItemRightAlign(str), 72, str,
+                 M_Item_Glow(6, dp_level_brightness == 8 ? GLOW_YELLOW :
+                                dp_level_brightness >  0 ? GLOW_GREEN  : GLOW_DARKRED));
+
+    M_WriteTextCentered(81, "MESSAGES SETTINGS", cr[CR_YELLOW]);
+
+    // Messages enabled
+    sprintf(str, msg_show ? "ON" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 90, str,
+                 M_Item_Glow(8, msg_show ? GLOW_DARKRED : GLOW_GREEN));
+
+    // Messages alignment
+    sprintf(str, msg_alignment == 1 ? "STATUS BAR" :
+                 msg_alignment == 2 ? "CENTERED" : "LEFT");
+    M_WriteText (M_ItemRightAlign(str), 99, str,
+                 M_Item_Glow(9, msg_alignment ? GLOW_GREEN : GLOW_DARKRED));
+
+    // Text casts shadows
+    sprintf(str, msg_text_shadows ? "ON" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 108, str, 
+                 M_Item_Glow(10, msg_text_shadows ? GLOW_GREEN : GLOW_DARKRED));
+
+    // Local time
+    sprintf(str, msg_local_time == 1 ? "12-HOUR FORMAT" :
+                 msg_local_time == 2 ? "24-HOUR FORMAT" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 117, str, 
+                 M_Item_Glow(11, msg_local_time ? GLOW_GREEN : GLOW_DARKRED));
+}
+
 static void M_ID_Gamma (int choice)
 {
     shade_wait = I_GetTime() + TICRATE;
@@ -1305,6 +1372,12 @@ static void M_ID_Gamma (int choice)
     st_fullupdate = true;
 }
 
+static void M_ID_CRYPalette (int choice)
+{
+    dp_cry_palette ^= 1;
+    R_InitColormaps();
+}
+
 static void M_ID_FOV (int choice)
 {
     vid_fov = M_INT_Slider(vid_fov, 45, 135, choice, true);
@@ -1313,6 +1386,21 @@ static void M_ID_FOV (int choice)
     R_InitLightTables();
     // [crispy] re-calculate the scalelight[][] array
     R_ExecuteSetViewSize();
+}
+
+static void M_ID_MenuShading (int choice)
+{
+    dp_menu_shading = M_INT_Slider(dp_menu_shading, 0, 12, choice, true);
+}
+
+static void M_ID_LevelBrightness (int choice)
+{
+    dp_level_brightness = M_INT_Slider(dp_level_brightness, 0, 8, choice, true);
+}
+
+static void M_ID_MessagesAlignment (int choice)
+{
+    msg_alignment = M_INT_Slider(msg_alignment, 0, 2, choice, false);
 }
 
 static void M_ID_TextShadows (int choice)
@@ -4647,7 +4735,7 @@ boolean M_Responder (event_t* ev)
         return true;
     }
 
-    // [JN] Allow to change gamma while active menu.
+    // [JN] Allow to change palette while active menu.
     if (key == key_menu_palette)    // [JN] Palette toggle.
     {
         dp_cry_palette ^= 1;
