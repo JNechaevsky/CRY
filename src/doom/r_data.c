@@ -161,7 +161,6 @@ fixed_t*	spritetopoffset;
 
 lighttable_t	*colormaps;
 lighttable_t	*pal_color; // [crispy] array holding palette colors for true color mode
-byte			*pal_pointer;  // [JN] Pointer to use CRY or original palette.
 
 // [FG] check if the lump can be a Doom patch
 // taken from PrBoom+ prboom2/src/r_patch.c:L350-L390
@@ -1087,15 +1086,14 @@ void R_InitColormaps (void)
 	byte *const crypal = W_CacheLumpName("CRYPAL", PU_STATIC);
 	byte *const invulpal = W_CacheLumpName("INVULPAL", PU_STATIC);
 	byte *const colormap = W_CacheLumpName("COLORMAP", PU_STATIC);
+	// [JN] Which palette to use for in-game rendering, CRYPAL or PLAYPAL?
+	byte *const pal_pointer = dp_cry_palette ? crypal : playpal;
 
 	if (!colormaps)
 	{
 		colormaps = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
 		R_AllocateColoredColormaps();
 	}
-
-	// [JN] Which palette to use for in-game rendering, CRYPAL or PLAYPAL?
-	pal_pointer = dp_cry_palette ? crypal : playpal;
 
 	for (c = 0; c < NUMCOLORMAPS; c++)
 	{
