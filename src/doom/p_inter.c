@@ -625,6 +625,13 @@ P_KillMobj
 	
     }
 
+    // [JN] Jaguar: player got forcefully gibbed with < -50 health, though in
+    // original Jaguar this is a status bar only effect and it's a bit broken.
+    if (target->player && target->health < -50)
+    {
+	P_SetMobjState (target, target->info->xdeathstate);
+    }
+    else
     if (target->health < -target->info->spawnhealth 
 	&& target->info->xdeathstate)
     {
