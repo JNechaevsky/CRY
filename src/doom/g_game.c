@@ -1821,12 +1821,13 @@ G_InitNew
     // [crispy] make sure "fast" parameters are really only applied once
     if ((fastparm || skill == sk_nightmare) && !fast_applied)
     {
-	for (i=S_SARG_RUN1 ; i<=S_SARG_PAIN2 ; i++)
-	    // [crispy] Fix infinite loop caused by Demon speed bug
-	    if (states[i].tics > 1)
-	    {
-	    states[i].tics >>= 1;
-	    }
+	// [JN] Jaguar: slightly different (slower) speeds for Demons and Spectres.
+	states[S_SARG_ATK1].tics = 4;
+	states[S_SARG_ATK2].tics = 4;
+	states[S_SARG_ATK3].tics = 4;
+	mobjinfo[MT_SERGEANT].speed = 15; 
+	mobjinfo[MT_SHADOWS].speed = 15; 
+
 	mobjinfo[MT_BRUISERSHOT].speed = 20*FRACUNIT;
 	mobjinfo[MT_HEADSHOT].speed = 20*FRACUNIT;
 	mobjinfo[MT_TROOPSHOT].speed = 20*FRACUNIT;
@@ -1834,8 +1835,12 @@ G_InitNew
     }
     else if (!fastparm && skill != sk_nightmare && fast_applied)
     {
-	for (i=S_SARG_RUN1 ; i<=S_SARG_PAIN2 ; i++)
-	    states[i].tics <<= 1;
+	states[S_SARG_ATK1].tics = 8;
+	states[S_SARG_ATK2].tics = 8;
+	states[S_SARG_ATK3].tics = 8;
+	mobjinfo[MT_SERGEANT].speed = 10; 
+	mobjinfo[MT_SHADOWS].speed = 10; 
+
 	mobjinfo[MT_BRUISERSHOT].speed = 15*FRACUNIT;
 	mobjinfo[MT_HEADSHOT].speed = 10*FRACUNIT;
 	mobjinfo[MT_TROOPSHOT].speed = 10*FRACUNIT;
