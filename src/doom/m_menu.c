@@ -1419,19 +1419,19 @@ static void M_ID_LocalTime (int choice)
 
 static menuitem_t ID_Menu_Sound[]=
 {
-    { M_LFRT, "SFX VOLUME",           M_SfxVol,          's' },
+    { M_LFRT, "SFX VOLUME",                M_SfxVol,          's' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
-    { M_LFRT, "MUSIC VOLUME",         M_MusicVol,        'm' },
+    { M_LFRT, "MUSIC VOLUME",              M_MusicVol,        'm' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
-    { M_LFRT, "SFX PLAYBACK",         M_ID_SFXSystem,    's' },
-    { M_LFRT, "MUSIC PLAYBACK",       M_ID_MusicSystem,  'm' },
-    { M_LFRT, "SOUNDS EFFECTS MODE",  M_ID_SFXMode,      's' },
-    { M_LFRT, "PITCH-SHIFTED SOUNDS", M_ID_PitchShift,   'p' },
-    { M_LFRT, "NUMBER OF SFX TO MIX", M_ID_SFXChannels,  'n' },
-    { M_LFRT, "MUTE INACTIVE WINDOW", M_ID_MuteInactive, 'm' },
+    { M_LFRT, "SFX PLAYBACK",              M_ID_SFXSystem,    's' },
+    { M_LFRT, "MUSIC PLAYBACK",            M_ID_MusicSystem,  'm' },
+    { M_LFRT, "SOUNDS EFFECTS MODE",       M_ID_SFXMode,      's' },
+    { M_LFRT, "JAGUAR SFX PITCH-SHIFTING", M_ID_PitchShift,   'j' },
+    { M_LFRT, "NUMBER OF SFX TO MIX",      M_ID_SFXChannels,  'n' },
+    { M_LFRT, "MUTE INACTIVE WINDOW",      M_ID_MuteInactive, 'm' },
 };
 
 static menu_t ID_Def_Sound =
@@ -3125,7 +3125,7 @@ static void M_ID_ApplyResetHook (void)
     snd_musicdevice = 3;
     snd_dmxoption = "-opl3";
     snd_monosfx = 0;
-    snd_pitchshift = 0;
+    snd_pitchshift = 1;
     snd_channels = 8;
     snd_mute_inactive = 0;
 

@@ -50,7 +50,7 @@ char *snd_musiccmd = "";
 // Whether to vary the pitch of sound effects
 // Each game will set the default differently
 
-int snd_pitchshift = -1;
+int snd_pitchshift = 1;
 
 int snd_musicdevice = SNDDEVICE_SB;
 int snd_sfxdevice = SNDDEVICE_SB;

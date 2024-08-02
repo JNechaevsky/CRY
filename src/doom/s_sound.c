@@ -157,12 +157,6 @@ void S_Init(int sfxVolume, int musicVolume)
         S_sfx[i].lumpnum = S_sfx[i].usefulness = -1;
     }
 
-    // Doom defaults to pitch-shifting off.
-    if (snd_pitchshift == -1)
-    {
-        snd_pitchshift = 0;
-    }
-
     I_AtExit(S_Shutdown, true);
 
     // [crispy] handle stereo separation for mono-sfx and flipped levels
@@ -476,21 +470,6 @@ static int S_AdjustSoundParams(mobj_t *listener, mobj_t *source,
     return (*vol > 0);
 }
 
-// clamp supplied integer to the range 0 <= x <= 255.
-
-static int Clamp(int x)
-{
-    if (x < 0)
-    {
-        return 0;
-    }
-    else if (x > 255)
-    {
-        return 255;
-    }
-    return x;
-}
-
 void S_StartSound(void *origin_p, int sfx_id)
 {
     sfxinfo_t *sfx;
@@ -561,16 +540,8 @@ void S_StartSound(void *origin_p, int sfx_id)
         sep = NORM_SEP;
     }
 
-    // hacks to vary the sfx pitches
-    if (sfx_id >= sfx_sawup && sfx_id <= sfx_sawhit)
-    {
-        pitch += 8 - (M_Random()&15);
-    }
-    else if (sfx_id != sfx_itemup)
-    {
-        pitch += 16 - (M_Random()&31);
-    }
-    pitch = Clamp(pitch);
+    // [JN] Jaguar: optionally emulate real Jaguar hardware lower pitch.
+    pitch = 120;
 
     // kill old sound
     S_StopSound(origin);
