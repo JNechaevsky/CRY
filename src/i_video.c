@@ -95,6 +95,10 @@ static SDL_Texture *palette_08 = NULL;
 static SDL_Texture *palette_09 = NULL;
 static SDL_Texture *palette_yel = NULL;
 static SDL_Texture *palette_14 = NULL;
+static SDL_Texture *palette_15 = NULL;
+static SDL_Texture *palette_16 = NULL;
+static SDL_Texture *palette_17 = NULL;
+static SDL_Texture *palette_18 = NULL;
 
 static int pane_alpha;
 
@@ -994,6 +998,11 @@ void I_SetPalette (int palette)
 		case 12:	curpane = palette_yel;	pane_alpha = 96;	break;
 		// Green palette
 		case 13:	curpane = palette_14;	pane_alpha = 140;   break;
+		// Yellow + green (bonus+rad)
+		case 14:	curpane = palette_15;	break;
+		case 15:	curpane = palette_16;	break;
+		case 16:	curpane = palette_17;	break;
+		case 17:	curpane = palette_18;	break;
 
 		default:
 			I_Error("Unknown palette: %d!\n", palette);
@@ -1480,6 +1489,23 @@ static void SetVideoMode(void)
         SDL_FillRect(argbbuffer, NULL, I_MapRGB(64, 255, 0));
         palette_14 = SDL_CreateTextureFromSurface(renderer, argbbuffer);
         SDL_SetTextureBlendMode(palette_14, SDL_BLENDMODE_MUL);
+
+        // Yellow + green (bonus+rad)
+        SDL_FillRect(argbbuffer, NULL, I_MapRGB(127, 255, 0));
+        palette_15 = SDL_CreateTextureFromSurface(renderer, argbbuffer);
+        SDL_SetTextureBlendMode(palette_15, SDL_BLENDMODE_MUL);
+
+        SDL_FillRect(argbbuffer, NULL, I_MapRGB(159, 255, 0));
+        palette_16 = SDL_CreateTextureFromSurface(renderer, argbbuffer);
+        SDL_SetTextureBlendMode(palette_16, SDL_BLENDMODE_MUL);
+
+        SDL_FillRect(argbbuffer, NULL, I_MapRGB(191, 255, 0));
+        palette_17 = SDL_CreateTextureFromSurface(renderer, argbbuffer);
+        SDL_SetTextureBlendMode(palette_17, SDL_BLENDMODE_MUL);
+
+        SDL_FillRect(argbbuffer, NULL, I_MapRGB(223, 255, 0));
+        palette_18 = SDL_CreateTextureFromSurface(renderer, argbbuffer);
+        SDL_SetTextureBlendMode(palette_18, SDL_BLENDMODE_MUL);
 
         SDL_FillRect(argbbuffer, NULL, 0);
     }

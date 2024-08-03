@@ -55,6 +55,8 @@
 #define NUMBONUSPALS		4
 // Radiation suit, green shift.
 #define RADIATIONPAL		13
+// [JN] Bonus+radiation palette, mixed gold and green shift
+#define STARTBONUSRADPALS   5
 
 
 // Number of status faces.
@@ -934,6 +936,13 @@ void ST_doPaletteStuff (void)
         }
 
         palette += STARTBONUSPALS-1;
+        
+        // [JN] If rad palette is active, shift indexes
+        // to apply bonus+radiation palette.
+        if (plyr->powers[pw_ironfeet] > 4*32 || plyr->powers[pw_ironfeet] & 8)
+        {
+            palette += STARTBONUSRADPALS;
+        }
     }
     else if (plyr->powers[pw_ironfeet] > 4*32 || plyr->powers[pw_ironfeet] & 8)
     {
