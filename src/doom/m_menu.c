@@ -4770,7 +4770,7 @@ boolean M_Responder (event_t* ev)
     if (key == key_menu_gamma)    // gamma toggle
     {
         vid_gamma = M_INT_Slider(vid_gamma, 0, MAXGAMMA-1, 1 /*right*/, false);
-        CT_SetMessage(&players[consoleplayer], gammalvls[vid_gamma][0], false, NULL);
+        CT_SetMessage(&players[consoleplayer], gammalvls[vid_gamma][0], true, NULL);
         I_SetPalette (st_palette);
         R_InitColormaps();
         R_FillBackScreen();
@@ -4784,7 +4784,7 @@ boolean M_Responder (event_t* ev)
         dp_cry_palette ^= 1;
         R_InitColormaps();
         CT_SetMessage(&players[consoleplayer],
-                      dp_cry_palette ? ID_CRYPAL_ON : ID_CRYPAL_OFF, false, NULL);
+                      dp_cry_palette ? ID_CRYPAL_ON : ID_CRYPAL_OFF, true, NULL);
         return true;
     }
 
