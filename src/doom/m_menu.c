@@ -3736,9 +3736,9 @@ static void M_DrawEpisode(void)
 static void M_Episode(int choice)
 {
     if (choice == 0)
-    ep_map = 1;     // Evil Unleashed
+    epi_map = 1;     // Evil Unleashed
     else
-    ep_map = 25;    // Hell on Earth
+    epi_map = 25;    // Hell on Earth
 
     M_SetupNextMenu(&NewDef);
 }
