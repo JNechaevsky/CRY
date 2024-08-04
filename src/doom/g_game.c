@@ -808,12 +808,37 @@ void G_DoLoadLevel (void)
         skytexture2 = R_TextureNumForName("SKY2_2");
         skyscrollspeed = 60; // Middle for Deimos levels
     }
-    else
+    else if (gamemap < 24)
     {
         skytexture = R_TextureNumForName("SKY3_1");
         skytexture2 = R_TextureNumForName("SKY3_2");
         skyscrollspeed = 75; // Fast for Hellish levels
     }
+    else if (gamemap < 36)
+    {
+        skytexture = R_TextureNumForName("SKY4_1");
+        skytexture2 = R_TextureNumForName("SKY4_2");
+        skyscrollspeed = 20; // Slow for startport levels
+    }
+    else if (gamemap < 42)
+    {
+        skytexture = R_TextureNumForName("SKY5_1");
+        skytexture2 = R_TextureNumForName("SKY5_2");
+        skyscrollspeed = 0; // TODO - scrolling for city levels?
+    }
+    else if (gamemap < 48)
+    {
+        skytexture = R_TextureNumForName("SKY6_1");
+        skytexture2 = R_TextureNumForName("SKY6_2");
+        skyscrollspeed = 0; // TODO - scrolling for hell levels?
+    }
+    else
+    {
+        skytexture = R_TextureNumForName("SKY7_1");
+        skytexture2 = R_TextureNumForName("SKY7_2");
+        skyscrollspeed = 75; // Redemption Denien exclusive sky
+    }
+    
 
     levelstarttic = gametic;        // for time calculation
     
