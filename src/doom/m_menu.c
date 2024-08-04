@@ -202,6 +202,7 @@ static menu_t *currentMenu;
 // =============================================================================
 
 static void M_NewGame(int choice);
+static void M_Episode(int choice);
 static void M_ChooseSkill(int choice);
 static void M_LoadGame(int choice);
 static void M_SaveGame(int choice);
@@ -227,6 +228,7 @@ static void M_QuickLoad(void);
 static void M_DrawMainMenu(void);
 static void M_DrawHelp(void);
 static void M_DrawNewGame(void);
+static void M_DrawEpisode(void);
 static void M_DrawSound(void);
 static void M_DrawLoad(void);
 static void M_DrawSave(void);
@@ -275,6 +277,34 @@ static menu_t MainDef =
 };
 
 //
+// EPISODE SELECT
+//
+
+enum
+{
+    ep1,
+    ep2,
+    ep_end
+} episodes_e;
+
+static menuitem_t EpisodeMenu[]=
+{
+    { M_SWTC, "Evil Unleashed",  M_Episode, 'e' },
+    { M_SWTC, "Hell on Earth",   M_Episode, 'h' },
+};
+
+static menu_t EpiDef =
+{
+    ep_end,         // # of menu items
+    &MainDef,       // previous menu
+    EpisodeMenu,    // menuitem_t ->
+    M_DrawEpisode,  // drawing routine ->
+    69,63,          // x,y
+    ep1,            // lastOn
+    false, false, false,
+};
+
+//
 // NEW GAME
 //
 
@@ -300,7 +330,7 @@ static menuitem_t NewGameMenu[]=
 static menu_t NewDef =
 {
     newg_end,       // # of menu items
-    &MainDef,       // previous menu
+    &EpiDef,        // previous menu
     NewGameMenu,    // menuitem_t ->
     M_DrawNewGame,  // drawing routine ->
     69,63,          // x,y
@@ -3688,18 +3718,34 @@ static void M_DrawNewGame (void)
 
 static void M_NewGame(int choice)
 {
-	M_SetupNextMenu(&NewDef);
+	M_SetupNextMenu(&EpiDef);
 }
 
 
 //
 //      M_Episode
 //
-static int epi;
+static int epi_map;
+
+static void M_DrawEpisode(void)
+{
+	M_WriteTextBigCentered(14, "New Game", NULL);
+	M_WriteTextBigCentered(38, "Episode:", NULL);
+}
+
+static void M_Episode(int choice)
+{
+    if (choice == 0)
+    ep_map = 1;     // Evil Unleashed
+    else
+    ep_map = 25;    // Hell on Earth
+
+    M_SetupNextMenu(&NewDef);
+}
 
 static void M_ChooseSkill (int choice)
 {
-	G_DeferedInitNew(choice, epi + 1, 1);
+	G_DeferedInitNew(choice, 1, epi_map);
 	M_ClearMenus();
 }
 
