@@ -36,6 +36,9 @@ extern musicinfo_t	S_music[];
 typedef enum
 {
     mus_None,
+    mus_intro,
+    mus_intr1,
+    mus_intr2,
     mus_map01,
     mus_map02,
     mus_map03,
@@ -60,8 +63,8 @@ typedef enum
     mus_map22,
     mus_map23,
     mus_map24,
-    mus_intro,
-    mus_inter,
+    mus_map25,
+    mus_map26,
     NUMMUSIC,
 } musicenum_t;
 

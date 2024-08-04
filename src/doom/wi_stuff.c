@@ -400,7 +400,7 @@ void WI_Ticker (void)
 	if (bcnt == 1)
 	{
 		// intermission music
-		S_ChangeMusic(mus_inter, true); 
+		S_ChangeMusic(gamemap < 25 ? mus_intr1 : mus_intr2, true); 
 	}
 
 	WI_checkForAccelerate();

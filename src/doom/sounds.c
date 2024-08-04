@@ -35,6 +35,9 @@
 musicinfo_t S_music[] =
 {
     MUSIC(NULL),
+    MUSIC("intro"),
+    MUSIC("intr1"),
+    MUSIC("intr2"),
     MUSIC("map01"),
     MUSIC("map02"),
     MUSIC("map03"),
@@ -59,8 +62,8 @@ musicinfo_t S_music[] =
     MUSIC("map22"),
     MUSIC("map23"),
     MUSIC("map24"),
-    MUSIC("intro"),
-    MUSIC("inter"),
+    MUSIC("map25"),
+    MUSIC("map26"),
 };
 
 
