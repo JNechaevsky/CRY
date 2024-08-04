@@ -77,6 +77,8 @@ typedef PACKED_STRUCT (
 // [JN] TODO - remove support for ANIMATED
 animdef_t		animdefs_vanilla[] =
 {
+	{true,	"TVSNOW03",	"TVSNOW01",	4},
+
 	{false,	"NUKAGE3",	"NUKAGE1",	8},
 	{false,	"FWATER4",	"FWATER1",	8},
 	{false,	"LAVA4",	"LAVA1",	8},
@@ -87,7 +89,8 @@ animdef_t		animdefs_vanilla[] =
 // [JN] Same sequences with swirling liquids.
 static animdef_t animdefs_swirling[] =
 {
-    {false,	"NUKAGE3",	"NUKAGE1",	65536},
+	{true,	"TVSNOW03",	"TVSNOW01",	4},
+
 	{false,	"NUKAGE3",	"NUKAGE1",	65536},
 	{false,	"FWATER4",	"FWATER1",	65536},
 	{false,	"LAVA4",	"LAVA1",	65536},

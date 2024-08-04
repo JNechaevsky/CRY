@@ -230,6 +230,11 @@ static const fullbright_t fullbright_walls[] = {
     {"SW2GSTON", redonly},
     {"SW2HOT",   sw2hot},
     {"SW2GARG",  brighttan},
+    
+    {"SW1NEW10", redonly},
+    {"SW1STEEL", redonly},
+    {"SW2NEW10", greenonly1},
+    {"SW2STEEL", greenonly1},
 };
 
 const byte *R_BrightmapForTexName (const char *texname)
