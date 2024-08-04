@@ -40,6 +40,8 @@ switchlist_t alphSwitchList[] =
 
 	{"SW1NEW10",		"SW2NEW10"},
 	{"SW1STEEL",		"SW2STEEL"},
+    {"SW1MET",			"SW2MET"},
+    {"SW1NEW33",		"SW2NEW33"},
 };
 
 int			switchlist[MAXSWITCHES * 2];
@@ -278,6 +280,14 @@ boolean P_UseSpecialLine (mobj_t *thing, line_t *line, int side)
 			break;
 		case 116:		/* Blazing Door Close (faster than TURBO!) */
 			if (EV_DoDoor (line,vld_blazeClose))
+				P_ChangeSwitchTexture(line,1);
+			break;
+		case 123:		/* Blazing PlatDownWaitUpStay */
+			if (EV_DoPlat(line,blazeDWUS,0))
+				P_ChangeSwitchTexture(line,1);
+			break;
+		case 132:		/* Raise Floor Turbo */
+			if (EV_DoFloor(line,raiseFloorTurbo))
 				P_ChangeSwitchTexture(line,1);
 			break;
 		/*=============================================== */

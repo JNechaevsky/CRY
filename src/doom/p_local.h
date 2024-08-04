@@ -508,7 +508,8 @@ typedef enum
     perpetualRaise,
     downWaitUpStay,
     raiseAndChange,
-    raiseToNearestAndChange
+    raiseToNearestAndChange,
+    blazeDWUS
 } plattype_e;
 
 typedef struct

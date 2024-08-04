@@ -693,6 +693,9 @@ void P_CrossSpecialLine (int linenum, int side, mobj_t *thing)
 		case 98:		/* Lower Floor (TURBO) */
 			EV_DoFloor(line,turboLower);
 			break;
+		case 120:		/* Blazing PlatDownWaitUpStay. */
+			EV_DoPlat(line,blazeDWUS,0);
+			break;
 			
 	}
 }
