@@ -606,6 +606,14 @@ void P_CrossSpecialLine (int linenum, int side, mobj_t *thing)
 			EV_TurnTagLightsOff(line);
 			line->special = 0;
 			break;
+		case 108:		/* Blazing Door Raise (faster than TURBO!) */
+			EV_DoDoor(line,vld_blazeRaise);
+			line->special = 0;
+			break;
+		case 109:		/* Blazing Door Open (faster than TURBO!) */
+			EV_DoDoor(line,vld_blazeOpen);
+			line->special = 0;
+			break;
 	/*==================================================== */
 	/* RE-DOABLE TRIGGERS */
 	/*==================================================== */

@@ -138,6 +138,9 @@ sfxinfo_t S_sfx[] =
   SOUND("barexp", 60),
   SOUND("punch",  64),
   SOUND_LINK("chgun", 64, sfx_pistol, 150, 0),
+//SOUND("tink",   60),
+  SOUND("bdopn",  100),
+  SOUND("bdcls",  100),
   SOUND("itmbk",  100),
 };
 

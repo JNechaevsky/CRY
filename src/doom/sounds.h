@@ -134,6 +134,9 @@ typedef enum
   sfx_barexp,
   sfx_punch,
   sfx_chgun,
+//sfx_tink,
+  sfx_bdopn,
+  sfx_bdcls,
   sfx_itmbk,
   NUMSFX
 } sfxenum_t;

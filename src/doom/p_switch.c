@@ -205,6 +205,8 @@ boolean P_UseSpecialLine (mobj_t *thing, line_t *line, int side)
 		case 33:		/* Red Card door open */
 		case 100:		/* Red Skull Door Open */
 		case 107:		/* Red Skull Door Raise */
+		case 117:		/* Blazing door raise */
+		case 118:		/* Blazing door open */
 			EV_VerticalDoor (line, thing);
 			break;
 		/*=============================================== */
@@ -264,6 +266,18 @@ boolean P_UseSpecialLine (mobj_t *thing, line_t *line, int side)
 			break;
 		case 70:		/* Turbo Lower Floor */
 			if (EV_DoFloor(line,turboLower))
+				P_ChangeSwitchTexture(line,1);
+			break;
+		case 114:		/* Blazing Door Raise (faster than TURBO!) */
+			if (EV_DoDoor (line,vld_blazeRaise))
+				P_ChangeSwitchTexture(line,1);
+			break;
+		case 115:		/* Blazing Door Open (faster than TURBO!) */
+			if (EV_DoDoor (line,vld_blazeOpen))
+				P_ChangeSwitchTexture(line,1);
+			break;
+		case 116:		/* Blazing Door Close (faster than TURBO!) */
+			if (EV_DoDoor (line,vld_blazeClose))
 				P_ChangeSwitchTexture(line,1);
 			break;
 		/*=============================================== */
@@ -343,6 +357,13 @@ boolean P_UseSpecialLine (mobj_t *thing, line_t *line, int side)
 			break;
 		case 103:		/* Open Door */
 			if (EV_DoDoor(line,vld_open))
+				P_ChangeSwitchTexture(line,0);
+			break;
+
+		case 133:		/* BlzOpenDoor BLUE */
+		case 135:		/* BlzOpenDoor RED */
+		case 137:		/* BlzOpenDoor YELLOW */
+			if (EV_DoLockedDoor(line,vld_blazeOpen,thing))
 				P_ChangeSwitchTexture(line,0);
 			break;
 	}
