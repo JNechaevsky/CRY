@@ -234,9 +234,11 @@ static const fullbright_t fullbright_walls[] = {
     {"PIPE02",   greenonly1},
     {"SW1NEW10", redonly},
     {"SW1STEEL", redonly},
+    {"SW1MET",   redonly},
     {"SW1NEW33", redonly},
     {"SW2NEW10", greenonly1},
     {"SW2STEEL", greenonly1},
+    {"SW2MET",   greenonly1},
     {"SW2NEW33", greenonly1},
 };
 

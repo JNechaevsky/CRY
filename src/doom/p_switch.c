@@ -290,6 +290,20 @@ boolean P_UseSpecialLine (mobj_t *thing, line_t *line, int side)
 			if (EV_DoFloor(line,raiseFloorTurbo))
 				P_ChangeSwitchTexture(line,1);
 			break;
+		//case 99:		/* BlzOpenDoor BLUE */
+		case 134:		/* BlzOpenDoor RED */
+		case 136:		/* BlzOpenDoor YELLOW */
+			if (EV_DoLockedDoor(line,vld_blazeOpen,thing))
+				P_ChangeSwitchTexture(line,1);
+			break;
+		case 138:		/* Light Turn On */
+			EV_LightTurnOn(line,255);
+			P_ChangeSwitchTexture(line,1);
+			break;
+		case 139:		/* Light Turn Off */
+			EV_LightTurnOn(line,35);
+			P_ChangeSwitchTexture(line,1);
+			break;
 		/*=============================================== */
 		/*	SWITCHES */
 		/*=============================================== */
