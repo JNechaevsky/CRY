@@ -51,13 +51,22 @@ void T_MoveCeiling (ceiling_t *ceiling)
 			res = T_MovePlane(ceiling->sector,ceiling->speed,
 					ceiling->topheight,false,1,ceiling->direction);
 			if (!(leveltime&7))
-				S_StartSound(&ceiling->sector->soundorg,sfx_stnmov);
+				switch(ceiling->type)
+				{
+					case silentCrushAndRaise:
+						break;
+					default:
+					S_StartSound(&ceiling->sector->soundorg,sfx_stnmov);
+						break;
+				}
 			if (res == pastdest)
 				switch(ceiling->type)
 				{
 					case raiseToHighest:
 						P_RemoveActiveCeiling(ceiling);
 						break;
+					case silentCrushAndRaise:
+						S_StartSound(&ceiling->sector->soundorg, sfx_pstop);
 					case fastCrushAndRaise:
 					case crushAndRaise:
 						ceiling->direction = -1;
@@ -70,10 +79,19 @@ void T_MoveCeiling (ceiling_t *ceiling)
 			res = T_MovePlane(ceiling->sector,ceiling->speed,
 				ceiling->bottomheight,ceiling->crush,1,ceiling->direction);
 			if (!(leveltime&7))
-				S_StartSound(&ceiling->sector->soundorg,sfx_stnmov);
+				switch(ceiling->type)
+				{
+					case silentCrushAndRaise:
+						break;
+					default:
+					S_StartSound(&ceiling->sector->soundorg,sfx_stnmov);
+						break;
+				}
 			if (res == pastdest)
 				switch(ceiling->type)
 				{
+					case silentCrushAndRaise:
+						S_StartSound(&ceiling->sector->soundorg, sfx_pstop);
 					case crushAndRaise:
 						ceiling->speed = CEILSPEED;
 					case fastCrushAndRaise:
@@ -90,6 +108,7 @@ void T_MoveCeiling (ceiling_t *ceiling)
 			if (res == crushed)
 				switch(ceiling->type)
 				{
+					case silentCrushAndRaise:
 					case crushAndRaise:
 					case lowerAndCrush:
 						ceiling->speed = CEILSPEED / 8;
@@ -123,6 +142,7 @@ int EV_DoCeiling (line_t *line, ceiling_e  type)
 	switch(type)
 	{
 		case fastCrushAndRaise:
+		case silentCrushAndRaise:
 		case crushAndRaise:
 			P_ActivateInStasisCeiling(line);
 		default:
@@ -154,6 +174,7 @@ int EV_DoCeiling (line_t *line, ceiling_e  type)
 				ceiling->direction = -1;
 				ceiling->speed = CEILSPEED * 2;
 				break;
+			case silentCrushAndRaise:
 			case crushAndRaise:
 				ceiling->crush = true;
 				ceiling->topheight = sec->ceilingheight;

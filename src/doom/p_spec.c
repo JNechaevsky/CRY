@@ -616,6 +616,10 @@ void P_CrossSpecialLine (int linenum, int side, mobj_t *thing)
 			EV_DoDoor(line,vld_blazeOpen);
 			line->special = 0;
 			break;
+		case 141:		/* Silent Ceiling Crush & Raise */
+			EV_DoCeiling(line,silentCrushAndRaise);
+			line->special = 0;
+			break;
 	/*==================================================== */
 	/* RE-DOABLE TRIGGERS */
 	/*==================================================== */

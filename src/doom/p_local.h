@@ -94,7 +94,8 @@ typedef enum
 	raiseToHighest,
 	lowerAndCrush,
 	crushAndRaise,
-	fastCrushAndRaise
+	fastCrushAndRaise,
+	silentCrushAndRaise
 } ceiling_e;
 
 typedef struct
