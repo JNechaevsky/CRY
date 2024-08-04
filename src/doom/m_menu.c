@@ -114,7 +114,12 @@ static char *gammalvls[MAXGAMMA][2] =
     { GAMMALVL_240,   "2.4"   },
     { GAMMALVL_260,   "2.6"   },
     { GAMMALVL_280,   "2.8"   },
-    { GAMMALVL_300,   "3.0"   }
+    { GAMMALVL_300,   "3.0"   },
+    { GAMMALVL_320,   "3.2"   },
+    { GAMMALVL_340,   "3.4"   },
+    { GAMMALVL_360,   "3.6"   },
+    { GAMMALVL_380,   "3.8"   },
+    { GAMMALVL_400,   "4.0"   },
 };
 
 // we are going to be entering a savegame string
@@ -1330,8 +1335,8 @@ static void M_Draw_ID_Display (void)
     M_WriteTextCentered(9, "DISPLAY OPTIONS", cr[CR_YELLOW]);
 
     // Gamma-correction slider and num
-    M_DrawGammaThermo(46, 27, 14, vid_gamma, 0);
-    M_WriteText (176, 30, gammalvls[vid_gamma][1],
+    M_DrawGammaThermo(46, 27, 16, vid_gamma, 0);
+    M_WriteText (192, 30, gammalvls[vid_gamma][1],
                           M_Item_Glow(0, GLOW_UNCOLORED));
 
     // Emulate CRY palette
@@ -3892,7 +3897,7 @@ static void M_DrawGammaThermo (int x, int y, int width, int dot, int itemPos)
         xx += 8;
     }
     V_DrawShadowedPatchOptional(xx, y, W_CacheLumpName("M_THERMR", PU_CACHE));
-    V_DrawPatch((x + 7) + dot * 3, y, W_CacheLumpName("M_THERMO", PU_CACHE));
+    V_DrawPatch((x + 8) + dot * 3, y, W_CacheLumpName("M_THERMO", PU_CACHE));
     dp_translation = NULL;
 }
 
