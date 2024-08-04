@@ -30,8 +30,8 @@
 #include "id_func.h"
 
 
-// [JN] Jaguar: only 24 maps available.
-#define NUMMAPS		24
+// [JN] 24 map of original Jaguar + 24 map of Hell on Earth
+#define NUMMAPS		48
 
 // Singple-player stuff
 #define SP_STATSX	50

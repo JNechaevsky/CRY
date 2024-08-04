@@ -1804,9 +1804,9 @@ G_InitNew
 	{
 		map = 1;
 	}
-	if (map > 24)
+	if (map > 48)
 	{
-		map = 24;
+		map = 48;
 	}
 
 	M_ClearRandom ();
