@@ -699,6 +699,12 @@ void P_CrossSpecialLine (int linenum, int side, mobj_t *thing)
 		case 98:		/* Lower Floor (TURBO) */
 			EV_DoFloor(line,turboLower);
 			break;
+		case 106:		/* Blazing Door Open (faster than TURBO!) */
+			EV_DoDoor (line,vld_blazeOpen);
+			break;
+		case 107:		/* Blazing Door Close (faster than TURBO!) */
+			EV_DoDoor (line,vld_blazeClose);
+			break;
 		case 120:		/* Blazing PlatDownWaitUpStay. */
 			EV_DoPlat(line,blazeDWUS,0);
 			break;
