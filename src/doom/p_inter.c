@@ -514,7 +514,8 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
         break;
 	
         case SPR_MGUN:
-        if (!P_GiveWeapon (player, wp_chaingun, false) )
+            if (!P_GiveWeapon(player, wp_chaingun,
+                            (special->flags & MF_DROPPED) != 0))
             return;
         CT_SetMessage(player, GOTCHAINGUN, false, NULL);
         sound = sfx_wpnup;	
@@ -673,6 +674,10 @@ P_KillMobj
 	item = MT_SHOTGUN;
 	break;
 	
+      case MT_CHAINGUY:
+	item = MT_CHAINGUN;
+	break;
+    
       default:
 	return;
     }
