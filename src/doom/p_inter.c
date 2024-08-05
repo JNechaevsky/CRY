@@ -549,6 +549,14 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
         sound = sfx_wpnup;	
         break;
 		
+        case SPR_SGN2:
+            if (!P_GiveWeapon(player, wp_supershotgun,
+                            (special->flags & MF_DROPPED) != 0))
+                return;
+        CT_SetMessage(player, GOTSHOTGUN2, false, NULL);
+        sound = sfx_wpnup;	
+        break;
+        
         default:
         I_Error ("P_SpecialThing: Unknown gettable thing");
     }
