@@ -66,6 +66,8 @@ musicinfo_t S_music[] =
     MUSIC("map26"),
     MUSIC("map27"),
     MUSIC("map28"),
+    MUSIC("map29"),
+    MUSIC("map30"),
 };
 
 

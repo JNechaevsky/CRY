@@ -105,6 +105,7 @@
 #define GOTBERSERK	"Berserk!"
 #define GOTSUIT	"Radiation Shielding Suit"
 #define GOTMAP	"Computer Area Map"
+#define GOTMSPHERE	"MegaSphere!"
 
 #define GOTCLIP	"You pick up a clip."
 #define GOTCLIPBOX	"You pick up a box of bullets."

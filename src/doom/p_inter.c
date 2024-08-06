@@ -341,6 +341,13 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
         CT_SetMessage(player, GOTSUPER, false, NULL);
         break;
 	
+        case SPR_MEGA:
+        player->health = 200;
+        player->mo->health = player->health;
+        P_GiveArmor (player, 2);
+        CT_SetMessage(player, GOTMSPHERE, false, NULL);
+        break;
+
         // cards
         // leave cards for everyone
         case SPR_BKEY:
