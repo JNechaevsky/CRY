@@ -63,6 +63,7 @@ dirtype_t diags[] =
     DI_NORTHWEST, DI_NORTHEAST, DI_SOUTHWEST, DI_SOUTHEAST
 };
 
+boolean flag667;
 
 //
 // ENEMY THINKING
@@ -1655,12 +1656,12 @@ void A_BossDeath (mobj_t *mo)
     line_t     junk;
     int        i;
 
-    // [JN] Jaguar: bruisers may apear on other levels,
-    // so don't check other than MAP08.
-    if (gamemap != 8)
+    // [JN] Jaguar: check only special levels for BossDeath actions.
+    if (gamemap != 8 && gamemap != 31)
     return;
 
-    if (mo->type != MT_BRUISER)
+    if (mo->type != MT_BRUISER
+    &&  mo->type != MT_FATSO && mo->type != MT_BABY)
     return;
 
     // make sure there is a player alive for victory
@@ -1694,6 +1695,28 @@ void A_BossDeath (mobj_t *mo)
         {
             junk.tag = 666;
             EV_DoFloor (&junk, lowerFloorToLowest);
+            return;
+        }
+    }
+    if (gamemap == 31)
+    {
+        if (mo->type == MT_FATSO)
+        {
+            junk.tag = 666;
+            EV_DoFloor(&junk,lowerFloorToLowest);
+            return;
+        }
+        
+        if (mo->type == MT_BABY)
+        {
+            // [JN] [DOOM Retro] Raise sector tag 667 only once. 
+            // Fixes bug: https://doomwiki.org/wiki/Tag_667#Bugs
+            if (!flag667)
+            {
+            junk.tag = 667;
+            EV_DoFloor(&junk,raiseToTexture);
+            flag667 = true;
+            }
             return;
         }
     }

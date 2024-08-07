@@ -69,6 +69,7 @@ typedef enum
     mus_map28,
     mus_map29,
     mus_map30,
+    mus_map31,
     NUMMUSIC,
 } musicenum_t;
 

@@ -1414,6 +1414,7 @@ void P_WriteSaveGameHeader(char *description)
     saveg_write8(gameskill);
     saveg_write8(gameepisode);
     saveg_write8(gamemap);
+    saveg_write8(flag667);
     saveg_write8(idmusnum);
 
     for (i=0 ; i<MAXPLAYERS ; i++) 
@@ -1451,6 +1452,7 @@ boolean P_ReadSaveGameHeader(void)
     gameskill = saveg_read8();
     gameepisode = saveg_read8();
     gamemap = saveg_read8();
+    flag667 = saveg_read8();
     idmusnum = saveg_read8();
 
     // [JN] jff 3/18/98 account for unsigned byte
