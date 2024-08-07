@@ -771,7 +771,7 @@ static void R_ProjectSprite (mobj_t* thing)
         thing->target)
     {
 	    // [crispy] Barons of Hell and Hell Knights bleed green blood
-	    if (thing->target->type == MT_BRUISER)
+	    if (thing->target->type == MT_BRUISER || thing->target->type == MT_KNIGHT)
 	    {
 		vis->translation = cr[CR_RED2GREEN];
 	    }

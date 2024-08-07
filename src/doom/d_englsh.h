@@ -182,12 +182,20 @@
 
 #define CC_ZOMBIE   "zombieman"
 #define CC_SHOTGUN  "shotgun guy"
+#define CC_HEAVY    "heavy weapon dude"
 #define CC_IMP      "imp"
 #define CC_DEMON    "demon"
 #define CC_SPECTRE  "spectre"
 #define CC_LOST     "lost soul"
 #define CC_CACO     "cacodemon"
+#define CC_HELL     "hell knight"
 #define CC_BARON    "baron of hell"
+#define CC_ARACH    "arachnotron"
+#define CC_PAIN     "pain elemental"
+#define CC_REVEN    "revenant"
+#define CC_MANCU    "mancubus"
+#define CC_SPIDER   "the spider mastermind"
+#define CC_CYBER    "the cyberdemon"
 #define CC_HERO     "our hero"
 
 //
