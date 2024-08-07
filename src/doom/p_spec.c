@@ -78,12 +78,14 @@ typedef PACKED_STRUCT (
 animdef_t		animdefs_vanilla[] =
 {
 	{true,	"TVSNOW03",	"TVSNOW01",	4},
+	{true,	"FLAME03",	"FLAME01",	8},
 
 	{false,	"NUKAGE3",	"NUKAGE1",	8},
 	{false,	"FWATER4",	"FWATER1",	8},
 	{false,	"LAVA4",	"LAVA1",	8},
 	{false,	"CSLIME04",	"CSLIME01",	8},
 	{false,	"BSLIME01",	"BSLIME01",	8},
+	{false,	"BLOOD3",	"BLOOD1",	8},
 	
     {-1,        "",             "",             0},
 };
@@ -92,12 +94,14 @@ animdef_t		animdefs_vanilla[] =
 static animdef_t animdefs_swirling[] =
 {
 	{true,	"TVSNOW03",	"TVSNOW01",	4},
+	{true,	"FLAME03",	"FLAME01",	8},
 
 	{false,	"NUKAGE3",	"NUKAGE1",	65536},
 	{false,	"FWATER4",	"FWATER1",	65536},
 	{false,	"LAVA4",	"LAVA1",	65536},
 	{false,	"CSLIME04",	"CSLIME01",	65536},
 	{false,	"BSLIME01",	"BSLIME01",	65536},
+	{false,	"BLOOD3",	"BLOOD1",	65536},
 	
     {-1,    "",         "",         0},
 };
@@ -509,7 +513,7 @@ void P_CrossSpecialLine (int linenum, int side, mobj_t *thing)
 			line->special = 0;
 			break;
 		case 8:			/* Build Stairs */
-			EV_BuildStairs(line);
+			EV_BuildStairs(line,build8);
 			line->special = 0;
 			break;
 		case 10:		/* PlatDownWaitUp */
@@ -616,6 +620,10 @@ void P_CrossSpecialLine (int linenum, int side, mobj_t *thing)
 			break;
 		case 109:		/* Blazing Door Open (faster than TURBO!) */
 			EV_DoDoor(line,vld_blazeOpen);
+			line->special = 0;
+			break;
+		case 100:		/* Build Stairs Turbo 16 */
+			EV_BuildStairs(line,turbo16);
 			line->special = 0;
 			break;
 		case 141:		/* Silent Ceiling Crush & Raise */

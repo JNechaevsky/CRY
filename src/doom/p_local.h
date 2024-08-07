@@ -289,7 +289,7 @@ typedef enum
     pastdest
 } result_e;
 
-extern int  EV_BuildStairs (line_t *line);
+extern int  EV_BuildStairs (line_t *line, stair_e type);
 extern int  EV_DoFloor (line_t *line, floor_e floortype);
 extern void T_MoveFloor (floormove_t *floor);
 

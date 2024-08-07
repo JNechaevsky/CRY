@@ -308,7 +308,7 @@ boolean P_UseSpecialLine (mobj_t *thing, line_t *line, int side)
 		/*	SWITCHES */
 		/*=============================================== */
 		case 7:			/* Build Stairs */
-			if (EV_BuildStairs(line))
+			if (EV_BuildStairs(line,build8))
 				P_ChangeSwitchTexture(line,0);
 			break;
 		case 9:			/* Change Donut */

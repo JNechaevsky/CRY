@@ -21,6 +21,9 @@
 #include "doomstat.h"
 
 
+// Andrey Budko
+#define STAIRS_UNINITIALIZED_CRUSH_FIELD_VALUE 10
+
 /*================================================================== */
 /*================================================================== */
 /* */
@@ -379,7 +382,7 @@ int EV_DoFloor(line_t *line,floor_e floortype)
 /* */
 /*================================================================== */
 
-int EV_BuildStairs(line_t *line)
+int EV_BuildStairs(line_t *line, stair_e type)
 {
 	int		secnum;
 	int		height;
@@ -390,6 +393,9 @@ int EV_BuildStairs(line_t *line)
 	int		rtn;
 	sector_t	*sec, *tsec;
 	floormove_t	*floor;
+
+	fixed_t	stairsize = 0;
+	fixed_t	speed = 0;
 
 	secnum = -1;
 	rtn = 0;
@@ -405,15 +411,32 @@ int EV_BuildStairs(line_t *line)
 		/* new floor thinker */
 		/* */
 		rtn = 1;
-		height = sec->floorheight + 8*FRACUNIT;
 		floor = Z_Malloc (sizeof(*floor), PU_LEVSPEC, 0);
 		P_AddThinker (&floor->thinker);
 		sec->specialdata = floor;
 		floor->thinker.function.acp1 = (actionf_p1) T_MoveFloor;
 		floor->direction = 1;
 		floor->sector = sec;
-		floor->speed = FLOORSPEED/2;
+		switch(type)
+		{
+			case build8:
+				speed = FLOORSPEED/4;
+				stairsize = 8*FRACUNIT;
+			break;
+			case turbo16:
+				speed = FLOORSPEED*4;
+				stairsize = 16*FRACUNIT;
+			break;
+		}
+		floor->speed = speed;
+		height = sec->floorheight + stairsize;
 		floor->floordestheight = height;
+		// Initialize
+		floor->type = lowerFloor;
+		// Andrey Budko
+		// Uninitialized crush field will not be equal to 0 or 1 (true)
+		// with high probability. So, initialize it with any other value
+		floor->crush = STAIRS_UNINITIALIZED_CRUSH_FIELD_VALUE;
 		
 		texture = sec->floorpic;
 
@@ -439,7 +462,8 @@ int EV_BuildStairs(line_t *line)
 				if (tsec->floorpic != texture)
 					continue;
 					
-				height += 8*FRACUNIT;
+				height += stairsize;
+					
 				if (tsec->specialdata)
 					continue;
 					
@@ -451,8 +475,14 @@ int EV_BuildStairs(line_t *line)
 				floor->thinker.function.acp1 = (actionf_p1) T_MoveFloor;
 				floor->direction = 1;
 				floor->sector = sec;
-				floor->speed = FLOORSPEED/2;
+				floor->speed = speed;
 				floor->floordestheight = height;
+				// Initialize
+				floor->type = lowerFloor;
+				// Andrey Budko
+				// Uninitialized crush field will not be equal to 0 or 1 (true)
+				// with high probability. So, initialize it with any other value
+				floor->crush = STAIRS_UNINITIALIZED_CRUSH_FIELD_VALUE;
 				ok = 1;
 				break;
 			}
