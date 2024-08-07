@@ -355,8 +355,8 @@ boolean P_UseSpecialLine (mobj_t *thing, line_t *line, int side)
 			if (EV_DoFloor(line,turboLower))
 				P_ChangeSwitchTexture(line,0);
 			break;
-		case 49:		/* Lower Ceiling And Crush */
-			if (EV_DoCeiling(line,lowerAndCrush))
+		case 49:		//[JN] Use Doom 2 spec: Ceiling Crush And Raise
+			if (EV_DoCeiling(line,crushAndRaise/*lowerAndCrush*/))
 				P_ChangeSwitchTexture(line,0);
 			break;
 		case 50:		/* Close Door */
