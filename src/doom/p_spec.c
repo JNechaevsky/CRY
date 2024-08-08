@@ -1217,6 +1217,9 @@ void P_SpawnSpecials (void)
 			case 14:	/* DOOR RAISE IN 5 MINUTES */
 				P_SpawnDoorRaiseIn5Mins (sector, i);
 				break;
+			case 17:	/* DOOM2: FIRE FLICKER */
+				P_SpawnFireFlicker(sector);
+				break;
 		}
 	}
 		

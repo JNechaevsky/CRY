@@ -323,6 +323,15 @@ typedef struct
     int        count;
     int        maxlight;
     int        minlight;
+} fireflicker_t;
+
+typedef struct
+{
+    thinker_t  thinker;
+    sector_t  *sector;
+    int        count;
+    int        maxlight;
+    int        minlight;
     int        maxtime;
     int        mintime;
 } lightflash_t;
@@ -350,9 +359,11 @@ typedef struct
 extern void EV_LightTurnOn (line_t *line, int bright);
 extern void EV_StartLightStrobing (line_t *line);
 extern void EV_TurnTagLightsOff (line_t *line);
+extern void P_SpawnFireFlicker (sector_t *sector);
 extern void P_SpawnGlowingLight (sector_t *sector);
 extern void P_SpawnLightFlash (sector_t *sector);
 extern void P_SpawnStrobeFlash (sector_t *sector, int fastOrSlow, int inSync);
+extern void T_FireFlicker (fireflicker_t *flick);
 extern void T_Glow (glow_t *g);
 extern void T_LightFlash (lightflash_t *flash);
 extern void T_StrobeFlash (strobe_t *flash);
