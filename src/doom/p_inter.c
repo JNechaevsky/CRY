@@ -251,6 +251,12 @@ boolean P_GivePower (player_t *player, int /*powertype_t*/ power)
 		player->powers[power] = INVULNTICS;
 		return true;
 	}
+	if (power == pw_invisibility)
+	{
+		player->powers[power] = INVISTICS;
+		player->mo->flags |= MF_SHADOW;
+		return true;
+	}
 	if (power == pw_ironfeet)
 	{
 		player->powers[power] = IRONTICS;
@@ -426,6 +432,9 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
         break;
 	
         case SPR_PINS:
+        if (!P_GivePower (player, pw_invisibility))
+            return;
+        CT_SetMessage(player, GOTINVIS, false, NULL);
         break;
 
         case SPR_SUIT:

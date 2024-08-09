@@ -485,6 +485,10 @@ void P_PlayerThink (player_t* player)
     if (player->powers[pw_invulnerability])
 	player->powers[pw_invulnerability]--;
 
+    if (player->powers[pw_invisibility])
+    if (! --player->powers[pw_invisibility] )
+	    player->mo->flags &= ~MF_SHADOW;
+
     if (player->powers[pw_ironfeet])
 	player->powers[pw_ironfeet]--;
 		

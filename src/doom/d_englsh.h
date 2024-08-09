@@ -103,6 +103,7 @@
 
 #define GOTINVUL	"Invulnerability!"
 #define GOTBERSERK	"Berserk!"
+#define GOTINVIS	"Partial Invisibility"
 #define GOTSUIT	"Radiation Shielding Suit"
 #define GOTMAP	"Computer Area Map"
 #define GOTMSPHERE	"MegaSphere!"
