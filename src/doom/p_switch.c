@@ -287,10 +287,6 @@ boolean P_UseSpecialLine (mobj_t *thing, line_t *line, int side)
 			if (EV_DoPlat(line,blazeDWUS,0))
 				P_ChangeSwitchTexture(line,1);
 			break;
-		case 127:		/* Build Stairs Turbo 16 */
-			if (EV_BuildStairs(line,turbo16))
-				P_ChangeSwitchTexture(line,0);
-			break;
 		case 132:		/* Raise Floor Turbo */
 			if (EV_DoFloor(line,raiseFloorTurbo))
 				P_ChangeSwitchTexture(line,1);
@@ -386,6 +382,30 @@ boolean P_UseSpecialLine (mobj_t *thing, line_t *line, int side)
 			break;
 		case 103:		/* Open Door */
 			if (EV_DoDoor(line,vld_open))
+				P_ChangeSwitchTexture(line,0);
+			break;
+		case 111:		/* Blazing Door Raise (faster than TURBO!) */
+			if (EV_DoDoor (line,vld_blazeRaise))
+				P_ChangeSwitchTexture(line,0);
+			break;
+		case 112:		/* Blazing Door Open (faster than TURBO!) */
+			if (EV_DoDoor (line,vld_blazeOpen))
+				P_ChangeSwitchTexture(line,0);
+			break;
+		case 113:		/* Blazing Door Close (faster than TURBO!) */
+			if (EV_DoDoor (line,vld_blazeClose))
+				P_ChangeSwitchTexture(line,0);
+			break;
+		case 122:		/* Blazing PlatDownWaitUpStay */
+			if (EV_DoPlat(line,blazeDWUS,0))
+				P_ChangeSwitchTexture(line,0);
+			break;
+		case 127:		/* Build Stairs Turbo 16 */
+			if (EV_BuildStairs(line,turbo16))
+				P_ChangeSwitchTexture(line,0);
+			break;
+		case 131:		/* Raise Floor Turbo */
+			if (EV_DoFloor(line,raiseFloorTurbo))
 				P_ChangeSwitchTexture(line,0);
 			break;
 
