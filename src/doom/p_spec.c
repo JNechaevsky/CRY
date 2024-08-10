@@ -86,6 +86,7 @@ animdef_t		animdefs_vanilla[] =
 	{false,	"CSLIME04",	"CSLIME01",	8},
 	{false,	"BSLIME01",	"BSLIME01",	8},
 	{false,	"BLOOD3",	"BLOOD1",	8},
+	{false,	"GLOW04",	"GLOW01",	8},
 	
     {-1,        "",             "",             0},
 };
@@ -102,6 +103,7 @@ static animdef_t animdefs_swirling[] =
 	{false,	"CSLIME04",	"CSLIME01",	65536},
 	{false,	"BSLIME01",	"BSLIME01",	65536},
 	{false,	"BLOOD3",	"BLOOD1",	65536},
+	{false,	"GLOW04",	"GLOW01",	8},
 	
     {-1,    "",         "",         0},
 };

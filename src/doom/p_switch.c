@@ -287,6 +287,10 @@ boolean P_UseSpecialLine (mobj_t *thing, line_t *line, int side)
 			if (EV_DoPlat(line,blazeDWUS,0))
 				P_ChangeSwitchTexture(line,1);
 			break;
+		case 127:		/* Build Stairs Turbo 16 */
+			if (EV_BuildStairs(line,turbo16))
+				P_ChangeSwitchTexture(line,0);
+			break;
 		case 132:		/* Raise Floor Turbo */
 			if (EV_DoFloor(line,raiseFloorTurbo))
 				P_ChangeSwitchTexture(line,1);
