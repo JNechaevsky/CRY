@@ -79,6 +79,7 @@ animdef_t		animdefs_vanilla[] =
 {
 	{true,	"TVSNOW03",	"TVSNOW01",	4},
 	{true,	"FLAME03",	"FLAME01",	8},
+	{true,	"BFALL4",	"BFALL1",	8},
 
 	{false,	"NUKAGE3",	"NUKAGE1",	8},
 	{false,	"FWATER4",	"FWATER1",	8},
@@ -96,6 +97,7 @@ static animdef_t animdefs_swirling[] =
 {
 	{true,	"TVSNOW03",	"TVSNOW01",	4},
 	{true,	"FLAME03",	"FLAME01",	8},
+	{true,	"BFALL4",	"BFALL1",	8},
 
 	{false,	"NUKAGE3",	"NUKAGE1",	65536},
 	{false,	"FWATER4",	"FWATER1",	65536},
@@ -626,6 +628,14 @@ void P_CrossSpecialLine (int linenum, int side, mobj_t *thing)
 			break;
 		case 100:		/* Build Stairs Turbo 16 */
 			EV_BuildStairs(line,turbo16);
+			line->special = 0;
+			break;
+		case 110:		/* Blazing Door Close (faster than TURBO!) */
+			EV_DoDoor (line,vld_blazeClose);
+			line->special = 0;
+			break;
+		case 119:		/* Raise floor to nearest surr. floor */
+			EV_DoFloor(line,raiseFloorToNearest);
 			line->special = 0;
 			break;
 		case 141:		/* Silent Ceiling Crush & Raise */
