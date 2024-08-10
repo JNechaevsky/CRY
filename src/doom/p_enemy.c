@@ -1657,11 +1657,14 @@ void A_BossDeath (mobj_t *mo)
     int        i;
 
     // [JN] Jaguar: check only special levels for BossDeath actions.
-    if (gamemap != 8 && gamemap != 31)
+    if (gamemap != 8   // Phobos Anomaly
+    &&  gamemap != 31  // Dead Simple
+    &&  gamemap != 48) // Redemption Denied
     return;
 
     if (mo->type != MT_BRUISER
-    &&  mo->type != MT_FATSO && mo->type != MT_BABY)
+    &&  mo->type != MT_FATSO && mo->type != MT_BABY
+    &&  mo->type != MT_SPIDER)
     return;
 
     // make sure there is a player alive for victory
@@ -1717,6 +1720,21 @@ void A_BossDeath (mobj_t *mo)
             EV_DoFloor(&junk,raiseToTexture);
             flag667 = true;
             }
+            return;
+        }
+    }
+    if (gamemap == 48)
+    {
+        if (mo->type == MT_BRUISER)
+        {
+            junk.tag = 671;
+            EV_DoFloor (&junk, turboLower); // lowerFloorToLowest
+            return;
+        }
+        if (mo->type == MT_SPIDER)
+        {
+            junk.tag = 668;
+            EV_DoFloor (&junk, lowerFloorToLowest);
             return;
         }
     }

@@ -1212,9 +1212,6 @@ void G_Ticker (void)
 	  case ga_completed: 
 	    G_DoCompleted (); 
 	    break; 
-	  case ga_victory: 
-	    F_StartFinale (); 
-	    break; 
 	  case ga_worlddone: 
 	    G_DoWorldDone (); 
 	    break; 
@@ -1568,11 +1565,9 @@ void G_WorldDone (void)
     if (secretexit) 
 	players[consoleplayer].didsecret = true; 
 
-    switch (gamemap)
+    if (gamemap == 23 || gamemap == 48)
     {
-        case 23:
-        F_StartFinale ();
-        break;
+        F_StartFinale (gamemap);
     }
 } 
  

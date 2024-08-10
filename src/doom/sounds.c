@@ -38,6 +38,7 @@ musicinfo_t S_music[] =
     MUSIC("intro"),
     MUSIC("intr1"),
     MUSIC("intr2"),
+    MUSIC("evil"),
     MUSIC("map01"),
     MUSIC("map02"),
     MUSIC("map03"),

@@ -39,6 +39,7 @@ typedef enum
     mus_intro,
     mus_intr1,
     mus_intr2,
+    mus_evil,
     mus_map01,
     mus_map02,
     mus_map03,

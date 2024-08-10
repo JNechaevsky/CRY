@@ -22,6 +22,7 @@
 #include "m_menu.h"
 #include "p_local.h"
 #include "s_sound.h"
+#include "v_trans.h"
 #include "v_video.h"
 #include "wi_stuff.h"
 #include "z_zone.h"
@@ -302,8 +303,7 @@ static void WI_drawStats (void)
 	// [crispy] draw total time after level time and par time
 	const int cnt_ttime = wbs->totaltimes / TICRATE;
 
-	V_DrawPatchFullScreen(W_CacheLumpName(gamemap < 25 ? 
-                              "M_TITLE" : "M_INTER", PU_CACHE), false);
+	V_DrawPatchFullScreen(W_CacheLumpName("M_TITLE", PU_CACHE), false);
 
     // Finished level stuff
     if (wbs->last < NUMMAPS)
@@ -335,8 +335,8 @@ static void WI_drawStats (void)
 	WI_drawTime(ORIGWIDTH - SP_STATSX, 132, cnt_ttime, false);
 
 	// Draws which level you are entering...
-	// Don't draw "Entering Military Base" after finishing map 23.
-	if (gamemap != 23)
+	// Don't draw "Entering" after finishing Military Base and Redemption Denied.
+	if (gamemap != 23 && gamemap != 48)
 	{
 		M_WriteTextBigCentered (155, "Entering", NULL);
 		sprintf(str, "%s", level_names[wminfo.next]);
