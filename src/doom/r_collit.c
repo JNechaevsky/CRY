@@ -2570,6 +2570,92 @@ static const sectorcolor_t sectorcolor_map26[] =
     {   26,     97,    0x949DB9 },
 };
 
+//
+// Area 27: The Gantlet
+//
+
+static const sectorcolor_t sectorcolor_map27[] =
+{
+    {   27,     30,    0xCEA98B },
+    {   27,     31,    0xCEA98B },
+    {   27,     32,    0xCEA98B },
+    {   27,     33,    0xCEA98B },
+    {   27,     34,    0xCEA98B },
+    {   27,     35,    0xCEA98B },
+    {   27,     36,    0xFF3030 },
+    {   27,     37,    0xCEA98B },
+    {   27,     38,    0xFF7F7F },
+    {   27,     39,    0xFF7F7F },
+    {   27,     40,    0xFF7F7F },
+    {   27,     41,    0xFF7F7F },
+    {   27,     42,    0xFF3030 },
+    {   27,     43,    0xCEA98B },
+    {   27,     45,    0xCEA98B },
+    {   27,     46,    0xCEA98B },
+    {   27,     47,    0xCEA98B },
+    {   27,     48,    0xCEA98B },
+    {   27,     49,    0xCEA98B },
+    {   27,     50,    0xCEA98B },
+    {   27,     52,    0xCEA98B },
+    {   27,     53,    0xCEA98B },
+    {   27,     54,    0xCEA98B },
+    {   27,     55,    0xCEA98B },
+    {   27,     56,    0xCEA98B },
+    {   27,     57,    0xCEA98B },
+    {   27,     58,    0xCEA98B },
+    {   27,     59,    0xCEA98B },
+    {   27,     60,    0x949DB9 },
+    {   27,     61,    0xFF3030 },
+    {   27,     62,    0xCEA98B },
+    {   27,     63,    0xCCEA5F },
+    {   27,     64,    0xCCEA5F },
+    {   27,     65,    0xCEA98B },
+    {   27,     66,    0xCEA98B },
+    {   27,     67,    0xCEA98B },
+    {   27,     68,    0xCEA98B },
+    {   27,     69,    0xCEA98B },
+    {   27,     70,    0xCEA98B },
+    {   27,     71,    0xCEA98B },
+    {   27,     72,    0xCEA98B },
+    {   27,     73,    0xCEA98B },
+    {   27,     74,    0xCEA98B },
+    {   27,     75,    0xCEA98B },
+    {   27,     76,    0xCEA98B },
+    {   27,     77,    0xFF3030 },
+    {   27,     78,    0xCEA98B },
+    {   27,     79,    0xCEA98B },
+    {   27,     80,    0xCEA98B },
+    {   27,     81,    0xCEA98B },
+    {   27,     82,    0xCEA98B },
+    {   27,     83,    0xCEA98B },
+    {   27,     84,    0xCEA98B },
+    {   27,     85,    0xCEA98B },
+    {   27,     86,    0x3089FF },
+    {   27,     87,    0xCEA98B },
+    {   27,     88,    0x3089FF },
+    {   27,     89,    0xCEA98B },
+    {   27,     90,    0xCEA98B },
+    {   27,     91,    0xCEA98B },
+    {   27,     92,    0x3089FF },
+    {   27,     93,    0xCEA98B },
+    {   27,     94,    0x949DB9 },
+    {   27,     95,    0x949DB9 },
+    {   27,     96,    0x949DB9 },
+    {   27,     97,    0xCEA98B },
+    {   27,     98,    0xCEA98B },
+    {   27,     99,    0xCEA98B },
+    {   27,    100,    0xCEA98B },
+    {   27,    101,    0xCEA98B },
+    {   27,    102,    0x949DB9 },
+    {   27,    103,    0xFF3030 },
+    {   27,    104,    0x3089FF },
+    {   27,    105,    0xCEA98B },
+    {   27,    109,    0xCEA98B },
+    {   27,    110,    0xCEA98B },
+    {   27,    111,    0xCEA98B },
+    {   27,    112,    0xCEA98B },
+};
+
 void P_SetSectorColorTable (int area)
 {
     switch (area)
@@ -2601,6 +2687,7 @@ void P_SetSectorColorTable (int area)
         
         case 25:  sectorcolor = sectorcolor_map25;  break;
         case 26:  sectorcolor = sectorcolor_map26;  break;
+        case 27:  sectorcolor = sectorcolor_map27;  break;
         default:  sectorcolor = sectorcolor_dummy;  break;
     }
 }
