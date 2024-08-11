@@ -36,7 +36,7 @@ static lighttable_t   *colormaps_D97C45;  // Middle yellow/gold (also E29A56)
 static lighttable_t   *colormaps_FF7F7F;  // Bright red
 static lighttable_t   *colormaps_55B828;  // Bright green
 static lighttable_t   *colormaps_BBE357;  // Slime green
-static lighttable_t   *colormaps_949DB9;  // Bright desaturated blue (also 6B779E)
+static lighttable_t   *colormaps_949DB9;  // Bright desaturated blue (also 6B779E, 2F2866)
 static lighttable_t   *colormaps_2B3BFF;  // Bright saturated blue
 static lighttable_t   *colormaps_50ADAC;  // Middle cyan (also 31A29F)
 static lighttable_t   *colormaps_CCE4A5;  // Middle green-yellow
@@ -46,7 +46,7 @@ static lighttable_t   *colormaps_B87A15;  // Middle orange
 static lighttable_t   *colormaps_FFD000;  // Middle yellow
 static lighttable_t   *colormaps_FFDE4C;  // Middle-bright yellow
 static lighttable_t   *colormaps_FFF588;  // Bright yellow
-static lighttable_t   *colormaps_3089FF;  // Bright cyanic blue
+static lighttable_t   *colormaps_3089FF;  // Bright cyanic blue (also 043B84)
 static lighttable_t   *colormaps_A88139;  // Middle brown
 static lighttable_t   *colormaps_7084C4;  // Dark cyanic blue 2
 static lighttable_t   *colormaps_D46D3D;  // Middle orange 2
@@ -2497,6 +2497,79 @@ static const sectorcolor_t sectorcolor_map25[] =
     {   25,     52,    0xFFCD5A },
 };
 
+//
+// Area 26: Underhalls
+//
+
+static const sectorcolor_t sectorcolor_map26[] =
+{
+    {   26,      8,    0x949DB9 },
+    {   26,      9,    0x949DB9 },
+    {   26,     10,    0x3089FF },
+    {   26,     11,    0x949DB9 },
+    {   26,     12,    0x949DB9 },
+    {   26,     13,    0x949DB9 },
+    {   26,     14,    0x949DB9 },
+    {   26,     15,    0x949DB9 },
+    {   26,     16,    0x949DB9 },
+    {   26,     17,    0x949DB9 },
+    {   26,     24,    0x949DB9 },
+    {   26,     25,    0x949DB9 },
+    {   26,     26,    0x949DB9 },
+    {   26,     27,    0x949DB9 },
+    {   26,     30,    0x949DB9 },
+    {   26,     31,    0x949DB9 },
+    {   26,     32,    0x949DB9 },
+    {   26,     33,    0x949DB9 },
+    {   26,     34,    0x949DB9 },
+    {   26,     35,    0x949DB9 },
+    {   26,     36,    0x949DB9 },
+    {   26,     37,    0x949DB9 },
+    {   26,     38,    0x949DB9 },
+    {   26,     39,    0x949DB9 },
+    {   26,     41,    0x949DB9 },
+    {   26,     42,    0xFF7F7F },
+    {   26,     43,    0xFF7F7F },
+    {   26,     44,    0xFF7F7F },
+    {   26,     45,    0x3089FF },
+    {   26,     46,    0x3089FF },
+    {   26,     47,    0x949DB9 },
+    {   26,     48,    0x949DB9 },
+    {   26,     49,    0x949DB9 },
+    {   26,     50,    0x949DB9 },
+    {   26,     51,    0x949DB9 },
+    {   26,     52,    0x949DB9 },
+    {   26,     53,    0x949DB9 },
+    {   26,     54,    0x949DB9 },
+    {   26,     55,    0x949DB9 },
+    {   26,     56,    0xCEA98B },
+    {   26,     57,    0xCEA98B },
+    {   26,     58,    0xCEA98B },
+    {   26,     59,    0xCEA98B },
+    {   26,     60,    0xCEA98B },
+    {   26,     61,    0xCEA98B },
+    {   26,     62,    0xCEA98B },
+    {   26,     63,    0xCEA98B },
+    {   26,     66,    0x949DB9 },
+    {   26,     67,    0x949DB9 },
+    {   26,     68,    0x949DB9 },
+    {   26,     69,    0xCEA98B },
+    {   26,     70,    0xCEA98B },
+    {   26,     71,    0x949DB9 },
+    {   26,     72,    0x949DB9 },
+    {   26,     73,    0x949DB9 },
+    {   26,     87,    0xCEA98B },
+    {   26,     89,    0xCEA98B },
+    {   26,     90,    0xCEA98B },
+    {   26,     91,    0xCEA98B },
+    {   26,     92,    0xCEA98B },
+    {   26,     93,    0xCEA98B },
+    {   26,     94,    0x949DB9 },
+    {   26,     95,    0x949DB9 },
+    {   26,     96,    0xFF3030 },
+    {   26,     97,    0x949DB9 },
+};
+
 void P_SetSectorColorTable (int area)
 {
     switch (area)
@@ -2527,6 +2600,7 @@ void P_SetSectorColorTable (int area)
         case 24:  sectorcolor = sectorcolor_map24;  break;
         
         case 25:  sectorcolor = sectorcolor_map25;  break;
+        case 26:  sectorcolor = sectorcolor_map26;  break;
         default:  sectorcolor = sectorcolor_dummy;  break;
     }
 }
