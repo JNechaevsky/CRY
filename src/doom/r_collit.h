@@ -50,6 +50,10 @@ extern const byte C_9BC8CD_CRY[], C_9BC8CD_DOOM[];
 extern const byte C_666666_CRY[], C_666666_DOOM[];
 extern const byte C_777777_CRY[], C_777777_DOOM[];
 
+extern const byte C_CEA98B_CRY[], C_CEA98B_DOOM[];
+extern const byte C_FFCD5A_CRY[], C_FFCD5A_DOOM[];
+extern const byte C_AC785B_CRY[], C_AC785B_DOOM[];
+
 
 // Composing functions
 extern void R_AllocateColoredColormaps (void);
