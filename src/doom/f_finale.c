@@ -88,7 +88,7 @@ static boolean F_CastResponder (event_t *ev);
 // F_StartFinale
 // -----------------------------------------------------------------------------
 
-void F_StartFinale (int level)
+void F_StartFinale (int area)
 {
 	gameaction = ga_nothing;
 	gamestate = GS_FINALE;
@@ -99,7 +99,7 @@ void F_StartFinale (int level)
 	players[consoleplayer].messageCenteredTics = 1;
 	players[consoleplayer].messageCentered = NULL;
 
-	if (level == 23)
+	if (area == 23)
 	{
 		S_ChangeMusic(mus_map02, true);
 		finaletext = JAGENDING;
@@ -108,7 +108,7 @@ void F_StartFinale (int level)
 	{
 		S_ChangeMusic(mus_evil, true);
 		finaletext = HOEENDING;
-    }
+	}
 
 	// [JN] Count intermission/finale text lenght. Once it's fully printed, 
 	// no extra "attack/use" button pressing is needed for skipping.
@@ -380,27 +380,27 @@ void F_CastTicker (void)
 		// sound hacks....
 		switch (st)
 		{
+			case S_PLAY_ATK1:
 			case S_POSS_ATK2:	sfx = sfx_pistol; break;
 			case S_SPOS_ATK2:
 			case S_CPOS_ATK2:
 			case S_CPOS_ATK3:
-			case S_CPOS_ATK4:	sfx = sfx_shotgn; break;
+			case S_CPOS_ATK4:
+			case S_SPID_ATK2:
+			case S_SPID_ATK3:	sfx = sfx_shotgn; break;
 			case S_TROO_ATK3:	sfx = sfx_claw;   break;
 			case S_SARG_ATK2:	sfx = sfx_sgtatk; break;
-			case S_SKULL_ATK2:	sfx = sfx_sklatk; break;
+			case S_SKULL_ATK2:
+			case S_PAIN_ATK3:	sfx = sfx_sklatk; break;
 			case S_BOSS_ATK2:
 			case S_BOS2_ATK2:
-			case S_HEAD_ATK2:	sfx = sfx_firsht; break;
-			case S_PAIN_ATK3:	sfx = sfx_sklatk; break;
+			case S_HEAD_ATK2:
+			case S_FATT_ATK2:
+			case S_FATT_ATK5:
+			case S_FATT_ATK8:	sfx = sfx_firsht; break;
 			case S_SKEL_FIST2:	sfx = sfx_skeswg; break;
 			case S_SKEL_FIST4:	sfx = sfx_skepch; break;
 			case S_SKEL_MISS2:	sfx = sfx_skeatk; break;
-			case S_FATT_ATK8:
-			case S_FATT_ATK5:
-			case S_FATT_ATK2:	sfx = sfx_firsht; break;
-			case S_SPID_ATK2:
-			case S_SPID_ATK3:	sfx = sfx_shotgn; break;
-			case S_PLAY_ATK1:	sfx = sfx_pistol; break;      
 			default: sfx = 0; break;
 		}
 
@@ -474,23 +474,23 @@ static boolean F_CastResponder (event_t *ev)
 static void F_CastDrawer (void)
 {
 	int            lump;
-    boolean        flip;
+	boolean        flip;
 	spritedef_t   *sprdef;
 	spriteframe_t *sprframe;
 	patch_t       *patch;
 
 	// erase the entire screen to a background
-    // [JN] Simplify to use common text drawing function.
-    if (gamemap == 23)
-    {
-        V_DrawPatchFullScreen(W_CacheLumpName("M_TITLE", PU_CACHE), false);
-        M_WriteTextBigCentered(15, castorder[castnum].name, NULL);
-    }
-    else
-    {
-        V_DrawPatchFullScreen(W_CacheLumpName("M_BOSSBK", PU_CACHE), false);
-        M_WriteTextBigCentered(178, castorder[castnum].name, NULL);
-    }
+	// [JN] Simplify to use common text drawing function.
+	if (gamemap == 23)
+	{
+		V_DrawPatchFullScreen(W_CacheLumpName("M_TITLE", PU_CACHE), false);
+		M_WriteTextBigCentered(15, castorder[castnum].name, NULL);
+	}
+	else
+	{
+		V_DrawPatchFullScreen(W_CacheLumpName("M_BOSSBK", PU_CACHE), false);
+		M_WriteTextBigCentered(178, castorder[castnum].name, NULL);
+	}
 	
 	// draw the current frame in the middle of the screen
 	sprdef = &sprites[caststate->sprite];
@@ -499,17 +499,17 @@ static void F_CastDrawer (void)
 	flip = (boolean)sprframe->flip[0];
 	patch = W_CacheLumpNum (lump+firstspritelump, PU_CACHE);
 
-    if (gamemap == 23)
-    {
-        V_DrawPatchFinale(ORIGWIDTH/4, 90, patch);
-    }
-    else
-    {
-        if (flip)
-        V_DrawPatchFlipped(ORIGWIDTH/2, 170, patch);
-        else
-        V_DrawPatch(ORIGWIDTH/2, 170, patch);
-    }
+	if (gamemap == 23)
+	{
+		V_DrawPatchFinale(ORIGWIDTH/4, 90, patch);
+	}
+	else
+	{
+		if (flip)
+		V_DrawPatchFlipped(ORIGWIDTH/2, 170, patch);
+		else
+		V_DrawPatch(ORIGWIDTH/2, 170, patch);
+	}
 }
 
 // -----------------------------------------------------------------------------

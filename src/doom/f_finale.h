@@ -22,4 +22,4 @@
 extern boolean F_Responder (event_t *ev);
 extern void F_Ticker (void);
 extern void F_Drawer (void);
-extern void F_StartFinale (int level);
+extern void F_StartFinale (int area);

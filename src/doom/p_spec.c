@@ -77,17 +77,17 @@ typedef PACKED_STRUCT (
 // [JN] TODO - remove support for ANIMATED
 animdef_t		animdefs_vanilla[] =
 {
-	{true,	"TVSNOW03",	"TVSNOW01",	4},
-	{true,	"FLAME03",	"FLAME01",	8},
 	{true,	"BFALL4",	"BFALL1",	8},
+	{true,	"FLAME03",	"FLAME01",	8},
+	{true,	"TVSNOW03",	"TVSNOW01",	4},
 
-	{false,	"NUKAGE3",	"NUKAGE1",	8},
-	{false,	"FWATER4",	"FWATER1",	8},
-	{false,	"LAVA4",	"LAVA1",	8},
-	{false,	"CSLIME04",	"CSLIME01",	8},
-	{false,	"BSLIME01",	"BSLIME01",	8},
 	{false,	"BLOOD3",	"BLOOD1",	8},
+	{false,	"BSLIME01",	"BSLIME01",	8},
+	{false,	"CSLIME04",	"CSLIME01",	8},
+	{false,	"FWATER4",	"FWATER1",	8},
 	{false,	"GLOW04",	"GLOW01",	8},
+	{false,	"LAVA4",	"LAVA1",	8},
+	{false,	"NUKAGE3",	"NUKAGE1",	8},
 	
     {-1,        "",             "",             0},
 };
@@ -95,17 +95,17 @@ animdef_t		animdefs_vanilla[] =
 // [JN] Same sequences with swirling liquids.
 static animdef_t animdefs_swirling[] =
 {
-	{true,	"TVSNOW03",	"TVSNOW01",	4},
-	{true,	"FLAME03",	"FLAME01",	8},
 	{true,	"BFALL4",	"BFALL1",	8},
+	{true,	"FLAME03",	"FLAME01",	8},
+	{true,	"TVSNOW03",	"TVSNOW01",	4},
 
-	{false,	"NUKAGE3",	"NUKAGE1",	65536},
-	{false,	"FWATER4",	"FWATER1",	65536},
-	{false,	"LAVA4",	"LAVA1",	65536},
-	{false,	"CSLIME04",	"CSLIME01",	65536},
-	{false,	"BSLIME01",	"BSLIME01",	65536},
 	{false,	"BLOOD3",	"BLOOD1",	65536},
+	{false,	"BSLIME01",	"BSLIME01",	65536},
+	{false,	"CSLIME04",	"CSLIME01",	65536},
+	{false,	"FWATER4",	"FWATER1",	65536},
 	{false,	"GLOW04",	"GLOW01",	8},
+	{false,	"LAVA4",	"LAVA1",	65536},
+	{false,	"NUKAGE3",	"NUKAGE1",	65536},
 	
     {-1,    "",         "",         0},
 };

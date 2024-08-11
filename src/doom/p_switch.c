@@ -35,14 +35,13 @@ switchlist_t alphSwitchList[] =
 	{"SW1GARG",		"SW2GARG"},
 	{"SW1GSTON",	"SW2GSTON"},
 	{"SW1HOT",		"SW2HOT"},
+	{"SW1MET",		"SW2MET"},
+	{"SW1NEW10",	"SW2NEW10"},
+	{"SW1NEW33",	"SW2NEW33"},
+	{"SW1SKULL",	"SW2SKULL"},
 	{"SW1STAR",		"SW2STAR"},
-	{"SW1WOOD",		"SW2WOOD"},
-
-	{"SW1NEW10",		"SW2NEW10"},
-	{"SW1STEEL",		"SW2STEEL"},
-    {"SW1MET",			"SW2MET"},
-    {"SW1NEW33",		"SW2NEW33"},
-    {"SW1SKULL",		"SW2SKULL"},
+	{"SW1STEEL",	"SW2STEEL"},
+	{"SW1WOOD",		"SW2WOOD"}
 };
 
 int			switchlist[MAXSWITCHES * 2];

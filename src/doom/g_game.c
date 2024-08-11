@@ -837,7 +837,7 @@ void G_DoLoadLevel (void)
     {
         skytexture = R_TextureNumForName("SKY7_1");
         skytexture2 = R_TextureNumForName("SKY7_2");
-        skyscrollspeed = 75; // Redemption Denien exclusive sky
+        skyscrollspeed = 75; // Redemption Denied exclusive sky
     }
     
 

@@ -453,7 +453,6 @@ void EV_VerticalDoor (line_t *line, mobj_t *thing)
 			door->speed = VDOORSPEED*4;
 			break;
 	}
-
 	
 	/* */
 	/* find the top and bottom of the movement range */
