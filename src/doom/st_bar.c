@@ -645,7 +645,7 @@ boolean ST_Responder (event_t *ev)
                 {
                     return false;
                 }
-                if (map > 24)
+                if (map > 48)
                 {
                     return false;
                 }
