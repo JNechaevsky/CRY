@@ -733,6 +733,12 @@ P_SpawnMobjSafe
     // [JN] Initialize animated brightmaps;
     mobj->bmap_flick = 0;
 
+    // [JN] Do not count Lost Souls as "kills" on Doom 2 levels.
+    if (mobj->type == MT_SKULL && gamemap > 24)
+    {
+        mobj->flags &= ~MF_COUNTKILL;
+    }
+
     // [JN] Jaguar: monsters doesn't attack imideatelly in Nightmare.
     // if (gameskill != sk_nightmare)
 	mobj->reactiontime = info->reactiontime;
