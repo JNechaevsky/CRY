@@ -2656,6 +2656,40 @@ static const sectorcolor_t sectorcolor_map27[] =
     {   27,    112,    0xCEA98B },
 };
 
+//
+// Area 28: The Focus
+//
+
+static const sectorcolor_t sectorcolor_map28[] =
+{
+    {   28,      8,    0xFF3030 },
+    {   28,     33,    0xFF3030 },
+    {   28,     40,    0x9BC8CD },
+    {   28,     43,    0xFFAFAF },
+    {   28,     45,    0xFFAFAF },
+    {   28,     46,    0xFF3030 },
+    {   28,     53,    0xFFAFAF },
+    {   28,     54,    0xFF7F7F },
+    {   28,     55,    0xFF7F7F },
+    {   28,     56,    0xFF7F7F },
+    {   28,     65,    0x3089FF },
+    {   28,     68,    0xEEC06B },
+    {   28,     69,    0xEEC06B },
+    {   28,     82,    0xCEA98B },
+    {   28,     83,    0xCEA98B },
+    {   28,     84,    0xCEA98B },
+    {   28,    108,    0x9BC8CD },
+    {   28,    111,    0xFFAFAF },
+    {   28,    113,    0xFFAFAF },
+    {   28,    114,    0xFF3030 },
+    {   28,    119,    0xFF3030 },
+    {   28,    120,    0xEEC06B },
+    {   28,    122,    0xFFF588 },
+    {   28,    127,    0xFF7F7F },
+    {   28,    128,    0xFF7F7F },
+    {   28,    129,    0xFF7F7F },
+};
+
 void P_SetSectorColorTable (int area)
 {
     switch (area)
@@ -2688,6 +2722,7 @@ void P_SetSectorColorTable (int area)
         case 25:  sectorcolor = sectorcolor_map25;  break;
         case 26:  sectorcolor = sectorcolor_map26;  break;
         case 27:  sectorcolor = sectorcolor_map27;  break;
+        case 28:  sectorcolor = sectorcolor_map28;  break;
         default:  sectorcolor = sectorcolor_dummy;  break;
     }
 }
