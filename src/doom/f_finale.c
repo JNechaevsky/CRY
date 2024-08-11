@@ -306,6 +306,7 @@ static castinfo_t castorder2[] = {
 	{CC_REVEN,      MT_UNDEAD},
 	{CC_MANCU,      MT_FATSO},
 	{CC_SPIDER,     MT_SPIDER},
+	{CC_CYBER,      MT_CYBORG},
 	{CC_HERO,       MT_PLAYER},
 	{NULL,          0}
 };
@@ -401,6 +402,9 @@ void F_CastTicker (void)
 			case S_SKEL_FIST2:	sfx = sfx_skeswg; break;
 			case S_SKEL_FIST4:	sfx = sfx_skepch; break;
 			case S_SKEL_MISS2:	sfx = sfx_skeatk; break;
+			case S_CYBER_ATK2:
+			case S_CYBER_ATK4:
+			case S_CYBER_ATK6:	sfx = sfx_rlaunc; break;
 			default: sfx = 0; break;
 		}
 
