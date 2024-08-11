@@ -233,6 +233,10 @@ R_RenderMaskedSegRange
     if (fixedcolormap)
 	dc_colormap[0] = dc_colormap[1] = fixedcolormap;
     
+    // [JN] Draw transparent texture for linedef special 1000.
+    if (curline->linedef->special == 1000)
+	colfunc = tlcolfunc;
+    
     // draw the columns
     for (dc_x = x1 ; dc_x <= x2 ; dc_x++)
     {
@@ -289,6 +293,8 @@ R_RenderMaskedSegRange
 	spryscale += rw_scalestep;
     }
 	
+    // [JN] Reset column drawing functions.
+    colfunc = basecolfunc;
 }
 
 // -----------------------------------------------------------------------------

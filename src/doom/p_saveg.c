@@ -1355,6 +1355,40 @@ static void saveg_write_glow_t(glow_t *str)
 }
 
 //
+// fireflicker_t
+//
+
+static void saveg_read_fireflicker_t(fireflicker_t *str)
+{
+    // sector_t *sector
+    str->sector = &sectors[saveg_read32()];
+
+    // int count
+    str->count = saveg_read32();
+
+    // int minlight
+    str->minlight = saveg_read32();
+
+    // int maxlight
+    str->maxlight = saveg_read32();
+}
+
+static void saveg_write_fireflicker_t(fireflicker_t *str)
+{
+    // sector_t *sector
+    saveg_write32(str->sector - sectors);
+
+    // int count
+    saveg_write32(str->count);
+
+    // int minlight
+    saveg_write32(str->minlight);
+
+    // int maxlight
+    saveg_write32(str->maxlight);
+}
+
+//
 // button_t
 //
 
@@ -1414,6 +1448,7 @@ void P_WriteSaveGameHeader(char *description)
     saveg_write8(gameskill);
     saveg_write8(gameepisode);
     saveg_write8(gamemap);
+    saveg_write8(flag667);
     saveg_write8(idmusnum);
 
     for (i=0 ; i<MAXPLAYERS ; i++) 
@@ -1451,6 +1486,7 @@ boolean P_ReadSaveGameHeader(void)
     gameskill = saveg_read8();
     gameepisode = saveg_read8();
     gamemap = saveg_read8();
+    flag667 = saveg_read8();
     idmusnum = saveg_read8();
 
     // [JN] jff 3/18/98 account for unsigned byte
@@ -1761,6 +1797,7 @@ enum
     tc_flash,
     tc_strobe,
     tc_glow,
+    tc_fireflicker,
     tc_button,
     tc_endspecials
 
@@ -1870,6 +1907,14 @@ void P_ArchiveSpecials (void)
             saveg_write_glow_t((glow_t *) th);
 	    continue;
 	}
+
+	if (th->function.acp1 == (actionf_p1)T_FireFlicker)
+	{
+            saveg_write8(tc_fireflicker);
+	    saveg_write_pad();
+            saveg_write_fireflicker_t((fireflicker_t *)th);
+	    continue;
+	}
     }
 	
     button_ptr = buttonlist;
@@ -1904,6 +1949,7 @@ void P_UnArchiveSpecials (void)
     lightflash_t*	flash;
     strobe_t*		strobe;
     glow_t*		glow;
+    fireflicker_t*		fireflicker;
     button_t		button;
 	
 	
@@ -1983,6 +2029,14 @@ void P_UnArchiveSpecials (void)
             saveg_read_glow_t(glow);
 	    glow->thinker.function.acp1 = (actionf_p1)T_Glow;
 	    P_AddThinker (&glow->thinker);
+	    break;
+
+	  case tc_fireflicker:
+	    saveg_read_pad();
+	    fireflicker = Z_Malloc(sizeof(*fireflicker), PU_LEVEL, NULL);
+            saveg_read_fireflicker_t(fireflicker);
+	    fireflicker->thinker.function.acp1 = (actionf_p1)T_FireFlicker;
+	    P_AddThinker(&fireflicker->thinker);
 	    break;
 
       case tc_button:

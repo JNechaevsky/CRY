@@ -771,7 +771,7 @@ static void R_ProjectSprite (mobj_t* thing)
         thing->target)
     {
 	    // [crispy] Barons of Hell and Hell Knights bleed green blood
-	    if (thing->target->type == MT_BRUISER)
+	    if (thing->target->type == MT_BRUISER || thing->target->type == MT_KNIGHT)
 	    {
 		vis->translation = cr[CR_RED2GREEN];
 	    }
@@ -966,7 +966,23 @@ static void R_DrawPSprite (pspdef_t* psp)
 
     vis->patch = lump;
 
-    if (fixedcolormap)
+    if (viewplayer->powers[pw_invisibility] > 4*32
+	|| viewplayer->powers[pw_invisibility] & 8)
+    {
+	// shadow draw
+	if (vis_improved_fuzz < 2)
+	{
+	    vis->colormap[0] = vis->colormap[1] = NULL;
+	}
+	else
+	{
+	    // [JN] Account invulnerability effect for translucent fuzz.
+	    vis->colormap[0] = vis->colormap[1] = fixedcolormap ? 
+                                              fixedcolormap : spritelights[MAXLIGHTSCALE-1];
+	    vis->mobjflags |= MF_SHADOW;
+	}
+    }
+    else if (fixedcolormap)
     {
 	// fixed color
 	vis->colormap[0] = vis->colormap[1] = fixedcolormap;

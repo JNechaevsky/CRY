@@ -103,8 +103,11 @@
 
 #define GOTINVUL	"Invulnerability!"
 #define GOTBERSERK	"Berserk!"
+#define GOTINVIS	"Partial Invisibility"
 #define GOTSUIT	"Radiation Shielding Suit"
 #define GOTMAP	"Computer Area Map"
+#define GOTVISOR	"Light Amplification Visor"
+#define GOTMSPHERE	"MegaSphere!"
 
 #define GOTCLIP	"You pick up a clip."
 #define GOTCLIPBOX	"You pick up a box of bullets."
@@ -122,6 +125,7 @@
 #define GOTLAUNCHER	"You got the rocket launcher!"
 #define GOTPLASMA	"You got the plasma gun!"
 #define GOTSHOTGUN	"You got the shotgun!"
+#define GOTSHOTGUN2	"You got the super shotgun!"
 
 //
 // P_Doors.C
@@ -168,7 +172,7 @@
 #define STSTR_NCON		"No Clipping Mode ON"
 #define STSTR_NCOFF		"No Clipping Mode OFF"
 
-#define STSTR_BEHOLD	"inVuln, Str, Rad or Allmap"
+#define STSTR_BEHOLD	"inVuln, Str, Inviso, Rad, Allmap, or Lite-amp"
 #define STSTR_BEHOLDX	"Power-up Toggled"
 
 #define STSTR_CHOPPERS	"... doesn't suck - GM"
@@ -180,12 +184,20 @@
 
 #define CC_ZOMBIE   "zombieman"
 #define CC_SHOTGUN  "shotgun guy"
+#define CC_HEAVY    "heavy weapon dude"
 #define CC_IMP      "imp"
 #define CC_DEMON    "demon"
 #define CC_SPECTRE  "spectre"
 #define CC_LOST     "lost soul"
 #define CC_CACO     "cacodemon"
+#define CC_HELL     "hell knight"
 #define CC_BARON    "baron of hell"
+#define CC_ARACH    "arachnotron"
+#define CC_PAIN     "pain elemental"
+#define CC_REVEN    "revenant"
+#define CC_MANCU    "mancubus"
+#define CC_SPIDER   "the spider mastermind"
+#define CC_CYBER    "the cyberdemon"
 #define CC_HERO     "our hero"
 
 //

@@ -165,12 +165,14 @@ static cheatseq_t cheat_freeze = CHEAT("freeze", 0);
 static cheatseq_t cheat_notarget = CHEAT("notarget", 0);
 static cheatseq_t cheat_buddha = CHEAT("buddha", 0);
 
-cheatseq_t cheat_powerup[] =
+cheatseq_t cheat_powerup[7] =
 {
     CHEAT("idbeholdv", 0),
     CHEAT("idbeholds", 0),
+    CHEAT("idbeholdi", 0),
     CHEAT("idbeholdr", 0),
     CHEAT("idbeholda", 0),
+    CHEAT("idbeholdl", 0),
     CHEAT("idbehold", 0),
 };
 
@@ -250,6 +252,12 @@ static inline boolean cht_CheckCheatSP (cheatseq_t *cht, char key)
 static boolean WeaponAvailable (int w)
 {
     if (w < 0 || w >= NUMWEAPONS)
+    {
+        return false;
+    }
+
+    // [JN] Jaguar: can't have SSG in Evil Unleashed levels.
+    if (w == wp_supershotgun && gamemap < 25)
     {
         return false;
     }
@@ -508,7 +516,7 @@ boolean ST_Responder (event_t *ev)
             }
 
             // 'behold?' power-up cheats
-            for (i = 0 ; i < 4 ; i++)
+            for (i = 0 ; i < 6 ; i++)
             {
                 if (cht_CheckCheatSP(&cheat_powerup[i], ev->data2))
                 {
@@ -530,7 +538,7 @@ boolean ST_Responder (event_t *ev)
                 }
             }
             // 'behold' power-up menu
-            if (cht_CheckCheatSP(&cheat_powerup[4], ev->data2))
+            if (cht_CheckCheatSP(&cheat_powerup[6], ev->data2))
             {
                 CT_SetMessage(plyr, STSTR_BEHOLD, false, NULL);
             }
@@ -639,7 +647,7 @@ boolean ST_Responder (event_t *ev)
                 {
                     return false;
                 }
-                if (map > 24)
+                if (map > 48)
                 {
                     return false;
                 }
@@ -1358,8 +1366,8 @@ void ST_Drawer (boolean force)
 
     // Pistol
     ST_DrawWeaponNumberFunc(2, 245 + wide_x, 175, plyr->weaponowned[1]);
-    // Shotgun
-    ST_DrawWeaponNumberFunc(3, 257 + wide_x, 175, plyr->weaponowned[2]);
+    // Shotgun or Super Shotgun
+    ST_DrawWeaponNumberFunc(3, 257 + wide_x, 175, plyr->weaponowned[2] || plyr->weaponowned[8]);
     // Chaingun
     ST_DrawWeaponNumberFunc(4, 269 + wide_x, 175, plyr->weaponowned[3]);
     // Rocket Launcher

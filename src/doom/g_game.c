@@ -149,6 +149,7 @@ static const struct
     { wp_chainsaw,        wp_fist },
     { wp_pistol,          wp_pistol },
     { wp_shotgun,         wp_shotgun },
+    { wp_supershotgun,    wp_shotgun },
     { wp_chaingun,        wp_chaingun },
     { wp_missile,         wp_missile },
     { wp_plasma,          wp_plasma },
@@ -808,12 +809,37 @@ void G_DoLoadLevel (void)
         skytexture2 = R_TextureNumForName("SKY2_2");
         skyscrollspeed = 60; // Middle for Deimos levels
     }
-    else
+    else if (gamemap < 24)
     {
         skytexture = R_TextureNumForName("SKY3_1");
         skytexture2 = R_TextureNumForName("SKY3_2");
         skyscrollspeed = 75; // Fast for Hellish levels
     }
+    else if (gamemap < 36)
+    {
+        skytexture = R_TextureNumForName("SKY4_1");
+        skytexture2 = R_TextureNumForName("SKY4_2");
+        skyscrollspeed = 20; // Slow for startport levels
+    }
+    else if (gamemap < 42)
+    {
+        skytexture = R_TextureNumForName("SKY5_1");
+        skytexture2 = R_TextureNumForName("SKY5_2");
+        skyscrollspeed = 0; // TODO - scrolling for city levels?
+    }
+    else if (gamemap < 48)
+    {
+        skytexture = R_TextureNumForName("SKY6_1");
+        skytexture2 = R_TextureNumForName("SKY6_2");
+        skyscrollspeed = 0; // TODO - scrolling for hell levels?
+    }
+    else
+    {
+        skytexture = R_TextureNumForName("SKY7_1");
+        skytexture2 = R_TextureNumForName("SKY7_2");
+        skyscrollspeed = 75; // Redemption Denied exclusive sky
+    }
+    
 
     levelstarttic = gametic;        // for time calculation
     
@@ -1186,9 +1212,6 @@ void G_Ticker (void)
 	  case ga_completed: 
 	    G_DoCompleted (); 
 	    break; 
-	  case ga_victory: 
-	    F_StartFinale (); 
-	    break; 
 	  case ga_worlddone: 
 	    G_DoWorldDone (); 
 	    break; 
@@ -1542,11 +1565,9 @@ void G_WorldDone (void)
     if (secretexit) 
 	players[consoleplayer].didsecret = true; 
 
-    switch (gamemap)
+    if (gamemap == 23 || gamemap == 48)
     {
-        case 23:
-        F_StartFinale ();
-        break;
+        F_StartFinale (gamemap);
     }
 } 
  
@@ -1758,6 +1779,7 @@ G_DeferedInitNew
     d_map = map; 
     G_ClearSavename();
     gameaction = ga_newgame; 
+    flag667 = false;
 } 
 
 
@@ -1774,6 +1796,7 @@ void G_DoNewGame (void)
     consoleplayer = 0;
     G_InitNew (d_skill, d_episode, d_map); 
     gameaction = ga_nothing; 
+    flag667 = false;
 } 
 
 
@@ -1804,9 +1827,9 @@ G_InitNew
 	{
 		map = 1;
 	}
-	if (map > 24)
+	if (map > 48)
 	{
-		map = 24;
+		map = 48;
 	}
 
 	M_ClearRandom ();

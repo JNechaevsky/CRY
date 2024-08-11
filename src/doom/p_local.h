@@ -94,7 +94,8 @@ typedef enum
 	raiseToHighest,
 	lowerAndCrush,
 	crushAndRaise,
-	fastCrushAndRaise
+	fastCrushAndRaise,
+	silentCrushAndRaise
 } ceiling_e;
 
 typedef struct
@@ -288,7 +289,7 @@ typedef enum
     pastdest
 } result_e;
 
-extern int  EV_BuildStairs (line_t *line);
+extern int  EV_BuildStairs (line_t *line, stair_e type);
 extern int  EV_DoFloor (line_t *line, floor_e floortype);
 extern void T_MoveFloor (floormove_t *floor);
 
@@ -314,6 +315,15 @@ extern int clipammo[NUMAMMO];
 #define STROBEBRIGHT    5
 #define FASTDARK        15
 #define SLOWDARK        35
+
+typedef struct
+{
+    thinker_t  thinker;
+    sector_t  *sector;
+    int        count;
+    int        maxlight;
+    int        minlight;
+} fireflicker_t;
 
 typedef struct
 {
@@ -349,9 +359,11 @@ typedef struct
 extern void EV_LightTurnOn (line_t *line, int bright);
 extern void EV_StartLightStrobing (line_t *line);
 extern void EV_TurnTagLightsOff (line_t *line);
+extern void P_SpawnFireFlicker (sector_t *sector);
 extern void P_SpawnGlowingLight (sector_t *sector);
 extern void P_SpawnLightFlash (sector_t *sector);
 extern void P_SpawnStrobeFlash (sector_t *sector, int fastOrSlow, int inSync);
+extern void T_FireFlicker (fireflicker_t *flick);
 extern void T_Glow (glow_t *g);
 extern void T_LightFlash (lightflash_t *flash);
 extern void T_StrobeFlash (strobe_t *flash);
@@ -508,7 +520,8 @@ typedef enum
     perpetualRaise,
     downWaitUpStay,
     raiseAndChange,
-    raiseToNearestAndChange
+    raiseToNearestAndChange,
+    blazeDWUS
 } plattype_e;
 
 typedef struct

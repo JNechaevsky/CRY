@@ -67,7 +67,6 @@ typedef enum
     ga_loadgame,
     ga_savegame,
     ga_completed,
-    ga_victory,
     ga_worlddone,
     ga_screenshot
 } gameaction_t;
@@ -703,6 +702,7 @@ typedef enum
     wp_plasma,
     wp_bfg,
     wp_chainsaw,
+    wp_supershotgun,
 
     NUMWEAPONS,
     
@@ -745,8 +745,10 @@ typedef enum
 {
     pw_invulnerability,
     pw_strength,
+    pw_invisibility,
     pw_ironfeet,
     pw_allmap,
+    pw_infrared,
     NUMPOWERS
     
 } powertype_t;
