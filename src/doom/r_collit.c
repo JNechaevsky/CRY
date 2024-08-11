@@ -2488,6 +2488,7 @@ static const sectorcolor_t sectorcolor_map25[] =
     {   25,     34,    0xFFCD5A },
     {   25,     35,    0xFFCD5A },
     {   25,     36,    0xFFCD5A },
+	{   25,     37,    0xFFCD5A },
     {   25,     39,    0x9BC8CD },
     {   25,     40,    0x9BC8CD },
     {   25,     47,    0x9BC8CD },
