@@ -257,6 +257,11 @@ boolean P_GivePower (player_t *player, int /*powertype_t*/ power)
 		player->mo->flags |= MF_SHADOW;
 		return true;
 	}
+	if (power == pw_infrared)
+	{
+		player->powers[power] = INFRATICS;
+		return true;
+	}
 	if (power == pw_ironfeet)
 	{
 		player->powers[power] = IRONTICS;
@@ -450,6 +455,9 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
         break;
 	
         case SPR_PVIS:
+        if (!P_GivePower (player, pw_infrared))
+            return;
+        CT_SetMessage(player, GOTVISOR, false, NULL);
         break;
 	
         // ammo
@@ -638,7 +646,7 @@ P_KillMobj
 	// [JN] & [crispy] Reset the yellow bonus palette when the player dies
 	target->player->bonuscount = 0;
 	// [JN] & [crispy] Remove the effect of the inverted palette when the player dies
-	target->player->fixedcolormap = 0;
+	target->player->fixedcolormap = target->player->powers[pw_infrared] ? 1 : 0;
 
 	if (target->player == &players[consoleplayer]
 	    && automapactive)
