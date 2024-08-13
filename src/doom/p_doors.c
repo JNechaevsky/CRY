@@ -19,9 +19,7 @@
 
 #include "z_zone.h"
 #include "p_local.h"
-#include "i_system.h"
 #include "s_sound.h"
-#include "d_englsh.h"
 #include "ct_chat.h"
 
 /*================================================================== */

@@ -239,7 +239,7 @@ int EV_DoFloor(line_t *line,floor_e floortype)
 	secnum = -1;
 	rtn = 0;
 	while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
-    {
+	{
 		sec = &sectors[secnum];
 		
 		/*	ALREADY MOVING?  IF SO, KEEP GOING... */
@@ -326,13 +326,18 @@ int EV_DoFloor(line_t *line,floor_e floortype)
 						{
 							side = getSide(secnum,i,0);
 							if (side->bottomtexture >= 0)
-								if (textureheight[side->bottomtexture] < minsize)
-							minsize = textureheight[side->bottomtexture];
+								if (
+					textureheight[side->bottomtexture]  < 
+									minsize)
+									minsize = 
+										textureheight[side->bottomtexture];
 							side = getSide(secnum,i,1);
 							if (side->bottomtexture >= 0)
-							if (textureheight[side->bottomtexture] < minsize)
-								minsize = textureheight[side->bottomtexture];
-						}
+								if (textureheight[side->bottomtexture] < 
+									minsize)
+									minsize = 
+										textureheight[side->bottomtexture];
+						} 
 					floor->floordestheight = floor->sector->floorheight + 
 						minsize;
 				}
