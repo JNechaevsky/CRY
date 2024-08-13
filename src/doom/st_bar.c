@@ -256,12 +256,6 @@ static boolean WeaponAvailable (int w)
         return false;
     }
 
-    // [JN] Jaguar: can't have SSG in Evil Unleashed levels.
-    if (w == wp_supershotgun && gamemap < 25)
-    {
-        return false;
-    }
-
     return true;
 }
 

@@ -149,7 +149,6 @@ static const struct
     { wp_chainsaw,        wp_fist },
     { wp_pistol,          wp_pistol },
     { wp_shotgun,         wp_shotgun },
-    { wp_supershotgun,    wp_shotgun },
     { wp_chaingun,        wp_chaingun },
     { wp_missile,         wp_missile },
     { wp_plasma,          wp_plasma },
