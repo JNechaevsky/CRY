@@ -726,12 +726,11 @@ void S_ChangeMusic(int musicnum, int looping)
     char namebuf[9];
     void *handle;
 
-    // [JN] TODO -- ?! music 27 goes out of this bounds?
-    //if (musicnum <= mus_None || musicnum >= NUMMUSIC)
-    //{
-    //    I_Error("Bad music number %d", musicnum);
-    //}
-    //else
+    if (musicnum <= mus_None || musicnum >= NUMMUSIC)
+    {
+        I_Error("Bad music number %d", musicnum);
+    }
+    else
     {
         music = &S_music[musicnum];
     }
