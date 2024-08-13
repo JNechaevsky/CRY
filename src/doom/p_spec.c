@@ -517,7 +517,7 @@ void P_CrossSpecialLine (int linenum, int side, mobj_t *thing)
 			line->special = 0;
 			break;
 		case 8:			/* Build Stairs */
-			EV_BuildStairs(line,build8);
+			EV_BuildStairs(line);
 			line->special = 0;
 			break;
 		case 10:		/* PlatDownWaitUp */
@@ -618,30 +618,6 @@ void P_CrossSpecialLine (int linenum, int side, mobj_t *thing)
 			EV_TurnTagLightsOff(line);
 			line->special = 0;
 			break;
-		case 108:		/* Blazing Door Raise (faster than TURBO!) */
-			EV_DoDoor(line,vld_blazeRaise);
-			line->special = 0;
-			break;
-		case 109:		/* Blazing Door Open (faster than TURBO!) */
-			EV_DoDoor(line,vld_blazeOpen);
-			line->special = 0;
-			break;
-		case 100:		/* Build Stairs Turbo 16 */
-			EV_BuildStairs(line,turbo16);
-			line->special = 0;
-			break;
-		case 110:		/* Blazing Door Close (faster than TURBO!) */
-			EV_DoDoor (line,vld_blazeClose);
-			line->special = 0;
-			break;
-		case 119:		/* Raise floor to nearest surr. floor */
-			EV_DoFloor(line,raiseFloorToNearest);
-			line->special = 0;
-			break;
-		case 141:		/* Silent Ceiling Crush & Raise */
-			EV_DoCeiling(line,silentCrushAndRaise);
-			line->special = 0;
-			break;
 	/*==================================================== */
 	/* RE-DOABLE TRIGGERS */
 	/*==================================================== */
@@ -721,21 +697,11 @@ void P_CrossSpecialLine (int linenum, int side, mobj_t *thing)
 		case 98:		/* Lower Floor (TURBO) */
 			EV_DoFloor(line,turboLower);
 			break;
-		case 105:		/* Blazing Door Raise (faster than TURBO!) */
-			EV_DoDoor(line,vld_blazeRaise);
-			break;
-		case 106:		/* Blazing Door Open (faster than TURBO!) */
-			EV_DoDoor (line,vld_blazeOpen);
-			break;
-		case 107:		/* Blazing Door Close (faster than TURBO!) */
-			EV_DoDoor (line,vld_blazeClose);
-			break;
-		case 120:		/* Blazing PlatDownWaitUpStay. */
-			EV_DoPlat(line,blazeDWUS,0);
-			break;
 			
 	}
 }
+
+
 
 /*
 ===============================================================================
@@ -784,6 +750,7 @@ void	P_ShootSpecialLine ( mobj_t *thing, line_t *line)
 	}
 }
 
+
 /*
 ===============================================================================
 =
@@ -797,11 +764,11 @@ void	P_ShootSpecialLine ( mobj_t *thing, line_t *line)
 void P_PlayerInSpecialSector (player_t *player)
 {
 	sector_t	*sector;
-
+	
 	sector = player->mo->subsector->sector;
 	if (player->mo->z != sector->floorheight)
 		return;		/* not all the way down yet */
-
+		
 	switch (sector->special)
 	{
 		case 5:		/* HELLSLIME DAMAGE */
@@ -893,8 +860,8 @@ void P_UpdateSpecials (void)
 	/* */
 	/*	ANIMATE LINE SPECIALS */
 	/* */
-    for (i = 0; i < numlinespecials; i++)
-    {
+	for (i = 0; i < numlinespecials; i++)
+	{
 		line = linespeciallist[i];
 		switch(line->special)
 		{
@@ -905,7 +872,7 @@ void P_UpdateSpecials (void)
 				sides[line->sidenum[0]].basetextureoffset;
 				break;
 		}
-    }
+	}
 	
 	/* */
 	/*	DO BUTTONS */
@@ -1179,7 +1146,6 @@ int EV_DoDonut(line_t*	line)
 
 ==============================================================================
 */
-
 /*
 ================================================================================
 = P_SpawnSpecials
@@ -1231,9 +1197,6 @@ void P_SpawnSpecials (void)
 				break;
 			case 14:	/* DOOR RAISE IN 5 MINUTES */
 				P_SpawnDoorRaiseIn5Mins (sector, i);
-				break;
-			case 17:	/* DOOM2: FIRE FLICKER */
-				P_SpawnFireFlicker(sector);
 				break;
 		}
 	}

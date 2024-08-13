@@ -50,22 +50,6 @@
 	"\n"                        \
 	"  congratulations!"
 
-#define HOEENDING               \
-	"you did it! by turning\n"  \
-	"the evil of the horrors\n" \
-	"of hell in upon itself\n"  \
-	"you have destroyed the\n"  \
-	"power of the demons.\n"    \
-    "\n"                        \
-	"their dreadful invasion\n" \
-	"has been stopped cold!\n"  \
-	"now you can retire to\n"   \
-	"a lifetime of frivolity.\n"\
-	"\n"                        \
-	"congratulations!"          \
-
-static const char *finaletext;
-
 typedef enum
 {
 	F_STAGE_TEXT,
@@ -88,7 +72,7 @@ static boolean F_CastResponder (event_t *ev);
 // F_StartFinale
 // -----------------------------------------------------------------------------
 
-void F_StartFinale (int area)
+void F_StartFinale (void)
 {
 	gameaction = ga_nothing;
 	gamestate = GS_FINALE;
@@ -99,20 +83,11 @@ void F_StartFinale (int area)
 	players[consoleplayer].messageCenteredTics = 1;
 	players[consoleplayer].messageCentered = NULL;
 
-	if (area == 23)
-	{
-		S_ChangeMusic(mus_map02, true);
-		finaletext = JAGENDING;
-	}
-	else
-	{
-		S_ChangeMusic(mus_evil, true);
-		finaletext = HOEENDING;
-	}
+	S_ChangeMusic(mus_map02, true);
 
 	// [JN] Count intermission/finale text lenght. Once it's fully printed, 
 	// no extra "attack/use" button pressing is needed for skipping.
-	finaleendcount = strlen(finaletext) * TEXTSPEED + TEXTEND;
+	finaleendcount = strlen(JAGENDING) * TEXTSPEED + TEXTEND;
 	finalestage = F_STAGE_TEXT;
 	finalecount = 0;
 }
@@ -195,8 +170,7 @@ void F_Ticker (void)
 
 		if (i < MAXPLAYERS)
 		{
-			// [JN] Jaguar: final levels
-			if (gamemap == 23 || gamemap == 48)
+			if (gamemap == 23) // [JN] Jaguar: final level
 			{
 				F_StartCast ();
 			}
@@ -231,7 +205,7 @@ static void F_TextWrite (void)
 	// draw some of the text onto the screen
 	cx = 10;
 	cy = 10;
-	ch = finaletext;
+	ch = JAGENDING;
 
 	count = ((signed int) finalecount - 10) / TEXTSPEED;
 
@@ -269,7 +243,7 @@ static void F_TextWrite (void)
 }
 
 // =============================================================================
-// Final Jaguar Doom and DOOM 2 animations
+// Final Jaguar Doom animations
 // Casting by id Software.
 //   in order of appearance
 // =============================================================================
@@ -280,7 +254,7 @@ typedef struct
 	mobjtype_t	type;
 } castinfo_t;
 
-static castinfo_t castorder1[] = {
+static castinfo_t castorder[] = {
 	{CC_ZOMBIE,     MT_POSSESSED},
 	{CC_SHOTGUN,    MT_SHOTGUY},
 	{CC_IMP,        MT_TROOP},
@@ -291,27 +265,6 @@ static castinfo_t castorder1[] = {
 	{CC_HERO,       MT_PLAYER},
 	{NULL,          0}
 };
-
-static castinfo_t castorder2[] = {
-	{CC_ZOMBIE,     MT_POSSESSED},
-	{CC_SHOTGUN,    MT_SHOTGUY},
-	{CC_HEAVY,      MT_CHAINGUY},
-	{CC_IMP,        MT_TROOP},
-	{CC_DEMON,      MT_SERGEANT},
-	{CC_LOST,       MT_SKULL},
-	{CC_CACO,       MT_HEAD},
-	{CC_HELL,       MT_KNIGHT},
-	{CC_BARON,      MT_BRUISER},
-	{CC_PAIN,       MT_PAIN},
-	{CC_REVEN,      MT_UNDEAD},
-	{CC_MANCU,      MT_FATSO},
-	{CC_SPIDER,     MT_SPIDER},
-	{CC_CYBER,      MT_CYBORG},
-	{CC_HERO,       MT_PLAYER},
-	{NULL,          0}
-};
-
-static castinfo_t *castorder;
 
 static int      castnum;
 static int      casttics;
@@ -328,14 +281,6 @@ static boolean  castattacking;
 static void F_StartCast (void)
 {
 	castnum = 0;
-	if (gamemap == 23)
-	{
-		castorder = castorder1;
-	}
-	else
-	{
-		castorder = castorder2;
-	}
 	caststate = &states[mobjinfo[castorder[castnum].type].seestate];
 	casttics = caststate->tics;
 	castdeath = false;
@@ -383,28 +328,12 @@ void F_CastTicker (void)
 		{
 			case S_PLAY_ATK1:
 			case S_POSS_ATK2:	sfx = sfx_pistol; break;
-			case S_SPOS_ATK2:
-			case S_CPOS_ATK2:
-			case S_CPOS_ATK3:
-			case S_CPOS_ATK4:
-			case S_SPID_ATK2:
-			case S_SPID_ATK3:	sfx = sfx_shotgn; break;
+			case S_SPOS_ATK2:	sfx = sfx_shotgn; break;
 			case S_TROO_ATK3:	sfx = sfx_claw;   break;
 			case S_SARG_ATK2:	sfx = sfx_sgtatk; break;
-			case S_SKULL_ATK2:
-			case S_PAIN_ATK3:	sfx = sfx_sklatk; break;
-			case S_BOSS_ATK2:
-			case S_BOS2_ATK2:
-			case S_HEAD_ATK2:
-			case S_FATT_ATK2:
-			case S_FATT_ATK5:
-			case S_FATT_ATK8:	sfx = sfx_firsht; break;
-			case S_SKEL_FIST2:	sfx = sfx_skeswg; break;
-			case S_SKEL_FIST4:	sfx = sfx_skepch; break;
-			case S_SKEL_MISS2:	sfx = sfx_skeatk; break;
-			case S_CYBER_ATK2:
-			case S_CYBER_ATK4:
-			case S_CYBER_ATK6:	sfx = sfx_rlaunc; break;
+			case S_SKULL_ATK2:	sfx = sfx_sklatk; break;
+			case S_HEAD_ATK2:	sfx = sfx_firsht; break;
+			case S_BOSS_ATK2:	sfx = sfx_firsht; break;
 			default: sfx = 0; break;
 		}
 
@@ -478,42 +407,23 @@ static boolean F_CastResponder (event_t *ev)
 static void F_CastDrawer (void)
 {
 	int            lump;
-	boolean        flip;
 	spritedef_t   *sprdef;
 	spriteframe_t *sprframe;
 	patch_t       *patch;
 
 	// erase the entire screen to a background
+	V_DrawPatchFullScreen(W_CacheLumpName("M_TITLE", PU_CACHE), false);
+
 	// [JN] Simplify to use common text drawing function.
-	if (gamemap == 23)
-	{
-		V_DrawPatchFullScreen(W_CacheLumpName("M_TITLE", PU_CACHE), false);
-		M_WriteTextBigCentered(15, castorder[castnum].name, NULL);
-	}
-	else
-	{
-		V_DrawPatchFullScreen(W_CacheLumpName("M_BOSSBK", PU_CACHE), false);
-		M_WriteTextBigCentered(178, castorder[castnum].name, NULL);
-	}
+	M_WriteTextBigCentered(15, castorder[castnum].name, NULL);
 	
 	// draw the current frame in the middle of the screen
 	sprdef = &sprites[caststate->sprite];
 	sprframe = &sprdef->spriteframes[ caststate->frame & FF_FRAMEMASK];
 	lump = sprframe->lump[0];
-	flip = (boolean)sprframe->flip[0];
 	patch = W_CacheLumpNum (lump+firstspritelump, PU_CACHE);
 
-	if (gamemap == 23)
-	{
-		V_DrawPatchFinale(ORIGWIDTH/4, 90, patch);
-	}
-	else
-	{
-		if (flip)
-		V_DrawPatchFlipped(ORIGWIDTH/2, 170, patch);
-		else
-		V_DrawPatch(ORIGWIDTH/2, 170, patch);
-	}
+	V_DrawPatchFinale(ORIGWIDTH/4, 90, patch);
 }
 
 // -----------------------------------------------------------------------------

@@ -21,9 +21,6 @@
 #include "doomstat.h"
 
 
-// Andrey Budko
-#define STAIRS_UNINITIALIZED_CRUSH_FIELD_VALUE 10
-
 /*================================================================== */
 /*================================================================== */
 /* */
@@ -31,6 +28,8 @@
 /* */
 /*================================================================== */
 /*================================================================== */
+
+
 
 /*================================================================== */
 /* */
@@ -190,17 +189,14 @@ result_e	T_MovePlane(sector_t *sector,fixed_t speed,
 /*	MOVE A FLOOR TO IT'S DESTINATION (UP OR DOWN) */
 /* */
 /*================================================================== */
-
 void T_MoveFloor(floormove_t *floor)
 {
 	result_e	res;
 	
 	res = T_MovePlane(floor->sector,floor->speed,
 			floor->floordestheight,floor->crush,0,floor->direction);
-    
-    if (!(leveltime&7)) // [JN] Jaguar is using value 3 here.
+	if (!(leveltime&7)) // [JN] Jaguar is using value 3 here.
 		S_StartSound((mobj_t *)&floor->sector->soundorg,sfx_stnmov);
-    
 	if (res == pastdest)
 	{
 		floor->sector->specialdata = NULL;
@@ -232,7 +228,6 @@ void T_MoveFloor(floormove_t *floor)
 /*	HANDLE FLOOR TYPES */
 /* */
 /*================================================================== */
-
 int EV_DoFloor(line_t *line,floor_e floortype)
 {
 	int			secnum;
@@ -244,7 +239,7 @@ int EV_DoFloor(line_t *line,floor_e floortype)
 	secnum = -1;
 	rtn = 0;
 	while ((secnum = P_FindSectorFromLineTag(line,secnum)) >= 0)
-    {
+	{
 		sec = &sectors[secnum];
 		
 		/*	ALREADY MOVING?  IF SO, KEEP GOING... */
@@ -326,20 +321,23 @@ int EV_DoFloor(line_t *line,floor_e floortype)
 					floor->direction = 1;
 					floor->sector = sec;
 					floor->speed = FLOORSPEED;
-					for (i = 0 ; i < sec->linecount ; i++)
-					{
+					for (i = 0; i < sec->linecount; i++)
 						if (twoSided (secnum, i) )
 						{
 							side = getSide(secnum,i,0);
 							if (side->bottomtexture >= 0)
-								if (textureheight[side->bottomtexture] < minsize)
-							minsize = textureheight[side->bottomtexture];
+								if (
+					textureheight[side->bottomtexture]  < 
+									minsize)
+									minsize = 
+										textureheight[side->bottomtexture];
 							side = getSide(secnum,i,1);
 							if (side->bottomtexture >= 0)
-							if (textureheight[side->bottomtexture] < minsize)
-								minsize = textureheight[side->bottomtexture];
-						}
-					}
+								if (textureheight[side->bottomtexture] < 
+									minsize)
+									minsize = 
+										textureheight[side->bottomtexture];
+						} 
 					floor->floordestheight = floor->sector->floorheight + 
 						minsize;
 				}
@@ -381,8 +379,7 @@ int EV_DoFloor(line_t *line,floor_e floortype)
 /*	BUILD A STAIRCASE! */
 /* */
 /*================================================================== */
-
-int EV_BuildStairs(line_t *line, stair_e type)
+int EV_BuildStairs(line_t *line)
 {
 	int		secnum;
 	int		height;
@@ -393,9 +390,6 @@ int EV_BuildStairs(line_t *line, stair_e type)
 	int		rtn;
 	sector_t	*sec, *tsec;
 	floormove_t	*floor;
-
-	fixed_t	stairsize = 0;
-	fixed_t	speed = 0;
 
 	secnum = -1;
 	rtn = 0;
@@ -411,32 +405,15 @@ int EV_BuildStairs(line_t *line, stair_e type)
 		/* new floor thinker */
 		/* */
 		rtn = 1;
+		height = sec->floorheight + 8*FRACUNIT;
 		floor = Z_Malloc (sizeof(*floor), PU_LEVSPEC, 0);
 		P_AddThinker (&floor->thinker);
 		sec->specialdata = floor;
 		floor->thinker.function.acp1 = (actionf_p1) T_MoveFloor;
 		floor->direction = 1;
 		floor->sector = sec;
-		switch(type)
-		{
-			case build8:
-				speed = FLOORSPEED/4;
-				stairsize = 8*FRACUNIT;
-			break;
-			case turbo16:
-				speed = FLOORSPEED*4;
-				stairsize = 16*FRACUNIT;
-			break;
-		}
-		floor->speed = speed;
-		height = sec->floorheight + stairsize;
+		floor->speed = FLOORSPEED/4;
 		floor->floordestheight = height;
-		// Initialize
-		floor->type = lowerFloor;
-		// Andrey Budko
-		// Uninitialized crush field will not be equal to 0 or 1 (true)
-		// with high probability. So, initialize it with any other value
-		floor->crush = STAIRS_UNINITIALIZED_CRUSH_FIELD_VALUE;
 		
 		texture = sec->floorpic;
 
@@ -462,8 +439,7 @@ int EV_BuildStairs(line_t *line, stair_e type)
 				if (tsec->floorpic != texture)
 					continue;
 					
-				height += stairsize;
-					
+				height += 8*FRACUNIT;
 				if (tsec->specialdata)
 					continue;
 					
@@ -475,14 +451,8 @@ int EV_BuildStairs(line_t *line, stair_e type)
 				floor->thinker.function.acp1 = (actionf_p1) T_MoveFloor;
 				floor->direction = 1;
 				floor->sector = sec;
-				floor->speed = speed;
+				floor->speed = FLOORSPEED/4;
 				floor->floordestheight = height;
-				// Initialize
-				floor->type = lowerFloor;
-				// Andrey Budko
-				// Uninitialized crush field will not be equal to 0 or 1 (true)
-				// with high probability. So, initialize it with any other value
-				floor->crush = STAIRS_UNINITIALIZED_CRUSH_FIELD_VALUE;
 				ok = 1;
 				break;
 			}
@@ -490,3 +460,4 @@ int EV_BuildStairs(line_t *line, stair_e type)
 	}
 	return rtn;
 }
+

@@ -288,25 +288,12 @@ static char *CRL_GetMobjName (mobjtype_t type)
     {
         case MT_POSSESSED:  return CC_ZOMBIE;   break;
         case MT_SHOTGUY:    return CC_SHOTGUN;  break;
-        case MT_CHAINGUY:   return CC_HEAVY;    break;
         case MT_TROOP:      return CC_IMP;      break;
         case MT_SERGEANT:   return CC_DEMON;    break;
         case MT_SHADOWS:    return CC_SPECTRE;  break;
         case MT_SKULL:      return CC_LOST;     break;
         case MT_HEAD:       return CC_CACO;     break;
-        case MT_KNIGHT:     return CC_HELL;     break;
         case MT_BRUISER:    return CC_BARON;    break;
-        case MT_BABY:       return CC_ARACH;    break;
-        case MT_PAIN:       return CC_PAIN;     break;
-        case MT_UNDEAD:     return CC_REVEN;    break;
-        case MT_FATSO:      return CC_MANCU;    break;
-        case MT_SPIDER:     return CC_SPIDER;   break;
-        case MT_CYBORG:     return CC_CYBER;    break;
-        /*
-        // Wolfenstein guard is not Dehackedable, so leave it nameless.
-        case MT_VILE:       return CC_ARCH;     break;
-        case MT_WOLFSS:     return "WOLFENSTEIN SS";    break;
-        */
         default:            return "";
     }
 }
@@ -369,9 +356,7 @@ boolean PIT_CheckThing (mobj_t* thing)
 	    return true;		// underneath
 		
 	if (tmthing->target 
-         && (tmthing->target->type == thing->type || 
-	    (tmthing->target->type == MT_KNIGHT && thing->type == MT_BRUISER)||
-	    (tmthing->target->type == MT_BRUISER && thing->type == MT_KNIGHT) ) )
+         && (tmthing->target->type == thing->type) )
 	{
 	    // Don't hit same species as originator.
 	    if (thing == tmthing->target)
@@ -1520,12 +1505,6 @@ boolean PIT_RadiusAttack (mobj_t* thing)
     fixed_t	dist;
 	
     if (!(thing->flags & MF_SHOOTABLE) )
-	return true;
-
-    // Boss spider and cyborg
-    // take no damage from concussion.
-    if (thing->type == MT_CYBORG
-	|| thing->type == MT_SPIDER)
 	return true;
 		
     dx = abs(thing->x - bombspot->x);

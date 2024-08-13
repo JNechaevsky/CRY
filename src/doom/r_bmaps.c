@@ -361,26 +361,12 @@ const byte *R_BrightmapForSprite (const int type)
                 return candle;
                 break;
             }
-            // Tall Blue Torch
-            case SPR_TBLU:
-            // Tall Green Torch
-            case SPR_TGRN:
-            // Tall Red Torch
-            case SPR_TRED:
             // Short Blue Torch
             case SPR_SMBT:
             // Short Green Torch
             case SPR_SMGT:
             // Short Red Torch
             case SPR_SMRT:
-            // Tall Technocolumn
-            case SPR_TLMP:
-            // Short Technocolumn
-            case SPR_TLP2:
-            // Evil Eye
-            case SPR_CEYE:
-            // Pile of Skulls and Candles
-            case SPR_POL3:
             // Floating Skull Rock
             case SPR_FSKU:
             // Berserk Pack
@@ -401,15 +387,9 @@ const byte *R_BrightmapForSprite (const int type)
         {
             case SPR_FCAN:
             case SPR_CAND:
-            case SPR_CEYE:
             case SPR_FSKU:
             case SPR_CBRA:
             case SPR_COLU:
-            case SPR_TLMP:
-            case SPR_TLP2:
-            case SPR_TBLU:
-            case SPR_TGRN:
-            case SPR_TRED:
             case SPR_SMBT:
             case SPR_SMGT:
             case SPR_SMRT:

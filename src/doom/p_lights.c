@@ -19,52 +19,6 @@
 #include "m_random.h"
 #include "p_local.h"
 
-
-/*================================================================== */
-/*================================================================== */
-/* */
-/*							FIRELIGHT FLICKER */
-/* */
-/*================================================================== */
-/*================================================================== */
-
-
-void T_FireFlicker (fireflicker_t *flick)
-{
-	int	amount;
-
-	if (--flick->count)
-		return;
-
-	amount = (P_Random()&3)*16;
-
-	if (flick->sector->lightlevel - amount < flick->minlight)
-		flick->sector->lightlevel = flick->minlight;
-	else
-		flick->sector->lightlevel = flick->maxlight - amount;
-
-	flick->count = 4;
-}
-
-void P_SpawnFireFlicker (sector_t *sector)
-{
-	fireflicker_t *flick;
-	
-	// Note that we are resetting sector attributes.
-	// Nothing special about it during gameplay.
-	sector->special = 0; 
-
-	flick = Z_Malloc ( sizeof(*flick), PU_LEVSPEC, 0);
-
-	P_AddThinker (&flick->thinker);
-
-	flick->thinker.function.acp1 = (actionf_p1) T_FireFlicker;
-	flick->sector = sector;
-	flick->maxlight = sector->lightlevel;
-	flick->minlight = P_FindMinSurroundingLight(sector,sector->lightlevel)+16;
-	flick->count = 4;
-}
-
 /*================================================================== */
 /*================================================================== */
 /* */
@@ -81,7 +35,6 @@ void P_SpawnFireFlicker (sector_t *sector)
 /*	that spawn thinkers */
 /* */
 /*================================================================== */
-
 void T_LightFlash (lightflash_t *flash)
 {
 	if (--flash->count)
@@ -100,6 +53,7 @@ void T_LightFlash (lightflash_t *flash)
 
 }
 
+
 /*================================================================== */
 /* */
 /*	P_SpawnLightFlash */
@@ -107,8 +61,7 @@ void T_LightFlash (lightflash_t *flash)
 /*	After the map has been loaded, scan each sector for specials that spawn thinkers */
 /* */
 /*================================================================== */
-
-void P_SpawnLightFlash (sector_t*	sector)
+void P_SpawnLightFlash (sector_t *sector)
 {
 	lightflash_t	*flash;
 	
@@ -139,7 +92,6 @@ void P_SpawnLightFlash (sector_t*	sector)
 /*	After the map has been loaded, scan each sector for specials that spawn thinkers */
 /* */
 /*================================================================== */
-
 void T_StrobeFlash (strobe_t *flash)
 {
 	if (--flash->count)
@@ -165,7 +117,6 @@ void T_StrobeFlash (strobe_t *flash)
 /*	After the map has been loaded, scan each sector for specials that spawn thinkers */
 /* */
 /*================================================================== */
-
 void P_SpawnStrobeFlash (sector_t *sector,int fastOrSlow, int inSync)
 {
 	strobe_t	*flash;
@@ -194,7 +145,6 @@ void P_SpawnStrobeFlash (sector_t *sector,int fastOrSlow, int inSync)
 /*	Start strobing lights (usually from a trigger) */
 /* */
 /*================================================================== */
-
 void EV_StartLightStrobing(line_t *line)
 {
 	int	secnum;
@@ -216,7 +166,6 @@ void EV_StartLightStrobing(line_t *line)
 /*	TURN LINE'S TAG LIGHTS OFF */
 /* */
 /*================================================================== */
-
 void EV_TurnTagLightsOff(line_t	*line)
 {
 	int			i;
@@ -249,7 +198,6 @@ void EV_TurnTagLightsOff(line_t	*line)
 /*	TURN LINE'S TAG LIGHTS ON */
 /* */
 /*================================================================== */
-
 void EV_LightTurnOn(line_t *line, int bright)
 {
 	int			i;
@@ -288,7 +236,6 @@ void EV_LightTurnOn(line_t *line, int bright)
 /*	Spawn glowing light */
 /* */
 /*================================================================== */
-
 void T_Glow(glow_t *g)
 {
 	switch(g->direction)
@@ -321,8 +268,9 @@ void P_SpawnGlowingLight(sector_t *sector)
 	g->sector = sector;
 	g->minlight = P_FindMinSurroundingLight(sector,sector->lightlevel);
 	g->maxlight = sector->lightlevel;
-    g->thinker.function.acp1 = (actionf_p1) T_Glow;
+	g->thinker.function.acp1 = (actionf_p1) T_Glow;
 	g->direction = -1;
 
 	sector->special = 0;
 }
+

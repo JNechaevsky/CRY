@@ -31,8 +31,8 @@
 #include "id_func.h"
 
 
-// [JN] 24 map of original Jaguar + 24 map of Hell on Earth
-#define NUMMAPS		48
+// [JN] 24 map of original Jaguar
+#define NUMMAPS		24
 
 // Singple-player stuff
 #define SP_STATSX	50
@@ -335,8 +335,8 @@ static void WI_drawStats (void)
 	WI_drawTime(ORIGWIDTH - SP_STATSX, 132, cnt_ttime, false);
 
 	// Draws which level you are entering...
-	// Don't draw "Entering" after finishing Military Base and Redemption Denied.
-	if (gamemap != 23 && gamemap != 48)
+	// Don't draw "Entering Military Base" after finishing map 23.
+	if (gamemap != 23)
 	{
 		M_WriteTextBigCentered (155, "Entering", NULL);
 		sprintf(str, "%s", level_names[wminfo.next]);
@@ -400,7 +400,7 @@ void WI_Ticker (void)
 	if (bcnt == 1)
 	{
 		// intermission music
-		S_ChangeMusic(gamemap < 25 ? mus_intr1 : mus_intr2, true); 
+		S_ChangeMusic(mus_inter, true); 
 	}
 
 	WI_checkForAccelerate();

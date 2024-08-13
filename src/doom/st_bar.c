@@ -256,12 +256,6 @@ static boolean WeaponAvailable (int w)
         return false;
     }
 
-    // [JN] Jaguar: can't have SSG in Evil Unleashed levels.
-    if (w == wp_supershotgun && gamemap < 25)
-    {
-        return false;
-    }
-
     return true;
 }
 
@@ -647,7 +641,7 @@ boolean ST_Responder (event_t *ev)
                 {
                     return false;
                 }
-                if (map > 48)
+                if (map > 24)
                 {
                     return false;
                 }
@@ -1366,8 +1360,8 @@ void ST_Drawer (boolean force)
 
     // Pistol
     ST_DrawWeaponNumberFunc(2, 245 + wide_x, 175, plyr->weaponowned[1]);
-    // Shotgun or Super Shotgun
-    ST_DrawWeaponNumberFunc(3, 257 + wide_x, 175, plyr->weaponowned[2] || plyr->weaponowned[8]);
+    // Shotgun
+    ST_DrawWeaponNumberFunc(3, 257 + wide_x, 175, plyr->weaponowned[2]);
     // Chaingun
     ST_DrawWeaponNumberFunc(4, 269 + wide_x, 175, plyr->weaponowned[3]);
     // Rocket Launcher

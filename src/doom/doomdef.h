@@ -702,7 +702,6 @@ typedef enum
     wp_plasma,
     wp_bfg,
     wp_chainsaw,
-    wp_supershotgun,
 
     NUMWEAPONS,
     

@@ -28,30 +28,29 @@
 /*	CHANGE THE TEXTURE OF A WALL SWITCH TO ITS OPPOSITE */
 /* */
 /*================================================================== */
-
 switchlist_t alphSwitchList[] =
 {
 	{"SW1BRN1",		"SW2BRN1"},
 	{"SW1GARG",		"SW2GARG"},
 	{"SW1GSTON",	"SW2GSTON"},
 	{"SW1HOT",		"SW2HOT"},
-	{"SW1MET",		"SW2MET"},
-	{"SW1NEW10",	"SW2NEW10"},
-	{"SW1NEW33",	"SW2NEW33"},
-	{"SW1SKULL",	"SW2SKULL"},
 	{"SW1STAR",		"SW2STAR"},
-	{"SW1STEEL",	"SW2STEEL"},
-	{"SW1WOOD",		"SW2WOOD"}
+	{"SW1WOOD",		"SW2WOOD"},
 };
 
 int			switchlist[MAXSWITCHES * 2];
 int			numswitches;
 button_t	buttonlist[MAXBUTTONS];
 
-// -----------------------------------------------------------------------------
-// P_InitSwitchList
-// Only called at game initialization.
-// -----------------------------------------------------------------------------
+/*
+===============
+=
+= P_InitSwitchList
+=
+= Only called at game initialization
+=
+===============
+*/
 
 void P_InitSwitchList(void)
 {
@@ -80,7 +79,6 @@ void P_InitSwitchList(void)
 /*	Start a button counting down till it turns off. */
 /* */
 /*================================================================== */
-
 void P_StartButton(line_t *line,bwhere_e w,int texture,int time)
 {
 	int		i;
@@ -105,7 +103,6 @@ void P_StartButton(line_t *line,bwhere_e w,int texture,int time)
 /*	Tell it if switch is ok to use again (1=yes, it's a button). */
 /* */
 /*================================================================== */
-
 void P_ChangeSwitchTexture(line_t *line,int useAgain)
 {
 	int	texTop;
@@ -165,7 +162,7 @@ void P_ChangeSwitchTexture(line_t *line,int useAgain)
 */
 
 boolean P_UseSpecialLine (mobj_t *thing, line_t *line, int side)
-{
+{		
 	/* */
 	/*	Switches that other things can activate */
 	/* */
@@ -207,8 +204,6 @@ boolean P_UseSpecialLine (mobj_t *thing, line_t *line, int side)
 		case 33:		/* Red Card door open */
 		case 100:		/* Red Skull Door Open */
 		case 107:		/* Red Skull Door Raise */
-		case 117:		/* Blazing door raise */
-		case 118:		/* Blazing door open */
 			EV_VerticalDoor (line, thing);
 			break;
 		/*=============================================== */
@@ -270,45 +265,11 @@ boolean P_UseSpecialLine (mobj_t *thing, line_t *line, int side)
 			if (EV_DoFloor(line,turboLower))
 				P_ChangeSwitchTexture(line,1);
 			break;
-		case 114:		/* Blazing Door Raise (faster than TURBO!) */
-			if (EV_DoDoor (line,vld_blazeRaise))
-				P_ChangeSwitchTexture(line,1);
-			break;
-		case 115:		/* Blazing Door Open (faster than TURBO!) */
-			if (EV_DoDoor (line,vld_blazeOpen))
-				P_ChangeSwitchTexture(line,1);
-			break;
-		case 116:		/* Blazing Door Close (faster than TURBO!) */
-			if (EV_DoDoor (line,vld_blazeClose))
-				P_ChangeSwitchTexture(line,1);
-			break;
-		case 123:		/* Blazing PlatDownWaitUpStay */
-			if (EV_DoPlat(line,blazeDWUS,0))
-				P_ChangeSwitchTexture(line,1);
-			break;
-		case 132:		/* Raise Floor Turbo */
-			if (EV_DoFloor(line,raiseFloorTurbo))
-				P_ChangeSwitchTexture(line,1);
-			break;
-		//case 99:		/* BlzOpenDoor BLUE */
-		case 134:		/* BlzOpenDoor RED */
-		case 136:		/* BlzOpenDoor YELLOW */
-			if (EV_DoLockedDoor(line,vld_blazeOpen,thing))
-				P_ChangeSwitchTexture(line,1);
-			break;
-		case 138:		/* Light Turn On */
-			EV_LightTurnOn(line,255);
-			P_ChangeSwitchTexture(line,1);
-			break;
-		case 139:		/* Light Turn Off */
-			EV_LightTurnOn(line,35);
-			P_ChangeSwitchTexture(line,1);
-			break;
 		/*=============================================== */
 		/*	SWITCHES */
 		/*=============================================== */
 		case 7:			/* Build Stairs */
-			if (EV_BuildStairs(line,build8))
+			if (EV_BuildStairs(line))
 				P_ChangeSwitchTexture(line,0);
 			break;
 		case 9:			/* Change Donut */
@@ -355,8 +316,8 @@ boolean P_UseSpecialLine (mobj_t *thing, line_t *line, int side)
 			if (EV_DoFloor(line,turboLower))
 				P_ChangeSwitchTexture(line,0);
 			break;
-		case 49:		//[JN] Use Doom 2 spec: Ceiling Crush And Raise
-			if (EV_DoCeiling(line,crushAndRaise/*lowerAndCrush*/))
+		case 49:		/* Lower Ceiling And Crush */
+			if (EV_DoCeiling(line,lowerAndCrush))
 				P_ChangeSwitchTexture(line,0);
 			break;
 		case 50:		/* Close Door */
@@ -383,38 +344,8 @@ boolean P_UseSpecialLine (mobj_t *thing, line_t *line, int side)
 			if (EV_DoDoor(line,vld_open))
 				P_ChangeSwitchTexture(line,0);
 			break;
-		case 111:		/* Blazing Door Raise (faster than TURBO!) */
-			if (EV_DoDoor (line,vld_blazeRaise))
-				P_ChangeSwitchTexture(line,0);
-			break;
-		case 112:		/* Blazing Door Open (faster than TURBO!) */
-			if (EV_DoDoor (line,vld_blazeOpen))
-				P_ChangeSwitchTexture(line,0);
-			break;
-		case 113:		/* Blazing Door Close (faster than TURBO!) */
-			if (EV_DoDoor (line,vld_blazeClose))
-				P_ChangeSwitchTexture(line,0);
-			break;
-		case 122:		/* Blazing PlatDownWaitUpStay */
-			if (EV_DoPlat(line,blazeDWUS,0))
-				P_ChangeSwitchTexture(line,0);
-			break;
-		case 127:		/* Build Stairs Turbo 16 */
-			if (EV_BuildStairs(line,turbo16))
-				P_ChangeSwitchTexture(line,0);
-			break;
-		case 131:		/* Raise Floor Turbo */
-			if (EV_DoFloor(line,raiseFloorTurbo))
-				P_ChangeSwitchTexture(line,0);
-			break;
-
-		case 133:		/* BlzOpenDoor BLUE */
-		case 135:		/* BlzOpenDoor RED */
-		case 137:		/* BlzOpenDoor YELLOW */
-			if (EV_DoLockedDoor(line,vld_blazeOpen,thing))
-				P_ChangeSwitchTexture(line,0);
-			break;
 	}
 	
 	return true;
 }
+
