@@ -582,7 +582,7 @@ void D_DoomMain (void)
     
     // Load configuration files before initialising other subsystems.
     printf("M_LoadDefaults: Load system defaults.\n");
-    M_SetConfigFilenames(PROGRAM_PREFIX "doom.ini");
+    M_SetConfigFilenames(PROGRAM_PREFIX ".ini");
     D_BindVariables();
     M_LoadDefaults();
 
@@ -593,7 +593,7 @@ void D_DoomMain (void)
     I_AtExit(M_SaveDefaults, true); // [crispy] always save configuration at exit
 
     // Find main IWAD file and load it.
-    iwadfile = D_FindWADByName("yaguar-doom.wad");
+    iwadfile = D_FindWADByName("cry.wad");
 
     // None found?
 
