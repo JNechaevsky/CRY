@@ -352,13 +352,6 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
         CT_SetMessage(player, GOTSUPER, false, NULL);
         break;
 	
-        case SPR_MEGA:
-        player->health = 200;
-        player->mo->health = player->health;
-        P_GiveArmor (player, 2);
-        CT_SetMessage(player, GOTMSPHERE, false, NULL);
-        break;
-
         // cards
         // leave cards for everyone
         case SPR_BKEY:
@@ -574,14 +567,6 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
         sound = sfx_wpnup;	
         break;
 		
-        case SPR_SGN2:
-            if (!P_GiveWeapon(player, wp_supershotgun,
-                            (special->flags & MF_DROPPED) != 0))
-                return;
-        CT_SetMessage(player, GOTSHOTGUN2, false, NULL);
-        sound = sfx_wpnup;	
-        break;
-        
         default:
         I_Error ("P_SpecialThing: Unknown gettable thing");
     }
@@ -698,10 +683,6 @@ P_KillMobj
 	item = MT_SHOTGUN;
 	break;
 	
-      case MT_CHAINGUY:
-	item = MT_CHAINGUN;
-	break;
-    
       default:
 	return;
     }

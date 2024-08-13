@@ -160,15 +160,6 @@ weaponinfo_t	weaponinfo[NUMWEAPONS] =
 	S_SAW1,
 	S_NULL
     },
-    {
-	// super shotgun
-	am_shell,
-	S_DSGUNUP,
-	S_DSGUNDOWN,
-	S_DSGUN,
-	S_DSGUN1,
-	S_DSGUNFLASH1
-    },	
 };
 
 
@@ -811,77 +802,6 @@ A_FireShotgun
 	
     for (i=0 ; i<7 ; i++)
 	P_GunShot (player->mo, false);
-}
-
-
-
-//
-// A_FireShotgun2
-//
-void
-A_FireShotgun2
-( mobj_t*	mobj,
-  player_t*	player,
-  pspdef_t*	psp ) 
-{
-    int		i;
-    angle_t	angle;
-    int		damage;
-		
-	
-    if (!player) return; // [crispy] let pspr action pointers get called from mobj states
-    S_StartSound (player->so, sfx_dshtgn); // [crispy] weapon sound source
-    P_SetMobjState (player->mo, S_PLAY_ATK2);
-
-    DecreaseAmmo(player, weaponinfo[player->readyweapon].ammo, 2);
-
-    P_SetPsprite (player,
-		  ps_flash,
-		  weaponinfo[player->readyweapon].flashstate);
-
-    P_BulletSlope (player->mo);
-	
-    for (i=0 ; i<20 ; i++)
-    {
-	damage = 5*(P_Random ()%3+1);
-	angle = player->mo->angle;
-	angle += P_SubRandom() << ANGLETOFINESHIFT;
-	P_LineAttack (player->mo,
-		      angle,
-		      MISSILERANGE,
-		      bulletslope + (P_SubRandom() << 5), damage);
-    }
-}
-
-void
-A_OpenShotgun2
-( mobj_t*	mobj,
-  player_t*	player,
-  pspdef_t*	psp )
-{
-    if (!player) return; // [crispy] let pspr action pointers get called from mobj states
-    S_StartSound (player->so, sfx_dbopn); // [crispy] weapon sound source
-}
-
-void
-A_LoadShotgun2
-( mobj_t*	mobj,
-  player_t*	player,
-  pspdef_t*	psp )
-{
-if (!player) return; // [crispy] let pspr action pointers get called from mobj states
-    S_StartSound (player->so, sfx_dbload); // [crispy] weapon sound source
-}
-
-void
-A_CloseShotgun2
-( mobj_t*	mobj,
-  player_t*	player,
-  pspdef_t*	psp )
-{
-    if (!player) return; // [crispy] let pspr action pointers get called from mobj states
-    S_StartSound (player->so, sfx_dbcls); // [crispy] weapon sound source
-    A_ReFire(NULL,player,psp); // [crispy] let pspr action pointers get called from mobj states
 }
 
 

@@ -78,9 +78,6 @@ extern  int		gamemap;
 // Nightmare mode flag, single player.
 extern  boolean         respawnmonsters;
 
-// [JN] Boolean for keeping sector effect 667. Thanks Jeff Doggett!
-extern boolean flag667;
-
 // -------------------------
 // Internal parameters for sound rendering.
 // These have been taken from the DOS version,
