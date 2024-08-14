@@ -1367,7 +1367,7 @@ static void M_Draw_ID_Display (void)
     // Messages enabled
     sprintf(str, msg_show ? "ON" : "OFF");
     M_WriteText (M_ItemRightAlign(str), 90, str,
-                 M_Item_Glow(8, msg_show ? GLOW_DARKRED : GLOW_GREEN));
+                 M_Item_Glow(8, msg_show ? GLOW_GREEN : GLOW_DARKRED));
 
     // Messages alignment
     sprintf(str, msg_alignment == 1 ? "STATUS BAR" :
@@ -3137,7 +3137,7 @@ static void M_ID_ApplyResetHook (void)
     dp_menu_shading = 0;
     dp_level_brightness = 0;
     // Messages settings
-    msg_show = 0;
+    msg_show = 1;
     msg_alignment = 0;
     msg_text_shadows = 0;
     msg_local_time = 0;

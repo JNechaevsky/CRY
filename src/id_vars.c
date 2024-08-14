@@ -55,7 +55,7 @@ int vid_fov = 90;
 int dp_menu_shading = 0;
 int dp_level_brightness = 0;
 // Messages Settings
-int msg_show = 0;
+int msg_show = 1;
 int msg_alignment = 0;
 int msg_text_shadows = 0;
 int msg_local_time = 0;
