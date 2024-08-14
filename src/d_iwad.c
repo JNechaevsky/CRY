@@ -299,7 +299,7 @@ char *D_TryFindWADByName(const char *filename)
 
 char *D_FindIWAD(int mask, GameMission_t *mission)
 {
-    char *result = D_FindWADByName("yaguar-doom.wad");;
+    char *result = D_FindWADByName("cry.wad");;
 
     return result;
 }

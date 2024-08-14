@@ -34,6 +34,8 @@
 #include "id_vars.h"
 
 
+#define VERSIONSNAME  "CRY 2.0"
+
 FILE *save_stream;
 int savegamelength;
 boolean savegame_error;
@@ -69,7 +71,7 @@ char *P_SaveGameFile(int slot)
         filename = malloc(filename_size);
     }
 
-    snprintf(basename, 32, "yaguar-save-" "%d.sav", /*10*savepage+*/slot);
+    snprintf(basename, 32, "cry-save-" "%d.sav", /*10*savepage+*/slot);
     M_snprintf(filename, filename_size, "%s%s", savegamedir, basename);
 
     return filename;
@@ -1406,7 +1408,7 @@ void P_WriteSaveGameHeader(char *description)
         saveg_write8(0);
 
     memset(name, 0, sizeof(name));
-    M_snprintf(name, sizeof(name), "version 2.0");
+    M_snprintf(name, sizeof(name), VERSIONSNAME);
 
     for (i=0; i<VERSIONSIZE; ++i)
         saveg_write8(name[i]);

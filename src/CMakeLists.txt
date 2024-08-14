@@ -83,18 +83,18 @@ if(WIN32)
 endif()
 
 if(WIN32)
-    add_executable("${PROGRAM_PREFIX}doom" WIN32 ${SOURCE_FILES} "${CMAKE_CURRENT_BINARY_DIR}/doom-res.rc")
+    add_executable("${PROGRAM_PREFIX}" WIN32 ${SOURCE_FILES} "${CMAKE_CURRENT_BINARY_DIR}/doom-res.rc")
 else()
-    add_executable("${PROGRAM_PREFIX}doom" ${SOURCE_FILES})
+    add_executable("${PROGRAM_PREFIX}" ${SOURCE_FILES})
 endif()
 
-target_include_directories("${PROGRAM_PREFIX}doom" PRIVATE ${GAME_INCLUDE_DIRS})
-target_link_libraries("${PROGRAM_PREFIX}doom" doom ${EXTRA_LIBS})
+target_include_directories("${PROGRAM_PREFIX}" PRIVATE ${GAME_INCLUDE_DIRS})
+target_link_libraries("${PROGRAM_PREFIX}" doom ${EXTRA_LIBS})
 
 if(MSVC)
-    set_target_properties("${PROGRAM_PREFIX}doom" PROPERTIES
+    set_target_properties("${PROGRAM_PREFIX}" PROPERTIES
                           LINK_FLAGS "/MANIFEST:NO")
 endif()
 
-set_target_properties("${PROGRAM_PREFIX}doom" PROPERTIES
+set_target_properties("${PROGRAM_PREFIX}" PROPERTIES
                       INTERPROCEDURAL_OPTIMIZATION ${ENABLE_LTO})

@@ -1,7 +1,7 @@
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 cmake_minimum_required(VERSION 3.9)
-project("Yaguar" VERSION 2.0.0 LANGUAGES C)
+project("CRY" VERSION 2.0.0 LANGUAGES C)
 
 # Autotools variables
 set(top_srcdir ${CMAKE_CURRENT_SOURCE_DIR})
@@ -10,8 +10,8 @@ set(top_builddir ${CMAKE_CURRENT_BINARY_DIR})
 # AC_INIT variables
 set(PACKAGE_VERSION "2.0")
 set(PACKAGE_NAME "${PROJECT_NAME}")
-set(PACKAGE_FULLNAME "Yaguar Doom ${PACKAGE_VERSION}")
-set(PACKAGE_TARNAME "yaguar-doom")
+set(PACKAGE_FULLNAME "CRY ${PACKAGE_VERSION}")
+set(PACKAGE_TARNAME "cry")
 set(PACKAGE_STRING "${PROJECT_NAME} ${PACKAGE_VERSION}")
 
 set(PACKAGE_BUGREPORT "julia.nechaevskaya@live.com")
@@ -92,7 +92,7 @@ string(CONCAT WINDOWS_RC_VERSION "${PROJECT_VERSION_MAJOR}, "
 string(TOLOWER "${PACKAGE_SHORTNAME}" PROGRAM_SPREFIX)
 
 # With a hyphen, used almost everywhere else.
-set(PROGRAM_PREFIX "${PROGRAM_SPREFIX}-")
+set(PROGRAM_PREFIX "${PROGRAM_SPREFIX}")
 
 configure_file(cmake/config.h.cin config.h)
 
