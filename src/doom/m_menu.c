@@ -1619,8 +1619,9 @@ static void M_ID_MusicSystem (int choice)
     // Reinitialize music volume
     S_SetMusicVolume(musicVolume * 8);
 
-    // Restart current music
-    S_ChangeMusic(current_mus_num, true);
+    // Restart current music.
+    // Do not loop title music when player is not in game.
+    S_ChangeMusic(current_mus_num, usergame);
 }
 
 static void M_ID_SFXMode (int choice)
