@@ -528,14 +528,21 @@ void D_DoomMain (void)
 
 #ifdef _WIN32
     // [JN] Print colorized title.
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 
-                            BACKGROUND_RED | BACKGROUND_GREEN |
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
+                            BACKGROUND_GREEN | BACKGROUND_BLUE);
+    for (p = 0 ; p < 20 ; ++p) printf(" ");
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
+                            BACKGROUND_RED);
+    for (p = 0 ; p < 6 ; ++p) printf(" ");
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
+                            BACKGROUND_RED |
                             FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE |
                             FOREGROUND_INTENSITY);
-
-    for (p = 0 ; p < 26 ; p++) printf(" ");
     printf(PACKAGE_FULLNAME);
-    for (p = 0 ; p < 27 ; p++) printf(" ");
+    for (p = 0 ; p < 7 ; ++p) printf(" ");
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
+                            BACKGROUND_RED | BACKGROUND_GREEN);
+    for (p = 0 ; p < 20 ; ++p) printf(" ");
     printf("\n");
 
     // [JN] Fallback to standard console colos.
