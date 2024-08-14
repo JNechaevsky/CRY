@@ -125,7 +125,6 @@ sfxinfo_t S_sfx[] =
   SOUND("bgdth2", 70),
   SOUND("sgtdth", 70),
   SOUND("cacdth", 70),
-  SOUND("skldth", 70),
   SOUND("brsdth", 32),
   SOUND("posact", 120),
   SOUND("bgact",  120),

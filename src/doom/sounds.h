@@ -121,7 +121,6 @@ typedef enum
   sfx_bgdth2,
   sfx_sgtdth,
   sfx_cacdth,
-  sfx_skldth,
   sfx_brsdth,
   sfx_posact,
   sfx_bgact,
