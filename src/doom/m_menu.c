@@ -1557,7 +1557,7 @@ static void M_ID_SFXSystem (int choice)
     S_SetMusicVolume(musicVolume * 8);
 
     // Restart current music
-    S_ChangeMusic(current_mus_num, true);
+    S_ChangeMusic(current_mus_num, usergame);
 }
 
 static void M_ID_MusicSystem (int choice)
@@ -1619,8 +1619,7 @@ static void M_ID_MusicSystem (int choice)
     // Reinitialize music volume
     S_SetMusicVolume(musicVolume * 8);
 
-    // Restart current music.
-    // Do not loop title music when player is not in game.
+    // Restart current music
     S_ChangeMusic(current_mus_num, usergame);
 }
 
@@ -3240,7 +3239,7 @@ static void M_ID_ApplyResetHook (void)
     I_PrecacheSounds(S_sfx, NUMSFX);
     S_SetSfxVolume(sfxVolume * 8);
     S_SetMusicVolume(musicVolume * 8);
-    S_ChangeMusic(current_mus_num, true);
+    S_ChangeMusic(current_mus_num, usergame);
     S_UpdateStereoSeparation();
 
     // [crispy] weapon sound sources
