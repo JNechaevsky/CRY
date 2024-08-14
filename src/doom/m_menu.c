@@ -1783,7 +1783,7 @@ static menuitem_t ID_Menu_Keybinds_1[]=
 
 static menu_t ID_Def_Keybinds_1 =
 {
-    m_id_end,
+    12,
     &ID_Def_Controls,
     ID_Menu_Keybinds_1,
     M_Draw_ID_Keybinds_1,
@@ -1895,11 +1895,12 @@ static menuitem_t ID_Menu_Keybinds_2[]=
     { M_SWTC, "BUDDHA MODE",              M_Bind_BuddhaMode,    'b' },
     { M_SKIP, "", 0, '\0'},
     { M_SKIP, "", 0, '\0'},
+    { M_SKIP, "", 0, '\0'},
 };
 
 static menu_t ID_Def_Keybinds_2 =
 {
-    m_id_end,
+    13,
     &ID_Def_Controls,
     ID_Menu_Keybinds_2,
     M_Draw_ID_Keybinds_2,
@@ -2019,7 +2020,7 @@ static menuitem_t ID_Menu_Keybinds_3[]=
 
 static menu_t ID_Def_Keybinds_3 =
 {
-    m_id_end,
+    10,
     &ID_Def_Controls,
     ID_Menu_Keybinds_3,
     M_Draw_ID_Keybinds_3,
@@ -2127,7 +2128,7 @@ static menuitem_t ID_Menu_Keybinds_4[]=
 
 static menu_t ID_Def_Keybinds_4 =
 {
-    m_id_end,
+    10,
     &ID_Def_Controls,
     ID_Menu_Keybinds_4,
     M_Draw_ID_Keybinds_4,
@@ -2235,7 +2236,7 @@ static menuitem_t ID_Menu_Keybinds_5[]=
 
 static menu_t ID_Def_Keybinds_5 =
 {
-    m_id_end,
+    12,
     &ID_Def_Controls,
     ID_Menu_Keybinds_5,
     M_Draw_ID_Keybinds_5,
@@ -2343,7 +2344,7 @@ static menuitem_t ID_Menu_Keybinds_6[]=
 
 static menu_t ID_Def_Keybinds_6 =
 {
-    6,
+    5,
     &ID_Def_Controls,
     ID_Menu_Keybinds_6,
     M_Draw_ID_Keybinds_6,
