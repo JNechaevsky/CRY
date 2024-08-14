@@ -410,7 +410,7 @@ void D_DoomLoop (void)
 {
     main_loop_started = true;
 
-    I_SetWindowTitle("Yaguar Doom");
+    I_SetWindowTitle("CRY");
     I_GraphicsCheckCommandLine();
     I_SetGrabMouseCallback(D_GrabMouseCallback);
     I_RegisterWindowIcon(doom_data, doom_w, doom_h);
@@ -600,8 +600,8 @@ void D_DoomMain (void)
     if (iwadfile == NULL)
     {
         i_error_safe = false;
-        I_Error("IWAD file yaguar-doom.wad not found.\n"
-                "Make sure it's in the same folder as the yaguar-doom executable.");
+        I_Error("IWAD file cry.wad not found.\n"
+                "Make sure it's in the same folder as the CRY executable.");
     }
 
     modifiedgame = false;
@@ -637,7 +637,7 @@ void D_DoomMain (void)
     W_GenerateHashTable();
 
     // [JN] Set the default directory where savegames are saved.
-    savegamedir = M_GetSaveGameDir("yaguar-doom.wad");
+    savegamedir = M_GetSaveGameDir("cry.wad");
 
     // [JN] Set the default directory where screenshots are saved.
     M_SetScreenshotDir();
