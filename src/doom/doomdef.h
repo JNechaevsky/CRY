@@ -744,10 +744,8 @@ typedef enum
 {
     pw_invulnerability,
     pw_strength,
-    pw_invisibility,
     pw_ironfeet,
     pw_allmap,
-    pw_infrared,
     NUMPOWERS
     
 } powertype_t;

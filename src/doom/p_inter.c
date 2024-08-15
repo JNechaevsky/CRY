@@ -409,9 +409,6 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
         break;
 	
         case SPR_PINS:
-        if (!P_GivePower (player, pw_invisibility))
-            return;
-        CT_SetMessage(player, GOTINVIS, false, NULL);
         break;
 
         case SPR_SUIT:
@@ -427,9 +424,6 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
         break;
 	
         case SPR_PVIS:
-        if (!P_GivePower (player, pw_infrared))
-            return;
-        CT_SetMessage(player, GOTVISOR, false, NULL);
         break;
 	
         // ammo
@@ -610,7 +604,7 @@ void P_KillMobj (mobj_t *source, mobj_t *target)
 	// [JN] & [crispy] Reset the yellow bonus palette when the player dies
 	target->player->bonuscount = 0;
 	// [JN] & [crispy] Remove the effect of the inverted palette when the player dies
-	target->player->fixedcolormap = target->player->powers[pw_infrared] ? 1 : 0;
+	target->player->fixedcolormap = 0;
 
 	if (target->player == &players[consoleplayer]
 	    && automapactive)
