@@ -20,37 +20,30 @@
 #include "p_local.h"
 
 
-//
-// TELEPORTATION
-//
-
-int EV_Teleport (line_t *line, int side, mobj_t *thing)
+/*================================================================== */
+/* */
+/*						TELEPORTATION */
+/* */
+/*================================================================== */
+int	EV_Teleport( line_t *line, int side, mobj_t *thing )
 {
-	int        i;
-	int        tag;
-	unsigned   an;
-	mobj_t    *m;
-	mobj_t    *fog;
-	thinker_t *thinker;
-	sector_t  *sector;
-	fixed_t    oldx;
-	fixed_t    oldy;
-	fixed_t    oldz;
-
-	// don't teleport missiles
+	int		i;
+	int		tag;
+	thinker_t	*thinker;
+	mobj_t		*m,*fog;
+	unsigned	an;
+	sector_t	*sector;
+	fixed_t		oldx, oldy, oldz;
+	
 	if (thing->flags & MF_MISSILE)
-	return 0;		
-
-	// Don't teleport if hit back of line,
-	//  so you can get out of teleporter.
-	if (side == 1)		
-	return 0;	
-    
-    tag = line->tag;
-
-	for (i = 0 ; i < numsectors ; i++)
-	{
-		if (sectors[i].tag == tag)
+		return 0;			/* don't teleport missiles */
+		
+	if (side == 1)		/* don't teleport if hit back of line, */
+		return 0;		/* so you can get out of teleporter */
+	
+	tag = line->tag;
+	for (i = 0; i < numsectors; i++)
+		if (sectors[ i ].tag == tag )
 		{
 			for (thinker = thinkercap.next ; thinker != &thinkercap ; thinker = thinker->next)
 			{
@@ -60,22 +53,18 @@ int EV_Teleport (line_t *line, int side, mobj_t *thing)
 
 				m = (mobj_t *)thinker;
 
-				// not a teleportman
 				if (m->type != MT_TELEPORTMAN )
-					continue;		
-
+					continue;		/* not a teleportman */
 				sector = m->subsector->sector;
-				// wrong sector
 				if (sector-sectors != i )
-					continue;	
+					continue;		/* wrong sector */
 
 				oldx = thing->x;
 				oldy = thing->y;
 				oldz = thing->z;
 
 				if (!P_TeleportMove (thing, m->x, m->y))
-					return 0;
-
+					return 0;	/* move is blocked */
 				thing->z = thing->floorz;
 
 				if (thing->player)
@@ -87,26 +76,20 @@ int EV_Teleport (line_t *line, int side, mobj_t *thing)
 					thing->player->lookdir = 0;
 				}
 
-				// spawn teleport fog at source and destination
+/* spawn teleport fog at source and destination */
 				fog = P_SpawnMobj (oldx, oldy, oldz, MT_TFOG);
 				S_StartSound (fog, sfx_telept);
 				an = m->angle >> ANGLETOFINESHIFT;
-				fog = P_SpawnMobj(m->x+20*finecosine[an],
-								  m->y+20*finesine[an],
-								  thing->z, MT_TFOG);
-
-				// emit sound, where?
+				fog = P_SpawnMobj (m->x+20*finecosine[an], m->y+20*finesine[an]
+					, thing->z, MT_TFOG);
 				S_StartSound (fog, sfx_telept);
-		
-				// don't move for a bit
 				if (thing->player)
-					thing->reactiontime = 18;	
-
+					thing->reactiontime = 18;	/* don't move for a bit */
 				thing->angle = m->angle;
 				thing->momx = thing->momy = thing->momz = 0;
 				return 1;
-			}
+			}	
 		}
-	}
 	return 0;
 }
+
