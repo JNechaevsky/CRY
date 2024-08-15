@@ -899,13 +899,13 @@ static void ST_updateFaceWidget (void)
 void ST_doPaletteStuff (void)
 {
     int palette;
-    int bzc;
     int cnt = plyr->damagecount;
 
     if (plyr->powers[pw_strength])
     {
         // slowly fade the berzerk out
-        bzc = 12 - (plyr->powers[pw_strength]>>6);
+        // [JN] Jaguar: emulate faster fading.
+        const int bzc = 42 - (plyr->powers[pw_strength]>>1);
 
         if (bzc > cnt)
         {
