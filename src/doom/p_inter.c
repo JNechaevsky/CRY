@@ -222,6 +222,7 @@ void P_GiveCard (player_t *player, card_t card)
 	if (player->cards[card])
 		return;		
 	player->bonuscount = BONUSADD;
+	yel_pane_alpha += player->bonuscount;  // [JN] Smooth palette.
 	player->cards[card] = 1;
 }
 
@@ -549,6 +550,7 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
     P_RemoveMobj (special);
 
     player->bonuscount += BONUSADD;
+    yel_pane_alpha += player->bonuscount;  // [JN] Smooth palette.
     // [JN] Limit bonus palette duration to 4 seconds.
     if (player->bonuscount > 4 * TICRATE)
     player->bonuscount = 4 * TICRATE;
@@ -753,8 +755,10 @@ void P_DamageMobj (mobj_t *target, mobj_t *inflictor, mobj_t *source, int damage
 		player->attacker = source;
 		player->damagecount += damage;	/* add damage after armor / invuln */
 
-	if (player->damagecount > 100)
-	    player->damagecount = 100;	// teleport stomp does 10k points...
+	// [JN] CRY: use 50 instead of 100 to prevent
+	// too long smooth pain palette duration.
+	if (player->damagecount > 50)
+	    player->damagecount = 50;	// teleport stomp does 10k points...
 	}
 
 /* */

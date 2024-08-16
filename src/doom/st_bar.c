@@ -50,11 +50,11 @@
 // Palette indices.
 // For damage/bonus red-/gold-shifts
 #define STARTREDPALS		1
-#define STARTBONUSPALS		9
-#define NUMREDPALS			8
-#define NUMBONUSPALS		4
+#define NUMREDPALS			16
+// Bonus items, gold shift.
+#define STARTBONUSPALS		17
 // Radiation suit, green shift.
-#define RADIATIONPAL		13
+#define RADIATIONPAL		18
 // [JN] Bonus+radiation palette, mixed gold and green shift
 #define STARTBONUSRADPALS   5
 
@@ -900,6 +900,7 @@ void ST_doPaletteStuff (void)
 {
     int palette;
     int cnt = plyr->damagecount;
+    int yel = plyr->bonuscount;;
 
     if (plyr->powers[pw_strength])
     {
@@ -915,7 +916,7 @@ void ST_doPaletteStuff (void)
 
     if (cnt)
     {
-        palette = (cnt+7)>>3;
+        palette = cnt;
 
         if (palette >= NUMREDPALS)
         {
@@ -924,8 +925,10 @@ void ST_doPaletteStuff (void)
 
         palette += STARTREDPALS;
     }
-    else if (plyr->bonuscount)
+    else if (yel)
     {
+        
+        /*
         palette = (plyr->bonuscount+7)>>3;
 
         // [JN] Fix missing first bonus palette index
@@ -936,6 +939,9 @@ void ST_doPaletteStuff (void)
         }
 
         palette += STARTBONUSPALS-1;
+        */
+        
+        palette = 17;
         
         // [JN] If rad palette is active, shift indexes
         // to apply bonus+radiation palette.
@@ -953,7 +959,7 @@ void ST_doPaletteStuff (void)
         palette = 0;
     }
 
-    if (palette != st_palette)
+    if (palette != st_palette || yel)
     {
         st_palette = palette;
 		I_SetPalette (palette);
