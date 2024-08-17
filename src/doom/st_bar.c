@@ -258,34 +258,6 @@ static boolean WeaponAvailable (int w)
 }
 
 // -----------------------------------------------------------------------------
-// GiveBackpack
-// [crispy] give or take backpack
-// -----------------------------------------------------------------------------
-
-static void GiveBackpack (boolean give)
-{
-    int i;
-    
-    if (give && !plyr->backpack)
-    {
-        for (i = 0; i < NUMAMMO; i++)
-        {
-            plyr->maxammo[i] *= 2;
-        }
-        plyr->backpack = true;
-    }
-    else
-    if (!give && plyr->backpack)
-    {
-        for (i = 0; i < NUMAMMO; i++)
-        {
-            plyr->maxammo[i] /= 2;
-        }
-        plyr->backpack = false;
-    }
-}
-
-// -----------------------------------------------------------------------------
 // [crispy] adapted from boom202s/M_CHEAT.C:467-498
 // -----------------------------------------------------------------------------
 
@@ -392,9 +364,6 @@ boolean ST_Responder (event_t *ev)
                 plyr->armorpoints = 200;
                 plyr->armortype = 2;
 
-                // [crispy] give backpack
-                GiveBackpack(true);
-
                 for (i=0;i<NUMWEAPONS;i++)
                 {
                     if (WeaponAvailable(i)) // [crispy] only give available weapons
@@ -416,9 +385,6 @@ boolean ST_Responder (event_t *ev)
             {
                 plyr->armorpoints = 200;
                 plyr->armortype = 2;
-
-                // [crispy] give backpack
-                GiveBackpack(true);
 
                 for (i = 0 ; i < NUMWEAPONS ; i++)
                 {
