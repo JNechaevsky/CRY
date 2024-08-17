@@ -3460,7 +3460,7 @@ static void M_DoSave(int slot)
 static void SetDefaultSaveName(int slot)
 {
     // [JN] Generate save name.
-    M_snprintf(savegamestrings[itemOn], SAVESTRINGSIZE - 1, "MAP%02d", gamemap);
+    M_snprintf(savegamestrings[itemOn], SAVESTRINGSIZE - 1, "AREA %d", gamemap);
 
     M_ForceUppercase(savegamestrings[itemOn]);
     joypadSave = false;
@@ -3471,16 +3471,9 @@ static boolean StartsWithMapIdentifier (char *str)
 {
     M_ForceUppercase(str);
 
-    if (strlen(str) >= 4 &&
-        str[0] == 'E' && isdigit(str[1]) &&
-        str[2] == 'M' && isdigit(str[3]))
-    {
-        return true;
-    }
-
-    if (strlen(str) >= 5 &&
-        str[0] == 'M' && str[1] == 'A' && str[2] == 'P' &&
-        isdigit(str[3]) && isdigit(str[4]))
+    if (strlen(str) >= 6 &&
+        str[0] == 'A' && str[1] == 'R' && str[2] == 'E' && str[3] == 'A' &&
+        str[4] == ' ' && isdigit(str[5]))
     {
         return true;
     }
