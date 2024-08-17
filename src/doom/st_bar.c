@@ -50,13 +50,13 @@
 // Palette indices.
 // For damage/bonus red-/gold-shifts
 #define STARTREDPALS		1
-#define STARTBONUSPALS		9
-#define NUMREDPALS			8
-#define NUMBONUSPALS		4
+#define NUMREDPALS			16
+// Bonus items, gold shift.
+#define BONUSPAL			17
 // Radiation suit, green shift.
-#define RADIATIONPAL		13
-// [JN] Bonus+radiation palette, mixed gold and green shift
-#define STARTBONUSRADPALS   5
+#define RADIATIONPAL		18
+// [JN] Bonus+radiation palette, mixed gold and green shift.
+#define RADIATIONBONUSPAL	19
 
 
 // Number of status faces.
@@ -899,7 +899,9 @@ static void ST_updateFaceWidget (void)
 void ST_doPaletteStuff (void)
 {
     int palette;
-    int cnt = plyr->damagecount;
+    int red = plyr->damagecount;
+    int yel = plyr->bonuscount;
+    int grn = (plyr->powers[pw_ironfeet] > 4*32 || plyr->powers[pw_ironfeet] & 8);
 
     if (plyr->powers[pw_strength])
     {
@@ -907,15 +909,15 @@ void ST_doPaletteStuff (void)
         // [JN] Jaguar: emulate faster fading.
         const int bzc = 42 - (plyr->powers[pw_strength]>>1);
 
-        if (bzc > cnt)
+        if (bzc > red)
         {
-            cnt = bzc;
+            red = bzc;
         }
     }
 
-    if (cnt)
+    if (red)
     {
-        palette = (cnt+7)>>3;
+        palette = red;
 
         if (palette >= NUMREDPALS)
         {
@@ -924,27 +926,17 @@ void ST_doPaletteStuff (void)
 
         palette += STARTREDPALS;
     }
-    else if (plyr->bonuscount)
+    else if (yel)
     {
-        palette = (plyr->bonuscount+7)>>3;
-
-        // [JN] Fix missing first bonus palette index
-        // by sudstracting -1 from STARTBONUSPALS, not NUMBONUSPALS.
-        if (palette >= NUMBONUSPALS)
-        {
-            palette = NUMBONUSPALS;
-        }
-
-        palette += STARTBONUSPALS-1;
+        palette = BONUSPAL;
         
-        // [JN] If rad palette is active, shift indexes
-        // to apply bonus+radiation palette.
-        if (plyr->powers[pw_ironfeet] > 4*32 || plyr->powers[pw_ironfeet] & 8)
+        // [JN] If rad palette is active, use special bonus+radiation palette.
+        if (grn)
         {
-            palette += STARTBONUSRADPALS;
+            palette = RADIATIONBONUSPAL;
         }
     }
-    else if (plyr->powers[pw_ironfeet] > 4*32 || plyr->powers[pw_ironfeet] & 8)
+    else if (grn)
     {
         palette = RADIATIONPAL;
     }
@@ -953,7 +945,7 @@ void ST_doPaletteStuff (void)
         palette = 0;
     }
 
-    if (palette != st_palette)
+    if (palette != st_palette || yel)
     {
         st_palette = palette;
 		I_SetPalette (palette);
