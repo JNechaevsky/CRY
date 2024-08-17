@@ -489,7 +489,7 @@ void P_PlayerThink (player_t* player)
 		
     if (player->bonuscount)
     {
-	yel_pane_alpha = player->bonuscount * 4;  // [JN] Smooth palette.
+	yel_pane_alpha = player->bonuscount * 4;  // [JN] CRY: smooth yellow palette fading.
 	player->bonuscount--;
     }
 
