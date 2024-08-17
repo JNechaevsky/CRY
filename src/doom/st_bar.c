@@ -52,11 +52,11 @@
 #define STARTREDPALS		1
 #define NUMREDPALS			16
 // Bonus items, gold shift.
-#define STARTBONUSPALS		17
+#define BONUSPAL			17
 // Radiation suit, green shift.
 #define RADIATIONPAL		18
-// [JN] Bonus+radiation palette, mixed gold and green shift
-#define STARTBONUSRADPALS   5
+// [JN] Bonus+radiation palette, mixed gold and green shift.
+#define RADIATIONBONUSPAL	19
 
 
 // Number of status faces.
@@ -928,13 +928,12 @@ void ST_doPaletteStuff (void)
     }
     else if (yel)
     {
-        palette = 17;
+        palette = BONUSPAL;
         
-        // [JN] If rad palette is active, shift indexes
-        // to apply bonus+radiation palette.
+        // [JN] If rad palette is active, use special bonus+radiation palette.
         if (grn)
         {
-            palette += STARTBONUSRADPALS;
+            palette = RADIATIONBONUSPAL;
         }
     }
     else if (grn)
