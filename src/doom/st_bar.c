@@ -899,8 +899,9 @@ static void ST_updateFaceWidget (void)
 void ST_doPaletteStuff (void)
 {
     int palette;
-    int cnt = plyr->damagecount;
-    int yel = plyr->bonuscount;;
+    int red = plyr->damagecount;
+    int yel = plyr->bonuscount;
+    int grn = (plyr->powers[pw_ironfeet] > 4*32 || plyr->powers[pw_ironfeet] & 8);
 
     if (plyr->powers[pw_strength])
     {
@@ -908,15 +909,15 @@ void ST_doPaletteStuff (void)
         // [JN] Jaguar: emulate faster fading.
         const int bzc = 42 - (plyr->powers[pw_strength]>>1);
 
-        if (bzc > cnt)
+        if (bzc > red)
         {
-            cnt = bzc;
+            red = bzc;
         }
     }
 
-    if (cnt)
+    if (red)
     {
-        palette = cnt;
+        palette = red;
 
         if (palette >= NUMREDPALS)
         {
@@ -927,30 +928,16 @@ void ST_doPaletteStuff (void)
     }
     else if (yel)
     {
-        
-        /*
-        palette = (plyr->bonuscount+7)>>3;
-
-        // [JN] Fix missing first bonus palette index
-        // by sudstracting -1 from STARTBONUSPALS, not NUMBONUSPALS.
-        if (palette >= NUMBONUSPALS)
-        {
-            palette = NUMBONUSPALS;
-        }
-
-        palette += STARTBONUSPALS-1;
-        */
-        
         palette = 17;
         
         // [JN] If rad palette is active, shift indexes
         // to apply bonus+radiation palette.
-        if (plyr->powers[pw_ironfeet] > 4*32 || plyr->powers[pw_ironfeet] & 8)
+        if (grn)
         {
             palette += STARTBONUSRADPALS;
         }
     }
-    else if (plyr->powers[pw_ironfeet] > 4*32 || plyr->powers[pw_ironfeet] & 8)
+    else if (grn)
     {
         palette = RADIATIONPAL;
     }
