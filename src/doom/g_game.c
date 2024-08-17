@@ -802,7 +802,7 @@ void G_DoLoadLevel (void)
         skytexture2 = R_TextureNumForName("SKY1_2");
         skyscrollspeed = 40; // slow for Phobos levels
     }
-    else if (gamemap < 18)
+    else if (gamemap < 17)
     {
         skytexture = R_TextureNumForName("SKY2_1");
         skytexture2 = R_TextureNumForName("SKY2_2");
