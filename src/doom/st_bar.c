@@ -852,7 +852,15 @@ static void ST_updateFaceWidget (void)
         priority = 0;
     }
 
-    st_facecount--;
+    // [JN] Jaguar: player is not changing looking direction while pause.
+    if (paused && !invul)
+    {
+        st_facecount = 1;
+    }
+    else
+    {
+        st_facecount--;
+    }
 
     // [crispy] fix status bar face hysteresis
     st_faceindex = painoffset + faceindex;
