@@ -853,11 +853,7 @@ static void ST_updateFaceWidget (void)
     }
 
     // [JN] Jaguar: player is not changing looking direction while pause.
-    if (paused && !invul)
-    {
-        st_facecount = 1;
-    }
-    else
+    if (!paused || invul)
     {
         st_facecount--;
     }
