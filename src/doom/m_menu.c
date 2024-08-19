@@ -628,6 +628,7 @@ static void M_ID_FlipLevels (int choice);
 static void M_ID_OnDeathAction (int choice);
 
 static void M_Choose_ID_Reset (int choice);
+static int  resetplaque_tics;
 
 // Keyboard binding prototypes
 static boolean KbdIsBinding;
@@ -3115,7 +3116,7 @@ static void M_ID_ApplyResetHook (void)
     // Video options
     //
 
-    vid_resolution = 2;
+    vid_resolution = 1;
     vid_widescreen = 0;
     vid_uncapped_fps = 0;
     vid_fpslimit = 0;
@@ -3261,6 +3262,8 @@ static void M_ID_ApplyReset (int key)
     }
 
     post_rendering_hook = M_ID_ApplyResetHook;
+    // [JN] Arm "Defaults Restored" plaque timer for 1.5 seconds after reset.
+    resetplaque_tics = 1.5 * TICRATE;
 }
 
 static void M_Choose_ID_Reset (int choice)
@@ -5111,6 +5114,12 @@ void M_Drawer (void)
             y += LINEHEIGHT;
         }
     }
+
+    // [JN] Draw "Defaults Restored" plaque while it's timer is active.
+    if (resetplaque_tics)
+    {
+        V_DrawShadowedPatchOptional(116, 76, W_CacheLumpName("DEFAULTS", PU_CACHE));
+    }
 }
 
 
@@ -5174,6 +5183,13 @@ void M_Ticker (void)
             // Decrease tics for glowing effect
             currentMenu->menuitems[i].tics--;
         }
+    }
+    
+    // [JN] "Defaults Restored" plaque timer.
+
+    if (resetplaque_tics)
+    {
+        resetplaque_tics--;
     }
 }
 
