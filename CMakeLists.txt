@@ -29,9 +29,10 @@ else()
     add_compile_options("-Wall"
                         "-Wdeclaration-after-statement"
                         "-Wredundant-decls"
-                        # "-Wpedantic"
+                        "-Wmissing-field-initializers"
+                        "-Wignored-qualifiers"
+                        "-Wpedantic"
                         # "-Wextra"
-                        # "-Wno-ignored-qualifiers"
                         )
 endif()
 

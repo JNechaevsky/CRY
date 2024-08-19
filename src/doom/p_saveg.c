@@ -2033,7 +2033,7 @@ void P_UnArchiveTotalTimes (void)
 
 static int restoretargets_fail = 0;
 
-const uint32_t P_ThinkerToIndex (const thinker_t *thinker)
+uint32_t P_ThinkerToIndex (const thinker_t *thinker)
 {
     thinker_t *th;
     uint32_t   i;

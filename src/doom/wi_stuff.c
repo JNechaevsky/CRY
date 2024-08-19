@@ -72,7 +72,7 @@ static patch_t *num[10];	// 0-9 digits
 // otherwise only use as many as necessary. Returns new x position.
 // -----------------------------------------------------------------------------
 
-static const int WI_drawNum (int x, int y, int n, int digits)
+static int WI_drawNum (int x, int y, int n, int digits)
 {
 	int fontwidth = SHORT(num[0]->width);
 	int neg;

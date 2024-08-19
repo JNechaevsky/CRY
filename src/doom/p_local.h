@@ -621,7 +621,7 @@ extern void     P_WriteSaveGameHeader(char *description);
 extern FILE    *save_stream;
 extern boolean  savegame_error;
 
-extern const uint32_t P_ThinkerToIndex (const thinker_t *thinker);
+extern uint32_t P_ThinkerToIndex (const thinker_t *thinker);
 
 // -----------------------------------------------------------------------------
 // P_SETUP
@@ -707,7 +707,6 @@ typedef struct
 {
     char  name1[9];
     char  name2[9];
-    short episode;
 } switchlist_t;
 
 typedef enum

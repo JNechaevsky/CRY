@@ -949,7 +949,7 @@ static byte *M_Cursor_Glow (const int tics)
         tics == -7 || tics == -8 ? cr[CR_MENU_DARK4]   : NULL;
 }
 
-static const int M_INT_Slider (int val, int min, int max, int direction, boolean capped)
+static int M_INT_Slider (int val, int min, int max, int direction, boolean capped)
 {
     switch (direction)
     {
@@ -968,8 +968,8 @@ static const int M_INT_Slider (int val, int min, int max, int direction, boolean
     return val;
 }
 
-static const float M_FLOAT_Slider (float val, float min, float max, float step,
-                                   int direction, boolean capped)
+static float M_FLOAT_Slider (float val, float min, float max, float step,
+                             int direction, boolean capped)
 {
     char buf[9];
 
@@ -3911,7 +3911,7 @@ M_StartMessage
 //
 // Find string width from hu_font_s chars
 //
-const int M_StringWidth(const char* string)
+int M_StringWidth(const char* string)
 {
     size_t             i;
     int             w = 0;

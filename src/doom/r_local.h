@@ -364,7 +364,7 @@ typedef struct vissprite_s
     // [crispy] color translation table for blood colored by monster class
     byte         *translation;
 
-    const pixel_t	(*blendfunc)(const pixel_t fg, const pixel_t bg);
+    pixel_t	    (*blendfunc)(const pixel_t fg, const pixel_t bg);
 
 } vissprite_t;
 

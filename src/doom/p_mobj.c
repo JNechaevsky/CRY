@@ -673,7 +673,7 @@ void P_MobjThinker (mobj_t* mobj)
 // [JN] killough 8/24/98: rewrote to use hashing
 // -----------------------------------------------------------------------------
 
-static const int P_FindDoomedNum (unsigned type)
+static int P_FindDoomedNum (unsigned type)
 {
     static struct { int first, next; } *hash;
     int i;

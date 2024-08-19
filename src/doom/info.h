@@ -683,7 +683,6 @@ typedef struct
 	int	damage;
 	int	activesound;
 	int	flags;
-    int	raisestate;
 } mobjinfo_t;
 
 extern mobjinfo_t mobjinfo[NUMMOBJTYPES];

@@ -1858,7 +1858,7 @@ void I_BindVideoVariables(void)
     M_BindIntVariable("mouse_grab",                    &mouse_grab);
 }
 
-const pixel_t I_BlendAdd (const pixel_t bg, const pixel_t fg)
+pixel_t I_BlendAdd (const pixel_t bg, const pixel_t fg)
 {
 	uint32_t r, g, b;
 
@@ -1870,7 +1870,7 @@ const pixel_t I_BlendAdd (const pixel_t bg, const pixel_t fg)
 }
 
 // [crispy] http://stereopsis.com/doubleblend.html
-const pixel_t I_BlendDark (const pixel_t bg, const int d)
+pixel_t I_BlendDark (const pixel_t bg, const int d)
 {
 	const uint32_t ag = (bg & 0xff00ff00) >> 8;
 	const uint32_t rb =  bg & 0x00ff00ff;
@@ -1885,7 +1885,7 @@ const pixel_t I_BlendDark (const pixel_t bg, const int d)
 }
 
 // [crispy] Main overlay blending function
-const pixel_t I_BlendOver (const pixel_t bg, const pixel_t fg, const int amount)
+pixel_t I_BlendOver (const pixel_t bg, const pixel_t fg, const int amount)
 {
 	const uint32_t r = ((amount * (fg & rmask) + (0xff - amount) * (bg & rmask)) >> 8) & rmask;
 	const uint32_t g = ((amount * (fg & gmask) + (0xff - amount) * (bg & gmask)) >> 8) & gmask;
@@ -1895,14 +1895,14 @@ const pixel_t I_BlendOver (const pixel_t bg, const pixel_t fg, const int amount)
 }
 
 // [crispy] TRANMAP blending emulation, used for Doom
-const pixel_t I_BlendOverTranmap (const pixel_t bg, const pixel_t fg)
+pixel_t I_BlendOverTranmap (const pixel_t bg, const pixel_t fg)
 {
 	return I_BlendOver(bg, fg, 0xB8); // [JN] 184, increased from 168 (72% opacity)
 }
 
-const pixel_t (*blendfunc) (const pixel_t fg, const pixel_t bg) = I_BlendOverTranmap;
+pixel_t (*blendfunc) (const pixel_t fg, const pixel_t bg) = I_BlendOverTranmap;
 
-const pixel_t I_MapRGB (const uint8_t r, const uint8_t g, const uint8_t b)
+pixel_t I_MapRGB (const uint8_t r, const uint8_t g, const uint8_t b)
 {
 /*
 	return amask |
@@ -1913,7 +1913,7 @@ const pixel_t I_MapRGB (const uint8_t r, const uint8_t g, const uint8_t b)
 	return SDL_MapRGB(argbbuffer->format, r, g, b);
 }
 
-const pixel_t I_BlendFuzz (const pixel_t bg, const pixel_t fg)
+pixel_t I_BlendFuzz (const pixel_t bg, const pixel_t fg)
 {
 	const uint32_t r = ((64 * (fg & rmask) + (0xff - 64) * (bg & rmask)) >> 8) & rmask;
 	const uint32_t g = ((64 * (fg & gmask) + (0xff - 64) * (bg & gmask)) >> 8) & gmask;

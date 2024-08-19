@@ -130,24 +130,24 @@ void V_CopyRect(int srcx, int srcy, pixel_t *source,
 // [crispy] four different rendering functions
 // for each possible combination of dp_translation and dp_translucent:
 // (1) normal, opaque patch
-static const inline pixel_t drawpatchpx00 (const pixel_t dest, const pixel_t source)
+static inline pixel_t drawpatchpx00 (const pixel_t dest, const pixel_t source)
 {return pal_color[source];}
 // (2) color-translated, opaque patch
-static const inline pixel_t drawpatchpx01 (const pixel_t dest, const pixel_t source)
+static inline pixel_t drawpatchpx01 (const pixel_t dest, const pixel_t source)
 {return pal_color[dp_translation[source]];}
 // (3) normal, translucent patch
-static const inline pixel_t drawpatchpx10 (const pixel_t dest, const pixel_t source)
+static inline pixel_t drawpatchpx10 (const pixel_t dest, const pixel_t source)
 {return I_BlendOverTranmap(dest, pal_color[source]);}
 // (4) color-translated, translucent patch
-static const inline pixel_t drawpatchpx11 (const pixel_t dest, const pixel_t source)
+static inline pixel_t drawpatchpx11 (const pixel_t dest, const pixel_t source)
 {return I_BlendOverTranmap(dest, pal_color[dp_translation[source]]);}
 
 // [JN] The shadow of the patch rendering function:
-static const inline pixel_t drawshadow_doom (const pixel_t dest, const pixel_t source)
+static inline pixel_t drawshadow_doom (const pixel_t dest, const pixel_t source)
 {return I_BlendDark(dest, 160);} // [JN] 160 of 256 full translucency.
 
 // [crispy] array of function pointers holding the different rendering functions
-typedef const pixel_t drawpatchpx_t (const pixel_t dest, const pixel_t source);
+typedef pixel_t drawpatchpx_t (const pixel_t dest, const pixel_t source);
 static drawpatchpx_t *const drawpatchpx_a[2][2] = {{drawpatchpx11, drawpatchpx10}, {drawpatchpx01, drawpatchpx00}};
 
 static fixed_t dx, dxi, dy, dyi;

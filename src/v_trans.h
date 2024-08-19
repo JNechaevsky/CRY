@@ -131,12 +131,12 @@ extern char **crstr;
 
 #define cr_esc '~'
 
-extern const pixel_t (*blendfunc) (const pixel_t fg, const pixel_t bg);
-extern const pixel_t I_BlendAdd (const pixel_t bg, const pixel_t fg);
-extern const pixel_t I_BlendDark (const pixel_t bg, const int d);
-extern const pixel_t I_BlendOver (const pixel_t bg, const pixel_t fg, const int amount);
-extern const pixel_t I_BlendOverTranmap (const pixel_t bg, const pixel_t fg);
-extern const pixel_t I_BlendFuzz (const pixel_t bg, const pixel_t fg);
+extern pixel_t (*blendfunc) (const pixel_t fg, const pixel_t bg);
+extern pixel_t I_BlendAdd (const pixel_t bg, const pixel_t fg);
+extern pixel_t I_BlendDark (const pixel_t bg, const int d);
+extern pixel_t I_BlendOver (const pixel_t bg, const pixel_t fg, const int amount);
+extern pixel_t I_BlendOverTranmap (const pixel_t bg, const pixel_t fg);
+extern pixel_t I_BlendFuzz (const pixel_t bg, const pixel_t fg);
 
 
 int V_GetPaletteIndex(byte *palette, int r, int g, int b);

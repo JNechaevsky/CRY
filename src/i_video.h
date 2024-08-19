@@ -91,7 +91,7 @@ void I_RenderReadPixels (byte **data, int *w, int *h);
 
 // Takes full 8 bit values.
 void I_SetPalette (int palette);
-extern const pixel_t I_MapRGB (const uint8_t r, const uint8_t g, const uint8_t b);
+extern pixel_t I_MapRGB (const uint8_t r, const uint8_t g, const uint8_t b);
 extern const int I_ShadeFactor[];
 extern const float I_SaturationPercent[];
 

@@ -391,7 +391,7 @@ static int S_GetChannel(mobj_t *origin, sfxinfo_t *sfxinfo)
 // Adapted from EDGE, converted to fixed point math.
 // -----------------------------------------------------------------------------
 
-static const int64_t S_ApproxDistanceZ (int64_t dx, int64_t dy, int64_t dz)
+static int64_t S_ApproxDistanceZ (int64_t dx, int64_t dy, int64_t dz)
 {
 	int64_t dxy;
 
