@@ -161,6 +161,8 @@ fixed_t*	spritetopoffset;
 
 lighttable_t	*colormaps;
 lighttable_t	*pal_color; // [crispy] array holding palette colors for true color mode
+lighttable_t	*cry_color; // [JN] array holding CRY patch drawing palette colors
+lighttable_t	*palette_pointer; // [JN] pointer to cry_color / pal_color
 
 // [FG] check if the lump can be a Doom patch
 // taken from PrBoom+ prboom2/src/r_patch.c:L350-L390
@@ -1105,10 +1107,11 @@ void R_InitColormaps (void)
 	byte r, g, b;
 
 	byte *const playpal = W_CacheLumpName("PLAYPAL", PU_STATIC);
-	byte *const crypal = W_CacheLumpName("CRYPAL", PU_STATIC);
+	byte *const cryworld = W_CacheLumpName("CRYWORLD", PU_STATIC);
+	byte *const crypatch = W_CacheLumpName("CRYPATCH", PU_STATIC);
 	byte *const invulpal = W_CacheLumpName("INVULPAL", PU_STATIC);
-	// [JN] Which palette to use for in-game rendering, CRYPAL or PLAYPAL?
-	byte *const pal_pointer = dp_cry_palette ? crypal : playpal;
+	// [JN] Which palette to use for in-game rendering, CRYWORLD or PLAYPAL?
+	byte *const render_pointer = dp_cry_palette ? cryworld : playpal;
 
 	if (!colormaps)
 	{
@@ -1124,9 +1127,9 @@ void R_InitColormaps (void)
 		{
 			const byte k = colormap[i];
 
-			r = gammatable[vid_gamma][pal_pointer[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			g = gammatable[vid_gamma][pal_pointer[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			b = gammatable[vid_gamma][pal_pointer[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			r = gammatable[vid_gamma][render_pointer[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			g = gammatable[vid_gamma][render_pointer[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			b = gammatable[vid_gamma][render_pointer[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
 
 			// [JN] Generate colored colormaps.
 			R_GenerateColoredColormaps(k, scale, j);
@@ -1161,8 +1164,26 @@ void R_InitColormaps (void)
 		pal_color[j++] = 0xff000000 | (r << 16) | (g << 8) | b;
 	}
 
+	if (!cry_color)
+	{
+		cry_color = (pixel_t*) Z_Malloc(256 * sizeof(pixel_t), PU_STATIC, 0);
+	}
+
+	for (i = 0, j = 0; i < 256; i++)
+	{
+		r = gammatable[vid_gamma][crypatch[3 * i + 0]];
+		g = gammatable[vid_gamma][crypatch[3 * i + 1]];
+		b = gammatable[vid_gamma][crypatch[3 * i + 2]];
+
+		cry_color[j++] = 0xff000000 | (r << 16) | (g << 8) | b;
+	}
+
+	// [JN] Which palette to use for patch drawing, CRYPATCH or PLAYPAL?
+	palette_pointer = dp_cry_palette ? cry_color : pal_color;
+
 	W_ReleaseLumpName("PLAYPAL");
-	W_ReleaseLumpName("CRYPAL");
+	W_ReleaseLumpName("CRYWORLD");
+	W_ReleaseLumpName("CRYPATCH");
 	W_ReleaseLumpName("INVULPAL");
 }
 

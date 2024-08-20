@@ -1224,7 +1224,7 @@ static void AM_drawFline_Vanilla (fline_t *fl, int color)
     }
 
 #define PUTDOT_RAW(xx,yy,cc) I_VideoBuffer[(yy)*f_w+(flipscreenwidth[xx])]=(cc)
-#define PUTDOT(xx,yy,cc) PUTDOT_RAW(xx,yy,(pal_color[(cc)]))
+#define PUTDOT(xx,yy,cc) PUTDOT_RAW(xx,yy,(palette_pointer[(cc)]))
 
     dx = fl->b.x - fl->a.x;
     ax = 2 * (dx<0 ? -dx : dx);
