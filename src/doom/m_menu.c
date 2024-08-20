@@ -5129,6 +5129,7 @@ void M_Drawer (void)
 static void M_ClearMenus (void)
 {
     menuactive = 0;
+    resetplaque_tics = 0;  // [JN] Forcefully reset "Defaults Restored" plaque timer.
 }
 
 
