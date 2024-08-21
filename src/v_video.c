@@ -50,8 +50,6 @@
 // [JN] Color translation.
 byte *dp_translation = NULL;
 boolean dp_translucent = false;
-extern pixel_t *pal_color;
-extern pixel_t *cry_color;
 extern pixel_t *palette_pointer;
 
 // The screen buffer that the v_video.c code draws to.
@@ -427,7 +425,7 @@ void V_DrawPatchFinale (int x, int y, patch_t *patch)
 				{
 					for (int g = 0; g < m; g++)
 					{
-						*dest = pal_color[*source];
+						*dest = palette_pointer[*source];
 						dest += SCREENWIDTH;
 					}
 					source++;
