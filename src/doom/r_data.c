@@ -1107,11 +1107,10 @@ void R_InitColormaps (void)
 	byte r, g, b;
 
 	byte *const playpal = W_CacheLumpName("PLAYPAL", PU_STATIC);
-	byte *const cryworld = W_CacheLumpName("CRYWORLD", PU_STATIC);
-	byte *const crypatch = W_CacheLumpName("CRYPATCH", PU_STATIC);
+	byte *const crypal = W_CacheLumpName("CRYPAL", PU_STATIC);
 	byte *const invulpal = W_CacheLumpName("INVULPAL", PU_STATIC);
-	// [JN] Which palette to use for in-game rendering, CRYWORLD or PLAYPAL?
-	byte *const render_pointer = dp_cry_palette ? cryworld : playpal;
+	// [JN] Which palette to use for in-game rendering, CRYPAL or PLAYPAL?
+	byte *const render_pointer = dp_cry_palette ? crypal : playpal;
 
 	if (!colormaps)
 	{
@@ -1169,21 +1168,20 @@ void R_InitColormaps (void)
 		cry_color = (pixel_t*) Z_Malloc(256 * sizeof(pixel_t), PU_STATIC, 0);
 	}
 
-	for (i = 0, j = 0; i < 256; i++)
+	for (i = 256, j = 0; i < 512; i++)
 	{
-		r = gammatable[vid_gamma][crypatch[3 * i + 0]];
-		g = gammatable[vid_gamma][crypatch[3 * i + 1]];
-		b = gammatable[vid_gamma][crypatch[3 * i + 2]];
+		r = gammatable[vid_gamma][crypal[3 * i + 0]];
+		g = gammatable[vid_gamma][crypal[3 * i + 1]];
+		b = gammatable[vid_gamma][crypal[3 * i + 2]];
 
 		cry_color[j++] = 0xff000000 | (r << 16) | (g << 8) | b;
 	}
 
-	// [JN] Which palette to use for patch drawing, CRYPATCH or PLAYPAL?
+	// [JN] Which palette to use for patch drawing, CRYPAL or PLAYPAL?
 	palette_pointer = dp_cry_palette ? cry_color : pal_color;
 
 	W_ReleaseLumpName("PLAYPAL");
-	W_ReleaseLumpName("CRYWORLD");
-	W_ReleaseLumpName("CRYPATCH");
+	W_ReleaseLumpName("CRYPAL");
 	W_ReleaseLumpName("INVULPAL");
 }
 
