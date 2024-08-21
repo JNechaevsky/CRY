@@ -50,7 +50,7 @@
 // [JN] Color translation.
 byte *dp_translation = NULL;
 boolean dp_translucent = false;
-extern pixel_t *pal_color;
+extern pixel_t *palette_pointer;
 
 // The screen buffer that the v_video.c code draws to.
 
@@ -131,16 +131,16 @@ void V_CopyRect(int srcx, int srcy, pixel_t *source,
 // for each possible combination of dp_translation and dp_translucent:
 // (1) normal, opaque patch
 static inline pixel_t drawpatchpx00 (const pixel_t dest, const pixel_t source)
-{return pal_color[source];}
+{return palette_pointer[source];}
 // (2) color-translated, opaque patch
 static inline pixel_t drawpatchpx01 (const pixel_t dest, const pixel_t source)
-{return pal_color[dp_translation[source]];}
+{return palette_pointer[dp_translation[source]];}
 // (3) normal, translucent patch
 static inline pixel_t drawpatchpx10 (const pixel_t dest, const pixel_t source)
-{return I_BlendOverTranmap(dest, pal_color[source]);}
+{return I_BlendOverTranmap(dest, palette_pointer[source]);}
 // (4) color-translated, translucent patch
 static inline pixel_t drawpatchpx11 (const pixel_t dest, const pixel_t source)
-{return I_BlendOverTranmap(dest, pal_color[dp_translation[source]]);}
+{return I_BlendOverTranmap(dest, palette_pointer[dp_translation[source]]);}
 
 // [JN] The shadow of the patch rendering function:
 static inline pixel_t drawshadow_doom (const pixel_t dest, const pixel_t source)
@@ -425,7 +425,7 @@ void V_DrawPatchFinale (int x, int y, patch_t *patch)
 				{
 					for (int g = 0; g < m; g++)
 					{
-						*dest = pal_color[*source];
+						*dest = palette_pointer[*source];
 						dest += SCREENWIDTH;
 					}
 					source++;
@@ -537,8 +537,8 @@ void V_FillFlat(int y_start, int y_stop, int x_start, int x_stop,
     {
         for (x = x_start; x < x_stop; x++)
         {
-            *dest++ = pal_color[src[(((y / vid_resolution) & 63) * 64)
-                                   + ((x / vid_resolution) & 63)]];
+            *dest++ = palette_pointer[src[(((y / vid_resolution) & 63) * 64)
+                                         + ((x / vid_resolution) & 63)]];
         }
     }
 }

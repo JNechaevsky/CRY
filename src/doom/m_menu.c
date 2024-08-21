@@ -1403,6 +1403,9 @@ static void M_ID_CRYPalette (int choice)
 {
     dp_cry_palette ^= 1;
     R_InitColormaps();
+    R_ExecuteSetViewSize();
+    R_FillBackScreen();
+    st_fullupdate = true;
 }
 
 static void M_ID_FOV (int choice)
@@ -4776,8 +4779,7 @@ boolean M_Responder (event_t* ev)
     // [JN] Allow to change palette while active menu.
     if (key == key_menu_palette)    // [JN] Palette toggle.
     {
-        dp_cry_palette ^= 1;
-        R_InitColormaps();
+        M_ID_CRYPalette(0);
         CT_SetMessage(&players[consoleplayer],
                       dp_cry_palette ? ID_CRYPAL_ON : ID_CRYPAL_OFF, true, NULL);
         return true;
