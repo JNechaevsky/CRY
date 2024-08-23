@@ -61,6 +61,7 @@ static lighttable_t   *colormaps_666666;  // Special green (00FF00, overlay 33%)
 static lighttable_t   *colormaps_777777;  // Special red (FF0000, overlay 55%)
 
 // Visplane light tables
+static lighttable_t ***zlight_INVULN = NULL;
 static lighttable_t ***zlight_EEC06B = NULL;
 static lighttable_t ***zlight_D97C45 = NULL;
 static lighttable_t ***zlight_FF7F7F = NULL;
@@ -91,6 +92,7 @@ static lighttable_t ***zlight_666666 = NULL;
 static lighttable_t ***zlight_777777 = NULL;
 
 // Segment/sprite light tables
+static lighttable_t ***scalelight_INVULN = NULL;
 static lighttable_t ***scalelight_EEC06B = NULL;
 static lighttable_t ***scalelight_D97C45 = NULL;
 static lighttable_t ***scalelight_FF7F7F = NULL;
@@ -321,6 +323,7 @@ void R_InitColoredLightTables (void)
     {
         for (i = 0 ; i < LIGHTLEVELS ; i++)
         {
+            free(scalelight_INVULN[i]);
             free(scalelight_EEC06B[i]);
             free(scalelight_D97C45[i]);
             free(scalelight_FF7F7F[i]);
@@ -350,6 +353,7 @@ void R_InitColoredLightTables (void)
             free(scalelight_666666[i]);
             free(scalelight_777777[i]);
         }
+        free(scalelight_INVULN);
         free(scalelight_EEC06B);
         free(scalelight_D97C45);
         free(scalelight_FF7F7F);
@@ -384,6 +388,7 @@ void R_InitColoredLightTables (void)
     {
         for (i = 0; i < LIGHTLEVELS; i++)
         {
+            free(zlight_INVULN[i]);
             free(zlight_EEC06B[i]);
             free(zlight_D97C45[i]);
             free(zlight_FF7F7F[i]);
@@ -413,6 +418,7 @@ void R_InitColoredLightTables (void)
             free(zlight_666666[i]);
             free(zlight_777777[i]);
         }
+        free(zlight_INVULN);
         free(zlight_EEC06B);
         free(zlight_D97C45);
         free(zlight_FF7F7F);
@@ -443,6 +449,7 @@ void R_InitColoredLightTables (void)
         free(zlight_777777);
     }
     
+    scalelight_INVULN = malloc(sclight_size);
     scalelight_EEC06B = malloc(sclight_size);
     scalelight_D97C45 = malloc(sclight_size);
     scalelight_FF7F7F = malloc(sclight_size);
@@ -472,6 +479,7 @@ void R_InitColoredLightTables (void)
     scalelight_666666 = malloc(sclight_size);
     scalelight_777777 = malloc(sclight_size);
 
+    zlight_INVULN = malloc(zlight_size);
     zlight_EEC06B = malloc(zlight_size);
     zlight_D97C45 = malloc(zlight_size);
     zlight_FF7F7F = malloc(zlight_size);
@@ -504,6 +512,7 @@ void R_InitColoredLightTables (void)
     // Calculate the light levels to use for each level / distance combination.
     for (i = 0 ; i < LIGHTLEVELS ; i++)
     {
+        scalelight_INVULN[i] = malloc(sclight_size_max);
         scalelight_EEC06B[i] = malloc(sclight_size_max);
         scalelight_D97C45[i] = malloc(sclight_size_max);
         scalelight_FF7F7F[i] = malloc(sclight_size_max);
@@ -533,6 +542,7 @@ void R_InitColoredLightTables (void)
         scalelight_666666[i] = malloc(sclight_size_max);
         scalelight_777777[i] = malloc(sclight_size_max);
 
+        zlight_INVULN[i] = malloc(zlight_size_max);
         zlight_EEC06B[i] = malloc(zlight_size_max);
         zlight_D97C45[i] = malloc(zlight_size_max);
         zlight_FF7F7F[i] = malloc(zlight_size_max);
@@ -567,6 +577,7 @@ void R_InitColoredLightTables (void)
             scale = (FixedDiv ((ORIGWIDTH / 2 * FRACUNIT), (j + 1) << LIGHTZSHIFT)) >> LIGHTSCALESHIFT;
             level = BETWEEN(0, NUMCOLORMAPS - 1, start_map[i] - scale / DISTMAP) * 256;
 
+            zlight_INVULN[i][j] = invulmaps + level;
             zlight_EEC06B[i][j] = colormaps_EEC06B + level;
             zlight_D97C45[i][j] = colormaps_D97C45 + level;
             zlight_FF7F7F[i][j] = colormaps_FF7F7F + level;
@@ -611,6 +622,7 @@ void R_GenerateColoredSClights (const int width)
         {
             level = BETWEEN(0, NUMCOLORMAPS-1, start_map[i] - j * NONWIDEWIDTH / (width << detailshift) / DISTMAP) * 256;
 
+            scalelight_INVULN[i][j] = invulmaps + level;
             scalelight_EEC06B[i][j] = colormaps_EEC06B + level;
             scalelight_D97C45[i][j] = colormaps_D97C45 + level;
             scalelight_FF7F7F[i][j] = colormaps_FF7F7F + level;
@@ -651,6 +663,11 @@ void R_GenerateColoredSClights (const int width)
 
 lighttable_t **R_ColoredVisplanesColorize (const int light, const int color)
 {
+    if (invulcolormap)
+    {
+        return zlight_INVULN[light];
+    }
+    
     if (vis_colored_lighting)
     {
         switch (color)
@@ -693,6 +710,11 @@ lighttable_t **R_ColoredSegsColorize (const int lightnum, const int color)
 {
     const int l = LIGHTLEVELS - 1;
 
+    if (invulcolormap)
+    {
+        return scalelight_INVULN[BETWEEN(0, l, lightnum)];
+    }
+
     if (vis_colored_lighting)
     {
         switch (color)
@@ -733,6 +755,11 @@ lighttable_t **R_ColoredSegsColorize (const int lightnum, const int color)
 
 lighttable_t *R_ColoredSprColorize (const int color)
 {
+    if (invulcolormap)
+    {
+        return invulmaps;
+    }
+        
     if (vis_colored_lighting)
     {
         switch (color)

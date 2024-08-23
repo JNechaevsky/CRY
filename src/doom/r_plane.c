@@ -185,18 +185,13 @@ R_MapPlane
     ds_xfrac += swirlFlow_x;
     ds_yfrac += swirlFlow_y;
 
-    if (fixedcolormap)
-	ds_colormap[0] = ds_colormap[1] = fixedcolormap;
-    else
-    {
 	index = distance >> LIGHTZSHIFT;
 	
 	if (index >= MAXLIGHTZ )
 	    index = MAXLIGHTZ-1;
 
 	ds_colormap[0] = planezlight[index];
-	ds_colormap[1] = colormaps;
-    }
+	ds_colormap[1] = invulcolormap ? invulmaps : colormaps;
 	
     ds_y = y;
     ds_x1 = x1;
@@ -428,7 +423,7 @@ void R_DrawPlanes (void)
             // Because of this hack, sky is not affected by INVUL inverse mapping.
             // [crispy] no brightmaps for sky
             // [JN] Jaguar: sky is always colored with invul effect.
-            dc_colormap[0] = dc_colormap[1] = fixedcolormap ? fixedcolormap : colormaps;
+            dc_colormap[0] = dc_colormap[1] = invulcolormap ? invulmaps : colormaps;
 
             for (int x = pl->minx ; x <= pl->maxx ; x++)
             {

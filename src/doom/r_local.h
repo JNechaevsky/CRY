@@ -445,6 +445,7 @@ extern fixed_t *spriteoffset;
 extern fixed_t *spritetopoffset;
 
 extern lighttable_t *colormaps;
+extern lighttable_t *invulmaps;
 extern lighttable_t *palette_pointer; // [JN] pointer to cry_color / pal_color
 
 extern int viewwidth;
@@ -734,7 +735,7 @@ extern lighttable_t**	scalelightfixed;
 extern lighttable_t***	zlight;
 
 extern int           extralight;
-extern lighttable_t *fixedcolormap;
+extern lighttable_t *invulcolormap;
 
 // Number of diminishing brightness levels.
 // There a 0-31, i.e. 32 LUT in the COLORMAP lump.

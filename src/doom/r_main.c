@@ -51,7 +51,7 @@ int			viewangleoffset;
 int			validcount = 1;		
 
 
-lighttable_t*		fixedcolormap;
+lighttable_t*		invulcolormap;
 
 
 int			centerx;
@@ -967,7 +967,6 @@ static inline boolean CheckLocalView(const player_t *player)
 //
 void R_SetupFrame (player_t* player)
 {		
-    int		i;
     int		tempCentery;
     int		pitch;
 
@@ -1066,18 +1065,9 @@ void R_SetupFrame (player_t* player)
     viewcos = finecosine[viewangle>>ANGLETOFINESHIFT];
 	
     if (player->fixedcolormap)
-    {
-	fixedcolormap =
-	    colormaps
-	    + player->fixedcolormap*256;
-	
-	walllights = scalelightfixed;
-
-	for (i=0 ; i<MAXLIGHTSCALE ; i++)
-	    scalelightfixed[i] = fixedcolormap;
-    }
+	invulcolormap = invulmaps;
     else
-	fixedcolormap = 0;
+	invulcolormap = 0;
 		
     validcount++;
 }

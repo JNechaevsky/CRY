@@ -30,8 +30,6 @@
 #include "id_func.h"
 
 
-// Index of the special effects (INVUL inverse) map.
-#define INVERSECOLORMAP		32
 
 
 //
@@ -499,7 +497,7 @@ void P_PlayerThink (player_t* player)
     {
 	if (player->powers[pw_invulnerability] > 4*32
 	    || (player->powers[pw_invulnerability]&8) )
-	    player->fixedcolormap = INVERSECOLORMAP;
+	    player->fixedcolormap = 1;
 	else
 	    player->fixedcolormap = 0;
     }
