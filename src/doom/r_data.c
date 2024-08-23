@@ -1112,9 +1112,12 @@ void R_InitColormaps (void)
 
 	byte *const playpal = W_CacheLumpName("PLAYPAL", PU_STATIC);
 	byte *const crypal = W_CacheLumpName("CRYPAL", PU_STATIC);
-	byte *const invulpal = W_CacheLumpName("INVULPAL", PU_STATIC);
+	byte *const invulpal = W_CacheLumpName("PLAYINVL", PU_STATIC);
+	byte *const invulcry = W_CacheLumpName("CRYINVL", PU_STATIC);
 	// [JN] Which palette to use for in-game rendering, CRYPAL or PLAYPAL?
 	byte *const render_pointer = dp_cry_palette ? crypal : playpal;
+	// [JN] Which palette to use for invulnerability palette, CRYINVL or PLAYINVL?
+	byte *const invul_pointer = dp_cry_palette ? invulcry : invulpal;
 
 	if (!colormaps)
 	{
@@ -1141,9 +1144,9 @@ void R_InitColormaps (void)
 			colormaps[j++] = 0xff000000 | (r << 16) | (g << 8) | b;
 
 			// [JN] Generate invulnerability colormaps.
-			ri = gammatable[vid_gamma][invulpal[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			gi = gammatable[vid_gamma][invulpal[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			bi = gammatable[vid_gamma][invulpal[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			ri = gammatable[vid_gamma][invul_pointer[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			gi = gammatable[vid_gamma][invul_pointer[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			bi = gammatable[vid_gamma][invul_pointer[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
 
 			invulmaps[ji++] = 0xff000000 | (ri << 16) | (gi << 8) | bi;
 		}
@@ -1182,7 +1185,8 @@ void R_InitColormaps (void)
 
 	W_ReleaseLumpName("PLAYPAL");
 	W_ReleaseLumpName("CRYPAL");
-	W_ReleaseLumpName("INVULPAL");
+	W_ReleaseLumpName("PLAYINVL");
+	W_ReleaseLumpName("CRYINVL");
 }
 
 
