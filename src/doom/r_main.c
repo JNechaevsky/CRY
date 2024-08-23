@@ -1064,7 +1064,7 @@ void R_SetupFrame (player_t* player)
     viewsin = finesine[viewangle>>ANGLETOFINESHIFT];
     viewcos = finecosine[viewangle>>ANGLETOFINESHIFT];
 	
-    if (player->fixedcolormap)
+    if (player->invulcolormap)
 	invulcolormap = invulmaps;
     else
 	invulcolormap = 0;

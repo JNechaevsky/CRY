@@ -497,12 +497,12 @@ void P_PlayerThink (player_t* player)
     {
 	if (player->powers[pw_invulnerability] > 4*32
 	    || (player->powers[pw_invulnerability]&8) )
-	    player->fixedcolormap = 1;
+	    player->invulcolormap = 1;
 	else
-	    player->fixedcolormap = 0;
+	    player->invulcolormap = 0;
     }
     else
-	player->fixedcolormap = 0;
+	player->invulcolormap = 0;
 }
 
 

@@ -888,7 +888,7 @@ void P_SpawnPlayer (mapthing_t* mthing)
     p->damagecount = 0;
     p->bonuscount = 0;
     p->extralight = 0;
-    p->fixedcolormap = 0;
+    p->invulcolormap = 0;
     p->viewheight = VIEWHEIGHT;
 
     // [crispy] weapon sound source
