@@ -646,8 +646,8 @@ void A_Look (mobj_t* actor)
     {
 	actor->target = targ;
 
-	// [JN] CRY: optionally emulate Jaguar sound propagation mode.
-	if ( aud_jaguar_prop || actor->flags & MF_AMBUSH )
+	// [JN] CRY: optionally emulate Jaguar's alerted monsters.
+	if ( mon_jaguar_alert || actor->flags & MF_AMBUSH )
 	{
 	    if (P_CheckSight (actor, actor->target))
 		goto seeyou;

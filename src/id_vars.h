@@ -89,7 +89,7 @@ extern int vis_flip_corpses;
 extern int xhair_draw;
 extern int xhair_color;
 
-extern int aud_jaguar_prop;
+extern int mon_jaguar_alert;
 
 extern int st_colored_stbar;
 extern int st_negative_health;

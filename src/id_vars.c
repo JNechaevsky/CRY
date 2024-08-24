@@ -113,8 +113,8 @@ int vis_flip_corpses = 0;
 int xhair_draw = 0;
 int xhair_color = 0;
 
-// Audible
-int aud_jaguar_prop = 1;
+// Monsters
+int mon_jaguar_alert = 1;
 
 // Status bar
 int st_colored_stbar = 0;
@@ -228,6 +228,9 @@ void ID_BindVariables (void)
     M_BindIntVariable("xhair_draw",                     &xhair_draw);
     M_BindIntVariable("xhair_color",                    &xhair_color);
     
+    // Monsters
+    M_BindIntVariable("mon_jaguar_alert",               &mon_jaguar_alert);
+
     // Status bar
     M_BindIntVariable("st_colored_stbar",               &st_colored_stbar);
     M_BindIntVariable("st_negative_health",             &st_negative_health);

@@ -441,8 +441,8 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_INT(xhair_draw),
     CONFIG_VARIABLE_INT(xhair_color),
 
-    // Audible
-    CONFIG_VARIABLE_INT(aud_jaguar_prop),
+    // Monsters
+    CONFIG_VARIABLE_INT(mon_jaguar_alert),
 
     // Status Bar
     CONFIG_VARIABLE_INT(st_colored_stbar),
