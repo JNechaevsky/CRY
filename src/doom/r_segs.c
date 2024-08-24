@@ -230,8 +230,8 @@ R_RenderMaskedSegRange
     }
     dc_texturemid += curline->sidedef->rowoffset;
 			
-    if (fixedcolormap)
-	dc_colormap[0] = dc_colormap[1] = fixedcolormap;
+    if (invulcolormap)
+	dc_colormap[0] = dc_colormap[1] = invulcolormap;
     
     // [JN] Draw transparent texture for linedef special 1000.
     if (curline->linedef->special == 1000)
@@ -243,7 +243,6 @@ R_RenderMaskedSegRange
 	// calculate lighting
 	if (maskedtexturecol[dc_x] != INT_MAX)  // [JN] 32-bit integer math
 	{
-	    if (!fixedcolormap)
 	    {
 		index = (spryscale / vid_resolution) >> LIGHTSCALESHIFT;
 
@@ -253,7 +252,8 @@ R_RenderMaskedSegRange
 		// [crispy] brightmaps for mid-textures
 		dc_brightmap = texturebrightmap[texnum];
 		dc_colormap[0] = walllights[index];
-		dc_colormap[1] = vis_brightmaps ? colormaps : dc_colormap[0];
+		dc_colormap[1] = invulcolormap ? invulmaps :
+                        vis_brightmaps ? colormaps : dc_colormap[0];
 	    }
 			
 	    // [crispy] apply Killough's int64 sprtopscreen overflow fix
@@ -374,7 +374,6 @@ void R_RenderSegLoop (void)
             texturecolumn >>= FRACBITS;
 
             // calculate lighting
-            if (!fixedcolormap)
             {
                 int index = (rw_scale / vid_resolution) >> LIGHTSCALESHIFT;
 
@@ -385,11 +384,8 @@ void R_RenderSegLoop (void)
 
                 // [crispy] optional brightmaps
                 dc_colormap[0] = walllights[index];
-                dc_colormap[1] = vis_brightmaps ? colormaps : dc_colormap[0];
-            }
-            else
-            {
-                dc_colormap[0] = dc_colormap[1] = fixedcolormap;
+                dc_colormap[1] = invulcolormap ? invulmaps :
+                                vis_brightmaps ? colormaps : dc_colormap[0];
             }
 
             dc_x = rw_x;
@@ -822,7 +818,6 @@ R_StoreWallRange
         // calculate light table use different light tables
         //  for horizontal / vertical / diagonal
         // OPTIMIZE: get rid of LIGHTSEGSHIFT globally
-        if (!fixedcolormap)
         {
             lightnum = (frontsector->lightlevel >> LIGHTSEGSHIFT) + (extralight * LIGHTBRIGHT);
             // [JN] Colorize segments drawing.

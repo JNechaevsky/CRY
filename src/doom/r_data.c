@@ -160,6 +160,7 @@ fixed_t*	spriteoffset;
 fixed_t*	spritetopoffset;
 
 lighttable_t	*colormaps;
+lighttable_t	*invulmaps;
 lighttable_t	*pal_color; // [crispy] array holding palette colors for true color mode
 lighttable_t	*cry_color; // [JN] array holding CRY patch drawing palette colors
 lighttable_t	*palette_pointer; // [JN] pointer to cry_color / pal_color
@@ -1105,16 +1106,23 @@ void R_InitColormaps (void)
 {
 	int c, i, j = 0;
 	byte r, g, b;
+	// [JN] Invulnerability colormap with diminished lighting
+	int ji = 0;
+	byte ri, gi, bi;
 
 	byte *const playpal = W_CacheLumpName("PLAYPAL", PU_STATIC);
 	byte *const crypal = W_CacheLumpName("CRYPAL", PU_STATIC);
-	byte *const invulpal = W_CacheLumpName("INVULPAL", PU_STATIC);
+	byte *const invulpal = W_CacheLumpName("PLAYINVL", PU_STATIC);
+	byte *const invulcry = W_CacheLumpName("CRYINVL", PU_STATIC);
 	// [JN] Which palette to use for in-game rendering, CRYPAL or PLAYPAL?
 	byte *const render_pointer = dp_cry_palette ? crypal : playpal;
+	// [JN] Which palette to use for invulnerability palette, CRYINVL or PLAYINVL?
+	byte *const invul_pointer = dp_cry_palette ? invulcry : invulpal;
 
 	if (!colormaps)
 	{
 		colormaps = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
+		invulmaps = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
 		R_AllocateColoredColormaps();
 	}
 
@@ -1134,19 +1142,14 @@ void R_InitColormaps (void)
 			R_GenerateColoredColormaps(k, scale, j);
 
 			colormaps[j++] = 0xff000000 | (r << 16) | (g << 8) | b;
+
+			// [JN] Generate invulnerability colormaps.
+			ri = gammatable[vid_gamma][invul_pointer[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			gi = gammatable[vid_gamma][invul_pointer[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+			bi = gammatable[vid_gamma][invul_pointer[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
+
+			invulmaps[ji++] = 0xff000000 | (ri << 16) | (gi << 8) | bi;
 		}
-	}
-
-	// [crispy] Invulnerability (c == COLORMAPS)
-	for (i = 0; i < 256; i++)
-	{
-		const byte k = colormap[i];
-
-		r = gammatable[vid_gamma][invulpal[3 * k + 0]];
-		g = gammatable[vid_gamma][invulpal[3 * k + 1]];
-		b = gammatable[vid_gamma][invulpal[3 * k + 2]];
-
-		colormaps[j++] = 0xff000000 | (r << 16) | (g << 8) | b;
 	}
 
 	if (!pal_color)
@@ -1182,7 +1185,8 @@ void R_InitColormaps (void)
 
 	W_ReleaseLumpName("PLAYPAL");
 	W_ReleaseLumpName("CRYPAL");
-	W_ReleaseLumpName("INVULPAL");
+	W_ReleaseLumpName("PLAYINVL");
+	W_ReleaseLumpName("CRYINVL");
 }
 
 

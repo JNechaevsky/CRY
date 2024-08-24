@@ -767,8 +767,8 @@ static void saveg_read_player_t(player_t *str)
     // int extralight;
     str->extralight = saveg_read32();
 
-    // int fixedcolormap;
-    str->fixedcolormap = saveg_read32();
+    // int invulcolormap;
+    str->invulcolormap = saveg_read32();
 
     // int colormap;
     str->colormap = saveg_read32();
@@ -895,8 +895,8 @@ static void saveg_write_player_t(player_t *str)
     // int extralight;
     saveg_write32(str->extralight);
 
-    // int fixedcolormap;
-    saveg_write32(str->fixedcolormap);
+    // int invulcolormap;
+    saveg_write32(str->invulcolormap);
 
     // int colormap;
     saveg_write32(str->colormap);

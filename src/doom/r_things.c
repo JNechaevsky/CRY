@@ -719,15 +719,10 @@ static void R_ProjectSprite (mobj_t* thing)
 	// shadow draw
 	vis->colormap[0] = vis->colormap[1] = NULL;
     }
-    else if (fixedcolormap)
-    {
-	// fixed map
-	vis->colormap[0] = vis->colormap[1] = fixedcolormap;
-    }
     else if (thing->frame & FF_FULLBRIGHT)
     {
 	// full bright
-	vis->colormap[0] = vis->colormap[1] = colormaps;
+	vis->colormap[0] = vis->colormap[1] = invulcolormap ? invulmaps : colormaps;
     }
     
     else
@@ -753,7 +748,8 @@ static void R_ProjectSprite (mobj_t* thing)
         ||  thing->sprite == SPR_CBRA)  // Candelabra
         {
             vis->colormap[0] = spritelights[index];
-            vis->colormap[1] = &colormaps[thing->bmap_flick*256];
+            vis->colormap[1] = invulcolormap ? &invulmaps[thing->bmap_flick*256] :
+                                               &colormaps[thing->bmap_flick*256];
         }
         else
         {
@@ -966,10 +962,9 @@ static void R_DrawPSprite (pspdef_t* psp)
 
     vis->patch = lump;
 
-    if (fixedcolormap)
+    if (invulcolormap)
     {
-	// fixed color
-	vis->colormap[0] = vis->colormap[1] = fixedcolormap;
+	vis->colormap[0] = vis->colormap[1] = invulcolormap;
     }
     else if (psp->state->frame & FF_FULLBRIGHT)
     {

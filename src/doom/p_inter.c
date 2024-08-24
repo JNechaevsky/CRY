@@ -605,8 +605,8 @@ void P_KillMobj (mobj_t *source, mobj_t *target)
 	target->player->centering = true;
 	// [JN] & [crispy] Reset the yellow bonus palette when the player dies
 	target->player->bonuscount = 0;
-	// [JN] & [crispy] Remove the effect of the inverted palette when the player dies
-	target->player->fixedcolormap = 0;
+	// [JN] & [crispy] Remove invulnerability palette when player dies
+	target->player->invulcolormap = 0;
 
 	if (target->player == &players[consoleplayer]
 	    && automapactive)

@@ -1352,7 +1352,7 @@ void G_PlayerFinishLevel (int player)
     p->targetsheathTics = 0;
     p->mo->flags &= ~MF_SHADOW;		// cancel invisibility 
     p->extralight = 0;			// cancel gun flashes 
-    p->fixedcolormap = 0;		// cancel ir gogles 
+    p->invulcolormap = 0;		// [JN] cancel invulnerability palette
     p->damagecount = 0;			// no palette changes 
     p->bonuscount = 0; 
     // [crispy] reset additional player properties

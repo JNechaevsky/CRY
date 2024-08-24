@@ -160,9 +160,8 @@ typedef struct player_s
     // So gun flashes light up areas.
     int			extralight;
 
-    // Current PLAYPAL, ???
-    //  can be set to REDCOLORMAP for pain, etc.
-    int			fixedcolormap;
+    // [JN] Invulnerability palette
+    int			invulcolormap;
 
     // Player skin colorshift,
     //  0-3 for which color to draw player.
