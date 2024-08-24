@@ -656,7 +656,20 @@ void P_KillMobj (mobj_t *source, mobj_t *target)
 		return;
 	}
 
+	// [JN] Tossing of dropped items feature (from DOOM Retro).
+	if (phys_toss_drop)
+	{
+	mo = P_SpawnMobj(target->x, target->y, target->floorz
+					+ target->height
+					* 3 / 2 - 3 * FRACUNIT, item);
+	mo->momx = (target->momx >> 1) + (ID_Random() << 8);
+	mo->momy = (target->momy >> 1) + (ID_Random() << 8);
+	mo->momz = 2 * FRACUNIT + (M_Random() << 9);
+	}
+	else
+	{
 	mo = P_SpawnMobj (target->x,target->y,ONFLOORZ, item);
+	}
 	mo->flags |= MF_DROPPED;		/* special versions of items */
 }
 
