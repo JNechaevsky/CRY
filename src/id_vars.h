@@ -89,8 +89,6 @@ extern int vis_flip_corpses;
 extern int xhair_draw;
 extern int xhair_color;
 
-extern int mon_jaguar_alert;
-
 extern int st_colored_stbar;
 extern int st_negative_health;
 
@@ -98,6 +96,9 @@ extern int phys_torque;
 extern int phys_toss_drop;
 extern int phys_floating_powerups;
 extern int phys_weapon_alignment;
+
+extern int acc_jaguar_alert;
+extern int acc_jaguar_explosion;
 
 extern int gp_default_skill;
 extern int gp_pistol_start;

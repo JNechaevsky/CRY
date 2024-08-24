@@ -441,9 +441,6 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_INT(xhair_draw),
     CONFIG_VARIABLE_INT(xhair_color),
 
-    // Monsters
-    CONFIG_VARIABLE_INT(mon_jaguar_alert),
-
     // Status Bar
     CONFIG_VARIABLE_INT(st_colored_stbar),
     CONFIG_VARIABLE_INT(st_negative_health),
@@ -454,6 +451,10 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_INT(phys_floating_powerups),
     CONFIG_VARIABLE_INT(phys_weapon_alignment),
     CONFIG_VARIABLE_INT(phys_breathing),
+
+    // Accuracy
+    CONFIG_VARIABLE_INT(acc_jaguar_alert),
+    CONFIG_VARIABLE_INT(acc_jaguar_explosion),
 
     // Gameplay
     CONFIG_VARIABLE_INT(gp_default_skill),

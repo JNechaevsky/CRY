@@ -611,7 +611,6 @@ static void M_ID_LinearSky (int choice);
 static void M_ID_FlipCorpses (int choice);
 static void M_ID_Crosshair (int choice);
 static void M_ID_CrosshairColor (int choice);
-static void M_ID_AlertedMonsters (int choice);
 
 static void M_Choose_ID_Gameplay_2 (int choice);
 static void M_Draw_ID_Gameplay_2 (void);
@@ -622,6 +621,11 @@ static void M_ID_TossDrop (int choice);
 static void M_ID_FloatingPowerups (int choice);
 static void M_ID_WeaponAlignment (int choice);
 static void M_ID_Breathing (int choice);
+static void M_ID_JaguarAlert (int choice);
+static void M_ID_JaguarExplosion (int choice);
+
+static void M_Choose_ID_Gameplay_3 (int choice);
+static void M_Draw_ID_Gameplay_3 (void);
 static void M_ID_DefaulSkill (int choice);
 static void M_ID_PistolStart (int choice);
 static void M_ID_RevealedSecrets (int choice);
@@ -667,6 +671,7 @@ static menu_t ID_Def_Keybinds_5;
 static menu_t ID_Def_Keybinds_6;
 static menu_t ID_Def_Gameplay_1;
 static menu_t ID_Def_Gameplay_2;
+static menu_t ID_Def_Gameplay_3;
 
 // Remember last keybindings page.
 static int Keybinds_Cur;
@@ -693,6 +698,7 @@ static menu_t *GameplayMenus[] =
 {
     &ID_Def_Gameplay_1,
     &ID_Def_Gameplay_2,
+    &ID_Def_Gameplay_3,
 };
 
 static void M_Choose_ID_Gameplay (int choice)
@@ -741,8 +747,9 @@ static void M_ScrollPages (boolean direction)
     else if (currentMenu == &ID_Def_Keybinds_6) M_SetupNextMenu(direction ? &ID_Def_Keybinds_1 : &ID_Def_Keybinds_5);
 
     // Gameplay features:
-    else if (currentMenu == &ID_Def_Gameplay_1) M_SetupNextMenu(&ID_Def_Gameplay_2);
-    else if (currentMenu == &ID_Def_Gameplay_2) M_SetupNextMenu(&ID_Def_Gameplay_1);
+    else if (currentMenu == &ID_Def_Gameplay_1) M_SetupNextMenu(direction ? &ID_Def_Gameplay_2 : &ID_Def_Gameplay_3);
+    else if (currentMenu == &ID_Def_Gameplay_2) M_SetupNextMenu(direction ? &ID_Def_Gameplay_3 : &ID_Def_Gameplay_1);
+    else if (currentMenu == &ID_Def_Gameplay_3) M_SetupNextMenu(direction ? &ID_Def_Gameplay_1 : &ID_Def_Gameplay_2);
 
     // Play sound.
     S_StartSound(NULL, sfx_pstop);
@@ -2752,7 +2759,7 @@ static menuitem_t ID_Menu_Gameplay_1[]=
     { M_LFRT, "SHAPE",                       M_ID_Crosshair,         's' },
     { M_LFRT, "INDICATION",                  M_ID_CrosshairColor,    'i' },
     { M_SKIP, "", 0, '\0' },
-    { M_LFRT, "ALERTED MONSTERS BEHAVIOUR",  M_ID_AlertedMonsters,   'a' },
+    { M_SKIP, "", 0, '\0' },
     { M_SWTC, "", /*NEXT PAGE >*/            M_Choose_ID_Gameplay_2, 'n' },
 };
 
@@ -2846,18 +2853,11 @@ static void M_Draw_ID_Gameplay_1 (void)
     M_WriteText (M_ItemRightAlign(str), 117, str,
                  M_Item_Glow(11, xhair_color ? GLOW_GREEN : GLOW_DARKRED));
 
-    M_WriteTextCentered(126, "MONSTERS", cr[CR_YELLOW]);
-
-    // Alerted monsters behaviour
-    sprintf(str, mon_jaguar_alert ? "JAGUAR" : "PC");
-    M_WriteText (M_ItemRightAlign(str), 135, str,
-                 M_Item_Glow(13, mon_jaguar_alert ? GLOW_DARKRED : GLOW_GREEN));
-
     // Footer
     M_WriteText (ID_MENU_LEFTOFFSET_BIG, 144, "NEXT PAGE >",
                  M_Item_Glow(14, GLOW_LIGHTGRAY));
 
-    sprintf(str, "PAGE 1/2");
+    sprintf(str, "PAGE 1/3");
     M_WriteText(M_ItemRightAlign(str), 144, str, cr[CR_GRAY]);
 }
 
@@ -2924,11 +2924,6 @@ static void M_ID_CrosshairColor (int choice)
     xhair_color = M_INT_Slider(xhair_color, 0, 3, choice, false);
 }
 
-static void M_ID_AlertedMonsters (int choice)
-{
-    mon_jaguar_alert ^= 1;
-}
-
 // -----------------------------------------------------------------------------
 // Gameplay features 2
 // -----------------------------------------------------------------------------
@@ -2944,12 +2939,12 @@ static menuitem_t ID_Menu_Gameplay_2[]=
     { M_LFRT, "WEAPON ATTACK ALIGNMENT",       M_ID_WeaponAlignment,   'w' },
     { M_LFRT, "IMITATE PLAYER'S BREATHING",    M_ID_Breathing,         'i' },
     { M_SKIP, "", 0, '\0' },
-    { M_LFRT, "DEFAULT SKILL LEVEL",           M_ID_DefaulSkill,       'd' },
-    { M_LFRT, "PISTOL START GAME MODE",        M_ID_PistolStart,       'p' },
-    { M_LFRT, "REPORT REVEALED SECRETS",       M_ID_RevealedSecrets,   'r' },
-    { M_LFRT, "FLIP LEVELS HORIZONTALLY",      M_ID_FlipLevels,        'f' },
-    { M_LFRT, "ON DEATH ACTION",               M_ID_OnDeathAction,     'o' },
-    { M_SWTC, "", /*< PREV PAGE*/              M_Choose_ID_Gameplay_1, 'p' },
+    { M_LFRT, "ALERTED MONSTERS BEHAVIOUR",    M_ID_JaguarAlert,       'a' },
+    { M_LFRT, "EXPLOSION RADIUS IMPACT",       M_ID_JaguarExplosion,   'e' },
+    { M_SKIP, "", 0, '\0' },
+    { M_SKIP, "", 0, '\0' },
+    { M_SKIP, "", 0, '\0' },
+    { M_SWTC, "", /* LAST PAGE >*/             M_Choose_ID_Gameplay_3, 'l' },
 };
 
 static menu_t ID_Def_Gameplay_2 =
@@ -3015,40 +3010,23 @@ static void M_Draw_ID_Gameplay_2 (void)
     M_WriteText (M_ItemRightAlign(str), 81, str,
                  M_Item_Glow(7, phys_breathing ? GLOW_GREEN : GLOW_DARKRED));
 
-    M_WriteTextCentered(90, "GAMEPLAY", cr[CR_YELLOW]);
+    M_WriteTextCentered(90, "ACCURACY", cr[CR_YELLOW]);
 
-    // Default skill level
-    snprintf(str, sizeof(str), "%s", DefSkillName[gp_default_skill]);
-    M_WriteText (M_ItemRightAlign(str), 99, str, 
-                 M_Item_Glow(9, DefSkillColor(gp_default_skill)));
+    // Alerted monsters behaviour
+    sprintf(str, acc_jaguar_alert ? "JAGUAR" : "PC");
+    M_WriteText (M_ItemRightAlign(str), 99, str,
+                 M_Item_Glow(9, acc_jaguar_alert ? GLOW_DARKRED : GLOW_GREEN));
 
-    // Pistol start game mode
-    sprintf(str, gp_pistol_start ? "ON" : "OFF");
+    // Explosion radius impact
+    sprintf(str, acc_jaguar_explosion ? "JAGUAR" : "PC");
     M_WriteText (M_ItemRightAlign(str), 108, str,
-                 M_Item_Glow(10, gp_pistol_start ? GLOW_GREEN : GLOW_DARKRED));
-
-    // Report revealed secrets
-    sprintf(str, gp_revealed_secrets == 1 ? "TOP" :
-                 gp_revealed_secrets == 2 ? "CENTERED" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 117, str,
-                 M_Item_Glow(11, gp_revealed_secrets ? GLOW_GREEN : GLOW_DARKRED));
-
-    // Flip levels horizontally
-    sprintf(str, gp_flip_levels ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 126, str,
-                 M_Item_Glow(12, gp_flip_levels ? GLOW_GREEN : GLOW_DARKRED));
-
-    // On death action
-    sprintf(str, gp_death_use_action == 1 ? "LAST SAVE" :
-                 gp_death_use_action == 2 ? "NOTHING" : "DEFAULT");
-    M_WriteText (M_ItemRightAlign(str), 135, str,
-                 M_Item_Glow(13, gp_death_use_action ? GLOW_GREEN : GLOW_DARKRED));
+                 M_Item_Glow(10, acc_jaguar_explosion ? GLOW_DARKRED : GLOW_GREEN));
 
     // Footer
-    M_WriteText (ID_MENU_LEFTOFFSET_BIG, 144, "< PREV PAGE",
+    M_WriteText (ID_MENU_LEFTOFFSET_BIG, 144, "LAST PAGE >",
                  M_Item_Glow(14, GLOW_LIGHTGRAY));
 
-    sprintf(str, "PAGE 2/2");
+    sprintf(str, "PAGE 2/3");
     M_WriteText(M_ItemRightAlign(str), 144, str, cr[CR_GRAY]);
 }
 
@@ -3086,6 +3064,97 @@ static void M_ID_WeaponAlignment (int choice)
 static void M_ID_Breathing (int choice)
 {
     phys_breathing ^= 1;
+}
+
+static void M_ID_JaguarAlert (int choice)
+{
+    acc_jaguar_alert ^= 1;
+}
+
+static void M_ID_JaguarExplosion (int choice)
+{
+    acc_jaguar_explosion ^= 1;
+}
+
+// -----------------------------------------------------------------------------
+// Gameplay features 3
+// -----------------------------------------------------------------------------
+
+static menuitem_t ID_Menu_Gameplay_3[]=
+{
+    { M_LFRT, "DEFAULT SKILL LEVEL",           M_ID_DefaulSkill,       'd' },
+    { M_LFRT, "PISTOL START GAME MODE",        M_ID_PistolStart,       'p' },
+    { M_LFRT, "REPORT REVEALED SECRETS",       M_ID_RevealedSecrets,   'r' },
+    { M_LFRT, "FLIP LEVELS HORIZONTALLY",      M_ID_FlipLevels,        'f' },
+    { M_LFRT, "ON DEATH ACTION",               M_ID_OnDeathAction,     'o' },
+    { M_SKIP, "", 0, '\0' },
+    { M_SKIP, "", 0, '\0' },
+    { M_SKIP, "", 0, '\0' },
+    { M_SKIP, "", 0, '\0' },
+    { M_SKIP, "", 0, '\0' },
+    { M_SKIP, "", 0, '\0' },
+    { M_SKIP, "", 0, '\0' },
+    { M_SKIP, "", 0, '\0' },
+    { M_SKIP, "", 0, '\0' },
+    { M_SWTC, "", /*FIRST PAGE >*/           M_Choose_ID_Gameplay_1, 'n' },
+};
+
+static menu_t ID_Def_Gameplay_3 =
+{
+    15,
+    &ID_Def_Main,
+    ID_Menu_Gameplay_3,
+    M_Draw_ID_Gameplay_3,
+    ID_MENU_LEFTOFFSET_BIG, ID_MENU_TOPOFFSET_SML,
+    0,
+    true, false, true,
+};
+
+static void M_Choose_ID_Gameplay_3 (int choice)
+{
+    M_SetupNextMenu(&ID_Def_Gameplay_3);
+}
+
+static void M_Draw_ID_Gameplay_3 (void)
+{
+    char str[32];
+    Gameplay_Cur = 2;
+
+    M_WriteTextCentered(9, "GAMEPLAY", cr[CR_YELLOW]);
+
+    // Default skill level
+    snprintf(str, sizeof(str), "%s", DefSkillName[gp_default_skill]);
+    M_WriteText (M_ItemRightAlign(str), 18, str, 
+                 M_Item_Glow(0, DefSkillColor(gp_default_skill)));
+
+    // Pistol start game mode
+    sprintf(str, gp_pistol_start ? "ON" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 27, str,
+                 M_Item_Glow(1, gp_pistol_start ? GLOW_GREEN : GLOW_DARKRED));
+
+    // Report revealed secrets
+    sprintf(str, gp_revealed_secrets == 1 ? "TOP" :
+                 gp_revealed_secrets == 2 ? "CENTERED" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 36, str,
+                 M_Item_Glow(2, gp_revealed_secrets ? GLOW_GREEN : GLOW_DARKRED));
+
+    // Flip levels horizontally
+    sprintf(str, gp_flip_levels ? "ON" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 45, str,
+                 M_Item_Glow(3, gp_flip_levels ? GLOW_GREEN : GLOW_DARKRED));
+
+    // On death action
+    sprintf(str, gp_death_use_action == 1 ? "LAST SAVE" :
+                 gp_death_use_action == 2 ? "NOTHING" : "DEFAULT");
+    M_WriteText (M_ItemRightAlign(str), 54, str,
+                 M_Item_Glow(4, gp_death_use_action ? GLOW_GREEN : GLOW_DARKRED));
+
+    // Footer
+    M_WriteText (ID_MENU_LEFTOFFSET_BIG, 144, "FIRST PAGE >",
+                 M_Item_Glow(14, GLOW_LIGHTGRAY));
+
+    sprintf(str, "PAGE 3/3");
+    M_WriteText(M_ItemRightAlign(str), 144, str, cr[CR_GRAY]);
 }
 
 static void M_ID_DefaulSkill (int choice)
@@ -3210,9 +3279,6 @@ static void M_ID_ApplyResetHook (void)
     xhair_draw = 0;
     xhair_color = 0;
 
-    // Monsters
-    mon_jaguar_alert = 1;
-
     // Status bar
     st_colored_stbar = 0;
     st_negative_health = 0;
@@ -3223,6 +3289,10 @@ static void M_ID_ApplyResetHook (void)
     phys_floating_powerups = 0;
     phys_weapon_alignment = 2;
     phys_breathing = 0;
+
+    // Accuracy
+    acc_jaguar_alert = 1;
+    acc_jaguar_explosion = 1;
 
     // Gameplay
     gp_default_skill = 2;
