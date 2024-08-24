@@ -611,6 +611,7 @@ static void M_ID_LinearSky (int choice);
 static void M_ID_FlipCorpses (int choice);
 static void M_ID_Crosshair (int choice);
 static void M_ID_CrosshairColor (int choice);
+static void M_ID_JaguarSndProp (int choice);
 
 static void M_Choose_ID_Gameplay_2 (int choice);
 static void M_Draw_ID_Gameplay_2 (void);
@@ -2751,7 +2752,7 @@ static menuitem_t ID_Menu_Gameplay_1[]=
     { M_LFRT, "SHAPE",                       M_ID_Crosshair,         's' },
     { M_LFRT, "INDICATION",                  M_ID_CrosshairColor,    'i' },
     { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
+    { M_LFRT, "SOUND PROPAGATION MODE",      M_ID_JaguarSndProp,     's' },
     //{ M_SKIP, "", 0, '\0' },
     { M_SWTC, "", /*NEXT PAGE >*/            M_Choose_ID_Gameplay_2, 'n' },
 };
@@ -2846,6 +2847,13 @@ static void M_Draw_ID_Gameplay_1 (void)
     M_WriteText (M_ItemRightAlign(str), 117, str,
                  M_Item_Glow(11, xhair_color ? GLOW_GREEN : GLOW_DARKRED));
 
+    M_WriteTextCentered(126, "AUDIBLE", cr[CR_YELLOW]);
+
+    // Sound propagation mode
+    sprintf(str, aud_jaguar_prop ? "JAGUAR" : "PC");
+    M_WriteText (M_ItemRightAlign(str), 135, str,
+                 M_Item_Glow(13, aud_jaguar_prop ? GLOW_DARKRED : GLOW_GREEN));
+
     // Footer
     M_WriteText (ID_MENU_LEFTOFFSET_BIG, 144, "NEXT PAGE >",
                  M_Item_Glow(14, GLOW_LIGHTGRAY));
@@ -2915,6 +2923,11 @@ static void M_ID_Crosshair (int choice)
 static void M_ID_CrosshairColor (int choice)
 {
     xhair_color = M_INT_Slider(xhair_color, 0, 3, choice, false);
+}
+
+static void M_ID_JaguarSndProp (int choice)
+{
+    aud_jaguar_prop ^= 1;
 }
 
 // -----------------------------------------------------------------------------
@@ -3197,6 +3210,9 @@ static void M_ID_ApplyResetHook (void)
     // Crosshair
     xhair_draw = 0;
     xhair_color = 0;
+
+    // Audible
+    aud_jaguar_prop = 1;
 
     // Status bar
     st_colored_stbar = 0;

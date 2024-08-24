@@ -113,6 +113,9 @@ int vis_flip_corpses = 0;
 int xhair_draw = 0;
 int xhair_color = 0;
 
+// Audible
+int aud_jaguar_prop = 1;
+
 // Status bar
 int st_colored_stbar = 0;
 int st_negative_health = 0;

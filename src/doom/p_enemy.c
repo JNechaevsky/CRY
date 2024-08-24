@@ -31,6 +31,7 @@
 #include "doomstat.h"
 
 #include "id_func.h"
+#include "id_vars.h"
 
 
 typedef enum
@@ -645,7 +646,8 @@ void A_Look (mobj_t* actor)
     {
 	actor->target = targ;
 
-	if ( actor->flags & MF_AMBUSH )
+	// [JN] CRY: optionally emulate Jaguar sound propagation mode.
+	if ( aud_jaguar_prop || actor->flags & MF_AMBUSH )
 	{
 	    if (P_CheckSight (actor, actor->target))
 		goto seeyou;
