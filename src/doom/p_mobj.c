@@ -253,7 +253,11 @@ void P_XYMovement (mobj_t* mo)
 	
     do
     {
-	if (xmove > MAXMOVE/2 || ymove > MAXMOVE/2)
+	// [JN] CRY: there are no wallrunning in Jaguar and
+	// presumably, projectiles doesn't pass through the walls.
+	// Thanks Lee Killough, AXDOOMER, Brad Harding and Jeff Doggett!
+	if (mo->player ? ((xmove > MAXMOVE/2 || ymove > MAXMOVE/2) && (xmove < -MAXMOVE/2 || ymove < -MAXMOVE/2)) 
+					: ((xmove > MAXMOVE/2 || ymove > MAXMOVE/2) || (xmove < -MAXMOVE/2 || ymove < -MAXMOVE/2)))
 	{
 	    ptryx = mo->x + xmove/2;
 	    ptryy = mo->y + ymove/2;
