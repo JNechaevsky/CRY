@@ -452,9 +452,9 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_INT(phys_weapon_alignment),
     CONFIG_VARIABLE_INT(phys_breathing),
 
-    // Accuracy
-    CONFIG_VARIABLE_INT(acc_jaguar_alert),
-    CONFIG_VARIABLE_INT(acc_jaguar_explosion),
+    // Emulation accuracy
+    CONFIG_VARIABLE_INT(emu_jaguar_alert),
+    CONFIG_VARIABLE_INT(emu_jaguar_explosion),
 
     // Gameplay
     CONFIG_VARIABLE_INT(gp_default_skill),

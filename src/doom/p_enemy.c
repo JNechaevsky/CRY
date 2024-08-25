@@ -647,7 +647,7 @@ void A_Look (mobj_t* actor)
 	actor->target = targ;
 
 	// [JN] CRY: optionally emulate Jaguar's alerted monsters.
-	if ( acc_jaguar_alert || actor->flags & MF_AMBUSH )
+	if ( emu_jaguar_alert || actor->flags & MF_AMBUSH )
 	{
 	    if (P_CheckSight (actor, actor->target))
 		goto seeyou;

@@ -1520,7 +1520,7 @@ boolean PIT_RadiusAttack (mobj_t* thing)
 	return true;	// out of range
 
     // [JN] CRY: optionally emulate Jaguar explosion radius impact.
-    if ( acc_jaguar_explosion || P_CheckSight (thing, bombspot) )
+    if ( emu_jaguar_explosion || P_CheckSight (thing, bombspot) )
     {
 	// must be in direct path
 	P_DamageMobj (thing, bombspot, bombsource, bombdamage - dist);

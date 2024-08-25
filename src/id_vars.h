@@ -97,8 +97,8 @@ extern int phys_toss_drop;
 extern int phys_floating_powerups;
 extern int phys_weapon_alignment;
 
-extern int acc_jaguar_alert;
-extern int acc_jaguar_explosion;
+extern int emu_jaguar_alert;
+extern int emu_jaguar_explosion;
 
 extern int gp_default_skill;
 extern int gp_pistol_start;

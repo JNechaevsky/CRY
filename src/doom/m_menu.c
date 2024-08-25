@@ -3010,17 +3010,17 @@ static void M_Draw_ID_Gameplay_2 (void)
     M_WriteText (M_ItemRightAlign(str), 81, str,
                  M_Item_Glow(7, phys_breathing ? GLOW_GREEN : GLOW_DARKRED));
 
-    M_WriteTextCentered(90, "ACCURACY", cr[CR_YELLOW]);
+    M_WriteTextCentered(90, "EMULATION ACCURACY", cr[CR_YELLOW]);
 
     // Alerted monsters behaviour
-    sprintf(str, acc_jaguar_alert ? "JAGUAR" : "PC");
+    sprintf(str, emu_jaguar_alert ? "JAGUAR" : "PC");
     M_WriteText (M_ItemRightAlign(str), 99, str,
-                 M_Item_Glow(9, acc_jaguar_alert ? GLOW_DARKRED : GLOW_GREEN));
+                 M_Item_Glow(9, emu_jaguar_alert ? GLOW_DARKRED : GLOW_GREEN));
 
     // Explosion radius impact
-    sprintf(str, acc_jaguar_explosion ? "JAGUAR" : "PC");
+    sprintf(str, emu_jaguar_explosion ? "JAGUAR" : "PC");
     M_WriteText (M_ItemRightAlign(str), 108, str,
-                 M_Item_Glow(10, acc_jaguar_explosion ? GLOW_DARKRED : GLOW_GREEN));
+                 M_Item_Glow(10, emu_jaguar_explosion ? GLOW_DARKRED : GLOW_GREEN));
 
     // Footer
     M_WriteText (ID_MENU_LEFTOFFSET_BIG, 144, "LAST PAGE >",
@@ -3068,12 +3068,12 @@ static void M_ID_Breathing (int choice)
 
 static void M_ID_JaguarAlert (int choice)
 {
-    acc_jaguar_alert ^= 1;
+    emu_jaguar_alert ^= 1;
 }
 
 static void M_ID_JaguarExplosion (int choice)
 {
-    acc_jaguar_explosion ^= 1;
+    emu_jaguar_explosion ^= 1;
 }
 
 // -----------------------------------------------------------------------------
@@ -3290,9 +3290,9 @@ static void M_ID_ApplyResetHook (void)
     phys_weapon_alignment = 2;
     phys_breathing = 0;
 
-    // Accuracy
-    acc_jaguar_alert = 1;
-    acc_jaguar_explosion = 1;
+    // Emulation accuracy
+    emu_jaguar_alert = 1;
+    emu_jaguar_explosion = 1;
 
     // Gameplay
     gp_default_skill = 2;

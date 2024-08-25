@@ -124,9 +124,9 @@ int phys_floating_powerups = 0;
 int phys_weapon_alignment = 2;
 int phys_breathing = 0;
 
-// Accuracy
-int acc_jaguar_alert = 1;
-int acc_jaguar_explosion = 1;
+// Emulation accuracy
+int emu_jaguar_alert = 1;
+int emu_jaguar_explosion = 1;
 
 // Gameplay
 int gp_default_skill = 2;
@@ -230,8 +230,8 @@ void ID_BindVariables (void)
     M_BindIntVariable("xhair_color",                    &xhair_color);
     
     // Monsters
-    M_BindIntVariable("acc_jaguar_alert",               &acc_jaguar_alert);
-    M_BindIntVariable("acc_jaguar_explosion",           &acc_jaguar_explosion);
+    M_BindIntVariable("emu_jaguar_alert",               &emu_jaguar_alert);
+    M_BindIntVariable("emu_jaguar_explosion",           &emu_jaguar_explosion);
 
     // Status bar
     M_BindIntVariable("st_colored_stbar",               &st_colored_stbar);
