@@ -926,6 +926,7 @@ static const sectorcolor_t sectorcolor_map03[] =
     {    3,     22,    0xFFF588 },
     {    3,     26,    0x3089FF },
     {    3,     28,    0x949DB9 },
+    {    3,     30,    0xFF3030 },
     {    3,     33,    0x7084C4 },
     {    3,     34,    0x7084C4 },
     {    3,     35,    0x7084C4 },
