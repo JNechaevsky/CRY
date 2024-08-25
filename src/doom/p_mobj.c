@@ -707,93 +707,90 @@ static int P_FindDoomedNum (unsigned type)
     return i;
 }
 
-//
-// P_SpawnMobj
-//
-static mobj_t*
-P_SpawnMobjSafe
-( fixed_t	x,
-  fixed_t	y,
-  fixed_t	z,
-  mobjtype_t	type,
-  boolean safe )
+/*
+===============
+=
+= P_SpawnMobj
+=
+===============
+*/
+
+static mobj_t *P_SpawnMobjSafe (fixed_t x, fixed_t y, fixed_t z, mobjtype_t type, boolean safe)
 {
-    mobj_t*	mobj;
-    state_t*	st;
-    mobjinfo_t*	info;
+	mobj_t		*mobj;
+	state_t		*st;
+	mobjinfo_t	*info;
 	
-    mobj = Z_Malloc (sizeof(*mobj), PU_LEVEL, NULL);
-    memset (mobj, 0, sizeof (*mobj));
-    info = &mobjinfo[type];
-	
-    mobj->type = type;
-    mobj->info = info;
-    mobj->x = x;
-    mobj->y = y;
-    mobj->radius = info->radius;
-    mobj->height = info->height;
-    mobj->flags = info->flags;
-    mobj->health = info->spawnhealth;
-    // [JN] Initialize animated brightmaps;
-    mobj->bmap_flick = 0;
+	mobj = Z_Malloc (sizeof(*mobj), PU_LEVEL, NULL);
 
-    // [JN] Jaguar: monsters doesn't attack imideatelly in Nightmare.
-    // if (gameskill != sk_nightmare)
+	memset (mobj, 0, sizeof (*mobj));
+	info = &mobjinfo[type];
+	
+	mobj->type = type;
+	mobj->info = info;
+	mobj->x = x;
+	mobj->y = y;
+	mobj->radius = info->radius;
+	mobj->height = info->height;
+	mobj->flags = info->flags;
+	mobj->health = info->spawnhealth;
+	// [JN] Initialize animated brightmaps;
+	mobj->bmap_flick = 0;
+
 	mobj->reactiontime = info->reactiontime;
-    
-    mobj->lastlook = safe ? ID_Random () % MAXPLAYERS : P_Random () % MAXPLAYERS;
-    // do not set the state with P_SetMobjState,
-    // because action routines can not be called yet
-    st = &states[safe ? P_LatestSafeState(info->spawnstate) : (statenum_t)info->spawnstate];
-
-    mobj->state = st;
-    mobj->tics = st->tics;
-    mobj->sprite = st->sprite;
-    mobj->frame = st->frame;
-
-    // set subsector and/or block links
-    P_SetThingPosition (mobj);
 	
-    mobj->floorz = mobj->subsector->sector->floorheight;
-    mobj->ceilingz = mobj->subsector->sector->ceilingheight;
+	mobj->lastlook = safe ? ID_Random () % MAXPLAYERS : P_Random () % MAXPLAYERS;
+/* do not set the state with P_SetMobjState, because action routines can't */
+/* be called yet */
+	st = &states[safe ? P_LatestSafeState(info->spawnstate) : (statenum_t)info->spawnstate];
 
-    if (z == ONFLOORZ)
-	mobj->z = mobj->floorz;
-    else if (z == ONCEILINGZ)
-	mobj->z = mobj->ceilingz - mobj->info->height;
-    else 
-	mobj->z = z;
+	mobj->state = st;
+	mobj->tics = st->tics;
+	mobj->sprite = st->sprite;
+	mobj->frame = st->frame;
 
-    // [crispy] randomly flip corpse, blood and death animation sprites
-    if (mobj->flags & MF_FLIPPABLE && !(mobj->flags & MF_SHOOTABLE))
-    {
-	mobj->health = (mobj->health & (int)~1) - (ID_RealRandom() & 1);
-    }
-    
-    // [JN] Set floating z value of floating powerups
-    // to actual mobj z coord and randomize amplitude
-    // so they will spawn at random height.
-    if (mobj->type == MT_MISC12  // Supercharge
-    ||  mobj->type == MT_INV     // Invulnerability
-    ||  mobj->type == MT_INS)    // Partial invisibility
-    {
-        mobj->old_float_z = mobj->float_z = mobj->z;
-        mobj->float_amp = ID_RealRandom() % 63;
-    }
+/* set subsector and/or block links */
+	P_SetThingPosition (mobj);
+	
+	mobj->floorz = mobj->subsector->sector->floorheight;
+	mobj->ceilingz = mobj->subsector->sector->ceilingheight;
+	if (z == ONFLOORZ)
+		mobj->z = mobj->floorz;
+	else if (z == ONCEILINGZ)
+		mobj->z = mobj->ceilingz - mobj->info->height;
+	else 
+		mobj->z = z;
+	
+	// [crispy] randomly flip corpse, blood and death animation sprites
+	if (mobj->flags & MF_FLIPPABLE && !(mobj->flags & MF_SHOOTABLE))
+	{
+		mobj->health = (mobj->health & (int)~1) - (ID_RealRandom() & 1);
+	}
+	
+	// [JN] Set floating z value of floating powerups
+	// to actual mobj z coord and randomize amplitude
+	// so they will spawn at random height.
+	if (mobj->type == MT_MISC12  // Supercharge
+	||  mobj->type == MT_INV     // Invulnerability
+	||  mobj->type == MT_INS)    // Partial invisibility
+	{
+		mobj->old_float_z = mobj->float_z = mobj->z;
+		mobj->float_amp = ID_RealRandom() % 63;
+	}
+	
+	// [AM] Do not interpolate on spawn.
+	mobj->interp = false;
+	
+	// [AM] Just in case interpolation is attempted...
+	mobj->oldx = mobj->x;
+	mobj->oldy = mobj->y;
+	mobj->oldz = mobj->z;
+	mobj->oldangle = mobj->angle;
+	
+	mobj->thinker.function.acp1 = (actionf_p1)P_MobjThinker;
+	P_AddThinker (&mobj->thinker);
 
-    // [AM] Do not interpolate on spawn.
-    mobj->interp = false;
-
-    // [AM] Just in case interpolation is attempted...
-    mobj->oldx = mobj->x;
-    mobj->oldy = mobj->y;
-    mobj->oldz = mobj->z;
-    mobj->oldangle = mobj->angle;
-
-    mobj->thinker.function.acp1 = (actionf_p1)P_MobjThinker;
-    P_AddThinker (&mobj->thinker);
-
-    return mobj;
+	return mobj;
 }
 
 mobj_t*
@@ -827,6 +824,7 @@ void P_RemoveMobj (mobj_t* mobj)
 }
 
 
+/*============================================================================= */
 
 
 // [crispy] weapon sound sources
@@ -838,153 +836,165 @@ mobj_t *Crispy_PlayerSO (int p)
 	return (mobj_t *) &muzzles[p];
 }
 
-//
-// P_SpawnPlayer
-// Called when a player is spawned on the level.
-// Most of the player structure stays unchanged
-//  between levels.
-//
-void P_SpawnPlayer (mapthing_t* mthing)
+/*
+============
+=
+= P_SpawnPlayer
+=
+= Called when a player is spawned on the level 
+= Most of the player structure stays unchanged between levels
+============
+*/
+
+void P_SpawnPlayer (mapthing_t *mthing)
 {
-    player_t*		p;
-    fixed_t		x;
-    fixed_t		y;
-    fixed_t		z;
+	player_t	*p;
+	fixed_t		x,y,z;
+	mobj_t		*mobj;
 
-    mobj_t*		mobj;
+	if (mthing->type == 0)
+		return;
 
-    if (mthing->type == 0)
-    {
-        return;
-    }
-
-    // not playing?
-    if (!playeringame[mthing->type-1])
-	return;					
+	if (!playeringame[mthing->type-1])
+		return;						/* not playing */
 		
-    p = &players[mthing->type-1];
+	p = &players[mthing->type-1];
 
-    if (p->playerstate == PST_REBORN)
-	G_PlayerReborn (mthing->type-1);
+	if (p->playerstate == PST_REBORN)
+		G_PlayerReborn (mthing->type-1);
 
-    x 		= mthing->x << FRACBITS;
-    y 		= mthing->y << FRACBITS;
-    z		= ONFLOORZ;
-    mobj	= P_SpawnMobj (x,y,z, MT_PLAYER);
+	x = mthing->x << FRACBITS;
+	y = mthing->y << FRACBITS;
+#if 0
+if (mthing->type==1)
+{
+x = 0xffb00000;
+y = 0xff500000;
+}
+#endif
+	z = ONFLOORZ;
+	mobj = P_SpawnMobj (x,y,z, MT_PLAYER);
 
-    // set color translations for player sprites
-    if (mthing->type > 1)		
+	// set color translations for player sprites
+	if (mthing->type > 1)		
 	mobj->flags |= (mthing->type-1)<<MF_TRANSSHIFT;
-		
-    mobj->angle	= ANG45 * (mthing->angle/45);
-    mobj->player = p;
-    mobj->health = p->health;
 
-    p->mo = mobj;
-    p->playerstate = PST_LIVE;	
-    p->refire = 0;
-    p->cheatTics = 0;
-    p->message = NULL;
-    // [JN] Reset ultimatemsg, so other messages may appear.
-    // See: https://github.com/chocolate-doom/chocolate-doom/issues/781
-    ultimatemsg = false;
-    lastmessage = NULL;
-    p->damagecount = 0;
-    p->bonuscount = 0;
-    p->extralight = 0;
-    p->invulcolormap = 0;
-    p->viewheight = VIEWHEIGHT;
+	mobj->angle	= ANG45 * (mthing->angle/45);
+	mobj->player = p;
+	mobj->health = p->health;
+	p->mo = mobj;
+	p->playerstate = PST_LIVE;	
+	p->refire = 0;
+	p->cheatTics = 0;
+	p->message = NULL;
+	// [JN] Reset ultimatemsg, so other messages may appear.
+	// See: https://github.com/chocolate-doom/chocolate-doom/issues/781
+	ultimatemsg = false;
+	lastmessage = NULL;
+	p->damagecount = 0;
+	p->bonuscount = 0;
+	p->extralight = 0;
+	p->invulcolormap = 0;
+	p->viewheight = VIEWHEIGHT;
 
-    // [crispy] weapon sound source
-    p->so = Crispy_PlayerSO(mthing->type-1);
+	// [crispy] weapon sound source
+	p->so = Crispy_PlayerSO(mthing->type-1);
 
-    p->psp_dy = p->psp_dy_max = 0;
-    // [JN] Keep NOCLIP cheat across the levels.
-    if (p->cheats & CF_NOCLIP)
+	p->psp_dy = p->psp_dy_max = 0;
+	// [JN] Keep NOCLIP cheat across the levels.
+	if (p->cheats & CF_NOCLIP)
     {
-        p->mo->flags |= MF_NOCLIP;
-    }
+		p->mo->flags |= MF_NOCLIP;
+	}
 
-    // [crispy] interpolate weapon bobbing
-    pspr_interp = false;
+	// [crispy] interpolate weapon bobbing
+	pspr_interp = false;
 
-    // setup gun psprite
-    P_SetupPsprites (p);
+	// setup gun psprite
+	P_SetupPsprites (p);
 			
-    if (mthing->type-1 == consoleplayer)
-    {
-	// wake up the status bar
-	ST_Start ();
-    }
+	if (mthing->type-1 == consoleplayer)
+	{
+		// wake up the status bar
+		ST_Start ();
+	}
 }
 
 
-//
-// P_SpawnMapThing
-// The fields of the mapthing should
-// already be in host byte order.
-//
-void P_SpawnMapThing (mapthing_t* mthing)
-{
-    int			i;
-    int			bit;
-    mobj_t*		mobj;
-    fixed_t		x;
-    fixed_t		y;
-    fixed_t		z;
-		
-    // [JN] Ignore deathmatch start positions.
-    if (mthing->type == 11)
-    {
-	return;
-    }
 
+/*
+=================
+=
+= P_SpawnMapThing
+=
+= The fields of the mapthing should already be in host byte order
+==================
+*/
+
+void P_SpawnMapThing (mapthing_t *mthing)
+{
+	int			i, bit;
+	mobj_t		*mobj;
+	fixed_t		x,y,z;
+		
+	// [JN] CRY: ignore deathmatch start positions (no multiplayer support).
+	if (mthing->type == 11)
+	{
+		return;
+	}
+	
     if (mthing->type <= 0)
     {
         // Thing type 0 is actually "player -1 start".  
         // For some reason, Vanilla Doom accepts/ignores this.
-
         return;
     }
-	
-    // check for players specially
-    if (mthing->type <= 4)
-    {
-	// save spots for respawning in network games
-	playerstarts[mthing->type-1] = *mthing;
-	playerstartsingame[mthing->type-1] = true;
-	    P_SpawnPlayer (mthing);
 
-	return;
-    }
+/* check for players specially */
 
-    // check for apropriate skill level
-    if (mthing->options & 16)
-	return;
+
+	if (mthing->type <= 4)
+	{
+		/* save spots for respawning in network games */
+		playerstarts[mthing->type-1] = *mthing;
+		playerstartsingame[mthing->type-1] = true;
+		P_SpawnPlayer (mthing);
+		return;
+	}
+
+/* check for apropriate skill level */
+	if ( mthing->options & 16 )
+		return;
 		
-    if (gameskill == sk_baby)
-	bit = 1;
-    else if (gameskill == sk_nightmare)
-	bit = 4;
-    else
-	bit = 1<<(gameskill-1);
-
-    if (!(mthing->options & bit) )
-	return;
+	if (gameskill == sk_baby)
+		bit = 1;
+	else if (gameskill == sk_nightmare)
+		bit = 4;
+	else
+		bit = 1<<(gameskill-1);
+	if (!(mthing->options & bit) )
+		return;
 	
-    // find which type to spawn
+#if 0 // #ifdef MARS
+/* hack player corpses into something else, because player graphics */
+/* aren't included */
+	if (mthing->type == 10 || mthing->type == 12)	/* player corpse */
+		mthing->type = 18;		/* possessed human corpse */
+#endif
 
-    // [JN] killough 8/23/98: use table for faster lookup
-    i = P_FindDoomedNum(mthing->type);
+
+/* find which type to spawn */
+	// [JN] killough 8/23/98: use table for faster lookup
+	i = P_FindDoomedNum(mthing->type);
 	
-    if (i==NUMMOBJTYPES)
-    {
-	// [crispy] ignore unknown map things
-	fprintf (stderr, "P_SpawnMapThing: Unknown type %i at (%i, %i)\n",
-		 mthing->type,
-		 mthing->x, mthing->y);
-	return;
-    }
+	if (i==NUMMOBJTYPES)
+	{
+		// [crispy] ignore unknown map things
+		fprintf (stderr, "P_SpawnMapThing: Unknown type %i at (%i, %i)\n",
+			mthing->type,
+			mthing->x, mthing->y);
+		return;
+	}
 		
     // don't spawn any monsters if -nomonsters
     if (nomonsters
@@ -994,29 +1004,27 @@ void P_SpawnMapThing (mapthing_t* mthing)
 	return;
     }
     
-    // spawn it
-    x = mthing->x << FRACBITS;
-    y = mthing->y << FRACBITS;
+/* spawn it */
 
-    if (mobjinfo[i].flags & MF_SPAWNCEILING)
-	z = ONCEILINGZ;
-    else
-	z = ONFLOORZ;
-    
-    mobj = P_SpawnMobj (x,y,z, i);
-    mobj->spawnpoint = *mthing;
-
-    if (mobj->tics > 0)
-	mobj->tics = 1 + (P_Random () % mobj->tics);
-    if (mobj->flags & MF_COUNTKILL)
-	totalkills++;
-    if (mobj->flags & MF_COUNTITEM)
-	totalitems++;
+	x = mthing->x << FRACBITS;
+	y = mthing->y << FRACBITS;
+	if (mobjinfo[i].flags & MF_SPAWNCEILING)
+		z = ONCEILINGZ;
+	else
+		z = ONFLOORZ;
+	mobj = P_SpawnMobj (x,y,z, i);
+	mobj->spawnpoint = *mthing;
+	if (mobj->tics > 0)
+		mobj->tics = 1 + (P_Random () % mobj->tics);
+	if (mobj->flags & MF_COUNTKILL)
+		totalkills++;
+	if (mobj->flags & MF_COUNTITEM)
+		totalitems++;
 		
-    mobj->angle = ANG45 * (mthing->angle/45);
-    if (mthing->options & MTF_AMBUSH)
-	mobj->flags |= MF_AMBUSH;
-
+	mobj->angle = ANG45 * (mthing->angle/45);
+	if (mthing->options & MTF_AMBUSH)
+		mobj->flags |= MF_AMBUSH;
+		
     // [crispy] randomly flip space marine corpse objects
     if (mobj->info->spawnstate == S_PLAY_DIE7
     ||  mobj->info->spawnstate == S_PLAY_XDIE9)
@@ -1040,120 +1048,109 @@ void P_SpawnMapThing (mapthing_t* mthing)
 }
 
 
+/*
+===============================================================================
 
-//
-// GAME SPAWN FUNCTIONS
-//
+						GAME SPAWN FUNCTIONS
+
+===============================================================================
+*/
+
+/*
+================
+=
+= P_SpawnPuff
+=
+================
+*/
 
 
-//
-// P_SpawnPuff
-//
-
-void
-P_SpawnPuff
-( fixed_t	x,
-  fixed_t	y,
-  fixed_t	z )
+void P_SpawnPuff (fixed_t x, fixed_t y, fixed_t z)
 {
-    P_SpawnPuffSafe(x, y, z, false);
+	P_SpawnPuffSafe(x, y, z, false);
 }
 
-void
-P_SpawnPuffSafe
-( fixed_t	x,
-  fixed_t	y,
-  fixed_t	z,
-  boolean	safe )
+void P_SpawnPuffSafe (fixed_t x, fixed_t y, fixed_t z, boolean safe)
 {
-    mobj_t*	th;
+	mobj_t	*th;
 	
-    z += safe ? (ID_SubRandom() << 10) : (P_SubRandom() << 10);
-
-    th = P_SpawnMobjSafe (x,y,z, MT_PUFF, safe);
-    th->momz = FRACUNIT;
-    th->tics -= safe ? ID_Random()&3 : P_Random()&3;
-
-    if (th->tics < 1)
-	th->tics = 1;
+	z += safe ? (ID_SubRandom() << 10) : (P_SubRandom() << 10);
+	th = P_SpawnMobjSafe (x,y,z, MT_PUFF, safe);
+	th->momz = FRACUNIT;
+	th->tics -= safe ? ID_Random()&3 : P_Random()&3;
+	if (th->tics < 1)
+		th->tics = 1;
 	
-    // [JN] CRL - prevent puffs appearing below floor and above ceiling levels.
-    // Just a cosmetical improvement, not needed outside of Freeze mode.
-    // Note: shifting puff's z *seems* to be safe for demos, but Freeze itself
-    // is not available in demo playing/recording, so keep this fix isolated.
-    if (crl_freeze)
-    {
-        if (th->z < th->floorz)
-        {
-            th->z = th->floorz;
-        }
-        if (th->z > th->ceilingz)
-        {
-            th->z = th->ceilingz;
-        }
-    }
-
-    // don't make punches spark on the wall
-    if (attackrange == MELEERANGE)
-	P_SetMobjState (th, safe ? P_LatestSafeState(S_PUFF3) : S_PUFF3);
-
-    // [crispy] suppress interpolation for the first tic
-    th->interp = -1;
-}
-
-
-
-//
-// P_SpawnBlood
-// 
-void
-P_SpawnBlood
-( fixed_t	x,
-  fixed_t	y,
-  fixed_t	z,
-  int		damage,
-  mobj_t*	target ) // [crispy] pass thing type
-{
-    mobj_t*	th;
-	
-    z += (P_SubRandom() << 10);
-    th = P_SpawnMobj (x,y,z, MT_BLOOD);
-    th->momz = FRACUNIT*2;
-    th->tics -= P_Random()&3;
-
-    if (th->tics < 1)
-	th->tics = 1;
+	// [JN] CRL - prevent puffs appearing below floor and above ceiling levels.
+	// Just a cosmetical improvement, not needed outside of Freeze mode.
+	// Note: shifting puff's z *seems* to be safe for demos, but Freeze itself
+	// is not available in demo playing/recording, so keep this fix isolated.
+	if (crl_freeze)
+	{
+		if (th->z < th->floorz)
+			th->z = th->floorz;
+		if (th->z > th->ceilingz)
+			th->z = th->ceilingz;
+	}
 		
-    if (damage <= 12 && damage >= 9)
-	P_SetMobjState (th,S_BLOOD2);
-    else if (damage < 9)
-	P_SetMobjState (th,S_BLOOD3);
+/* don't make punches spark on the wall */
+	if (attackrange == MELEERANGE)
+		P_SetMobjState (th, safe ? P_LatestSafeState(S_PUFF3) : S_PUFF3);
 
-    // [crispy] connect blood object with the monster that bleeds it
-    th->target = target;
+	// [crispy] suppress interpolation for the first tic
+	th->interp = -1;
 }
 
 
+/*
+================
+=
+= P_SpawnBlood
+=
+================
+*/
 
-//
-// P_CheckMissileSpawn
-// Moves the missile forward a bit
-//  and possibly explodes it right there.
-//
-void P_CheckMissileSpawn (mobj_t* th)
+void P_SpawnBlood (fixed_t x, fixed_t y, fixed_t z, int damage, mobj_t *target) // [crispy] pass thing type
 {
-    th->tics -= P_Random()&3;
-    if (th->tics < 1)
-	th->tics = 1;
-    
-    // move a little forward so an angle can
-    // be computed if it immediately explodes
-    th->x += (th->momx>>1);
-    th->y += (th->momy>>1);
-    th->z += (th->momz>>1);
+	mobj_t	*th;
+	
+	z += (P_SubRandom() << 10);
+	th = P_SpawnMobj (x,y,z, MT_BLOOD);
+	th->momz = FRACUNIT*2;
+	th->tics -= P_Random()&3;
+	if (th->tics<1)
+		th->tics = 1;
+	if (damage <= 12 && damage >= 9)
+		P_SetMobjState (th,S_BLOOD2);
+	else if (damage < 9)
+		P_SetMobjState (th,S_BLOOD3);
 
-    if (!P_TryMove (th, th->x, th->y))
-	P_ExplodeMissile (th);
+	// [crispy] connect blood object with the monster that bleeds it
+	th->target = target;
+}
+
+/*
+================
+=
+= P_CheckMissileSpawn
+=
+= Moves the missile forward a bit and possibly explodes it right there
+=
+================
+*/
+
+void P_CheckMissileSpawn (mobj_t *th)
+{
+	th->tics -= P_Random()&3;
+	if (th->tics < 1)
+		th->tics = 1;
+    
+	th->x += (th->momx>>1);
+	th->y += (th->momy>>1);	/* move a little forward so an angle can */
+							/* be computed if it immediately explodes */
+	th->z += (th->momz>>1);
+	if (!P_TryMove (th, th->x, th->y))
+		P_ExplodeMissile (th);
 }
 
 // Certain functions assume that a mobj_t pointer is non-NULL,
@@ -1179,70 +1176,66 @@ mobj_t *P_SubstNullMobj(mobj_t *mobj)
     return mobj;
 }
 
-//
-// P_SpawnMissile
-//
-mobj_t*
-P_SpawnMissile
-( mobj_t*	source,
-  mobj_t*	dest,
-  mobjtype_t	type )
+/*
+================
+=
+= P_SpawnMissile
+=
+================
+*/
+
+mobj_t *P_SpawnMissile (mobj_t *source, mobj_t *dest, mobjtype_t type)
 {
-    mobj_t*	th;
-    angle_t	an;
-    int		dist;
+	mobj_t		*th;
+	angle_t		an;
+	int			dist;
 
-    th = P_SpawnMobj (source->x,
-		      source->y,
-		      source->z + 4*8*FRACUNIT, type);
-    
-    if (th->info->seesound)
-	S_StartSound (th, th->info->seesound);
-
-    th->target = source;	// where it came from
-    an = R_PointToAngle2 (source->x, source->y, dest->x, dest->y);
-
-    // fuzzy player
-    if (dest->flags & MF_SHADOW)
-	an += P_SubRandom() << 20;
-
-    th->angle = an;
-    an >>= ANGLETOFINESHIFT;
-    th->momx = FixedMul (th->info->speed, finecosine[an]);
-    th->momy = FixedMul (th->info->speed, finesine[an]);
 	
-    dist = P_AproxDistance (dest->x - source->x, dest->y - source->y);
-    dist = dist / th->info->speed;
+	th = P_SpawnMobj (source->x,source->y, source->z + 4*8*FRACUNIT, type);
+	if (th->info->seesound)
+		S_StartSound (th, th->info->seesound);
+	th->target = source;		/* where it came from */
+	an = R_PointToAngle2 (source->x, source->y, dest->x, dest->y);
 
-    if (dist < 1)
-	dist = 1;
+	// fuzzy player
+	if (dest->flags & MF_SHADOW)
+		an += P_SubRandom() << 20;
 
-    th->momz = (dest->z - source->z) / dist;
-    P_CheckMissileSpawn (th);
+	th->angle = an;
+	an >>= ANGLETOFINESHIFT;
+	th->momx = FixedMul (th->info->speed, finecosine[an]);
+	th->momy = FixedMul (th->info->speed, finesine[an]);
+	
+	dist = P_AproxDistance (dest->x - source->x, dest->y - source->y);
+	dist = dist / th->info->speed;
+	if (dist < 1)
+		dist = 1;
+	th->momz = (dest->z - source->z) / dist;
+	P_CheckMissileSpawn (th);
 	
     return th;
 }
 
 
-//
-// P_SpawnPlayerMissile
-// Tries to aim at a nearby monster
-//
-void
-P_SpawnPlayerMissile
-( mobj_t*	source,
-  mobjtype_t	type )
+/*
+================
+=
+= P_SpawnPlayerMissile
+=
+= Tries to aim at a nearby monster
+================
+*/
+
+void P_SpawnPlayerMissile (mobj_t *source, mobjtype_t type)
 {
-    mobj_t*	th;
-    angle_t	an;
-    
-    fixed_t	x;
-    fixed_t	y;
-    fixed_t	z;
-    fixed_t	slope;
-    
-    // see which target is to be aimed at
-    an = source->angle;
+	mobj_t			*th;
+	angle_t			an;
+	fixed_t			x,y,z, slope;
+			
+/* */
+/* see which target is to be aimed at */
+/* */
+	an = source->angle;
     if (compat_vertical_aiming == 1)
     {
 	slope = PLAYER_SLOPE(source->player);
@@ -1259,8 +1252,8 @@ P_SpawnPlayerMissile
 
 	if (!linetarget)
 	{
-	    an -= 2<<26;
-	    slope = P_AimLineAttack (source, an, 16*64*FRACUNIT, false);
+		an -= 2<<26;
+		slope = P_AimLineAttack (source, an, 16*64*FRACUNIT, false);
 	}
 
 	if (!linetarget)
@@ -1276,26 +1269,23 @@ P_SpawnPlayerMissile
 	}
     }
     }
-		
-    x = source->x;
-    y = source->y;
-    z = source->z + 4*8*FRACUNIT;
 	
-    th = P_SpawnMobj (x,y,z, type);
+	x = source->x;
+	y = source->y;
+	z = source->z + 4*8*FRACUNIT;
+	
+	th = P_SpawnMobj (x,y,z, type);
+	if (th->info->seesound)
+		S_StartSound (th, th->info->seesound);
+	th->target = source;
+	th->angle = an;
+	
+	th->momx = FixedMul( th->info->speed, finecosine[an>>ANGLETOFINESHIFT]);
+	th->momy = FixedMul( th->info->speed, finesine[an>>ANGLETOFINESHIFT]);
+	th->momz = FixedMul( th->info->speed, slope);
+	// [crispy] suppress interpolation of player missiles for the first tic
+	th->interp = -1;
 
-    if (th->info->seesound)
-	S_StartSound (th, th->info->seesound);
-
-    th->target = source;
-    th->angle = an;
-    th->momx = FixedMul( th->info->speed,
-			 finecosine[an>>ANGLETOFINESHIFT]);
-    th->momy = FixedMul( th->info->speed,
-			 finesine[an>>ANGLETOFINESHIFT]);
-    th->momz = FixedMul( th->info->speed, slope);
-    // [crispy] suppress interpolation of player missiles for the first tic
-    th->interp = -1;
-
-    P_CheckMissileSpawn (th);
+	P_CheckMissileSpawn (th);
 }
 
