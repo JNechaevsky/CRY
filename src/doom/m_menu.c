@@ -5111,6 +5111,7 @@ void M_StartControlPanel (void)
     
     menuactive = 1;
     currentMenu = &MainDef;         // JDC
+    M_Reset_Line_Glow();
     itemOn = currentMenu->lastOn;   // JDC
 }
 
