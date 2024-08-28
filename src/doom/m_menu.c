@@ -3418,17 +3418,19 @@ static void M_DrawSaveLoadBottomLine (void)
         struct stat filestat;
         char filedate[32];
 
-        stat(P_SaveGameFile(itemOn), &filestat);
+        if (M_stat(P_SaveGameFile(itemOn), &filestat) == 0)
+        {
 // [FG] suppress the most useless compiler warning ever
 #if defined(__GNUC__)
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wformat-y2k"
 #endif
-        strftime(filedate, sizeof(filedate), "%x %X", localtime(&filestat.st_mtime));
+            strftime(filedate, sizeof(filedate), "%x %X", localtime(&filestat.st_mtime));
 #if defined(__GNUC__)
 #  pragma GCC diagnostic pop
 #endif
-        M_WriteTextCentered(152, filedate, cr[CR_MENU_DARK2]);
+            M_WriteTextCentered(152, filedate, cr[CR_MENU_DARK2]);
+        }
     }
 }
 
