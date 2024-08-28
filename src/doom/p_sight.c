@@ -105,7 +105,9 @@ P_DivlineSide
     
     if (!node->dy)
     {
-	if (x==node->y)
+	// [JN] CRY: fix "Sleeping shotgun guy" bug.
+	// Not happening in vanilla Jaguar Doom.
+	if (y==node->y)
 	    return 2;
 
 	if (y <= node->y)
