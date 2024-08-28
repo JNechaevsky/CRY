@@ -99,6 +99,11 @@ static byte cr_orange_bright1[256];
 
 static byte cr_white[256];
 static byte cr_gray[256];
+static byte cr_gray_bright5[256];
+static byte cr_gray_bright4[256];
+static byte cr_gray_bright3[256];
+static byte cr_gray_bright2[256];
+static byte cr_gray_bright1[256];
 
 static byte cr_lightgray[256];
 static byte cr_lightgray_bright5[256];
@@ -218,6 +223,11 @@ byte *cr[] =
 
     (byte *) &cr_white,
     (byte *) &cr_gray,
+    (byte *) &cr_gray_bright5,
+    (byte *) &cr_gray_bright4,
+    (byte *) &cr_gray_bright3,
+    (byte *) &cr_gray_bright2,
+    (byte *) &cr_gray_bright1,
 
     (byte *) &cr_lightgray,
     (byte *) &cr_lightgray_bright5,
@@ -763,6 +773,32 @@ byte V_Colorize (byte *playpal, int cr, byte source, boolean keepgray109)
             hsv.y = 0;
             hsv.z *= 0.5;
         }
+        else if (cr == CR_GRAY_BRIGHT5)
+        {
+            hsv.y = 0;
+            hsv.z *= 0.75;
+        }
+        else if (cr == CR_GRAY_BRIGHT4)
+        {
+            hsv.y = 0;
+            hsv.z *= 0.70;
+        }
+        else if (cr == CR_GRAY_BRIGHT3)
+        {
+            hsv.y = 0;
+            hsv.z *= 0.65;
+        }
+        else if (cr == CR_GRAY_BRIGHT2)
+        {
+            hsv.y = 0;
+            hsv.z *= 0.60;
+        }
+        else if (cr == CR_GRAY_BRIGHT1)
+        {
+            hsv.y = 0;
+            hsv.z *= 0.55;
+        }
+
         else if (cr == CR_LIGHTGRAY)
         {
             hsv.y = 0;

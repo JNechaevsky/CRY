@@ -829,6 +829,7 @@ static byte *M_Big_Line_Glow (const int tics)
 #define GLOW_BLUE       7
 #define GLOW_OLIVE      8
 #define GLOW_DARKGREEN  9
+#define GLOW_GRAY       10
 
 #define ITEMONTICS      currentMenu->menuitems[itemOn].tics
 #define ITEMSETONTICS   currentMenu->menuitems[itemSetOn].tics
@@ -847,6 +848,7 @@ static byte *M_Item_Glow (const int itemSetOn, const int color)
             color == GLOW_BLUE      ? cr[CR_BLUE2_BRIGHT5]     :
             color == GLOW_OLIVE     ? cr[CR_OLIVE_BRIGHT5]     :
             color == GLOW_DARKGREEN ? cr[CR_DARKGREEN_BRIGHT5] :
+            color == GLOW_GRAY      ? cr[CR_GRAY_BRIGHT5]      :
                                       cr[CR_MENU_BRIGHT5]      ; // GLOW_UNCOLORED
     }
     else
@@ -940,6 +942,15 @@ static byte *M_Item_Glow (const int itemSetOn, const int color)
                 ITEMSETONTICS == 3 ? cr[CR_DARKGREEN_BRIGHT3] :
                 ITEMSETONTICS == 2 ? cr[CR_DARKGREEN_BRIGHT2] :
                 ITEMSETONTICS == 1 ? cr[CR_DARKGREEN_BRIGHT1] : cr[CR_DARKGREEN];
+        }
+        if (color == GLOW_GRAY)
+        {
+            return
+                ITEMSETONTICS == 5 ? cr[CR_GRAY_BRIGHT5] :
+                ITEMSETONTICS == 4 ? cr[CR_GRAY_BRIGHT4] :
+                ITEMSETONTICS == 3 ? cr[CR_GRAY_BRIGHT3] :
+                ITEMSETONTICS == 2 ? cr[CR_GRAY_BRIGHT2] :
+                ITEMSETONTICS == 1 ? cr[CR_GRAY_BRIGHT1] : cr[CR_GRAY];
         }
     }
     return NULL;
@@ -2858,7 +2869,7 @@ static void M_Draw_ID_Gameplay_1 (void)
                  M_Item_Glow(14, GLOW_LIGHTGRAY));
 
     sprintf(str, "PAGE 1/3");
-    M_WriteText(M_ItemRightAlign(str), 144, str, cr[CR_GRAY]);
+    M_WriteText(M_ItemRightAlign(str), 144, str, M_Item_Glow(14, GLOW_GRAY));
 }
 
 static void M_ID_Brightmaps (int choice)
@@ -3027,7 +3038,7 @@ static void M_Draw_ID_Gameplay_2 (void)
                  M_Item_Glow(14, GLOW_LIGHTGRAY));
 
     sprintf(str, "PAGE 2/3");
-    M_WriteText(M_ItemRightAlign(str), 144, str, cr[CR_GRAY]);
+    M_WriteText(M_ItemRightAlign(str), 144, str, M_Item_Glow(14, GLOW_GRAY));
 }
 
 static void M_ID_ColoredSTBar (int choice)
@@ -3154,7 +3165,7 @@ static void M_Draw_ID_Gameplay_3 (void)
                  M_Item_Glow(14, GLOW_LIGHTGRAY));
 
     sprintf(str, "PAGE 3/3");
-    M_WriteText(M_ItemRightAlign(str), 144, str, cr[CR_GRAY]);
+    M_WriteText(M_ItemRightAlign(str), 144, str, M_Item_Glow(14, GLOW_GRAY));
 }
 
 static void M_ID_DefaulSkill (int choice)
