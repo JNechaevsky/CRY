@@ -621,11 +621,12 @@ static void M_ID_TossDrop (int choice);
 static void M_ID_FloatingPowerups (int choice);
 static void M_ID_WeaponAlignment (int choice);
 static void M_ID_Breathing (int choice);
-static void M_ID_JaguarAlert (int choice);
-static void M_ID_JaguarExplosion (int choice);
+static void M_ID_CorpseCrushingSnd (int choice);
 
 static void M_Choose_ID_Gameplay_3 (int choice);
 static void M_Draw_ID_Gameplay_3 (void);
+static void M_ID_JaguarAlert (int choice);
+static void M_ID_JaguarExplosion (int choice);
 static void M_ID_DefaulSkill (int choice);
 static void M_ID_PistolStart (int choice);
 static void M_ID_RevealedSecrets (int choice);
@@ -2958,8 +2959,8 @@ static menuitem_t ID_Menu_Gameplay_2[]=
     { M_LFRT, "WEAPON ATTACK ALIGNMENT",       M_ID_WeaponAlignment,   'w' },
     { M_LFRT, "IMITATE PLAYER'S BREATHING",    M_ID_Breathing,         'i' },
     { M_SKIP, "", 0, '\0' },
-    { M_LFRT, "ALERTED MONSTERS BEHAVIOUR",    M_ID_JaguarAlert,       'a' },
-    { M_LFRT, "EXPLOSION RADIUS IMPACT",       M_ID_JaguarExplosion,   'e' },
+    { M_LFRT, "CORPSE CRUSHING SOUND",         M_ID_CorpseCrushingSnd, 'c' },
+    { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
@@ -3029,17 +3030,12 @@ static void M_Draw_ID_Gameplay_2 (void)
     M_WriteText (M_ItemRightAlign(str), 81, str,
                  M_Item_Glow(7, phys_breathing ? GLOW_GREEN : GLOW_DARKRED));
 
-    M_WriteTextCentered(90, "EMULATION ACCURACY", cr[CR_YELLOW]);
+    M_WriteTextCentered(90, "AUDIBLE", cr[CR_YELLOW]);
 
-    // Alerted monsters behaviour
-    sprintf(str, emu_jaguar_alert ? "JAGUAR" : "PC");
+    // Sound of corpse crushing
+    sprintf(str, aud_corpse_crushing ? "ON" : "OFF");
     M_WriteText (M_ItemRightAlign(str), 99, str,
-                 M_Item_Glow(9, emu_jaguar_alert ? GLOW_DARKRED : GLOW_GREEN));
-
-    // Explosion radius impact
-    sprintf(str, emu_jaguar_explosion ? "JAGUAR" : "PC");
-    M_WriteText (M_ItemRightAlign(str), 108, str,
-                 M_Item_Glow(10, emu_jaguar_explosion ? GLOW_DARKRED : GLOW_GREEN));
+                 M_Item_Glow(9, aud_corpse_crushing ? GLOW_GREEN : GLOW_DARKRED));
 
     // Footer
     M_WriteText (ID_MENU_LEFTOFFSET_BIG, 144, "LAST PAGE >",
@@ -3085,14 +3081,9 @@ static void M_ID_Breathing (int choice)
     phys_breathing ^= 1;
 }
 
-static void M_ID_JaguarAlert (int choice)
+static void M_ID_CorpseCrushingSnd (int choice)
 {
-    emu_jaguar_alert ^= 1;
-}
-
-static void M_ID_JaguarExplosion (int choice)
-{
-    emu_jaguar_explosion ^= 1;
+    aud_corpse_crushing ^= 1;
 }
 
 // -----------------------------------------------------------------------------
@@ -3101,14 +3092,14 @@ static void M_ID_JaguarExplosion (int choice)
 
 static menuitem_t ID_Menu_Gameplay_3[]=
 {
+    { M_LFRT, "ALERTED MONSTERS BEHAVIOUR",    M_ID_JaguarAlert,       'a' },
+    { M_LFRT, "EXPLOSION RADIUS IMPACT",       M_ID_JaguarExplosion,   'e' },
+    { M_SKIP, "", 0, '\0' },
     { M_LFRT, "DEFAULT SKILL LEVEL",           M_ID_DefaulSkill,       'd' },
     { M_LFRT, "PISTOL START GAME MODE",        M_ID_PistolStart,       'p' },
     { M_LFRT, "REPORT REVEALED SECRETS",       M_ID_RevealedSecrets,   'r' },
     { M_LFRT, "FLIP LEVELS HORIZONTALLY",      M_ID_FlipLevels,        'f' },
     { M_LFRT, "ON DEATH ACTION",               M_ID_OnDeathAction,     'o' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
@@ -3139,34 +3130,46 @@ static void M_Draw_ID_Gameplay_3 (void)
     char str[32];
     Gameplay_Cur = 2;
 
-    M_WriteTextCentered(9, "GAMEPLAY", cr[CR_YELLOW]);
+    M_WriteTextCentered(9, "EMULATION ACCURACY", cr[CR_YELLOW]);
+
+    // Alerted monsters behaviour
+    sprintf(str, emu_jaguar_alert ? "JAGUAR" : "PC");
+    M_WriteText (M_ItemRightAlign(str), 18, str,
+                 M_Item_Glow(0, emu_jaguar_alert ? GLOW_DARKRED : GLOW_GREEN));
+
+    // Explosion radius impact
+    sprintf(str, emu_jaguar_explosion ? "JAGUAR" : "PC");
+    M_WriteText (M_ItemRightAlign(str), 27, str,
+                 M_Item_Glow(1, emu_jaguar_explosion ? GLOW_DARKRED : GLOW_GREEN));
+
+    M_WriteTextCentered(36, "GAMEPLAY", cr[CR_YELLOW]);
 
     // Default skill level
     snprintf(str, sizeof(str), "%s", DefSkillName[gp_default_skill]);
-    M_WriteText (M_ItemRightAlign(str), 18, str, 
-                 M_Item_Glow(0, DefSkillColor(gp_default_skill)));
+    M_WriteText (M_ItemRightAlign(str), 45, str, 
+                 M_Item_Glow(3, DefSkillColor(gp_default_skill)));
 
     // Pistol start game mode
     sprintf(str, gp_pistol_start ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 27, str,
-                 M_Item_Glow(1, gp_pistol_start ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 54, str,
+                 M_Item_Glow(4, gp_pistol_start ? GLOW_GREEN : GLOW_DARKRED));
 
     // Report revealed secrets
     sprintf(str, gp_revealed_secrets == 1 ? "TOP" :
                  gp_revealed_secrets == 2 ? "CENTERED" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 36, str,
-                 M_Item_Glow(2, gp_revealed_secrets ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 63, str,
+                 M_Item_Glow(5, gp_revealed_secrets ? GLOW_GREEN : GLOW_DARKRED));
 
     // Flip levels horizontally
     sprintf(str, gp_flip_levels ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 45, str,
-                 M_Item_Glow(3, gp_flip_levels ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 72, str,
+                 M_Item_Glow(6, gp_flip_levels ? GLOW_GREEN : GLOW_DARKRED));
 
     // On death action
     sprintf(str, gp_death_use_action == 1 ? "LAST SAVE" :
                  gp_death_use_action == 2 ? "NOTHING" : "DEFAULT");
-    M_WriteText (M_ItemRightAlign(str), 54, str,
-                 M_Item_Glow(4, gp_death_use_action ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 81, str,
+                 M_Item_Glow(7, gp_death_use_action ? GLOW_GREEN : GLOW_DARKRED));
 
     // Footer
     M_WriteText (ID_MENU_LEFTOFFSET_BIG, 144, "FIRST PAGE >",
@@ -3174,6 +3177,16 @@ static void M_Draw_ID_Gameplay_3 (void)
 
     sprintf(str, "PAGE 3/3");
     M_WriteText(M_ItemRightAlign(str), 144, str, M_Item_Glow(14, GLOW_GRAY));
+}
+
+static void M_ID_JaguarAlert (int choice)
+{
+    emu_jaguar_alert ^= 1;
+}
+
+static void M_ID_JaguarExplosion (int choice)
+{
+    emu_jaguar_explosion ^= 1;
 }
 
 static void M_ID_DefaulSkill (int choice)
@@ -3308,6 +3321,9 @@ static void M_ID_ApplyResetHook (void)
     phys_floating_powerups = 0;
     phys_weapon_alignment = 2;
     phys_breathing = 0;
+
+    // Audible
+    aud_corpse_crushing = 0;
 
     // Emulation accuracy
     emu_jaguar_alert = 1;

@@ -124,6 +124,9 @@ int phys_floating_powerups = 0;
 int phys_weapon_alignment = 2;
 int phys_breathing = 0;
 
+// Audible
+int aud_corpse_crushing = 0;
+
 // Emulation accuracy
 int emu_jaguar_alert = 1;
 int emu_jaguar_explosion = 1;
@@ -243,6 +246,9 @@ void ID_BindVariables (void)
     M_BindIntVariable("phys_floating_powerups",         &phys_floating_powerups);
     M_BindIntVariable("phys_weapon_alignment",          &phys_weapon_alignment);
     M_BindIntVariable("phys_breathing",                 &phys_breathing);
+    
+    // Audible
+    M_BindIntVariable("aud_corpse_crushing",            &aud_corpse_crushing);
     
     // Gameplay
     M_BindIntVariable("gp_default_skill",               &gp_default_skill);
