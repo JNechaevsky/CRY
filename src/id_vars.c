@@ -125,7 +125,7 @@ int phys_weapon_alignment = 2;
 int phys_breathing = 0;
 
 // Audible
-int aud_corpse_crushing = 0;
+int aud_crushed_corpse = 0;
 
 // Emulation accuracy
 int emu_jaguar_alert = 1;
@@ -248,7 +248,7 @@ void ID_BindVariables (void)
     M_BindIntVariable("phys_breathing",                 &phys_breathing);
     
     // Audible
-    M_BindIntVariable("aud_corpse_crushing",            &aud_corpse_crushing);
+    M_BindIntVariable("aud_crushed_corpse",             &aud_crushed_corpse);
     
     // Gameplay
     M_BindIntVariable("gp_default_skill",               &gp_default_skill);

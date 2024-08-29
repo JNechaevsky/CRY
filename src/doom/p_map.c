@@ -1608,7 +1608,7 @@ boolean PIT_ChangeSector (mobj_t*	thing)
 
 	// [JN] Optionally play DSSLOP upon corpse crushing.
 	// No sound for explosive barrels, though.
-	if (aud_corpse_crushing && thing->type != MT_BARREL)
+	if (aud_crushed_corpse && thing->type != MT_BARREL)
 	{
 	S_StartSound(thing, sfx_slop);
 	}

@@ -621,7 +621,7 @@ static void M_ID_TossDrop (int choice);
 static void M_ID_FloatingPowerups (int choice);
 static void M_ID_WeaponAlignment (int choice);
 static void M_ID_Breathing (int choice);
-static void M_ID_CorpseCrushingSnd (int choice);
+static void M_ID_SndOfCrushedCorpse (int choice);
 
 static void M_Choose_ID_Gameplay_3 (int choice);
 static void M_Draw_ID_Gameplay_3 (void);
@@ -2959,7 +2959,7 @@ static menuitem_t ID_Menu_Gameplay_2[]=
     { M_LFRT, "WEAPON ATTACK ALIGNMENT",       M_ID_WeaponAlignment,   'w' },
     { M_LFRT, "IMITATE PLAYER'S BREATHING",    M_ID_Breathing,         'i' },
     { M_SKIP, "", 0, '\0' },
-    { M_LFRT, "CORPSE CRUSHING SOUND",         M_ID_CorpseCrushingSnd, 'c' },
+    { M_LFRT, "SOUND OF CRUSHED CORPSE",       M_ID_SndOfCrushedCorpse,'s' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
@@ -3033,9 +3033,9 @@ static void M_Draw_ID_Gameplay_2 (void)
     M_WriteTextCentered(90, "AUDIBLE", cr[CR_YELLOW]);
 
     // Sound of corpse crushing
-    sprintf(str, aud_corpse_crushing ? "ON" : "OFF");
+    sprintf(str, aud_crushed_corpse ? "ON" : "OFF");
     M_WriteText (M_ItemRightAlign(str), 99, str,
-                 M_Item_Glow(9, aud_corpse_crushing ? GLOW_GREEN : GLOW_DARKRED));
+                 M_Item_Glow(9, aud_crushed_corpse ? GLOW_GREEN : GLOW_DARKRED));
 
     // Footer
     M_WriteText (ID_MENU_LEFTOFFSET_BIG, 144, "LAST PAGE >",
@@ -3081,9 +3081,9 @@ static void M_ID_Breathing (int choice)
     phys_breathing ^= 1;
 }
 
-static void M_ID_CorpseCrushingSnd (int choice)
+static void M_ID_SndOfCrushedCorpse (int choice)
 {
-    aud_corpse_crushing ^= 1;
+    aud_crushed_corpse ^= 1;
 }
 
 // -----------------------------------------------------------------------------
@@ -3323,7 +3323,7 @@ static void M_ID_ApplyResetHook (void)
     phys_breathing = 0;
 
     // Audible
-    aud_corpse_crushing = 0;
+    aud_crushed_corpse = 0;
 
     // Emulation accuracy
     emu_jaguar_alert = 1;

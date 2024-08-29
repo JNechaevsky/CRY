@@ -97,7 +97,7 @@ extern int phys_toss_drop;
 extern int phys_floating_powerups;
 extern int phys_weapon_alignment;
 
-extern int aud_corpse_crushing;
+extern int aud_crushed_corpse;
 
 extern int emu_jaguar_alert;
 extern int emu_jaguar_explosion;
