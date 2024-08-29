@@ -361,6 +361,28 @@ const byte *R_BrightmapForFlatNum (const int num)
 
 const byte *R_BrightmapForState (const int state)
 {
+    // [JN] Colorize gun flashes via brightmaps
+    // for proper support of colored lighting.
+    switch (state)
+    {
+        case S_PISTOLFLASH:
+        case S_SGUNFLASH1:
+        case S_SGUNFLASH2:
+        case S_CHAINFLASH1:
+        case S_CHAINFLASH2:
+        case S_MISSILEFLASH1:
+        case S_MISSILEFLASH2:
+        case S_MISSILEFLASH3:
+        case S_MISSILEFLASH4:
+        case S_PLASMAFLASH1:
+        case S_PLASMAFLASH2:
+        case S_BFGFLASH1:
+        case S_BFGFLASH2:
+        {
+            return fullbright;
+        }
+    }
+
     if (vis_brightmaps)
     {
         switch (state)

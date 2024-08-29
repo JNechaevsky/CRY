@@ -58,7 +58,8 @@ state_t	states[NUMSTATES] = {
 {SPR_PISG,1,10,{A_FirePistol},S_PISTOL3},	/* S_PISTOL2 */
 {SPR_PISG,2,4,{NULL},S_PISTOL4},	/* S_PISTOL3 */
 {SPR_PISG,1,5,{A_ReFire},S_PISTOL},	/* S_PISTOL4 */
-{SPR_PISF,32768,7,{A_Light1},S_LIGHTDONE},	/* S_PISTOLFLASH */
+// [JN] Diable full bright for pistol flash, use brightmap instead.
+{SPR_PISF,0,7,{A_Light1},S_LIGHTDONE},	/* S_PISTOLFLASH */
 {SPR_SHTG,0,1,{A_WeaponReady},S_SGUN},	/* S_SGUN */
 {SPR_SHTG,0,1,{A_Lower},S_SGUNDOWN},	/* S_SGUNDOWN */
 {SPR_SHTG,0,1,{A_Raise},S_SGUNUP},	/* S_SGUNUP */
@@ -71,26 +72,29 @@ state_t	states[NUMSTATES] = {
 {SPR_SHTG,1,5,{NULL},S_SGUN8},	/* S_SGUN7 */
 {SPR_SHTG,0,3,{NULL},S_SGUN9},	/* S_SGUN8 */
 {SPR_SHTG,0,7,{A_ReFire},S_SGUN},	/* S_SGUN9 */
-{SPR_SHTF,32768,4,{A_Light1},S_SGUNFLASH2},	/* S_SGUNFLASH1 */
-{SPR_SHTF,32769,3,{A_Light2},S_LIGHTDONE},	/* S_SGUNFLASH2 */
+// [JN] Diable full bright for shotgun flash, use brightmap instead.
+{SPR_SHTF,0,4,{A_Light1},S_SGUNFLASH2},	/* S_SGUNFLASH1 */
+{SPR_SHTF,1,3,{A_Light2},S_LIGHTDONE},	/* S_SGUNFLASH2 */
 {SPR_CHGG,0,1,{A_WeaponReady},S_CHAIN},	/* S_CHAIN */
 {SPR_CHGG,0,1,{A_Lower},S_CHAINDOWN},	/* S_CHAINDOWN */
 {SPR_CHGG,0,1,{A_Raise},S_CHAINUP},	/* S_CHAINUP */
 {SPR_CHGG,0,4,{A_FireCGun},S_CHAIN2},	/* S_CHAIN1 */
 {SPR_CHGG,1,5,{A_FireCGun},S_CHAIN3},	/* S_CHAIN2 */
 {SPR_CHGG,1,0,{A_ReFire},S_CHAIN},	/* S_CHAIN3 */
-{SPR_CHGF,32768,5,{A_Light1},S_LIGHTDONE},	/* S_CHAINFLASH1 */
-{SPR_CHGF,32769,4,{A_Light2},S_LIGHTDONE},	/* S_CHAINFLASH2 */
+// [JN] Diable full bright for chaingun flash, use brightmap instead.
+{SPR_CHGF,0,5,{A_Light1},S_LIGHTDONE},	/* S_CHAINFLASH1 */
+{SPR_CHGF,1,4,{A_Light2},S_LIGHTDONE},	/* S_CHAINFLASH2 */
 {SPR_MISG,0,1,{A_WeaponReady},S_MISSILE},	/* S_MISSILE */
 {SPR_MISG,0,1,{A_Lower},S_MISSILEDOWN},	/* S_MISSILEDOWN */
 {SPR_MISG,0,1,{A_Raise},S_MISSILEUP},	/* S_MISSILEUP */
 {SPR_MISG,1,8,{A_GunFlash},S_MISSILE2},	/* S_MISSILE1 */
 {SPR_MISG,1,15,{A_FireMissile},S_MISSILE3},	/* S_MISSILE2 */
 {SPR_MISG,1,0,{A_ReFire},S_MISSILE},	/* S_MISSILE3 */
-{SPR_MISF,32768,4,{A_Light1},S_MISSILEFLASH2},	/* S_MISSILEFLASH1 */
-{SPR_MISF,32769,4,{NULL},S_MISSILEFLASH3},	/* S_MISSILEFLASH2 */
-{SPR_MISF,32770,4,{A_Light2},S_MISSILEFLASH4},	/* S_MISSILEFLASH3 */
-{SPR_MISF,32771,4,{A_Light2},S_LIGHTDONE},	/* S_MISSILEFLASH4 */
+// [JN] Diable full bright for rocket launcher flash, use brightmap instead.
+{SPR_MISF,0,4,{A_Light1},S_MISSILEFLASH2},	/* S_MISSILEFLASH1 */
+{SPR_MISF,1,4,{NULL},S_MISSILEFLASH3},	/* S_MISSILEFLASH2 */
+{SPR_MISF,2,4,{A_Light2},S_MISSILEFLASH4},	/* S_MISSILEFLASH3 */
+{SPR_MISF,3,4,{A_Light2},S_LIGHTDONE},	/* S_MISSILEFLASH4 */
 {SPR_SAWG,2,4,{A_WeaponReady},S_SAWB},	/* S_SAW */
 {SPR_SAWG,3,5,{A_WeaponReady},S_SAW},	/* S_SAWB */
 {SPR_SAWG,2,1,{A_Lower},S_SAWDOWN},	/* S_SAWDOWN */
@@ -103,8 +107,9 @@ state_t	states[NUMSTATES] = {
 {SPR_PLSG,0,1,{A_Raise},S_PLASMAUP},	/* S_PLASMAUP */
 {SPR_PLSG,0,5,{A_FirePlasma},S_PLASMA2},	/* S_PLASMA1 */
 {SPR_PLSG,1,20,{A_ReFire},S_PLASMA},	/* S_PLASMA2 */
-{SPR_PLSF,32768,4,{A_Light1},S_LIGHTDONE},	/* S_PLASMAFLASH1 */
-{SPR_PLSF,32769,4,{A_Light1},S_LIGHTDONE},	/* S_PLASMAFLASH2 */
+// [JN] Diable full bright for plasma gun flash, use brightmap instead.
+{SPR_PLSF,0,4,{A_Light1},S_LIGHTDONE},	/* S_PLASMAFLASH1 */
+{SPR_PLSF,1,4,{A_Light1},S_LIGHTDONE},	/* S_PLASMAFLASH2 */
 {SPR_BFGG,0,1,{A_WeaponReady},S_BFG},	/* S_BFG */
 {SPR_BFGG,0,1,{A_Lower},S_BFGDOWN},	/* S_BFGDOWN */
 {SPR_BFGG,0,1,{A_Raise},S_BFGUP},	/* S_BFGUP */
@@ -112,8 +117,9 @@ state_t	states[NUMSTATES] = {
 {SPR_BFGG,1,10,{A_GunFlash},S_BFG3},	/* S_BFG2 */
 {SPR_BFGG,1,10,{A_FireBFG},S_BFG4},	/* S_BFG3 */
 {SPR_BFGG,1,20,{A_ReFire},S_BFG},	/* S_BFG4 */
-{SPR_BFGF,32768,11,{A_Light1},S_BFGFLASH2},	/* S_BFGFLASH1 */
-{SPR_BFGF,32769,6,{A_Light2},S_LIGHTDONE},	/* S_BFGFLASH2 */
+// [JN] Diable full bright for BFG flash, use brightmap instead.
+{SPR_BFGF,0,11,{A_Light1},S_BFGFLASH2},	/* S_BFGFLASH1 */
+{SPR_BFGF,1,6,{A_Light2},S_LIGHTDONE},	/* S_BFGFLASH2 */
 {SPR_BLUD,2,8,{NULL},S_BLOOD2},	/* S_BLOOD1 */
 {SPR_BLUD,1,8,{NULL},S_BLOOD3},	/* S_BLOOD2 */
 {SPR_BLUD,0,8,{NULL},S_NULL},	/* S_BLOOD3 */
