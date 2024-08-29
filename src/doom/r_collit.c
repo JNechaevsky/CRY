@@ -1883,7 +1883,7 @@ static const sectorcolor_t sectorcolor_map16[] =
 {
     {   16,      0,    0xFFAFAF },
     {   16,      1,    0xFFAFAF },
-    {   16,      3,    0x9BC8CD },
+    {   16,      3,    0xFFAFAF },
     {   16,      2,    0xFF7F7F },
     {   16,      4,    0x9BC8CD },
     {   16,      5,    0xFFAFAF },
