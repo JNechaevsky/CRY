@@ -3254,7 +3254,7 @@ static void M_ID_ApplyResetHook (void)
     musicVolume = 8;
     snd_sfxdevice = 3;
     snd_musicdevice = 3;
-    snd_dmxoption = "-opl3";
+    snd_dmxoption = "";
     snd_monosfx = 0;
     snd_pitchshift = 1;
     snd_channels = 8;
