@@ -930,7 +930,7 @@ static const sectorcolor_t sectorcolor_map03[] =
     {    3,     25,    0x949DB9 },
     {    3,     26,    0x3089FF },
     {    3,     27,    0x949DB9 },
-    {    3,     28,    0xEEC06B },
+    {    3,     28,    0xFFF588 },
     {    3,     29,    0x949DB9 },
     {    3,     30,    0xFF7F7F },
     {    3,     31,    0x949DB9 },
