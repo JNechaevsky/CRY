@@ -455,16 +455,16 @@ static default_t	doom_defaults_list[] =
     // Audible
     CONFIG_VARIABLE_INT(aud_crushed_corpse),
 
-    // Emulation accuracy
-    CONFIG_VARIABLE_INT(emu_jaguar_alert),
-    CONFIG_VARIABLE_INT(emu_jaguar_explosion),
-
     // Gameplay
     CONFIG_VARIABLE_INT(gp_default_skill),
     CONFIG_VARIABLE_INT(gp_pistol_start),
     CONFIG_VARIABLE_INT(gp_revealed_secrets),
     CONFIG_VARIABLE_INT(gp_flip_levels),
     CONFIG_VARIABLE_INT(gp_death_use_action),
+
+    // Emulation accuracy
+    CONFIG_VARIABLE_INT(emu_jaguar_alert),
+    CONFIG_VARIABLE_INT(emu_jaguar_explosion),
 
     // Compatibility-breaking
     CONFIG_VARIABLE_INT(compat_blockmap_fix),

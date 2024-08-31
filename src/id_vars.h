@@ -99,15 +99,15 @@ extern int phys_weapon_alignment;
 
 extern int aud_crushed_corpse;
 
-extern int emu_jaguar_alert;
-extern int emu_jaguar_explosion;
-
 extern int gp_default_skill;
 extern int gp_pistol_start;
 extern int gp_revealed_secrets;
 extern int phys_breathing;
 extern int gp_flip_levels;
 extern int gp_death_use_action;
+
+extern int emu_jaguar_alert;
+extern int emu_jaguar_explosion;
 
 // Compatibility-breaking
 extern int compat_blockmap_fix;

@@ -127,16 +127,16 @@ int phys_breathing = 0;
 // Audible
 int aud_crushed_corpse = 0;
 
-// Emulation accuracy
-int emu_jaguar_alert = 1;
-int emu_jaguar_explosion = 1;
-
 // Gameplay
 int gp_default_skill = 2;
 int gp_pistol_start = 0;
 int gp_revealed_secrets = 0;
 int gp_flip_levels = 0;
 int gp_death_use_action = 0;
+
+// Emulation accuracy
+int emu_jaguar_alert = 1;
+int emu_jaguar_explosion = 1;
 
 // Compatibility-breaking
 int compat_blockmap_fix = 0;
@@ -232,10 +232,6 @@ void ID_BindVariables (void)
     M_BindIntVariable("xhair_draw",                     &xhair_draw);
     M_BindIntVariable("xhair_color",                    &xhair_color);
     
-    // Monsters
-    M_BindIntVariable("emu_jaguar_alert",               &emu_jaguar_alert);
-    M_BindIntVariable("emu_jaguar_explosion",           &emu_jaguar_explosion);
-
     // Status bar
     M_BindIntVariable("st_colored_stbar",               &st_colored_stbar);
     M_BindIntVariable("st_negative_health",             &st_negative_health);
@@ -256,6 +252,10 @@ void ID_BindVariables (void)
     M_BindIntVariable("gp_revealed_secrets",            &gp_revealed_secrets);
     M_BindIntVariable("gp_flip_levels",                 &gp_flip_levels);
     M_BindIntVariable("gp_death_use_action",            &gp_death_use_action);
+
+    // Monsters
+    M_BindIntVariable("emu_jaguar_alert",               &emu_jaguar_alert);
+    M_BindIntVariable("emu_jaguar_explosion",           &emu_jaguar_explosion);
     
     M_BindIntVariable("compat_blockmap_fix",            &compat_blockmap_fix);
     M_BindIntVariable("compat_vertical_aiming",         &compat_vertical_aiming);
