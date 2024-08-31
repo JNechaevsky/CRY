@@ -3186,12 +3186,12 @@ static void M_Draw_ID_Gameplay_3 (void)
     // Print explanations of emulation accuracy features
     if (itemOn == 6 && emu_jaguar_alert)
     {
-        M_WriteTextCentered(117, "ALERTED MONSTERS WILL NOT START", cr[CR_GRAY]);
-        M_WriteTextCentered(126, "CHASING UNTIL THEY SEE PLAYER", cr[CR_GRAY]);
+        M_WriteTextCentered(117, "MONSTERS DON'T ATTACK", cr[CR_GRAY]);
+        M_WriteTextCentered(126, "UNTIL PLAYER IS SIGHTED", cr[CR_GRAY]);
     }
     if (itemOn == 7 && emu_jaguar_explosion)
     {
-        M_WriteTextCentered(117, "SOLID WALLS WILL NOT BLOCK", cr[CR_GRAY]);
+        M_WriteTextCentered(117, "SOLID WALLS DON'T BLOCK", cr[CR_GRAY]);
         M_WriteTextCentered(126, "EXPLOSION RADIUS DAMAGE", cr[CR_GRAY]);
     }
 
