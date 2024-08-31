@@ -620,6 +620,7 @@ static void M_ID_Torque (int choice);
 static void M_ID_TossDrop (int choice);
 static void M_ID_FloatingPowerups (int choice);
 static void M_ID_WeaponAlignment (int choice);
+static void M_ID_VerticalAiming (int choice);
 static void M_ID_Breathing (int choice);
 static void M_ID_SndOfCrushedCorpse (int choice);
 
@@ -2957,10 +2958,10 @@ static menuitem_t ID_Menu_Gameplay_2[]=
     { M_LFRT, "ITEMS ARE TOSSED WHEN DROPPED", M_ID_TossDrop,          'i' },
     { M_LFRT, "FLOATING POWERUPS AMPLITUDE",   M_ID_FloatingPowerups,  'f' },
     { M_LFRT, "WEAPON ATTACK ALIGNMENT",       M_ID_WeaponAlignment,   'w' },
+    { M_LFRT, "VERTICAL AIMING",               M_ID_VerticalAiming,    'v' },
     { M_LFRT, "IMITATE PLAYER'S BREATHING",    M_ID_Breathing,         'i' },
     { M_SKIP, "", 0, '\0' },
     { M_LFRT, "SOUND OF CRUSHED CORPSE",       M_ID_SndOfCrushedCorpse,'s' },
-    { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
@@ -3025,17 +3026,23 @@ static void M_Draw_ID_Gameplay_2 (void)
     M_WriteText (M_ItemRightAlign(str), 72, str,
                  M_Item_Glow(6, phys_weapon_alignment == 2 ? GLOW_DARKRED : GLOW_GREEN));
 
+    // Vertical aiming
+    sprintf(str, compat_vertical_aiming == 1 ? "DIRECT" :
+                 compat_vertical_aiming == 2 ? "BOTH" : "AUTOAIM");
+    M_WriteText (M_ItemRightAlign(str), 81, str,
+                 M_Item_Glow(7, compat_vertical_aiming ? GLOW_GREEN : GLOW_DARKRED));
+
     // Imitate player's breathing
     sprintf(str, phys_breathing ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 81, str,
-                 M_Item_Glow(7, phys_breathing ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 90, str,
+                 M_Item_Glow(8, phys_breathing ? GLOW_GREEN : GLOW_DARKRED));
 
-    M_WriteTextCentered(90, "AUDIBLE", cr[CR_YELLOW]);
+    M_WriteTextCentered(99, "AUDIBLE", cr[CR_YELLOW]);
 
     // Sound of corpse crushing
     sprintf(str, aud_crushed_corpse ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 99, str,
-                 M_Item_Glow(9, aud_crushed_corpse ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 108, str,
+                 M_Item_Glow(10, aud_crushed_corpse ? GLOW_GREEN : GLOW_DARKRED));
 
     // Footer
     M_WriteText (ID_MENU_LEFTOFFSET_BIG, 144, "LAST PAGE >",
@@ -3074,6 +3081,11 @@ static void M_ID_WeaponAlignment (int choice)
 {
     phys_weapon_alignment = M_INT_Slider(phys_weapon_alignment, 0, 2, choice, false);
     pspr_interp = false;
+}
+
+static void M_ID_VerticalAiming (int choice)
+{
+    compat_vertical_aiming = M_INT_Slider(compat_vertical_aiming, 0, 2, choice, false);
 }
 
 static void M_ID_Breathing (int choice)
