@@ -46,35 +46,35 @@ state_t	states[NUMSTATES] = {
 {SPR_PUNG,0,1,{A_WeaponReady},S_PUNCH},	/* S_PUNCH */
 {SPR_PUNG,0,1,{A_Lower},S_PUNCHDOWN},	/* S_PUNCHDOWN */
 {SPR_PUNG,0,1,{A_Raise},S_PUNCHUP},	/* S_PUNCHUP */
-{SPR_PUNG,1,4,{NULL},S_PUNCH2},	/* S_PUNCH1 */
-{SPR_PUNG,2,4,{A_Punch},S_PUNCH3},	/* S_PUNCH2 */
+{SPR_PUNG,1,5,{NULL},S_PUNCH2},	/* S_PUNCH1 */
+{SPR_PUNG,2,5,{A_Punch},S_PUNCH3},	/* S_PUNCH2 */
 {SPR_PUNG,3,5,{NULL},S_PUNCH4},	/* S_PUNCH3 */
-{SPR_PUNG,2,4,{NULL},S_PUNCH5},	/* S_PUNCH4 */
+{SPR_PUNG,2,5,{NULL},S_PUNCH5},	/* S_PUNCH4 */
 {SPR_PUNG,1,5,{A_ReFire},S_PUNCH},	/* S_PUNCH5 */
 {SPR_PISG,0,1,{A_WeaponReady},S_PISTOL},	/* S_PISTOL */
 {SPR_PISG,0,1,{A_Lower},S_PISTOLDOWN},	/* S_PISTOLDOWN */
 {SPR_PISG,0,1,{A_Raise},S_PISTOLUP},	/* S_PISTOLUP */
-{SPR_PISG,0,6,{NULL},S_PISTOL2},	/* S_PISTOL1 */
-{SPR_PISG,1,10,{A_FirePistol},S_PISTOL3},	/* S_PISTOL2 */
-{SPR_PISG,2,4,{NULL},S_PISTOL4},	/* S_PISTOL3 */
+{SPR_PISG,0,5,{NULL},S_PISTOL2},	/* S_PISTOL1 */
+{SPR_PISG,1,7,{A_FirePistol},S_PISTOL3},	/* S_PISTOL2 */
+{SPR_PISG,2,7,{NULL},S_PISTOL4},	/* S_PISTOL3 */
 {SPR_PISG,1,5,{A_ReFire},S_PISTOL},	/* S_PISTOL4 */
 // [JN] Diable full bright for pistol flash, use brightmap instead.
 {SPR_PISF,0,7,{A_Light1},S_LIGHTDONE},	/* S_PISTOLFLASH */
 {SPR_SHTG,0,1,{A_WeaponReady},S_SGUN},	/* S_SGUN */
 {SPR_SHTG,0,1,{A_Lower},S_SGUNDOWN},	/* S_SGUNDOWN */
 {SPR_SHTG,0,1,{A_Raise},S_SGUNUP},	/* S_SGUNUP */
-{SPR_SHTG,0,3,{NULL},S_SGUN2},	/* S_SGUN1 */
-{SPR_SHTG,0,7,{A_FireShotgun},S_SGUN3},	/* S_SGUN2 */
-{SPR_SHTG,1,5,{NULL},S_SGUN4},	/* S_SGUN3 */
+{SPR_SHTG,0,5,{NULL},S_SGUN2},	/* S_SGUN1 */
+{SPR_SHTG,0,5,{A_FireShotgun},S_SGUN3},	/* S_SGUN2 */
+{SPR_SHTG,1,7,{NULL},S_SGUN4},	/* S_SGUN3 */
 {SPR_SHTG,2,5,{NULL},S_SGUN5},	/* S_SGUN4 */
-{SPR_SHTG,3,4,{NULL},S_SGUN6},	/* S_SGUN5 */
+{SPR_SHTG,3,5,{NULL},S_SGUN6},	/* S_SGUN5 */
 {SPR_SHTG,2,5,{NULL},S_SGUN7},	/* S_SGUN6 */
 {SPR_SHTG,1,5,{NULL},S_SGUN8},	/* S_SGUN7 */
-{SPR_SHTG,0,3,{NULL},S_SGUN9},	/* S_SGUN8 */
+{SPR_SHTG,0,5,{NULL},S_SGUN9},	/* S_SGUN8 */
 {SPR_SHTG,0,7,{A_ReFire},S_SGUN},	/* S_SGUN9 */
 // [JN] Diable full bright for shotgun flash, use brightmap instead.
 {SPR_SHTF,0,4,{A_Light1},S_SGUNFLASH2},	/* S_SGUNFLASH1 */
-{SPR_SHTF,1,3,{A_Light2},S_LIGHTDONE},	/* S_SGUNFLASH2 */
+{SPR_SHTF,1,2,{A_Light2},S_LIGHTDONE},	/* S_SGUNFLASH2 */
 {SPR_CHGG,0,1,{A_WeaponReady},S_CHAIN},	/* S_CHAIN */
 {SPR_CHGG,0,1,{A_Lower},S_CHAINDOWN},	/* S_CHAINDOWN */
 {SPR_CHGG,0,1,{A_Raise},S_CHAINUP},	/* S_CHAINUP */
@@ -82,13 +82,13 @@ state_t	states[NUMSTATES] = {
 {SPR_CHGG,1,5,{A_FireCGun},S_CHAIN3},	/* S_CHAIN2 */
 {SPR_CHGG,1,0,{A_ReFire},S_CHAIN},	/* S_CHAIN3 */
 // [JN] Diable full bright for chaingun flash, use brightmap instead.
-{SPR_CHGF,0,5,{A_Light1},S_LIGHTDONE},	/* S_CHAINFLASH1 */
+{SPR_CHGF,0,7,{A_Light1},S_LIGHTDONE},	/* S_CHAINFLASH1 */
 {SPR_CHGF,1,4,{A_Light2},S_LIGHTDONE},	/* S_CHAINFLASH2 */
 {SPR_MISG,0,1,{A_WeaponReady},S_MISSILE},	/* S_MISSILE */
 {SPR_MISG,0,1,{A_Lower},S_MISSILEDOWN},	/* S_MISSILEDOWN */
 {SPR_MISG,0,1,{A_Raise},S_MISSILEUP},	/* S_MISSILEUP */
-{SPR_MISG,1,8,{A_GunFlash},S_MISSILE2},	/* S_MISSILE1 */
-{SPR_MISG,1,15,{A_FireMissile},S_MISSILE3},	/* S_MISSILE2 */
+{SPR_MISG,1,9,{A_GunFlash},S_MISSILE2},	/* S_MISSILE1 */
+{SPR_MISG,1,14,{A_FireMissile},S_MISSILE3},	/* S_MISSILE2 */
 {SPR_MISG,1,0,{A_ReFire},S_MISSILE},	/* S_MISSILE3 */
 // [JN] Diable full bright for rocket launcher flash, use brightmap instead.
 {SPR_MISF,0,4,{A_Light1},S_MISSILEFLASH2},	/* S_MISSILEFLASH1 */
@@ -106,20 +106,20 @@ state_t	states[NUMSTATES] = {
 {SPR_PLSG,0,1,{A_Lower},S_PLASMADOWN},	/* S_PLASMADOWN */
 {SPR_PLSG,0,1,{A_Raise},S_PLASMAUP},	/* S_PLASMAUP */
 {SPR_PLSG,0,5,{A_FirePlasma},S_PLASMA2},	/* S_PLASMA1 */
-{SPR_PLSG,1,20,{A_ReFire},S_PLASMA},	/* S_PLASMA2 */
+{SPR_PLSG,1,23,{A_ReFire},S_PLASMA},	/* S_PLASMA2 */
 // [JN] Diable full bright for plasma gun flash, use brightmap instead.
-{SPR_PLSF,0,4,{A_Light1},S_LIGHTDONE},	/* S_PLASMAFLASH1 */
-{SPR_PLSF,1,4,{A_Light1},S_LIGHTDONE},	/* S_PLASMAFLASH2 */
+{SPR_PLSF,0,5,{A_Light1},S_LIGHTDONE},	/* S_PLASMAFLASH1 */
+{SPR_PLSF,1,5,{A_Light1},S_LIGHTDONE},	/* S_PLASMAFLASH2 */
 {SPR_BFGG,0,1,{A_WeaponReady},S_BFG},	/* S_BFG */
 {SPR_BFGG,0,1,{A_Lower},S_BFGDOWN},	/* S_BFGDOWN */
 {SPR_BFGG,0,1,{A_Raise},S_BFGUP},	/* S_BFGUP */
-{SPR_BFGG,0,20,{A_BFGsound},S_BFG2},	/* S_BFG1 */
-{SPR_BFGG,1,10,{A_GunFlash},S_BFG3},	/* S_BFG2 */
-{SPR_BFGG,1,10,{A_FireBFG},S_BFG4},	/* S_BFG3 */
-{SPR_BFGG,1,20,{A_ReFire},S_BFG},	/* S_BFG4 */
+{SPR_BFGG,0,23,{A_BFGsound},S_BFG2},	/* S_BFG1 */
+{SPR_BFGG,1,11,{A_GunFlash},S_BFG3},	/* S_BFG2 */
+{SPR_BFGG,1,11,{A_FireBFG},S_BFG4},	/* S_BFG3 */
+{SPR_BFGG,1,23,{A_ReFire},S_BFG},	/* S_BFG4 */
 // [JN] Diable full bright for BFG flash, use brightmap instead.
 {SPR_BFGF,0,11,{A_Light1},S_BFGFLASH2},	/* S_BFGFLASH1 */
-{SPR_BFGF,1,6,{A_Light2},S_LIGHTDONE},	/* S_BFGFLASH2 */
+{SPR_BFGF,1,7,{A_Light2},S_LIGHTDONE},	/* S_BFGFLASH2 */
 {SPR_BLUD,2,8,{NULL},S_BLOOD2},	/* S_BLOOD1 */
 {SPR_BLUD,1,8,{NULL},S_BLOOD3},	/* S_BLOOD2 */
 {SPR_BLUD,0,8,{NULL},S_NULL},	/* S_BLOOD3 */
