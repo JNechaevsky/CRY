@@ -110,7 +110,6 @@ extern int emu_jaguar_alert;
 extern int emu_jaguar_explosion;
 
 // Compatibility-breaking
-extern int compat_blockmap_fix;
 extern int compat_vertical_aiming;
 
 // Mouse look

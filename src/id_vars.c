@@ -139,7 +139,6 @@ int emu_jaguar_alert = 1;
 int emu_jaguar_explosion = 1;
 
 // Compatibility-breaking
-int compat_blockmap_fix = 0;
 int compat_vertical_aiming = 0;
 
 
@@ -257,6 +256,5 @@ void ID_BindVariables (void)
     M_BindIntVariable("emu_jaguar_alert",               &emu_jaguar_alert);
     M_BindIntVariable("emu_jaguar_explosion",           &emu_jaguar_explosion);
     
-    M_BindIntVariable("compat_blockmap_fix",            &compat_blockmap_fix);
     M_BindIntVariable("compat_vertical_aiming",         &compat_vertical_aiming);
 }

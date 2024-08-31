@@ -3349,7 +3349,6 @@ static void M_ID_ApplyResetHook (void)
     emu_jaguar_explosion = 1;
 
     // Compatibility-breaking
-    compat_blockmap_fix = 0;
     compat_vertical_aiming = 0;
 
     // Restart graphical systems

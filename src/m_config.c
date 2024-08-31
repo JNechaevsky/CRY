@@ -467,7 +467,6 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_INT(emu_jaguar_explosion),
 
     // Compatibility-breaking
-    CONFIG_VARIABLE_INT(compat_blockmap_fix),
     CONFIG_VARIABLE_INT(compat_vertical_aiming),
 };
 
