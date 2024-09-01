@@ -867,6 +867,7 @@ static const sectorcolor_t sectorcolor_map02[] =
 {
     {    2,      1,    0xFF7F7F },
     {    2,      2,    0xFF7F7F },
+    {    2,     14,    0xFFF588 },
     {    2,     23,    0xBBE357 },
     {    2,     30,    0x3089FF },
     {    2,     34,    0xFFF588 },
@@ -917,11 +918,16 @@ static const sectorcolor_t sectorcolor_map02[] =
 
 static const sectorcolor_t sectorcolor_map03[] =
 {
+    {    3,      0,    0x949DB9 },
+    {    3,      1,    0x949DB9 },
+    {    3,      2,    0x949DB9 },
     {    3,      3,    0xFF7F7F },
     {    3,      4,    0xFF7F7F },
     {    3,      5,    0xFF7F7F },
     {    3,      6,    0xFF7F7F },
     {    3,      7,    0x7084C4 },
+    {    3,      8,    0x949DB9 },
+    {    3,      9,    0x949DB9 },
     {    3,     10,    0x7084C4 },
     {    3,     11,    0x7084C4 },
     {    3,     12,    0x7084C4 },
@@ -952,6 +958,7 @@ static const sectorcolor_t sectorcolor_map03[] =
     {    3,     64,    0xBBE357 },
     {    3,     65,    0xBBE357 },
     {    3,     66,    0xBBE357 },
+    {    3,     72,    0xFF7F7F },
     {    3,     74,    0xFFF588 },
     {    3,     75,    0x55B828 },
     {    3,     76,    0xFFF588 },
@@ -1022,6 +1029,7 @@ static const sectorcolor_t sectorcolor_map04[] =
     {    4,     51,    0xBBE357 },
     {    4,     60,    0xBBE357 },
     {    4,     61,    0x3089FF },
+    {    4,     62,    0xEEC06B },
     {    4,     71,    0xBBE357 },
     {    4,     72,    0xBBE357 },
     {    4,     75,    0x55B828 },
@@ -1275,7 +1283,7 @@ static const sectorcolor_t sectorcolor_map08[] =
     {    8,     16,    0xFFAFAF },
     {    8,     30,    0x3089FF },
     {    8,     51,    0xFF7F7F },
-    {    8,     52,    0xFF3030 },
+    {    8,     52,    0xB30202 },
     {    8,     53,    0xFF7F7F },
     {    8,     70,    0xB30202 },
     {    8,     76,    0xB30202 },
@@ -1411,6 +1419,7 @@ static const sectorcolor_t sectorcolor_map10[] =
     {   10,    128,    0x3089FF },
     {   10,    129,    0x3089FF },
     {   10,    130,    0xFFF588 },
+    {   10,    131,    0xEEC06B },
     SECTORCOLOR_END
 };
 
