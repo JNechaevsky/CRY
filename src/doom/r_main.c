@@ -496,7 +496,8 @@ fixed_t R_ScaleFromGlobalAngle (angle_t visangle)
 
 // [crispy] in widescreen mode, make sure the same number of horizontal
 // pixels shows the same part of the game scene as in regular rendering mode
-static int scaledviewwidth_nonwide, viewwidth_nonwide;
+static int scaledviewwidth_nonwide;
+int viewwidth_nonwide;  // [JN] Externalized for colored lighting.
 static fixed_t centerxfrac_nonwide;
 
 //
