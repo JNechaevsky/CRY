@@ -727,7 +727,7 @@ extern boolean original_colormap;
 #define LIGHTLEVELS     256     // 32
 #define LIGHTSEGSHIFT   0       // 3
 #define LIGHTBRIGHT     15      // 2
-#define MAXLIGHTSCALE   384     // 48
+#define MAXLIGHTSCALE   376     // 48
 #define LIGHTSCALESHIFT 9       // 12
 #define MAXLIGHTZ       1024
 #define LIGHTZSHIFT     17
