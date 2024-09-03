@@ -703,6 +703,7 @@ extern int     centery;
 extern int     validcount;
 extern int     viewwindowx;
 extern int     viewwindowy;
+extern int     viewwidth_nonwide;
 
 // [JN] FOV from DOOM Retro, Woof! and Nugget Doom
 extern  float fovdiff;
@@ -722,11 +723,12 @@ extern boolean original_colormap;
 
 // Lighting constants.
 // [crispy] smooth diminishing lighting
-#define LIGHTLEVELS     32
-#define LIGHTSEGSHIFT   3
-#define LIGHTBRIGHT     2
-#define MAXLIGHTSCALE   48
-#define LIGHTSCALESHIFT 12
+// [JN] Even smoother, use full 0...256 brightness range.
+#define LIGHTLEVELS     256     // 32
+#define LIGHTSEGSHIFT   0       // 3
+#define LIGHTBRIGHT     15      // 2
+#define MAXLIGHTSCALE   376     // 48
+#define LIGHTSCALESHIFT 9       // 12
 #define MAXLIGHTZ       1024
 #define LIGHTZSHIFT     17
 
@@ -739,7 +741,8 @@ extern lighttable_t *invulcolormap;
 
 // Number of diminishing brightness levels.
 // There a 0-31, i.e. 32 LUT in the COLORMAP lump.
-#define NUMCOLORMAPS    32
+// [JN] Use full 0...256 brightness range.
+#define NUMCOLORMAPS    256     // 32
 
 // Blocky/low detail mode. 0 = high, 1 = low
 extern int detailshift;	
