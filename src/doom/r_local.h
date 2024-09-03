@@ -724,7 +724,7 @@ extern boolean original_colormap;
 // Lighting constants.
 // [crispy] smooth diminishing lighting
 // [JN] Even smoother, use full 0...256 brightness range.
-#define LIGHTLEVELS     256
+#define LIGHTLEVELS     256     // 32
 #define LIGHTSEGSHIFT   0       // 3
 #define LIGHTBRIGHT     15      // 2
 #define MAXLIGHTSCALE   384     // 48
