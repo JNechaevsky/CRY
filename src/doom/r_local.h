@@ -723,12 +723,12 @@ extern boolean original_colormap;
 
 // Lighting constants.
 // [crispy] smooth diminishing lighting
-// [JN] Even smoother! Use full 255 brightness range.
-#define LIGHTLEVELS     255
-#define LIGHTSEGSHIFT   0 // 1
-#define LIGHTBRIGHT     2*7 // 2
-#define MAXLIGHTSCALE   48*9 // 48
-#define LIGHTSCALESHIFT 9 // 12
+// [JN] Even smoother, use full 0...256 brightness range.
+#define LIGHTLEVELS     256
+#define LIGHTSEGSHIFT   0       // 3
+#define LIGHTBRIGHT     15      // 2
+#define MAXLIGHTSCALE   384     // 48
+#define LIGHTSCALESHIFT 9       // 12
 #define MAXLIGHTZ       1024
 #define LIGHTZSHIFT     17
 
@@ -741,8 +741,8 @@ extern lighttable_t *invulcolormap;
 
 // Number of diminishing brightness levels.
 // There a 0-31, i.e. 32 LUT in the COLORMAP lump.
-// [JN] Use full 255 brightness range.
-#define NUMCOLORMAPS    255 // 32
+// [JN] Use full 0...256 brightness range.
+#define NUMCOLORMAPS    256     // 32
 
 // Blocky/low detail mode. 0 = high, 1 = low
 extern int detailshift;	
