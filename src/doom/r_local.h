@@ -729,8 +729,8 @@ extern boolean original_colormap;
 #define LIGHTBRIGHT     15      // 2
 #define MAXLIGHTSCALE   376     // 48
 #define LIGHTSCALESHIFT 9       // 12
-#define MAXLIGHTZ       1024
-#define LIGHTZSHIFT     17
+#define MAXLIGHTZ       2048    // 1024
+#define LIGHTZSHIFT     16      // 17
 
 extern lighttable_t***	scalelight;
 extern lighttable_t**	scalelightfixed;
