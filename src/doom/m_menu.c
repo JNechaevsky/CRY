@@ -598,7 +598,6 @@ static void M_ID_Automap_Rotate (int choice);
 static void M_ID_Automap_Overlay (int choice);
 static void M_ID_Automap_Shading (int choice);
 
-static void M_Choose_ID_Gameplay_1 (int choice);
 static void M_Draw_ID_Gameplay_1 (void);
 static void M_ID_Brightmaps (int choice);
 static void M_ID_Translucency (int choice);
@@ -612,7 +611,6 @@ static void M_ID_FlipCorpses (int choice);
 static void M_ID_Crosshair (int choice);
 static void M_ID_CrosshairColor (int choice);
 
-static void M_Choose_ID_Gameplay_2 (int choice);
 static void M_Draw_ID_Gameplay_2 (void);
 static void M_ID_ColoredSTBar (int choice);
 static void M_ID_NegativeHealth (int choice);
@@ -624,7 +622,6 @@ static void M_ID_VerticalAiming (int choice);
 static void M_ID_Breathing (int choice);
 static void M_ID_SndOfCrushedCorpse (int choice);
 
-static void M_Choose_ID_Gameplay_3 (int choice);
 static void M_Draw_ID_Gameplay_3 (void);
 static void M_ID_DefaulSkill (int choice);
 static void M_ID_PistolStart (int choice);
@@ -633,6 +630,9 @@ static void M_ID_FlipLevels (int choice);
 static void M_ID_OnDeathAction (int choice);
 static void M_ID_JaguarAlert (int choice);
 static void M_ID_JaguarExplosion (int choice);
+
+static void M_ScrollGameplay (int choice);
+static void M_DrawGameplayFooter (char *pagenum);
 
 static void M_Choose_ID_Reset (int choice);
 static int  resetplaque_tics;
@@ -2781,7 +2781,7 @@ static menuitem_t ID_Menu_Gameplay_1[]=
     { M_LFRT, "INDICATION",                  M_ID_CrosshairColor,    'i' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
-    { M_SWTC, "", /*NEXT PAGE >*/            M_Choose_ID_Gameplay_2, 'n' },
+    { M_LFRT, "", /* < SCROLL PAGES >*/      M_ScrollGameplay,       's' },
 };
 
 static menu_t ID_Def_Gameplay_1 =
@@ -2794,11 +2794,6 @@ static menu_t ID_Def_Gameplay_1 =
     0,
     true, false, true,
 };
-
-static void M_Choose_ID_Gameplay_1 (int choice)
-{
-    M_SetupNextMenu(&ID_Def_Gameplay_1);
-}
 
 static void M_Draw_ID_Gameplay_1 (void)
 {
@@ -2875,11 +2870,7 @@ static void M_Draw_ID_Gameplay_1 (void)
                  M_Item_Glow(11, xhair_color ? GLOW_GREEN : GLOW_DARKRED));
 
     // Footer
-    M_WriteText (ID_MENU_LEFTOFFSET_BIG, 144, "NEXT PAGE >",
-                 M_Item_Glow(14, GLOW_LIGHTGRAY));
-
-    sprintf(str, "PAGE 1/3");
-    M_WriteText(M_ItemRightAlign(str), 144, str, M_Item_Glow(14, GLOW_GRAY));
+    M_DrawGameplayFooter("1");
 }
 
 static void M_ID_Brightmaps (int choice)
@@ -2965,7 +2956,7 @@ static menuitem_t ID_Menu_Gameplay_2[]=
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
-    { M_SWTC, "", /* LAST PAGE >*/             M_Choose_ID_Gameplay_3, 'l' },
+    { M_LFRT, "", /* < SCROLL PAGES >*/        M_ScrollGameplay,       's' },
 };
 
 static menu_t ID_Def_Gameplay_2 =
@@ -2978,11 +2969,6 @@ static menu_t ID_Def_Gameplay_2 =
     0,
     true, false, true,
 };
-
-static void M_Choose_ID_Gameplay_2 (int choice)
-{
-    M_SetupNextMenu(&ID_Def_Gameplay_2);
-}
 
 static void M_Draw_ID_Gameplay_2 (void)
 {
@@ -3045,11 +3031,7 @@ static void M_Draw_ID_Gameplay_2 (void)
                  M_Item_Glow(10, aud_crushed_corpse ? GLOW_GREEN : GLOW_DARKRED));
 
     // Footer
-    M_WriteText (ID_MENU_LEFTOFFSET_BIG, 144, "LAST PAGE >",
-                 M_Item_Glow(14, GLOW_LIGHTGRAY));
-
-    sprintf(str, "PAGE 2/3");
-    M_WriteText(M_ItemRightAlign(str), 144, str, M_Item_Glow(14, GLOW_GRAY));
+    M_DrawGameplayFooter("2");
 }
 
 static void M_ID_ColoredSTBar (int choice)
@@ -3118,7 +3100,7 @@ static menuitem_t ID_Menu_Gameplay_3[]=
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
-    { M_SWTC, "", /*FIRST PAGE >*/           M_Choose_ID_Gameplay_1, 'n' },
+    { M_LFRT, "", /* < SCROLL PAGES >*/        M_ScrollGameplay,       's' },
 };
 
 static menu_t ID_Def_Gameplay_3 =
@@ -3131,11 +3113,6 @@ static menu_t ID_Def_Gameplay_3 =
     0,
     true, false, true,
 };
-
-static void M_Choose_ID_Gameplay_3 (int choice)
-{
-    M_SetupNextMenu(&ID_Def_Gameplay_3);
-}
 
 static void M_Draw_ID_Gameplay_3 (void)
 {
@@ -3196,11 +3173,7 @@ static void M_Draw_ID_Gameplay_3 (void)
     }
 
     // Footer
-    M_WriteText (ID_MENU_LEFTOFFSET_BIG, 144, "FIRST PAGE >",
-                 M_Item_Glow(14, GLOW_LIGHTGRAY));
-
-    sprintf(str, "PAGE 3/3");
-    M_WriteText(M_ItemRightAlign(str), 144, str, M_Item_Glow(14, GLOW_GRAY));
+    M_DrawGameplayFooter("3");
 }
 
 static void M_ID_DefaulSkill (int choice)
@@ -3244,6 +3217,34 @@ static void M_ID_JaguarAlert (int choice)
 static void M_ID_JaguarExplosion (int choice)
 {
     emu_jaguar_explosion ^= 1;
+}
+
+static void M_ScrollGameplay (int choice)
+{
+    if (choice) // Scroll right
+    {
+             if (currentMenu == &ID_Def_Gameplay_1) { ID_Def_Gameplay_2.lastOn = 14; M_SetupNextMenu(&ID_Def_Gameplay_2); }
+        else if (currentMenu == &ID_Def_Gameplay_2) { ID_Def_Gameplay_3.lastOn = 14; M_SetupNextMenu(&ID_Def_Gameplay_3); }
+        else if (currentMenu == &ID_Def_Gameplay_3) { ID_Def_Gameplay_1.lastOn = 14; M_SetupNextMenu(&ID_Def_Gameplay_1); }
+    }
+    else
+    {           // Scroll left
+             if (currentMenu == &ID_Def_Gameplay_1) { ID_Def_Gameplay_3.lastOn = 14; M_SetupNextMenu(&ID_Def_Gameplay_3); }
+        else if (currentMenu == &ID_Def_Gameplay_2) { ID_Def_Gameplay_1.lastOn = 14; M_SetupNextMenu(&ID_Def_Gameplay_1); }
+        else if (currentMenu == &ID_Def_Gameplay_3) { ID_Def_Gameplay_2.lastOn = 14; M_SetupNextMenu(&ID_Def_Gameplay_2); }
+    }
+}
+
+static void M_DrawGameplayFooter (char *pagenum)
+{
+    char str[32];
+    
+    M_WriteText(ID_MENU_LEFTOFFSET_BIG, 144, "< SCROLL PAGES >",
+                M_Item_Glow(14, GLOW_LIGHTGRAY));
+
+    M_snprintf(str, 32, "%s", M_StringJoin("PAGE ", pagenum, "/3", NULL));
+    M_WriteText(M_ItemRightAlign(str), 144, str,
+                M_Item_Glow(14, GLOW_GRAY));
 }
 
 // -----------------------------------------------------------------------------
