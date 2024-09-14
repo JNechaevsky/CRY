@@ -1167,7 +1167,14 @@ char *M_GetAutoloadDir(const char *iwadname)
 
     M_MakeDirectory(autoload_path);
 
-    result = M_StringJoin(autoload_path, DIR_SEPARATOR_S, iwadname, NULL);
+    result = M_StringJoin(autoload_path,
+    // [JN] TODO - This is not correct, but autoload folder refers to
+    // "autoload" itself, not "autoload/something"...
+#ifndef _WIN32
+        DIR_SEPARATOR_S,
+        iwadname,
+#endif
+        NULL);
     M_MakeDirectory(result);
 
     // TODO: Add README file
