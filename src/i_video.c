@@ -110,7 +110,6 @@ static SDL_Texture *palette_19 = NULL;
 
 static int pane_alpha;
 
-static unsigned int rmask, gmask, bmask, amask; // [crispy] moved up here
 extern pixel_t* pal_color; // [crispy] evil hack to get FPS dots working as in Vanilla
 
 static boolean palette_to_set;
@@ -1401,10 +1400,6 @@ static void SetVideoMode(void)
 
     if (argbbuffer == NULL)
     {
-        int bpp;
-
-        SDL_PixelFormatEnumToMasks(SDL_PIXELFORMAT_ARGB8888, &bpp,
-                                   &rmask, &gmask, &bmask, &amask);
         argbbuffer = SDL_CreateRGBSurfaceWithFormat(
                      0, SCREENWIDTH, SCREENHEIGHT, 32, SDL_PIXELFORMAT_ARGB8888);
 
@@ -1878,6 +1873,11 @@ void I_BindVideoVariables(void)
     M_BindIntVariable("mouse_enable",                  &usemouse);
     M_BindIntVariable("mouse_grab",                    &mouse_grab);
 }
+
+#define amask (0xFF000000U)
+#define rmask (0x00FF0000U)
+#define gmask (0x0000FF00U)
+#define bmask (0x000000FFU)
 
 pixel_t I_BlendAdd (const pixel_t bg, const pixel_t fg)
 {
