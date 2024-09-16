@@ -19,6 +19,7 @@
 
 #include "z_zone.h"
 #include "doomstat.h"
+#include "p_local.h"
 #include "r_collit.h"
 
 #include "id_vars.h"
@@ -2681,6 +2682,101 @@ static const sectorcolor_t sectorcolor_map23[] =
 // Area 24: Military Base
 //
 
+// Hellish sky version with red lighting under sky
+static const sectorcolor_t sectorcolor_map24_emu[] =
+{
+    {   24,      0,    0xFFAFAF },
+    {   24,      1,    0xFFAFAF },
+    {   24,      2,    0xFFAFAF },
+    {   24,      3,    0xFFAFAF },
+    {   24,      5,    0xBBE357 },
+    {   24,     17,    0xFF7F7F },
+    {   24,     18,    0xFF7F7F },
+    {   24,     19,    0xFF7F7F },
+    {   24,     20,    0xFF7F7F },
+    {   24,     21,    0xFF7F7F },
+    {   24,     22,    0xFF7F7F },
+    {   24,     23,    0xBBE357 },
+    {   24,     24,    0x3089FF },
+    {   24,     25,    0x3089FF },
+    {   24,     26,    0xBBE357 },
+    {   24,     27,    0xBBE357 },
+    {   24,     28,    0xBBE357 },
+    {   24,     29,    0x55B828 },
+    {   24,     30,    0xBBE357 },
+    {   24,     31,    0xBBE357 },
+    {   24,     32,    0xBBE357 },
+    {   24,     33,    0xBBE357 },
+    {   24,     34,    0xBBE357 },
+    {   24,     35,    0xFF7F7F },
+    {   24,     36,    0xBBE357 },
+    {   24,     37,    0x55B828 },
+    {   24,     38,    0x55B828 },
+    {   24,     39,    0x55B828 },
+    {   24,     46,    0x55B828 },
+    {   24,     47,    0xFF7F7F },
+    {   24,     50,    0x55B828 },
+    {   24,     51,    0x55B828 },
+    {   24,     52,    0xBBE357 },
+    {   24,     53,    0xFF7F7F },
+    {   24,     58,    0xBBE357 },
+    {   24,     59,    0xBBE357 },
+    {   24,     60,    0xBBE357 },
+    {   24,     61,    0xBBE357 },
+    {   24,     62,    0xBBE357 },
+    {   24,     63,    0xFF7F7F },
+    {   24,     64,    0xBBE357 },
+    {   24,     65,    0xBBE357 },
+    {   24,     66,    0x55B828 },
+    {   24,     68,    0xFF7F7F },
+    {   24,     69,    0xFF7F7F },
+    {   24,     70,    0xFF7F7F },
+    {   24,     71,    0xFF7F7F },
+    {   24,     72,    0xFF7F7F },
+    {   24,     73,    0xFF7F7F },
+    {   24,     74,    0xFF7F7F },
+    {   24,     80,    0xEEC06B },
+    {   24,     81,    0xFF7F7F },
+    {   24,     82,    0xFF7F7F },
+    {   24,     83,    0xFFAFAF },
+    {   24,     84,    0xFF7F7F },
+    {   24,     85,    0xFF7F7F },
+    {   24,     86,    0xFF7F7F },
+    {   24,     87,    0xFF7F7F },
+    {   24,     88,    0xFF7F7F },
+    {   24,     89,    0xFF7F7F },
+    {   24,     90,    0xFF7F7F },
+    {   24,     91,    0xFF7F7F },
+    {   24,     92,    0xFF7F7F },
+    {   24,     94,    0xECB866 },
+    {   24,     98,    0xFF7F7F },
+    {   24,     99,    0xECB866 },
+    {   24,    100,    0xECB866 },
+    {   24,    101,    0xFF7F7F },
+    {   24,    102,    0xFF7F7F },
+    {   24,    103,    0x55B828 },
+    {   24,    104,    0xFF7F7F },
+    {   24,    105,    0xFF7F7F },
+    {   24,    107,    0xFFF588 },
+    {   24,    113,    0xFFAFAF },
+    {   24,    115,    0xFFF588 },
+    {   24,    119,    0xFFF588 },
+    {   24,    120,    0xFFF588 },
+    {   24,    123,    0xFFAFAF },
+    {   24,    125,    0xFF7F7F },
+    {   24,    127,    0xFF7F7F },
+    {   24,    130,    0xD97C45 },
+    {   24,    133,    0xFF7F7F },
+    {   24,    136,    0xFF7F7F },
+    {   24,    145,    0x3089FF },
+    {   24,    146,    0xFF7F7F },
+    {   24,    147,    0xFFF588 },
+    {   24,    148,    0xFF7F7F },
+    {   24,    149,    0xFFF588 },
+    SECTORCOLOR_END
+};
+
+// Phobos sky version
 static const sectorcolor_t sectorcolor_map24[] =
 {
     {   24,      5,    0xBBE357 },
@@ -2763,8 +2859,46 @@ void P_SetSectorColorTable (int area)
         case 21:  sectorcolor = sectorcolor_map21;  break;
         case 22:  sectorcolor = sectorcolor_map22;  break;
         case 23:  sectorcolor = sectorcolor_map23;  break;
-        case 24:  sectorcolor = sectorcolor_map24;  break;
+        case 24:  sectorcolor = emu_jaguar_skies ? 
+                                sectorcolor_map24_emu :     // Hellish sky
+                                sectorcolor_map24;  break;  // Phobos sky
         default:  sectorcolor = sectorcolor_dummy;  break;
+    }
+}
+
+void P_ReloadSectorColorTable (int area)
+{
+    sector_t *ss = sectors;
+
+    // [JN] If current area is not a given one,
+    // do not bother to reinject color tables.
+    // In fact, only AREA 24 needs this function.
+    if (gamemap != area)
+    {
+        return;
+    }
+
+    // [JN] Inject color tables into the sectors of IWAD levels.
+    if (canmodify)
+    {
+        for (int i = 0 ; i < numsectors ; i++, ss++)
+        {
+            for (int j = 0; sectorcolor[j].map != -1; j++)
+            {
+                // [JN] Clear current lighting values.
+                ss->color = 0;
+                
+                // [JN] Re-inject lighting values.
+                if (i == sectorcolor[j].sector && gamemap == sectorcolor[j].map)
+                {
+                    if (sectorcolor[j].color)
+                    {
+                        ss->color = sectorcolor[j].color;
+                    }
+                    break;
+                }
+            }
+        }
     }
 }
 

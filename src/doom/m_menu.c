@@ -50,6 +50,7 @@
 #include "v_trans.h"
 #include "am_map.h"
 #include "st_bar.h"
+#include "r_collit.h"
 
 #include "id_vars.h"
 #include "id_func.h"
@@ -3234,8 +3235,12 @@ static void M_ID_JaguarSkies (int choice)
 {
     emu_jaguar_skies ^= 1;
 
-    // [JN] (Re-)set Jaguar sky textures.
+    // Reset Jaguar sky textures.
     G_InitSkyTextures();
+    // Redefine color table for colored lighting.
+    P_SetSectorColorTable(24);
+    // Refill colored lighting values.
+    P_ReloadSectorColorTable(24);
 }
 
 static void M_ScrollGameplay (int choice)

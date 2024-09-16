@@ -67,7 +67,7 @@ int		numsides;
 side_t*		sides;
 
 static int      totallines;
-static boolean  canmodify;
+boolean  canmodify;
 
 // BLOCKMAP
 // Created from axis aligned bounding box
