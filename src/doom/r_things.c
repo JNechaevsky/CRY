@@ -748,8 +748,8 @@ static void R_ProjectSprite (mobj_t* thing)
         ||  thing->sprite == SPR_CBRA)  // Candelabra
         {
             vis->colormap[0] = spritelights[index];
-            vis->colormap[1] = invulcolormap ? &invulmaps[thing->bmap_flick*256] :
-                                               &colormaps[thing->bmap_flick*256];
+            vis->colormap[1] = invulcolormap ? &invulmaps[(thing->bmap_flick<<BMAPANIMSHIFT)*256] :
+                                               &colormaps[(thing->bmap_flick<<BMAPANIMSHIFT)*256];
         }
         else
         {

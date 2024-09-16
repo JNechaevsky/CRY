@@ -522,7 +522,7 @@ extern visplane_t *ceilingplane;
 // R_BMAPS
 // -----------------------------------------------------------------------------
 
-#define MAXDIMINDEX 47
+#define BMAPMAXDIMINDEX 376  // 47 << 3
 
 extern const byte  *R_BrightmapForTexName (const char *texname);
 extern const byte  *R_BrightmapForSprite (const int type);
