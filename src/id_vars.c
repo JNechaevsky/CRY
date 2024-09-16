@@ -137,6 +137,7 @@ int gp_death_use_action = 0;
 // Emulation accuracy
 int emu_jaguar_alert = 1;
 int emu_jaguar_explosion = 1;
+int emu_jaguar_skies = 1;
 
 // Compatibility-breaking
 int compat_vertical_aiming = 0;
@@ -255,6 +256,7 @@ void ID_BindVariables (void)
     // Monsters
     M_BindIntVariable("emu_jaguar_alert",               &emu_jaguar_alert);
     M_BindIntVariable("emu_jaguar_explosion",           &emu_jaguar_explosion);
+    M_BindIntVariable("emu_jaguar_skies",               &emu_jaguar_skies);
     
     M_BindIntVariable("compat_vertical_aiming",         &compat_vertical_aiming);
 }

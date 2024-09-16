@@ -73,5 +73,6 @@ typedef struct
 
 extern const sectorcolor_t *sectorcolor;
 extern void  P_SetSectorColorTable (int area);
+extern void  P_ReloadSectorColorTable (int area);
 
 
