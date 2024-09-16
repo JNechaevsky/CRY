@@ -48,6 +48,7 @@ extern void G_DoWorldDone (void);
 extern void G_DrawMouseSpeedBox (void);
 extern void G_ExitLevel (void);
 extern void G_InitNew (skill_t skill, int episode, int map);
+extern void G_InitSkyTextures (void); 
 extern void G_LoadGame (char *name);
 extern void G_PlayerReborn (int player);
 extern void G_SaveGame (int slot, char *description);

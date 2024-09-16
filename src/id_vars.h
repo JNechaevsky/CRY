@@ -108,6 +108,7 @@ extern int gp_death_use_action;
 
 extern int emu_jaguar_alert;
 extern int emu_jaguar_explosion;
+extern int emu_jaguar_skies;
 
 // Compatibility-breaking
 extern int compat_vertical_aiming;

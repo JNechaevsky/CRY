@@ -630,6 +630,7 @@ static void M_ID_FlipLevels (int choice);
 static void M_ID_OnDeathAction (int choice);
 static void M_ID_JaguarAlert (int choice);
 static void M_ID_JaguarExplosion (int choice);
+static void M_ID_JaguarSkies (int choice);
 
 static void M_ScrollGameplay (int choice);
 static void M_DrawGameplayFooter (char *pagenum);
@@ -3094,7 +3095,7 @@ static menuitem_t ID_Menu_Gameplay_3[]=
     { M_SKIP, "", 0, '\0' },
     { M_LFRT, "ALERTED MONSTERS BEHAVIOUR",    M_ID_JaguarAlert,       'a' },
     { M_LFRT, "EXPLOSION RADIUS IMPACT",       M_ID_JaguarExplosion,   'e' },
-    { M_SKIP, "", 0, '\0' },
+    { M_LFRT, "SKY TEXTURES",                  M_ID_JaguarSkies,       's' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
@@ -3160,6 +3161,11 @@ static void M_Draw_ID_Gameplay_3 (void)
     M_WriteText (M_ItemRightAlign(str), 81, str,
                  M_Item_Glow(7, emu_jaguar_explosion ? GLOW_DARKRED : GLOW_GREEN));
 
+    // Sky textures
+    sprintf(str, emu_jaguar_skies ? "JAGUAR" : "PC");
+    M_WriteText (M_ItemRightAlign(str), 90, str,
+                 M_Item_Glow(8, emu_jaguar_skies ? GLOW_DARKRED : GLOW_GREEN));
+
     // Print explanations of emulation accuracy features
     if (itemOn == 6 && emu_jaguar_alert)
     {
@@ -3170,6 +3176,11 @@ static void M_Draw_ID_Gameplay_3 (void)
     {
         M_WriteTextCentered(117, "SOLID WALLS DON'T BLOCK", cr[CR_GRAY]);
         M_WriteTextCentered(126, "EXPLOSION RADIUS DAMAGE", cr[CR_GRAY]);
+    }
+    if (itemOn == 8 && emu_jaguar_skies)
+    {
+        M_WriteTextCentered(117, "AREA 17 USES DEIMOS SKY", cr[CR_GRAY]);
+        M_WriteTextCentered(126, "AREA 24 USES HELLISH SKY", cr[CR_GRAY]);
     }
 
     // Footer
@@ -3217,6 +3228,14 @@ static void M_ID_JaguarAlert (int choice)
 static void M_ID_JaguarExplosion (int choice)
 {
     emu_jaguar_explosion ^= 1;
+}
+
+static void M_ID_JaguarSkies (int choice)
+{
+    emu_jaguar_skies ^= 1;
+
+    // [JN] (Re-)set Jaguar sky textures.
+    G_InitSkyTextures();
 }
 
 static void M_ScrollGameplay (int choice)
@@ -3360,6 +3379,7 @@ static void M_ID_ApplyResetHook (void)
     // Emulation accuracy
     emu_jaguar_alert = 1;
     emu_jaguar_explosion = 1;
+    emu_jaguar_skies = 1;
 
     // Compatibility-breaking
     compat_vertical_aiming = 0;
@@ -3379,6 +3399,7 @@ static void M_ID_ApplyResetHook (void)
     {
         AM_Start();
     }
+    G_InitSkyTextures();
 
     // Restart audio systems
     S_StopMusic();

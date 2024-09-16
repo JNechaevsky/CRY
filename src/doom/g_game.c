@@ -771,6 +771,34 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
     	CRL_ImpulseCamera(cmd->forwardmove, cmd->sidemove, cmd->angleturn); 
 } 
  
+// -----------------------------------------------------------------------------
+// G_InitSkyTextures
+// [JN] CRY: define sky textures with optional emulation. Jaguar skies are:
+// AREA 17 (Hell Keep) is using Deimos sky.
+// AREA 24 (Military base) is using hellish sky.
+// -----------------------------------------------------------------------------
+
+void G_InitSkyTextures (void)
+{
+    if (gamemap < 9 || (!emu_jaguar_skies && gamemap == 24))
+    {
+        skytexture = R_TextureNumForName("SKY1_1");
+        skytexture2 = R_TextureNumForName("SKY1_2");
+        skyscrollspeed = 40; // slow for Phobos levels
+    }
+    else if (gamemap < (emu_jaguar_skies ? 18 : 17))
+    {
+        skytexture = R_TextureNumForName("SKY2_1");
+        skytexture2 = R_TextureNumForName("SKY2_2");
+        skyscrollspeed = 60; // Middle for Deimos levels
+    }
+    else
+    {
+        skytexture = R_TextureNumForName("SKY3_1");
+        skytexture2 = R_TextureNumForName("SKY3_2");
+        skyscrollspeed = 75; // Fast for Hellish levels
+    }
+}
 
 //
 // G_DoLoadLevel 
@@ -795,25 +823,8 @@ void G_DoLoadLevel (void)
 
     skyflatnum = R_FlatNumForName(SKYFLATNAME);
 
-    // [JN] Set Jaguar skies.
-    if (gamemap < 9 || gamemap == 24)
-    {
-        skytexture = R_TextureNumForName("SKY1_1");
-        skytexture2 = R_TextureNumForName("SKY1_2");
-        skyscrollspeed = 40; // slow for Phobos levels
-    }
-    else if (gamemap < 17)
-    {
-        skytexture = R_TextureNumForName("SKY2_1");
-        skytexture2 = R_TextureNumForName("SKY2_2");
-        skyscrollspeed = 60; // Middle for Deimos levels
-    }
-    else
-    {
-        skytexture = R_TextureNumForName("SKY3_1");
-        skytexture2 = R_TextureNumForName("SKY3_2");
-        skyscrollspeed = 75; // Fast for Hellish levels
-    }
+    // [JN] Set Jaguar sky textures.
+    G_InitSkyTextures();
     
     levelstarttic = gametic;        // for time calculation
     
