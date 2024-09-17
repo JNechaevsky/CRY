@@ -748,6 +748,7 @@ void S_ChangeMusic(int musicnum, int looping)
     S_StopMusic();
 
     // [JN] CRY: emulate Jaguar music arrangement:
+    // TODO - SIMPLIFY!
     if (emu_jaguar_music)
     {
         const int jag_intermusic[] =
@@ -803,12 +804,35 @@ void S_ChangeMusic(int musicnum, int looping)
     }
     else
     {
+        switch (gamestate) 
+        {
+            case GS_DEMOSCREEN:
+            M_snprintf(namebuf, sizeof(namebuf), "m_intro");
+            music->lumpnum = W_GetNumForName(namebuf);
+            break;
+
+            case GS_LEVEL:
+            M_snprintf(namebuf, sizeof(namebuf), "m_%s", music->name);
+            music->lumpnum = W_GetNumForName(namebuf);
+            break;
+
+            case GS_INTERMISSION:
+            M_snprintf(namebuf, sizeof(namebuf), "m_inter");
+            music->lumpnum = W_GetNumForName(namebuf);
+            break;
+
+            case GS_FINALE:
+            M_snprintf(namebuf, sizeof(namebuf), "m_map02");
+            music->lumpnum = W_GetNumForName(namebuf);
+        }
+        /*
     // get lumpnum if neccessary
     if (!music->lumpnum)
     {
         M_snprintf(namebuf, sizeof(namebuf), "m_%s", music->name);
         music->lumpnum = W_GetNumForName(namebuf);
     }
+    */
     }
 
     music->data = W_CacheLumpNum(music->lumpnum, PU_STATIC);
