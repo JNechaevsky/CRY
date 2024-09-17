@@ -742,7 +742,8 @@ void S_ChangeMusic(int musicnum, int looping)
     // shutdown old music
     S_StopMusic();
 
-    // [JN] CRY: emulate Jaguar music arrangement:
+    // [JN] CRY: different music handling, depending on game state
+    // to emulate both PC and Jaguar music arrangement.
     switch (gamestate) 
     {
         case GS_DEMOSCREEN:
@@ -753,7 +754,9 @@ void S_ChangeMusic(int musicnum, int looping)
         case GS_LEVEL:
             if (emu_jaguar_music)
             {
-                return; // Do not try to play empty music!
+                // [JN] No music on game levels, 
+                // so don't try to play empty music!
+                return;
             }
             else
             {
