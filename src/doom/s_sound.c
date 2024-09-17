@@ -774,7 +774,7 @@ void S_ChangeMusic(int musicnum, int looping)
                 {
                     1, 2, 4, 6, 9, 10, 11, 14, 16, 17,
                     1, 2, 4, 6, 9, 10, 11, 14, 16, 17,
-                    1, 2, 4, 6
+                    1, 2, 4, 6, 6
                 };
                 M_snprintf(namebuf, sizeof(namebuf), "m_map%02d", jag_intermusic[gamemap]);
             }
