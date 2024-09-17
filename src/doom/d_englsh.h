@@ -160,6 +160,7 @@
 
 #define STSTR_MUS		"Music Change"
 #define STSTR_NOMUS		"IMPOSSIBLE SELECTION"
+#define STSTR_JAGMUS		"NOT AVAILABLE IN JAGUAR MUSIC ARRANGEMENT"
 #define STSTR_DQDON		"Degreelessness Mode On"
 #define STSTR_DQDOFF	"Degreelessness Mode Off"
 
