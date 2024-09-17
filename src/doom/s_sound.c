@@ -747,19 +747,21 @@ void S_ChangeMusic(int musicnum, int looping)
     // shutdown old music
     S_StopMusic();
 
+    // [JN] CRY: emulate Jaguar music arrangement:
     if (emu_jaguar_music)
     {
         switch (gamestate) 
         {
-            case GS_DEMOSCREEN: 
+            case GS_DEMOSCREEN:
             M_snprintf(namebuf, sizeof(namebuf), "m_intro");
             music->lumpnum = W_GetNumForName(namebuf);
             break;
-            
+
             case GS_LEVEL:
+            return; // Do not try to play empty music!
             break;
-            
-            case GS_INTERMISSION: 
+
+            case GS_INTERMISSION:
             M_snprintf(namebuf, sizeof(namebuf), "m_map%02d", gamemap);
             music->lumpnum = W_GetNumForName(namebuf);
             break;
@@ -767,9 +769,6 @@ void S_ChangeMusic(int musicnum, int looping)
             case GS_FINALE:
             M_snprintf(namebuf, sizeof(namebuf), "m_map02");
             music->lumpnum = W_GetNumForName(namebuf);
-
-            default:
-            break;
         }
     }
     else
