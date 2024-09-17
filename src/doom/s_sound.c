@@ -748,91 +748,47 @@ void S_ChangeMusic(int musicnum, int looping)
     S_StopMusic();
 
     // [JN] CRY: emulate Jaguar music arrangement:
-    // TODO - SIMPLIFY!
-    if (emu_jaguar_music)
+    switch (gamestate) 
     {
-        const int jag_intermusic[] =
-        {
-               // Play music after finished level...
-            1, // Dummy
-            2, // Area 1: Hangar
-            4, // Area 2: Plant
-            6, // Area 3: Toxin Refinery
-            9, // Area 4: Command Control
-           10, // Area 5: Phobos Lab
-           11, // Area 6: Central Processing
-           14, // Area 7: Computer Station
-           16, // Area 8: Phobos Anomaly
-           20, // Area 9: Deimos Anomaly (wrong, should have E3M2 music)
-            1, // Area 10: Containment Area
-            2, // Area 11: Refinery
-            4, // Area 12: Deimos Lab
-            6, // Area 13: Command Center
-            9, // Area 14: Halls of the Damned
-           10, // Area 15: Spawning Vats
-           11, // Area 16: Tower of Babel
-           14, // Area 17: Hell Keep
-           16, // Area 18: Pandemonium
-           20, // Area 19: House of Pain (wrong again, should have E3M2 music)
-            1, // Area 20: Unholy Cathedral
-            2, // Area 21: Mt. Erebus
-            4, // Area 22: Limbo
-            6, // Area 23: Dis
-            9, // Area 24: Military Base
-        };
-
-        switch (gamestate) 
-        {
-            case GS_DEMOSCREEN:
+        case GS_DEMOSCREEN:
             M_snprintf(namebuf, sizeof(namebuf), "m_intro");
             music->lumpnum = W_GetNumForName(namebuf);
-            break;
+        break;
 
-            case GS_LEVEL:
-            return; // Do not try to play empty music!
-            break;
+        case GS_LEVEL:
+            if (emu_jaguar_music)
+            {
+                return; // Do not try to play empty music!
+            }
+            else
+            {
+                M_snprintf(namebuf, sizeof(namebuf), "m_%s", music->name);
+                music->lumpnum = W_GetNumForName(namebuf);
+            }
+        break;
 
-            case GS_INTERMISSION:
-            M_snprintf(namebuf, sizeof(namebuf), "m_map%02d", jag_intermusic[gamemap]);
+        case GS_INTERMISSION:
+            if (emu_jaguar_music)
+            {
+                const int jag_intermusic[] =
+                {
+                    1, 2, 4, 6, 9, 10, 11, 14, 16, 17,
+                    1, 2, 4, 6, 9, 10, 11, 14, 16, 17,
+                    1, 2, 4, 6
+                };
+                M_snprintf(namebuf, sizeof(namebuf), "m_map%02d", jag_intermusic[gamemap]);
+            }
+            else
+            {
+                M_snprintf(namebuf, sizeof(namebuf), "m_inter");
+            }
             music->lumpnum = W_GetNumForName(namebuf);
-            break;
+        break;
 
-            case GS_FINALE:
+        case GS_FINALE:
             M_snprintf(namebuf, sizeof(namebuf), "m_map02");
             music->lumpnum = W_GetNumForName(namebuf);
-        }
-    }
-    else
-    {
-        switch (gamestate) 
-        {
-            case GS_DEMOSCREEN:
-            M_snprintf(namebuf, sizeof(namebuf), "m_intro");
-            music->lumpnum = W_GetNumForName(namebuf);
-            break;
-
-            case GS_LEVEL:
-            M_snprintf(namebuf, sizeof(namebuf), "m_%s", music->name);
-            music->lumpnum = W_GetNumForName(namebuf);
-            break;
-
-            case GS_INTERMISSION:
-            M_snprintf(namebuf, sizeof(namebuf), "m_inter");
-            music->lumpnum = W_GetNumForName(namebuf);
-            break;
-
-            case GS_FINALE:
-            M_snprintf(namebuf, sizeof(namebuf), "m_map02");
-            music->lumpnum = W_GetNumForName(namebuf);
-        }
-        /*
-    // get lumpnum if neccessary
-    if (!music->lumpnum)
-    {
-        M_snprintf(namebuf, sizeof(namebuf), "m_%s", music->name);
-        music->lumpnum = W_GetNumForName(namebuf);
-    }
-    */
+        break;
     }
 
     music->data = W_CacheLumpNum(music->lumpnum, PU_STATIC);
