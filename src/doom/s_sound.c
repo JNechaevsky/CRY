@@ -747,11 +747,39 @@ void S_ChangeMusic(int musicnum, int looping)
     // shutdown old music
     S_StopMusic();
 
+    if (emu_jaguar_music)
+    {
+        switch (gamestate) 
+        {
+            case GS_DEMOSCREEN: 
+            M_snprintf(namebuf, sizeof(namebuf), "m_intro");
+            music->lumpnum = W_GetNumForName(namebuf);
+            break;
+            
+            case GS_LEVEL:
+            break;
+            
+            case GS_INTERMISSION: 
+            M_snprintf(namebuf, sizeof(namebuf), "m_map%02d", gamemap);
+            music->lumpnum = W_GetNumForName(namebuf);
+            break;
+
+            case GS_FINALE:
+            M_snprintf(namebuf, sizeof(namebuf), "m_map02");
+            music->lumpnum = W_GetNumForName(namebuf);
+
+            default:
+            break;
+        }
+    }
+    else
+    {
     // get lumpnum if neccessary
     if (!music->lumpnum)
     {
         M_snprintf(namebuf, sizeof(namebuf), "m_%s", music->name);
         music->lumpnum = W_GetNumForName(namebuf);
+    }
     }
 
     music->data = W_CacheLumpNum(music->lumpnum, PU_STATIC);
