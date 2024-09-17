@@ -59,8 +59,6 @@ void S_StopSound(mobj_t *origin);
 void S_UnlinkSound(mobj_t *origin);
 
 
-// Start music using <music_id> from sounds.h
-void S_StartMusic(int music_id);
 
 // Start music using <music_id> from sounds.h,
 //  and set whether looping

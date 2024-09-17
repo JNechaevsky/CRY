@@ -3404,7 +3404,7 @@ static void M_ID_ApplyResetHook (void)
     gp_death_use_action = 0;
 
     // Emulation accuracy
-    emu_jaguar_music = 1;
+    emu_jaguar_music = 0;
     emu_jaguar_alert = 1;
     emu_jaguar_explosion = 1;
     emu_jaguar_skies = 1;
@@ -3922,7 +3922,8 @@ static void M_EndGameResponse(int key)
     players[consoleplayer].messageCenteredTics = 1;
     players[consoleplayer].messageCentered = NULL;
     st_palette = 0;
-    S_StartMusic(mus_intro);
+    gamestate = GS_DEMOSCREEN;
+    S_ChangeMusic(mus_intro, false);
     D_StartTitle ();
 }
 

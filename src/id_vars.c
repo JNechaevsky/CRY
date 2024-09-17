@@ -135,7 +135,7 @@ int gp_flip_levels = 0;
 int gp_death_use_action = 0;
 
 // Emulation accuracy
-int emu_jaguar_music = 1;
+int emu_jaguar_music = 0;
 int emu_jaguar_alert = 1;
 int emu_jaguar_explosion = 1;
 int emu_jaguar_skies = 1;

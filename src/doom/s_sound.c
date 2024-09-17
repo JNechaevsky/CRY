@@ -715,11 +715,6 @@ void S_SetSfxVolume(int volume)
 // Starts some music with the music id found in sounds.h.
 //
 
-void S_StartMusic(int m_id)
-{
-    S_ChangeMusic(m_id, false);
-}
-
 void S_ChangeMusic(int musicnum, int looping)
 {
     musicinfo_t *music = NULL;
