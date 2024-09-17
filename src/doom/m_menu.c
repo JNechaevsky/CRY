@@ -3235,7 +3235,12 @@ static void M_ID_OnDeathAction (int choice)
 static void M_ID_JaguarMusic (int choice)
 {
     emu_jaguar_music ^= 1;
-    // TODO - stop and/or change current music
+
+    // Shut down music
+    S_StopMusic();
+
+    // Restart music
+    S_ChangeMusic(current_mus_num, usergame);
 }
 
 static void M_ID_JaguarAlert (int choice)
