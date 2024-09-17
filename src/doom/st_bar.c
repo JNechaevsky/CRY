@@ -433,18 +433,25 @@ boolean ST_Responder (event_t *ev)
                 // [JN] Fixed: using a proper IDMUS selection for shareware 
                 // and registered game versions.
                 {
-                    musnum = mus_map01 + (buf[0]-'0')*10 + buf[1]-'0' - 1;
-
-                    // [crispy] prevent crash with IDMUS00
-                    if (musnum < mus_map01 || musnum >= NUMMUSIC)
+                    if (emu_jaguar_music)
                     {
-                        CT_SetMessage(plyr, STSTR_NOMUS, false, NULL);
+                        CT_SetMessage(plyr, STSTR_JAGMUS, false, NULL);
                     }
                     else
                     {
-                        S_ChangeMusic(musnum, 1);
-                        // [JN] jff 3/17/98 remember idmus number for restore
-                        idmusnum = musnum;
+                        musnum = mus_map01 + (buf[0]-'0')*10 + buf[1]-'0' - 1;
+
+                        // [crispy] prevent crash with IDMUS00
+                        if (musnum < mus_map01 || musnum >= NUMMUSIC)
+                        {
+                            CT_SetMessage(plyr, STSTR_NOMUS, false, NULL);
+                        }
+                        else
+                        {
+                            S_ChangeMusic(musnum, 1);
+                            // [JN] jff 3/17/98 remember idmus number for restore
+                            idmusnum = musnum;
+                        }
                     }
                 }
 

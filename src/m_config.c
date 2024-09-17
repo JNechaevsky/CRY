@@ -463,6 +463,7 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_INT(gp_death_use_action),
 
     // Emulation accuracy
+    CONFIG_VARIABLE_INT(emu_jaguar_music),
     CONFIG_VARIABLE_INT(emu_jaguar_alert),
     CONFIG_VARIABLE_INT(emu_jaguar_explosion),
     CONFIG_VARIABLE_INT(emu_jaguar_skies),

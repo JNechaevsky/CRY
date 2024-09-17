@@ -715,11 +715,6 @@ void S_SetSfxVolume(int volume)
 // Starts some music with the music id found in sounds.h.
 //
 
-void S_StartMusic(int m_id)
-{
-    S_ChangeMusic(m_id, false);
-}
-
 void S_ChangeMusic(int musicnum, int looping)
 {
     musicinfo_t *music = NULL;
@@ -747,11 +742,51 @@ void S_ChangeMusic(int musicnum, int looping)
     // shutdown old music
     S_StopMusic();
 
-    // get lumpnum if neccessary
-    if (!music->lumpnum)
+    // [JN] CRY: different music handling, depending on game state
+    // to emulate both PC and Jaguar music arrangement.
+    switch (gamestate) 
     {
-        M_snprintf(namebuf, sizeof(namebuf), "m_%s", music->name);
-        music->lumpnum = W_GetNumForName(namebuf);
+        case GS_DEMOSCREEN:
+            M_snprintf(namebuf, sizeof(namebuf), "m_intro");
+            music->lumpnum = W_GetNumForName(namebuf);
+        break;
+
+        case GS_LEVEL:
+            if (emu_jaguar_music)
+            {
+                // [JN] No music on game levels, 
+                // so don't try to play empty music!
+                return;
+            }
+            else
+            {
+                M_snprintf(namebuf, sizeof(namebuf), "m_%s", music->name);
+                music->lumpnum = W_GetNumForName(namebuf);
+            }
+        break;
+
+        case GS_INTERMISSION:
+            if (emu_jaguar_music)
+            {
+                const int jag_intermusic[] =
+                {
+                    1, 2, 4, 6, 9, 10, 11, 14, 16, 17,
+                    1, 2, 4, 6, 9, 10, 11, 14, 16, 17,
+                    1, 2, 4, 6, 6
+                };
+                M_snprintf(namebuf, sizeof(namebuf), "m_map%02d", jag_intermusic[gamemap]);
+            }
+            else
+            {
+                M_snprintf(namebuf, sizeof(namebuf), "m_inter");
+            }
+            music->lumpnum = W_GetNumForName(namebuf);
+        break;
+
+        case GS_FINALE:
+            M_snprintf(namebuf, sizeof(namebuf), "m_map02");
+            music->lumpnum = W_GetNumForName(namebuf);
+        break;
     }
 
     music->data = W_CacheLumpNum(music->lumpnum, PU_STATIC);

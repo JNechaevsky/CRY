@@ -629,6 +629,7 @@ static void M_ID_PistolStart (int choice);
 static void M_ID_RevealedSecrets (int choice);
 static void M_ID_FlipLevels (int choice);
 static void M_ID_OnDeathAction (int choice);
+static void M_ID_JaguarMusic (int choice);
 static void M_ID_JaguarAlert (int choice);
 static void M_ID_JaguarExplosion (int choice);
 static void M_ID_JaguarSkies (int choice);
@@ -3094,10 +3095,10 @@ static menuitem_t ID_Menu_Gameplay_3[]=
     { M_LFRT, "FLIP LEVELS HORIZONTALLY",      M_ID_FlipLevels,        'f' },
     { M_LFRT, "ON DEATH ACTION",               M_ID_OnDeathAction,     'o' },
     { M_SKIP, "", 0, '\0' },
+    { M_LFRT, "MUSIC ARRANGEMENT",             M_ID_JaguarMusic,       'm' },
     { M_LFRT, "ALERTED MONSTERS BEHAVIOUR",    M_ID_JaguarAlert,       'a' },
     { M_LFRT, "EXPLOSION RADIUS IMPACT",       M_ID_JaguarExplosion,   'e' },
     { M_LFRT, "SKY TEXTURES",                  M_ID_JaguarSkies,       's' },
-    { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
@@ -3152,33 +3153,43 @@ static void M_Draw_ID_Gameplay_3 (void)
 
     M_WriteTextCentered(63, "EMULATION ACCURACY", cr[CR_YELLOW]);
 
+    // Music arrangement
+    sprintf(str, emu_jaguar_music ? "JAGUAR" : "PC");
+    M_WriteText (M_ItemRightAlign(str), 72, str,
+                 M_Item_Glow(6, emu_jaguar_music ? GLOW_DARKRED : GLOW_GREEN));
+
     // Alerted monsters behaviour
     sprintf(str, emu_jaguar_alert ? "JAGUAR" : "PC");
-    M_WriteText (M_ItemRightAlign(str), 72, str,
-                 M_Item_Glow(6, emu_jaguar_alert ? GLOW_DARKRED : GLOW_GREEN));
+    M_WriteText (M_ItemRightAlign(str), 81, str,
+                 M_Item_Glow(7, emu_jaguar_alert ? GLOW_DARKRED : GLOW_GREEN));
 
     // Explosion radius impact
     sprintf(str, emu_jaguar_explosion ? "JAGUAR" : "PC");
-    M_WriteText (M_ItemRightAlign(str), 81, str,
-                 M_Item_Glow(7, emu_jaguar_explosion ? GLOW_DARKRED : GLOW_GREEN));
+    M_WriteText (M_ItemRightAlign(str), 90, str,
+                 M_Item_Glow(8, emu_jaguar_explosion ? GLOW_DARKRED : GLOW_GREEN));
 
     // Sky textures
     sprintf(str, emu_jaguar_skies ? "JAGUAR" : "PC");
-    M_WriteText (M_ItemRightAlign(str), 90, str,
-                 M_Item_Glow(8, emu_jaguar_skies ? GLOW_DARKRED : GLOW_GREEN));
+    M_WriteText (M_ItemRightAlign(str), 99, str,
+                 M_Item_Glow(9, emu_jaguar_skies ? GLOW_DARKRED : GLOW_GREEN));
 
     // Print explanations of emulation accuracy features
-    if (itemOn == 6 && emu_jaguar_alert)
+    if (itemOn == 6 && emu_jaguar_music)
+    {
+        M_WriteTextCentered(117, "PLAY MUSIC ONLY ON TITLE,", cr[CR_GRAY]);
+        M_WriteTextCentered(126, "INTERMISSION AND FINALE SCREENS", cr[CR_GRAY]);
+    }
+    if (itemOn == 7 && emu_jaguar_alert)
     {
         M_WriteTextCentered(117, "MONSTERS DON'T ATTACK", cr[CR_GRAY]);
         M_WriteTextCentered(126, "UNTIL PLAYER IS SIGHTED", cr[CR_GRAY]);
     }
-    if (itemOn == 7 && emu_jaguar_explosion)
+    if (itemOn == 8 && emu_jaguar_explosion)
     {
         M_WriteTextCentered(117, "SOLID WALLS DON'T BLOCK", cr[CR_GRAY]);
         M_WriteTextCentered(126, "EXPLOSION RADIUS DAMAGE", cr[CR_GRAY]);
     }
-    if (itemOn == 8 && emu_jaguar_skies)
+    if (itemOn == 9 && emu_jaguar_skies)
     {
         M_WriteTextCentered(117, "AREA 17 USES DEIMOS SKY", cr[CR_GRAY]);
         M_WriteTextCentered(126, "AREA 24 USES HELLISH SKY", cr[CR_GRAY]);
@@ -3219,6 +3230,17 @@ static void M_ID_FlipLevels (int choice)
 static void M_ID_OnDeathAction (int choice)
 {
     gp_death_use_action = M_INT_Slider(gp_death_use_action, 0, 2, choice, false);
+}
+
+static void M_ID_JaguarMusic (int choice)
+{
+    emu_jaguar_music ^= 1;
+
+    // Shut down music
+    S_StopMusic();
+
+    // Restart music
+    S_ChangeMusic(current_mus_num, usergame);
 }
 
 static void M_ID_JaguarAlert (int choice)
@@ -3382,6 +3404,7 @@ static void M_ID_ApplyResetHook (void)
     gp_death_use_action = 0;
 
     // Emulation accuracy
+    emu_jaguar_music = 0;
     emu_jaguar_alert = 1;
     emu_jaguar_explosion = 1;
     emu_jaguar_skies = 1;
@@ -3899,7 +3922,8 @@ static void M_EndGameResponse(int key)
     players[consoleplayer].messageCenteredTics = 1;
     players[consoleplayer].messageCentered = NULL;
     st_palette = 0;
-    S_StartMusic(mus_intro);
+    gamestate = GS_DEMOSCREEN;
+    S_ChangeMusic(mus_intro, false);
     D_StartTitle ();
 }
 

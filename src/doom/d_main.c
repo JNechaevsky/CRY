@@ -761,7 +761,8 @@ void D_DoomMain (void)
 			G_InitNew (startskill, startepisode, startmap);
 		else
 		{
-			S_StartMusic(mus_intro);
+			gamestate = GS_DEMOSCREEN;
+			S_ChangeMusic(mus_intro, false);
 			D_StartTitle ();                // start up intro loop
 		}
     }

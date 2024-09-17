@@ -135,6 +135,7 @@ int gp_flip_levels = 0;
 int gp_death_use_action = 0;
 
 // Emulation accuracy
+int emu_jaguar_music = 0;
 int emu_jaguar_alert = 1;
 int emu_jaguar_explosion = 1;
 int emu_jaguar_skies = 1;
@@ -253,7 +254,8 @@ void ID_BindVariables (void)
     M_BindIntVariable("gp_flip_levels",                 &gp_flip_levels);
     M_BindIntVariable("gp_death_use_action",            &gp_death_use_action);
 
-    // Monsters
+    // Emulation accuracy
+    M_BindIntVariable("emu_jaguar_music",               &emu_jaguar_music);
     M_BindIntVariable("emu_jaguar_alert",               &emu_jaguar_alert);
     M_BindIntVariable("emu_jaguar_explosion",           &emu_jaguar_explosion);
     M_BindIntVariable("emu_jaguar_skies",               &emu_jaguar_skies);
