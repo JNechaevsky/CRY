@@ -99,7 +99,7 @@ static int GuessFileType(const char *name)
 
     // only ever add one argument to the -iwad parameter
 
-    if (iwad_found == false /*&& D_IsIWADName(lower)*/)
+    if (iwad_found == false && D_IsIWADName(lower))
     {
         ret = FILETYPE_IWAD;
         iwad_found = true;
@@ -145,11 +145,11 @@ void M_AddLooseFiles(void)
         return;
     }
 
-    // allocate space for up to five additional regular parameters
-    // (-iwad, -merge, -deh, -playdemo, -config)
+    // allocate space for up to three additional regular parameters
+    // (-iwad, -merge, -config)
 
-    arguments = malloc((myargc + 5) * sizeof(*arguments));
-    memset(arguments, 0, (myargc + 5) * sizeof(*arguments));
+    arguments = malloc((myargc + 3) * sizeof(*arguments));
+    memset(arguments, 0, (myargc + 3) * sizeof(*arguments));
 
     // check the command line and make sure it does not already
     // contain any regular parameters or response files
