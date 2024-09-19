@@ -2881,9 +2881,24 @@ static void M_ID_Brightmaps (int choice)
     vis_brightmaps ^= 1;
 }
 
-static void M_ID_ColoredLighting (int choice)
+static void M_ID_ColoredLightingHook (void)
 {
     vis_colored_lighting ^= 1;
+    
+    if (!vis_colored_lighting)
+    {
+        R_FreeColoredLights();
+    }
+    else
+    {
+        R_InitColoredLightTables();
+    }
+    R_ExecuteSetViewSize();
+}
+
+static void M_ID_ColoredLighting (int choice)
+{
+    post_rendering_hook = M_ID_ColoredLightingHook;
 }
 
 static void M_ID_Translucency (int choice)
