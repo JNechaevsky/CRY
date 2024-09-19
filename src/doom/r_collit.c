@@ -313,8 +313,11 @@ void R_InitColoredLightTables (void)
     const size_t zlight_size      = LIGHTLEVELS * sizeof(*zlight);
     const size_t zlight_size_max  = MAXLIGHTZ * sizeof(**zlight);
 
+    // [JN] Don't allocate/calculate anything if colored lighting is disabled.
     if (!vis_colored_lighting)
+    {
         return;
+    }
   
     scalelight_EEC06B = malloc(sclight_size);
     scalelight_D97C45 = malloc(sclight_size);
@@ -479,8 +482,11 @@ void R_GenerateColoredSClights (const int width)
     int i, j;
     int level, startmap;
 
+    // [JN] Don't calculate anything if colored lighting is disabled.
     if (!vis_colored_lighting)
+    {
         return;
+    }
 
     // Calculate the light levels to use for each level / scale combination.
     for (i = 0 ; i < LIGHTLEVELS ; i++)

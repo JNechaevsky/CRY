@@ -664,7 +664,6 @@ void R_InitLightTables (void)
     scalelight = malloc(LIGHTLEVELS * sizeof(*scalelight));
     scalelightfixed = malloc(MAXLIGHTSCALE * sizeof(*scalelightfixed));
     zlight = malloc(LIGHTLEVELS * sizeof(*zlight));
-
     scalelight_INVULN = malloc(LIGHTLEVELS * sizeof(*scalelight_INVULN));
     zlight_INVULN = malloc(LIGHTLEVELS * sizeof(*zlight_INVULN));
 
