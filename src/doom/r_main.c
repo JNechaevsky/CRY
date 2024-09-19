@@ -99,7 +99,6 @@ angle_t			linearskyangle[MAXWIDTH+1];
 lighttable_t***		scalelight = NULL;
 lighttable_t**		scalelightfixed = NULL;
 lighttable_t***		zlight = NULL;
-
 lighttable_t***		scalelight_INVULN = NULL;
 lighttable_t***		zlight_INVULN = NULL;
 
@@ -675,9 +674,8 @@ void R_InitLightTables (void)
     {
 	scalelight[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
 	zlight[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-
-    scalelight_INVULN[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight_INVULN));
-    zlight_INVULN[i] = malloc(MAXLIGHTZ * sizeof(**zlight_INVULN));
+	scalelight_INVULN[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight_INVULN));
+	zlight_INVULN[i] = malloc(MAXLIGHTZ * sizeof(**zlight_INVULN));
 
 	startmap = ((LIGHTLEVELS-LIGHTBRIGHT-i)*2)*NUMCOLORMAPS/LIGHTLEVELS;
 	for (j=0 ; j<MAXLIGHTZ ; j++)
@@ -693,7 +691,7 @@ void R_InitLightTables (void)
 		level = NUMCOLORMAPS-1;
 
 	    zlight[i][j] = colormaps + level*256;
-        zlight_INVULN[i][j] = invulmaps + level*256;
+	    zlight_INVULN[i][j] = invulmaps + level*256;
 	}
     }
     
@@ -894,7 +892,7 @@ void R_ExecuteSetViewSize (void)
 		level = NUMCOLORMAPS-1;
 
 	    scalelight[i][j] = colormaps + level*256;
-        scalelight_INVULN[i][j] = invulmaps + level*256;
+	    scalelight_INVULN[i][j] = invulmaps + level*256;
 	}
     }
 
