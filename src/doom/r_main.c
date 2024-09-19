@@ -100,6 +100,9 @@ lighttable_t***		scalelight = NULL;
 lighttable_t**		scalelightfixed = NULL;
 lighttable_t***		zlight = NULL;
 
+lighttable_t***		scalelight_INVULN = NULL;
+lighttable_t***		zlight_INVULN = NULL;
+
 // bumped light from gun blasts
 int			extralight;			
 
@@ -640,9 +643,31 @@ void R_InitLightTables (void)
 	free(zlight);
     }
 
+    if (scalelight_INVULN)
+    {
+	for (i = 0; i < LIGHTLEVELS; i++)
+	{
+		free(scalelight_INVULN[i]);
+	}
+	free(scalelight_INVULN);
+    }
+
+    if (zlight_INVULN)
+    {
+	for (i = 0; i < LIGHTLEVELS; i++)
+	{
+		free(zlight_INVULN[i]);
+	}
+	free(zlight_INVULN);
+    }
+    
+
     scalelight = malloc(LIGHTLEVELS * sizeof(*scalelight));
     scalelightfixed = malloc(MAXLIGHTSCALE * sizeof(*scalelightfixed));
     zlight = malloc(LIGHTLEVELS * sizeof(*zlight));
+
+    scalelight_INVULN = malloc(LIGHTLEVELS * sizeof(*scalelight_INVULN));
+    zlight_INVULN = malloc(LIGHTLEVELS * sizeof(*zlight_INVULN));
 
     // Calculate the light levels to use
     //  for each level / distance combination.
@@ -650,6 +675,9 @@ void R_InitLightTables (void)
     {
 	scalelight[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
 	zlight[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
+
+    scalelight_INVULN[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight_INVULN));
+    zlight_INVULN[i] = malloc(MAXLIGHTZ * sizeof(**zlight_INVULN));
 
 	startmap = ((LIGHTLEVELS-LIGHTBRIGHT-i)*2)*NUMCOLORMAPS/LIGHTLEVELS;
 	for (j=0 ; j<MAXLIGHTZ ; j++)
@@ -665,6 +693,7 @@ void R_InitLightTables (void)
 		level = NUMCOLORMAPS-1;
 
 	    zlight[i][j] = colormaps + level*256;
+        zlight_INVULN[i][j] = invulmaps + level*256;
 	}
     }
     
@@ -865,6 +894,7 @@ void R_ExecuteSetViewSize (void)
 		level = NUMCOLORMAPS-1;
 
 	    scalelight[i][j] = colormaps + level*256;
+        scalelight_INVULN[i][j] = invulmaps + level*256;
 	}
     }
 

@@ -736,6 +736,9 @@ extern lighttable_t***	scalelight;
 extern lighttable_t**	scalelightfixed;
 extern lighttable_t***	zlight;
 
+extern lighttable_t***	scalelight_INVULN;
+extern lighttable_t***	zlight_INVULN;
+
 extern int           extralight;
 extern lighttable_t *invulcolormap;
 
