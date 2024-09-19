@@ -258,11 +258,13 @@ void P_DeathThink (player_t* player)
     P_MovePsprites (player);
 	
     // fall to the ground
-    if (player->viewheight > 6*FRACUNIT)
+    // [JN] Jaguar is using height of 8 pixels instead of PC's 6.
+    // Hhm, why? Probably for faster falling because of slower TICRATE?
+    if (player->viewheight > 8*FRACUNIT)
 	player->viewheight -= FRACUNIT;
 
-    if (player->viewheight < 6*FRACUNIT)
-	player->viewheight = 6*FRACUNIT;
+    if (player->viewheight < 8*FRACUNIT)
+	player->viewheight = 8*FRACUNIT;
 
     player->deltaviewheight = 0;
     onground = (player->mo->z <= player->mo->floorz);
