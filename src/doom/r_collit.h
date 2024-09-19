@@ -57,6 +57,7 @@ extern void R_GenerateColoredColormaps (const byte k, const float scale, const i
 // Initialization functions
 extern void R_InitColoredLightTables (void);
 extern void R_GenerateColoredSClights (const int width);
+extern void R_FreeColoredLights (void);
 
 // Coloring lookup tables
 extern lighttable_t **R_ColoredVisplanesColorize (const int light, const int color);

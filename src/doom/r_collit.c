@@ -62,7 +62,6 @@ static lighttable_t   *colormaps_666666;  // Special green (00FF00, overlay 33%)
 static lighttable_t   *colormaps_777777;  // Special red (FF0000, overlay 55%)
 
 // Visplane light tables
-static lighttable_t ***zlight_INVULN = NULL;
 static lighttable_t ***zlight_EEC06B = NULL;
 static lighttable_t ***zlight_D97C45 = NULL;
 static lighttable_t ***zlight_FF7F7F = NULL;
@@ -93,7 +92,6 @@ static lighttable_t ***zlight_666666 = NULL;
 static lighttable_t ***zlight_777777 = NULL;
 
 // Segment/sprite light tables
-static lighttable_t ***scalelight_INVULN = NULL;
 static lighttable_t ***scalelight_EEC06B = NULL;
 static lighttable_t ***scalelight_D97C45 = NULL;
 static lighttable_t ***scalelight_FF7F7F = NULL;
@@ -315,137 +313,12 @@ void R_InitColoredLightTables (void)
     const size_t zlight_size      = LIGHTLEVELS * sizeof(*zlight);
     const size_t zlight_size_max  = MAXLIGHTZ * sizeof(**zlight);
 
-    if (scalelight_EEC06B)
+    // [JN] Don't allocate/calculate anything if colored lighting is disabled.
+    if (!vis_colored_lighting)
     {
-        for (i = 0 ; i < LIGHTLEVELS ; i++)
-        {
-            free(scalelight_INVULN[i]);
-            free(scalelight_EEC06B[i]);
-            free(scalelight_D97C45[i]);
-            free(scalelight_FF7F7F[i]);
-            free(scalelight_55B828[i]);
-            free(scalelight_BBE357[i]);
-            free(scalelight_949DB9[i]);
-            free(scalelight_2B3BFF[i]);
-            free(scalelight_50ADAC[i]);
-            free(scalelight_CCE4A5[i]);
-            free(scalelight_CCEA5F[i]);
-            free(scalelight_B30202[i]);
-            free(scalelight_B87A15[i]);
-            free(scalelight_FFD000[i]);
-            free(scalelight_FFDE4C[i]);
-            free(scalelight_FFF588[i]);
-            free(scalelight_3089FF[i]);
-            free(scalelight_A88139[i]);
-            free(scalelight_7084C4[i]);
-            free(scalelight_D46D3D[i]);
-            free(scalelight_05A8A0[i]);
-            free(scalelight_FF3030[i]);
-            free(scalelight_6435B5[i]);
-            free(scalelight_FFAFAF[i]);
-            free(scalelight_ECB866[i]);
-            free(scalelight_C63F23[i]);
-            free(scalelight_9BC8CD[i]);
-            free(scalelight_666666[i]);
-            free(scalelight_777777[i]);
-        }
-        free(scalelight_INVULN);
-        free(scalelight_EEC06B);
-        free(scalelight_D97C45);
-        free(scalelight_FF7F7F);
-        free(scalelight_55B828);
-        free(scalelight_BBE357);
-        free(scalelight_949DB9);
-        free(scalelight_2B3BFF);
-        free(scalelight_50ADAC);
-        free(scalelight_CCE4A5);
-        free(scalelight_CCEA5F);
-        free(scalelight_B30202);
-        free(scalelight_B87A15);
-        free(scalelight_FFD000);
-        free(scalelight_FFDE4C);
-        free(scalelight_FFF588);
-        free(scalelight_3089FF);
-        free(scalelight_A88139);
-        free(scalelight_7084C4);
-        free(scalelight_D46D3D);
-        free(scalelight_05A8A0);
-        free(scalelight_FF3030);
-        free(scalelight_6435B5);
-        free(scalelight_FFAFAF);
-        free(scalelight_ECB866);
-        free(scalelight_C63F23);
-        free(scalelight_9BC8CD);
-        free(scalelight_666666);
-        free(scalelight_777777);
+        return;
     }
-
-    if (zlight_EEC06B)
-    {
-        for (i = 0; i < LIGHTLEVELS; i++)
-        {
-            free(zlight_INVULN[i]);
-            free(zlight_EEC06B[i]);
-            free(zlight_D97C45[i]);
-            free(zlight_FF7F7F[i]);
-            free(zlight_55B828[i]);
-            free(zlight_BBE357[i]);
-            free(zlight_949DB9[i]);
-            free(zlight_2B3BFF[i]);
-            free(zlight_50ADAC[i]);
-            free(zlight_CCE4A5[i]);
-            free(zlight_CCEA5F[i]);
-            free(zlight_B30202[i]);
-            free(zlight_B87A15[i]);
-            free(zlight_FFD000[i]);
-            free(zlight_FFDE4C[i]);
-            free(zlight_FFF588[i]);
-            free(zlight_3089FF[i]);
-            free(zlight_A88139[i]);
-            free(zlight_7084C4[i]);
-            free(zlight_D46D3D[i]);
-            free(zlight_05A8A0[i]);
-            free(zlight_FF3030[i]);
-            free(zlight_6435B5[i]);
-            free(zlight_FFAFAF[i]);
-            free(zlight_ECB866[i]);
-            free(zlight_C63F23[i]);
-            free(zlight_9BC8CD[i]);
-            free(zlight_666666[i]);
-            free(zlight_777777[i]);
-        }
-        free(zlight_INVULN);
-        free(zlight_EEC06B);
-        free(zlight_D97C45);
-        free(zlight_FF7F7F);
-        free(zlight_55B828);
-        free(zlight_BBE357);
-        free(zlight_949DB9);
-        free(zlight_2B3BFF);
-        free(zlight_50ADAC);
-        free(zlight_CCE4A5);
-        free(zlight_CCEA5F);
-        free(zlight_B30202);
-        free(zlight_B87A15);
-        free(zlight_FFD000);
-        free(zlight_FFDE4C);
-        free(zlight_FFF588);
-        free(zlight_3089FF);
-        free(zlight_A88139);
-        free(zlight_7084C4);
-        free(zlight_D46D3D);
-        free(zlight_05A8A0);
-        free(zlight_FF3030);
-        free(zlight_6435B5);
-        free(zlight_FFAFAF);
-        free(zlight_ECB866);
-        free(zlight_C63F23);
-        free(zlight_9BC8CD);
-        free(zlight_666666);
-        free(zlight_777777);
-    }
-    
-    scalelight_INVULN = malloc(sclight_size);
+  
     scalelight_EEC06B = malloc(sclight_size);
     scalelight_D97C45 = malloc(sclight_size);
     scalelight_FF7F7F = malloc(sclight_size);
@@ -475,7 +348,6 @@ void R_InitColoredLightTables (void)
     scalelight_666666 = malloc(sclight_size);
     scalelight_777777 = malloc(sclight_size);
 
-    zlight_INVULN = malloc(zlight_size);
     zlight_EEC06B = malloc(zlight_size);
     zlight_D97C45 = malloc(zlight_size);
     zlight_FF7F7F = malloc(zlight_size);
@@ -508,7 +380,6 @@ void R_InitColoredLightTables (void)
     // Calculate the light levels to use for each level / distance combination.
     for (i = 0 ; i < LIGHTLEVELS ; i++)
     {
-        scalelight_INVULN[i] = malloc(sclight_size_max);
         scalelight_EEC06B[i] = malloc(sclight_size_max);
         scalelight_D97C45[i] = malloc(sclight_size_max);
         scalelight_FF7F7F[i] = malloc(sclight_size_max);
@@ -538,7 +409,6 @@ void R_InitColoredLightTables (void)
         scalelight_666666[i] = malloc(sclight_size_max);
         scalelight_777777[i] = malloc(sclight_size_max);
 
-        zlight_INVULN[i] = malloc(zlight_size_max);
         zlight_EEC06B[i] = malloc(zlight_size_max);
         zlight_D97C45[i] = malloc(zlight_size_max);
         zlight_FF7F7F[i] = malloc(zlight_size_max);
@@ -575,7 +445,6 @@ void R_InitColoredLightTables (void)
             scale = (FixedDiv ((ORIGWIDTH / 2 * FRACUNIT), (j + 1) << LIGHTZSHIFT)) >> LIGHTSCALESHIFT;
             level = BETWEEN(0, NUMCOLORMAPS - 1, startmap - scale / DISTMAP) * 256;
 
-            zlight_INVULN[i][j] = invulmaps + level;
             zlight_EEC06B[i][j] = colormaps_EEC06B + level;
             zlight_D97C45[i][j] = colormaps_D97C45 + level;
             zlight_FF7F7F[i][j] = colormaps_FF7F7F + level;
@@ -613,6 +482,12 @@ void R_GenerateColoredSClights (const int width)
     int i, j;
     int level, startmap;
 
+    // [JN] Don't calculate anything if colored lighting is disabled.
+    if (!vis_colored_lighting)
+    {
+        return;
+    }
+
     // Calculate the light levels to use for each level / scale combination.
     for (i = 0 ; i < LIGHTLEVELS ; i++)
     {
@@ -622,7 +497,6 @@ void R_GenerateColoredSClights (const int width)
         {
             level = BETWEEN(0, NUMCOLORMAPS-1, startmap - j * NONWIDEWIDTH / (width << detailshift) / DISTMAP) * 256;
 
-            scalelight_INVULN[i][j] = invulmaps + level;
             scalelight_EEC06B[i][j] = colormaps_EEC06B + level;
             scalelight_D97C45[i][j] = colormaps_D97C45 + level;
             scalelight_FF7F7F[i][j] = colormaps_FF7F7F + level;
@@ -653,6 +527,142 @@ void R_GenerateColoredSClights (const int width)
             scalelight_777777[i][j] = colormaps_777777 + level;
         }
     }
+}
+
+void R_FreeColoredLights (void)
+{
+    int i;
+
+    // [JN] Fail-safe: do not try to free lighttables
+    // if at least the first one was not allocated.
+    if (scalelight_EEC06B)
+    {
+        for (i = 0 ; i < LIGHTLEVELS ; i++)
+        {
+            free(scalelight_EEC06B[i]);
+            free(scalelight_D97C45[i]);
+            free(scalelight_FF7F7F[i]);
+            free(scalelight_55B828[i]);
+            free(scalelight_BBE357[i]);
+            free(scalelight_949DB9[i]);
+            free(scalelight_2B3BFF[i]);
+            free(scalelight_50ADAC[i]);
+            free(scalelight_CCE4A5[i]);
+            free(scalelight_CCEA5F[i]);
+            free(scalelight_B30202[i]);
+            free(scalelight_B87A15[i]);
+            free(scalelight_FFD000[i]);
+            free(scalelight_FFDE4C[i]);
+            free(scalelight_FFF588[i]);
+            free(scalelight_3089FF[i]);
+            free(scalelight_A88139[i]);
+            free(scalelight_7084C4[i]);
+            free(scalelight_D46D3D[i]);
+            free(scalelight_05A8A0[i]);
+            free(scalelight_FF3030[i]);
+            free(scalelight_6435B5[i]);
+            free(scalelight_FFAFAF[i]);
+            free(scalelight_ECB866[i]);
+            free(scalelight_C63F23[i]);
+            free(scalelight_9BC8CD[i]);
+            free(scalelight_666666[i]);
+            free(scalelight_777777[i]);
+        }
+
+        free(scalelight_EEC06B);
+        free(scalelight_D97C45);
+        free(scalelight_FF7F7F);
+        free(scalelight_55B828);
+        free(scalelight_BBE357);
+        free(scalelight_949DB9);
+        free(scalelight_2B3BFF);
+        free(scalelight_50ADAC);
+        free(scalelight_CCE4A5);
+        free(scalelight_CCEA5F);
+        free(scalelight_B30202);
+        free(scalelight_B87A15);
+        free(scalelight_FFD000);
+        free(scalelight_FFDE4C);
+        free(scalelight_FFF588);
+        free(scalelight_3089FF);
+        free(scalelight_A88139);
+        free(scalelight_7084C4);
+        free(scalelight_D46D3D);
+        free(scalelight_05A8A0);
+        free(scalelight_FF3030);
+        free(scalelight_6435B5);
+        free(scalelight_FFAFAF);
+        free(scalelight_ECB866);
+        free(scalelight_C63F23);
+        free(scalelight_9BC8CD);
+        free(scalelight_666666);
+        free(scalelight_777777);
+
+        for (i = 0; i < LIGHTLEVELS; i++)
+        {
+            free(zlight_EEC06B[i]);
+            free(zlight_D97C45[i]);
+            free(zlight_FF7F7F[i]);
+            free(zlight_55B828[i]);
+            free(zlight_BBE357[i]);
+            free(zlight_949DB9[i]);
+            free(zlight_2B3BFF[i]);
+            free(zlight_50ADAC[i]);
+            free(zlight_CCE4A5[i]);
+            free(zlight_CCEA5F[i]);
+            free(zlight_B30202[i]);
+            free(zlight_B87A15[i]);
+            free(zlight_FFD000[i]);
+            free(zlight_FFDE4C[i]);
+            free(zlight_FFF588[i]);
+            free(zlight_3089FF[i]);
+            free(zlight_A88139[i]);
+            free(zlight_7084C4[i]);
+            free(zlight_D46D3D[i]);
+            free(zlight_05A8A0[i]);
+            free(zlight_FF3030[i]);
+            free(zlight_6435B5[i]);
+            free(zlight_FFAFAF[i]);
+            free(zlight_ECB866[i]);
+            free(zlight_C63F23[i]);
+            free(zlight_9BC8CD[i]);
+            free(zlight_666666[i]);
+            free(zlight_777777[i]);
+        }
+
+        free(zlight_EEC06B);
+        free(zlight_D97C45);
+        free(zlight_FF7F7F);
+        free(zlight_55B828);
+        free(zlight_BBE357);
+        free(zlight_949DB9);
+        free(zlight_2B3BFF);
+        free(zlight_50ADAC);
+        free(zlight_CCE4A5);
+        free(zlight_CCEA5F);
+        free(zlight_B30202);
+        free(zlight_B87A15);
+        free(zlight_FFD000);
+        free(zlight_FFDE4C);
+        free(zlight_FFF588);
+        free(zlight_3089FF);
+        free(zlight_A88139);
+        free(zlight_7084C4);
+        free(zlight_D46D3D);
+        free(zlight_05A8A0);
+        free(zlight_FF3030);
+        free(zlight_6435B5);
+        free(zlight_FFAFAF);
+        free(zlight_ECB866);
+        free(zlight_C63F23);
+        free(zlight_9BC8CD);
+        free(zlight_666666);
+        free(zlight_777777);
+
+        // [JN] Indicate that freed light tables
+        // can't be freed again until future reallocation.
+        scalelight_EEC06B = NULL;
+    }    
 }
 
 // =============================================================================
