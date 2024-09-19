@@ -1339,7 +1339,9 @@ void ST_Drawer (boolean force)
     ST_DrawWeaponNumberFunc(7, 269 + wide_x, 185, plyr->weaponowned[6]);
 
     // Current map
-    ST_DrawBigNumber(gamemap, 279 + wide_x, 174, NULL);
+    // [JN] CRY: center the number in the "Area" section,
+    // in the same way as in Jaguar Doom (x -= 6).
+    ST_DrawBigNumber(gamemap, (gamemap < 10 ? 272 : 278) + wide_x, 174, NULL);
     }
 }
 
