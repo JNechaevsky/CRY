@@ -3386,7 +3386,7 @@ static void M_ID_ApplyResetHook (void)
     vis_brightmaps = 0;
     vis_translucency = 0;
     vis_improved_fuzz = 0;
-    vis_colored_lighting = 0;
+    vis_colored_lighting = 0; R_FreeColoredLights();
     vis_colored_blood = 0;
     vis_swirling_liquids = 0;
     vis_animated_sky = 0; skysmoothdelta = 0;
