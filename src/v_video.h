@@ -33,6 +33,8 @@
 extern byte *dp_translation;
 extern boolean dp_translucent;
 
+extern pixel_t *palette_pointer;
+
 // Allocates buffer screens, call before R_Init.
 void V_Init (void);
 

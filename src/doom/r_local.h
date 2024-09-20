@@ -446,7 +446,6 @@ extern fixed_t *spritetopoffset;
 
 extern lighttable_t *colormaps;
 extern lighttable_t *invulmaps;
-extern lighttable_t *palette_pointer; // [JN] pointer to cry_color / pal_color
 
 extern int viewwidth;
 extern int scaledviewwidth;

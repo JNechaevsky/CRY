@@ -110,8 +110,6 @@ static SDL_Texture *palette_19 = NULL;
 
 static int pane_alpha;
 
-extern pixel_t* pal_color; // [crispy] evil hack to get FPS dots working as in Vanilla
-
 static boolean palette_to_set;
 
 // display has been set up?

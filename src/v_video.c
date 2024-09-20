@@ -50,7 +50,9 @@
 // [JN] Color translation.
 byte *dp_translation = NULL;
 boolean dp_translucent = false;
-extern pixel_t *palette_pointer;
+
+// [JN] pointer to cry_color / pal_color
+pixel_t *palette_pointer;
 
 // The screen buffer that the v_video.c code draws to.
 

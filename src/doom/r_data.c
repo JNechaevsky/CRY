@@ -163,7 +163,6 @@ lighttable_t	*colormaps;
 lighttable_t	*invulmaps;
 lighttable_t	*pal_color; // [crispy] array holding palette colors for true color mode
 lighttable_t	*cry_color; // [JN] array holding CRY patch drawing palette colors
-lighttable_t	*palette_pointer; // [JN] pointer to cry_color / pal_color
 
 // [FG] check if the lump can be a Doom patch
 // taken from PrBoom+ prboom2/src/r_patch.c:L350-L390
