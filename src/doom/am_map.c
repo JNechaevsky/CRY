@@ -1592,21 +1592,21 @@ static void AM_drawWalls (void)
 					// [JN] RED Key-locked doors
 					else
 					if (lines[i].special == 28  || lines[i].special == 33
-					||  lines[i].special == 134 || lines[i].special == 135)
+					||  lines[i].special == 100 || lines[i].special == 107)
 					{
 						AM_drawMline(&l, 176);
 					}
 					// [JN] BLUE Key-locked doors
 					else
 					if (lines[i].special == 26  || lines[i].special == 32
-					||  lines[i].special == 99  || lines[i].special == 133)
+					||  lines[i].special == 99  || lines[i].special == 106)
 					{
 						AM_drawMline(&l, 200);
 					}
 					// [JN] YELLOW Key-locked doors
 					else
 					if (lines[i].special == 27  || lines[i].special == 34
-					||  lines[i].special == 136 || lines[i].special == 137)
+					||  lines[i].special == 105 || lines[i].special == 108)
 					{
 						AM_drawMline(&l, 228);
 					}
