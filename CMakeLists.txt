@@ -8,11 +8,11 @@ set(top_srcdir ${CMAKE_CURRENT_SOURCE_DIR})
 set(top_builddir ${CMAKE_CURRENT_BINARY_DIR})
 
 # AC_INIT variables
-set(PACKAGE_VERSION "2.1")
+set(PACKAGE_VERSION_CRY "2.1")
 set(PACKAGE_NAME "${PROJECT_NAME}")
-set(PACKAGE_FULLNAME "CRY ${PACKAGE_VERSION}")
+set(PACKAGE_FULLNAME "CRY ${PACKAGE_VERSION_CRY}")
 set(PACKAGE_TARNAME "cry")
-set(PACKAGE_STRING "${PROJECT_NAME} ${PACKAGE_VERSION}")
+set(PACKAGE_STRING "${PROJECT_NAME} ${PACKAGE_VERSION_CRY}")
 
 set(PACKAGE_BUGREPORT "julia.nechaevskaya@live.com")
 
@@ -25,6 +25,14 @@ set(PACKAGE_LICENSE "GNU GPL (version 2)")
 if(MSVC)
     add_definitions("/D_CRT_SECURE_NO_WARNINGS" "/D_CRT_SECURE_NO_DEPRECATE"
                     "/D_CRT_NONSTDC_NO_DEPRECATE")
+# Disable several warnings for cl.exe.
+add_compile_options("/wd4013" # Function undefined; assuming extern returning int
+                    "/wd4018" # Signed/unsigned mismatch
+                    "/wd4146" # Unary minus operator applied to unsigned type, result still unsigned
+                    "/wd4244" # Conversion from 'type1' to 'type2', possible loss of data
+                    "/wd4267" # Conversion from 'size_t' to 'type', possible loss of data
+                    "/wd4305" # Truncation from 'type1' to 'type2'
+                    )
 else()
     add_compile_options("-Wall"
                         "-Wdeclaration-after-statement"
