@@ -594,6 +594,7 @@ static void M_ID_Widget_Coords (int choice);
 static void M_ID_Widget_Render (int choice);
 static void M_ID_Widget_Health (int choice);
 static void M_ID_Automap_Smooth (int choice);
+static void M_ID_Automap_Square (int choice);
 static void M_ID_Automap_Secrets (int choice);
 static void M_ID_Automap_Rotate (int choice);
 static void M_ID_Automap_Overlay (int choice);
@@ -2590,11 +2591,11 @@ static menuitem_t ID_Menu_Widgets[]=
     { M_LFRT, "TARGET'S HEALTH",       M_ID_Widget_Health,    't' },
     { M_SKIP, "", 0, '\0' },
     { M_LFRT, "SMOOTH LINES",          M_ID_Automap_Smooth,   's' },
+    { M_LFRT, "SQUARE ASPECT RATIO",   M_ID_Automap_Square,   's' },
     { M_LFRT, "MARK SECRET SECTORS",   M_ID_Automap_Secrets,  'm' },
     { M_LFRT, "ROTATE MODE",           M_ID_Automap_Rotate,   'r' },
     { M_LFRT, "OVERLAY MODE",          M_ID_Automap_Overlay,  'o' },
     { M_LFRT, "OVERLAY SHADING LEVEL", M_ID_Automap_Shading,  'o' },
-    { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
 };
 
@@ -2674,26 +2675,31 @@ static void M_Draw_ID_Widgets (void)
     M_WriteText (M_ItemRightAlign(str), 99, str,
                  M_Item_Glow(9, automap_smooth ? GLOW_GREEN : GLOW_DARKRED));
 
+    // Square aspect ratio
+    sprintf(str, automap_square ? "ON" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 108, str,
+                 M_Item_Glow(10, automap_square ? GLOW_GREEN : GLOW_DARKRED));
+
     // Mark secret sectors
     sprintf(str, automap_secrets == 1 ? "REVEALED" :
                  automap_secrets == 2 ? "ALWAYS" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 108, str,
-                 M_Item_Glow(10, automap_secrets ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 117, str,
+                 M_Item_Glow(11, automap_secrets ? GLOW_GREEN : GLOW_DARKRED));
 
     // Rotate mode
     sprintf(str, automap_rotate ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 117, str,
-                 M_Item_Glow(11, automap_rotate ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 126, str,
+                 M_Item_Glow(12, automap_rotate ? GLOW_GREEN : GLOW_DARKRED));
 
     // Overlay mode
     sprintf(str, automap_overlay ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 126, str,
-                 M_Item_Glow(12, automap_overlay ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 135, str,
+                 M_Item_Glow(13, automap_overlay ? GLOW_GREEN : GLOW_DARKRED));
 
     // Overlay shading level
     sprintf(str,"%d", automap_shading);
-    M_WriteText (M_ItemRightAlign(str), 135, str,
-                 M_Item_Glow(13, !automap_overlay ? GLOW_DARKRED :
+    M_WriteText (M_ItemRightAlign(str), 144, str,
+                 M_Item_Glow(14, !automap_overlay ? GLOW_DARKRED :
                                   automap_shading ==  0 ? GLOW_RED :
                                   automap_shading == 12 ? GLOW_YELLOW : GLOW_GREEN));
 }
@@ -2742,6 +2748,11 @@ static void M_ID_Automap_Smooth (int choice)
 {
     automap_smooth ^= 1;
     AM_SetdrawFline();
+}
+
+static void M_ID_Automap_Square (int choice)
+{
+    automap_square ^= 1;
 }
 
 static void M_ID_Automap_Rotate (int choice)
@@ -3373,6 +3384,7 @@ static void M_ID_ApplyResetHook (void)
     widget_health = 0;
     // Automap
     automap_smooth = 0;
+    automap_square = 0;
     automap_secrets = 0;
     automap_rotate = 0;
     automap_overlay = 0;

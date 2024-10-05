@@ -89,6 +89,7 @@ int widget_render = 0;
 int widget_health = 0;
 // Automap
 int automap_smooth = 0;
+int automap_square = 0;
 int automap_secrets = 0;
 int automap_rotate = 0;
 int automap_overlay = 0;
@@ -209,6 +210,7 @@ void ID_BindVariables (void)
     M_BindIntVariable("widget_health",                  &widget_health);
     // Automap
     M_BindIntVariable("automap_smooth",                 &automap_smooth);
+    M_BindIntVariable("automap_square",                 &automap_square);
     M_BindIntVariable("automap_secrets",                &automap_secrets);
     M_BindIntVariable("automap_rotate",                 &automap_rotate);
     M_BindIntVariable("automap_overlay",                &automap_overlay);
