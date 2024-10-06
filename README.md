@@ -6,9 +6,9 @@ The project is created by [Julia Nechaevskaya](mailto:julia.nechaevskaya@live.co
 
 ### Download
 
-**CRY 2.0 (released: September 14, 2024)**
-* Windows (64-bit): [cry-2.0-win-64.zip](https://github.com/JNechaevsky/CRY/releases/download/2.0/cry-2.0-win-64.zip)
-* Windows (32-bit): [cry-2.0-win-32.zip](https://github.com/JNechaevsky/CRY/releases/download/2.0/cry-2.0-win-32.zip)
+**CRY 2.1 (released: October 6, 2024)**
+* Windows (64-bit): [cry-2.1-win-64.zip](https://github.com/JNechaevsky/CRY/releases/download/2.1/cry-2.1-win-64.zip)
+* Windows (32-bit): [cry-2.1-win-32.zip](https://github.com/JNechaevsky/CRY/releases/download/2.1/cry-2.1-win-32.zip)
 
 ### Major features
 
