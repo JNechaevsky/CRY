@@ -1,4 +1,4 @@
-![](https://raw.githubusercontent.com/JNechaevsky/jnechaevsky.github.io/main/projects/cry/cry-logo-git.png)
+![](https://raw.githubusercontent.com/JNechaevsky/jnechaevsky.github.io/main/cry/cry-logo-dw.png)
 ### About
 CRY is a non-conservative recreation of Jaguar Doom for PC.
 
