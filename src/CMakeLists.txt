@@ -93,7 +93,7 @@ else()
 endif()
 
 target_include_directories("${PROGRAM_PREFIX}" PRIVATE ${GAME_INCLUDE_DIRS})
-target_link_libraries("${PROGRAM_PREFIX}" doom ${EXTRA_LIBS})
+target_link_libraries("${PROGRAM_PREFIX}" doom ${EXTRA_LIBS} m)
 
 if(MSVC)
     set_target_properties("${PROGRAM_PREFIX}" PROPERTIES
