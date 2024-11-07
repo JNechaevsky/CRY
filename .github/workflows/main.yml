@@ -53,5 +53,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: cry-dev-win64
-          path: build_vs_64/src/Release/*
+          path: build_vs_64/src/Release/*.exe
           retention-days: 90
