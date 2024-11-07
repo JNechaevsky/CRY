@@ -3,10 +3,10 @@ name: MSVC-Win64
 on:
   push:
     branches:
-      - trip
+      - main
   pull_request:
     branches:
-      - trip
+      - main
 
 jobs:
   build:
