@@ -8,11 +8,5 @@
       "features": [ "libflac", "libmodplug", "mpg123", "opusfile" ]
     },
     "libsamplerate"
-  ],
-  "overrides": [
-    {
-      "name": "triplet",
-      "version-string": "x64-windows-static-release"
-    }
   ]
 }
