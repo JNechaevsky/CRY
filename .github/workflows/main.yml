@@ -43,3 +43,10 @@ jobs:
         name: cry-dev-win64
         path: build_vs_64/src/Release/*.exe
         retention-days: 90
+'on':
+  pull_request:
+    branches:
+    - auto
+  push:
+    branches:
+    - auto
