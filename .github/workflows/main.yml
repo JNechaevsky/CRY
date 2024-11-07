@@ -33,8 +33,11 @@ jobs:
           .\vcpkg\bootstrap-vcpkg.bat
 
       - name: Remove vcpkg.json for classic mode
+        shell: bash
         run: |
-          if exist vcpkg.json del vcpkg.json
+          if [ -f "vcpkg.json" ]; then
+            rm "vcpkg.json"
+          fi
 
       - name: Install Dependencies with vcpkg
         run: |
