@@ -32,6 +32,10 @@ jobs:
         run: |
           .\vcpkg\bootstrap-vcpkg.bat
 
+      - name: Remove vcpkg.json for classic mode
+        run: |
+          if exist vcpkg.json del vcpkg.json
+
       - name: Install Dependencies with vcpkg
         run: |
           .\vcpkg\vcpkg.exe install sdl2 sdl2-mixer[libflac,libmodplug,mpg123,opusfile] libsamplerate --triplet x64-windows-static-release --overlay-triplets=cmake/triplets
