@@ -1,52 +1,56 @@
-name: MSVC-Win64
-true:
-  pull_request:
-    branches:
-    - auto
+
+name: Build Win64 Static
+
+on:
   push:
     branches:
-    - auto
+      - auto
+  pull_request:
+    branches:
+      - auto
+
 jobs:
   build:
     runs-on: windows-latest
     steps:
-    - name: Check out repository
-      uses: actions/checkout@v4
-    - name: Get latest VCPKG commit
-      run: "|\n  git clone https://github.com/microsoft/vcpkg.git\n  cd vcpkg\n  echo\
-        \ \"LATEST_COMMIT=$(git rev-parse HEAD)\" >> $GITHUB_ENV"
-    - name: Update builtin-baseline in vcpkg.json
-      run: "|\n  LATEST_COMMIT=$LATEST_COMMIT\n  jq --arg commit \"$LATEST_COMMIT\"\
-        \ '. + {\"builtin-baseline\": $commit}' vcpkg.json > temp.json && mv temp.json\
-        \ vcpkg.json"
-    - name: Install vcpkg
-      run: 'git clone https://github.com/microsoft/vcpkg.git
+      - name: Check out repository
+        uses: actions/checkout@v4
 
-        .\vcpkg\bootstrap-vcpkg.bat
+      - name: Get latest VCPKG commit
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          cd vcpkg
+          echo "LATEST_COMMIT=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
-        '
-    - name: Install Dependencies with vcpkg
-      run: '.\vcpkg\vcpkg.exe install --overlay-triplets=cmake/triplets --triplet=x64-windows-static-release
+      - name: Update builtin-baseline in vcpkg.json
+        run: |
+          LATEST_COMMIT=$LATEST_COMMIT
+          jq --arg commit "$LATEST_COMMIT" '. + {"builtin-baseline": $commit}' vcpkg.json > temp.json && mv temp.json vcpkg.json
 
-        '
-    - name: Configure CMake
-      run: "cmake -B build_vs_64 -S . -DCMAKE_BUILD_TYPE=Release `\n      -DENABLE_LTO=ON\
-        \ `\n      -DVCPKG_OVERLAY_TRIPLETS=\"cmake/triplets\" `\n      -DVCPKG_TARGET_TRIPLET=\"\
-        x64-windows-static-release\" `\n      -DCMAKE_POLICY_DEFAULT_CMP0091=NEW `\n\
-        \      -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded `\n      -DCMAKE_TOOLCHAIN_FILE=${{\
-        \ github.workspace }}\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake\n"
-    - name: Build
-      run: cmake --build build_vs_64 --config Release
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: cry-dev-win64
-        path: build_vs_64/src/Release/*.exe
-        retention-days: 90
-'on':
-  pull_request:
-    branches:
-    - auto
-  push:
-    branches:
-    - auto
+      - name: Install vcpkg
+        run: |
+          .\vcpkg\bootstrap-vcpkg.bat
+
+      - name: Install Dependencies with vcpkg
+        run: |
+          .\vcpkg\vcpkg.exe install --overlay-triplets=cmake/triplets --triplet=x64-windows-static-release
+
+      - name: Configure CMake
+        run: |
+          cmake -B build_vs_64 -S . -DCMAKE_BUILD_TYPE=Release `
+                -DENABLE_LTO=ON `
+                -DVCPKG_OVERLAY_TRIPLETS="cmake/triplets" `
+                -DVCPKG_TARGET_TRIPLET="x64-windows-static-release" `
+                -DCMAKE_POLICY_DEFAULT_CMP0091=NEW `
+                -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded `
+                -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake
+
+      - name: Build
+        run: cmake --build build_vs_64 --config Release
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: inter-doom-dev-win64.zip
+          path: build_vs_64/src/Release/*
+          retention-days: 90
