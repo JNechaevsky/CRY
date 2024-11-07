@@ -1,0 +1,45 @@
+name: MSVC-Win64
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          .\vcpkg\bootstrap-vcpkg.bat
+
+      - name: Install Dependencies with vcpkg
+        run: |
+          .\vcpkg\vcpkg.exe install --overlay-triplets=cmake/triplets --triplet=x64-windows-static-release
+
+      - name: Configure CMake
+        run: |
+          cmake -B build_vs_64 -S . -DCMAKE_BUILD_TYPE=Release `
+                -DENABLE_LTO=ON `
+                -DVCPKG_OVERLAY_TRIPLETS="cmake/triplets" `
+                -DVCPKG_TARGET_TRIPLET="x64-windows-static-release" `
+                -DCMAKE_POLICY_DEFAULT_CMP0091=NEW `
+                -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded `
+                -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake
+
+      - name: Build
+        run: cmake --build build_vs_64 --config Release
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cry-dev-win64
+          path: build_vs_64/src/Release/*.exe
+          retention-days: 90
