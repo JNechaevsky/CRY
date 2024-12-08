@@ -462,6 +462,7 @@ static void M_Choose_ID_Video (int choice);
 static void M_Draw_ID_Video (void);
 static void M_ID_RenderingRes (int choice);
 static void M_ID_Widescreen (int choice);
+static void M_ID_ExclusiveFS (int choice);
 
 static void M_ID_UncappedFPS (int choice);
 static void M_ID_LimitFPS (int choice);
@@ -1094,6 +1095,7 @@ static menuitem_t ID_Menu_Video[]=
 {
     { M_LFRT, "RENDERING RESOLUTION", M_ID_RenderingRes,  'r' },
     { M_LFRT, "WIDESCREEN MODE",      M_ID_Widescreen,    'w' },
+    { M_LFRT, "EXCLUSIVE FULLSCREEN", M_ID_ExclusiveFS,  'e' },
     { M_LFRT, "UNCAPPED FRAMERATE",   M_ID_UncappedFPS,   'u' },
     { M_LFRT, "FRAMERATE LIMIT",      M_ID_LimitFPS,      'f' },
     { M_LFRT, "ENABLE VSYNC",         M_ID_VSync,         'e' },
@@ -1104,7 +1106,7 @@ static menuitem_t ID_Menu_Video[]=
 
 static menu_t ID_Def_Video =
 {
-    8,
+    9,
     &ID_Def_Main,
     ID_Menu_Video,
     M_Draw_ID_Video,
@@ -1149,40 +1151,45 @@ static void M_Draw_ID_Video (void)
     M_WriteText (M_ItemRightAlign(str), 27, str, 
                  M_Item_Glow(1, vid_widescreen ? GLOW_GREEN : GLOW_DARKRED));
 
+    // Exclusive fullscreen
+    sprintf(str, vid_fullscreen_exclusive ? "ON" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 36, str, 
+                 M_Item_Glow(2, vid_fullscreen_exclusive ? GLOW_GREEN : GLOW_DARKRED));
+
     // Uncapped framerate
     sprintf(str, vid_uncapped_fps ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 36, str, 
-                 M_Item_Glow(2, vid_uncapped_fps ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 45, str, 
+                 M_Item_Glow(3, vid_uncapped_fps ? GLOW_GREEN : GLOW_DARKRED));
 
     // Framerate limit
     sprintf(str, !vid_uncapped_fps ? "35" :
                  vid_fpslimit ? "%d" : "NONE", vid_fpslimit);
-    M_WriteText (M_ItemRightAlign(str), 45, str, 
+    M_WriteText (M_ItemRightAlign(str), 54, str, 
                  !vid_uncapped_fps ? cr[CR_DARKRED] :
-                 M_Item_Glow(3, vid_fpslimit == 0 ? GLOW_RED :
+                 M_Item_Glow(4, vid_fpslimit == 0 ? GLOW_RED :
                                 vid_fpslimit >= 500 ? GLOW_YELLOW : GLOW_GREEN));
 
     // Enable vsync
     sprintf(str, vid_vsync ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 54, str, 
-                 M_Item_Glow(4, vid_vsync ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 63, str, 
+                 M_Item_Glow(5, vid_vsync ? GLOW_GREEN : GLOW_DARKRED));
 
     // Show FPS counter
     sprintf(str, vid_showfps ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 63, str, 
-                 M_Item_Glow(5, vid_showfps ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 72, str, 
+                 M_Item_Glow(6, vid_showfps ? GLOW_GREEN : GLOW_DARKRED));
 
     // Pixel scaling
     sprintf(str, vid_smooth_scaling ? "SMOOTH" : "SHARP");
-    M_WriteText (M_ItemRightAlign(str), 72, str, 
-                 M_Item_Glow(6, vid_smooth_scaling ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 81, str, 
+                 M_Item_Glow(7, vid_smooth_scaling ? GLOW_GREEN : GLOW_DARKRED));
 
     // Loading banner
     sprintf(str, vid_screenwipe == 1 ? "LOADING" :
                  vid_screenwipe == 2 ? "MELT" :
                  vid_screenwipe == 3 ? "CROSSFADE" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 81, str,
-                 M_Item_Glow(7, vid_screenwipe == 1 ? GLOW_DARKRED : GLOW_GREEN));
+    M_WriteText (M_ItemRightAlign(str), 90, str,
+                 M_Item_Glow(8, vid_screenwipe == 1 ? GLOW_DARKRED : GLOW_GREEN));
 
     // [JN] Print current resolution. Shamelessly taken from Nugget Doom!
     if (itemOn == 0 || itemOn == 1)
@@ -1245,6 +1252,22 @@ static void M_ID_Widescreen (int choice)
 {
     vid_widescreen = M_INT_Slider(vid_widescreen, 0, 5, choice, false);
     post_rendering_hook = M_ID_WidescreenHook;
+}
+
+static void M_ID_ExclusiveFSHook (void)
+{
+    vid_fullscreen_exclusive ^= 1;
+
+    // [JN] Force to update, if running in fullscreen mode.
+    if (vid_fullscreen)
+    {
+        I_UpdateExclusiveFullScreen();
+    }
+}
+
+static void M_ID_ExclusiveFS (int choice)
+{
+    post_rendering_hook = M_ID_ExclusiveFSHook;
 }
 
 static void M_ID_UncappedFPS (int choice)
@@ -2829,7 +2852,8 @@ static void M_Draw_ID_Gameplay_1 (void)
 
     // Fuzz effect
     sprintf(str, vis_improved_fuzz == 1 ? "FUZZ" :
-                 vis_improved_fuzz == 2 ? "TRANSLUCENT" : "OFF");
+                 vis_improved_fuzz == 2 ? "TRANSLUCENT" :
+                 vis_improved_fuzz == 3 ? "GRAYSCALE" : "OFF");
     M_WriteText (M_ItemRightAlign(str), 36, str,
                  M_Item_Glow(2, vis_improved_fuzz ? GLOW_GREEN : GLOW_DARKRED));
 
@@ -2919,7 +2943,7 @@ static void M_ID_Translucency (int choice)
 
 static void M_ID_ImprovedFuzz (int choice)
 {
-    vis_improved_fuzz = M_INT_Slider(vis_improved_fuzz, 0, 2, choice, false);
+    vis_improved_fuzz = M_INT_Slider(vis_improved_fuzz, 0, 3, choice, false);
 }
 
 static void M_ID_ColoredBlood (int choice)
@@ -3331,6 +3355,7 @@ static void M_ID_ApplyResetHook (void)
 
     vid_resolution = 1;
     vid_widescreen = 0;
+    vid_fullscreen_exclusive = 0;
     vid_uncapped_fps = 0;
     vid_fpslimit = 0;
     vid_vsync = 1;
@@ -3453,6 +3478,10 @@ static void M_ID_ApplyResetHook (void)
     if (automapactive)
     {
         AM_Start();
+    }
+    if (vid_fullscreen)
+    {
+        I_UpdateExclusiveFullScreen();
     }
     G_InitSkyTextures();
 

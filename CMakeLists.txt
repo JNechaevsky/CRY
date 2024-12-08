@@ -1,6 +1,6 @@
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.15)
 project("CRY" VERSION 2.1.0 LANGUAGES C)
 
 # Autotools variables
@@ -56,6 +56,12 @@ check_ipo_supported(RESULT HAVE_LTO)
 
 include(CMakeDependentOption) # Note: replace first ON to OFF to disable.
 cmake_dependent_option(ENABLE_LTO "Use link-time optimization" ON "HAVE_LTO" OFF)
+
+if(ENABLE_LTO)
+    message(STATUS "LTO is ENABLED")
+else()
+    message(STATUS "LTO is DISABLED")
+endif()
 
 # Enable ASan (AddressSanitizer).
 # Note: doesn't work with MinGW, use Clang64 if using MSYS enviroment.

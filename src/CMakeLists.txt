@@ -30,6 +30,7 @@ set(GAME_SOURCE_FILES
     i_sdlsound.c
     i_sound.c           i_sound.h
     i_timer.c           i_timer.h
+    i_truecolor.c       i_truecolor.h
     i_video.c           i_video.h
     midifile.c          midifile.h
     mus2mid.c           mus2mid.h
@@ -97,7 +98,7 @@ target_link_libraries("${PROGRAM_PREFIX}" doom ${EXTRA_LIBS} m)
 
 if(MSVC)
     set_target_properties("${PROGRAM_PREFIX}" PROPERTIES
-                          LINK_FLAGS "/MANIFEST:NO")
+                          LINK_FLAGS "/MANIFEST:NO /LTCG")
 endif()
 
 set_target_properties("${PROGRAM_PREFIX}" PROPERTIES

@@ -139,10 +139,10 @@ static inline pixel_t drawpatchpx01 (const pixel_t dest, const pixel_t source)
 {return palette_pointer[dp_translation[source]];}
 // (3) normal, translucent patch
 static inline pixel_t drawpatchpx10 (const pixel_t dest, const pixel_t source)
-{return I_BlendOverTranmap(dest, palette_pointer[source]);}
+{return I_BlendOver(dest, palette_pointer[source], 168);}
 // (4) color-translated, translucent patch
 static inline pixel_t drawpatchpx11 (const pixel_t dest, const pixel_t source)
-{return I_BlendOverTranmap(dest, palette_pointer[dp_translation[source]]);}
+{return I_BlendOver(dest, palette_pointer[dp_translation[source]], 168);}
 
 // [JN] The shadow of the patch rendering function:
 static inline pixel_t drawshadow_doom (const pixel_t dest, const pixel_t source)
@@ -554,10 +554,13 @@ void V_Init (void)
     if (NONWIDEWIDTH && SCREENHEIGHT)
     {
         dx = (NONWIDEWIDTH << FRACBITS) / ORIGWIDTH;
-        dxi = (ORIGWIDTH << FRACBITS) / NONWIDEWIDTH + 1;
+        dxi = (ORIGWIDTH << FRACBITS) / NONWIDEWIDTH + 1;  // [JN] +1 for multiple resolutions
         dy = (SCREENHEIGHT << FRACBITS) / ORIGHEIGHT;
-        dyi = (ORIGHEIGHT << FRACBITS) / SCREENHEIGHT + 1;
+        dyi = (ORIGHEIGHT << FRACBITS) / SCREENHEIGHT + 1; // [JN] +1 for multiple resolutions
     }
+    // no-op!
+    // There used to be separate screens that could be drawn to; these are
+    // now handled in the upper layers.
 }
 
 // Set the buffer that the code draws to.

@@ -156,6 +156,10 @@ static int vid_max_scaling_buffer_pixels = 16000000;
 
 int vid_fullscreen = true;
 
+// [JN] Exclusive full screen mode.
+
+int vid_fullscreen_exclusive = 0;
+
 // Aspect ratio correction mode
 
 int vid_aspect_ratio_correct = true;
@@ -351,6 +355,7 @@ static void AdjustWindowSize(void)
 static void HandleWindowEvent(SDL_WindowEvent *event)
 {
     int i;
+    int flags = 0;
 
     switch (event->event)
     {
@@ -388,11 +393,25 @@ static void HandleWindowEvent(SDL_WindowEvent *event)
 
         case SDL_WINDOWEVENT_FOCUS_GAINED:
             window_focused = true;
+            // [JN] Focus gained in exclusive fullscreen mode.
+            // Set SDL_WINDOW_FULLSCREEN flag to the window.
+            if (vid_fullscreen_exclusive && vid_fullscreen)
+            {
+                flags |= SDL_WINDOW_FULLSCREEN;
+                SDL_SetWindowFullscreen(screen, flags);
+            }
             volume_needs_update = true;
             break;
 
         case SDL_WINDOWEVENT_FOCUS_LOST:
             window_focused = false;
+            // [JN] Focus lost in exclusive fullscreen mode.
+            // Clear SDL_WINDOW_FULLSCREEN flag from the window.
+            if (vid_fullscreen_exclusive && vid_fullscreen)
+            {
+                flags &= ~SDL_WINDOW_FULLSCREEN;
+                SDL_SetWindowFullscreen(screen, flags);
+            }
             volume_needs_update = true;
             break;
 
@@ -453,19 +472,19 @@ static void I_ToggleFullScreen(void)
 {
     unsigned int flags = 0;
 
-    // TODO: Consider implementing vid_fullscreen toggle for SDL_WINDOW_FULLSCREEN
-    // (mode-changing) setup. This is hard because we have to shut down and
-    // restart again.
-    if (vid_fullscreen_width != 0 || vid_fullscreen_height != 0)
-    {
-        return;
-    }
-
     vid_fullscreen = !vid_fullscreen;
 
     if (vid_fullscreen)
     {
-        flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+        flags |= vid_fullscreen_exclusive ? SDL_WINDOW_FULLSCREEN :
+                                            SDL_WINDOW_FULLSCREEN_DESKTOP;
+    }
+
+    if (vid_fullscreen_exclusive)
+    {
+        SDL_DisplayMode mode;
+        SDL_GetCurrentDisplayMode(vid_video_display, &mode);
+        SDL_SetWindowSize(screen, mode.w, mode.h);
     }
 
     SDL_SetWindowFullscreen(screen, flags);
@@ -477,6 +496,23 @@ static void I_ToggleFullScreen(void)
         AdjustWindowSize();
         SDL_SetWindowSize(screen, vid_window_width, vid_window_height);
     }
+}
+
+void I_UpdateExclusiveFullScreen(void)
+{
+    unsigned int flags = 0;
+
+    flags |= vid_fullscreen_exclusive ? SDL_WINDOW_FULLSCREEN :
+                                        SDL_WINDOW_FULLSCREEN_DESKTOP;
+
+    if (vid_fullscreen_exclusive)
+    {
+        SDL_DisplayMode mode;
+        SDL_GetCurrentDisplayMode(vid_video_display, &mode);
+        SDL_SetWindowSize(screen, mode.w, mode.h);
+    }
+
+    SDL_SetWindowFullscreen(screen, flags);
 }
 
 void I_GetEvent(void)
@@ -1251,9 +1287,16 @@ static void SetVideoMode(void)
     // [JN] Choose render driver to use.
     SDL_SetHint(SDL_HINT_RENDER_DRIVER, vid_screen_scale_api);
 
+    // [JN] Ensure 'mode.w/h' is initialized before use.
+    if (SDL_GetCurrentDisplayMode(vid_video_display, &mode) != 0)
+    {
+        I_Error("Could not get display mode for video display #%d: %s",
+        vid_video_display, SDL_GetError());
+    }
+
     if (vid_fullscreen)
     {
-        if (vid_fullscreen_width == 0 && vid_fullscreen_height == 0)
+        if (!vid_fullscreen_exclusive)
         {
             // This window_flags means "Never change the screen resolution!
             // Instead, draw to the entire screen by scaling the texture
@@ -1262,8 +1305,10 @@ static void SetVideoMode(void)
         }
         else
         {
-            w = vid_fullscreen_width;
-            h = vid_fullscreen_height;
+            // [JN] Use native resolution for exclusive fullscreen mode. 
+            // Width (w) and height (h) are set from SDL.
+            w = mode.w;
+            h = mode.h;
             window_flags |= SDL_WINDOW_FULLSCREEN;
         }
     }
@@ -1309,12 +1354,6 @@ static void SetVideoMode(void)
     // intermediate texture into the upscaled texture.
     renderer_flags = SDL_RENDERER_TARGETTEXTURE;
 	
-    if (SDL_GetCurrentDisplayMode(vid_video_display, &mode) != 0)
-    {
-        I_Error("Could not get display mode for video display #%d: %s",
-        vid_video_display, SDL_GetError());
-    }
-
     // Turn on vsync if we aren't in a -timedemo
     if (mode.refresh_rate > 0)
     {
@@ -1854,6 +1893,7 @@ void I_BindVideoVariables(void)
     M_BindIntVariable("vid_startup_delay",             &vid_startup_delay);
     M_BindIntVariable("vid_resize_delay",              &vid_resize_delay);
     M_BindIntVariable("vid_fullscreen",                &vid_fullscreen);
+    M_BindIntVariable("vid_fullscreen_exclusive",      &vid_fullscreen_exclusive);
     M_BindIntVariable("vid_video_display",             &vid_video_display);
     M_BindIntVariable("vid_aspect_ratio_correct",      &vid_aspect_ratio_correct);
     M_BindIntVariable("vid_integer_scaling",           &vid_integer_scaling);
@@ -1872,103 +1912,7 @@ void I_BindVideoVariables(void)
     M_BindIntVariable("mouse_grab",                    &mouse_grab);
 }
 
-#define amask (0xFF000000U)
-#define rmask (0x00FF0000U)
-#define gmask (0x0000FF00U)
-#define bmask (0x000000FFU)
-
-pixel_t I_BlendAdd (const pixel_t bg, const pixel_t fg)
-{
-	uint32_t r, g, b;
-
-	if ((r = (fg & rmask) + (bg & rmask)) > rmask) r = rmask;
-	if ((g = (fg & gmask) + (bg & gmask)) > gmask) g = gmask;
-	if ((b = (fg & bmask) + (bg & bmask)) > bmask) b = bmask;
-
-	return amask | r | g | b;
-}
-
-// [crispy] http://stereopsis.com/doubleblend.html
-pixel_t I_BlendDark (const pixel_t bg, const int d)
-{
-	const uint32_t ag = (bg & 0xff00ff00) >> 8;
-	const uint32_t rb =  bg & 0x00ff00ff;
-
-	uint32_t sag = d * ag;
-	uint32_t srb = d * rb;
-
-	sag = sag & 0xff00ff00;
-	srb = (srb >> 8) & 0x00ff00ff;
-
-	return amask | sag | srb;
-}
-
-// [crispy] Main overlay blending function
-pixel_t I_BlendOver (const pixel_t bg, const pixel_t fg, const int amount)
-{
-	const uint32_t r = ((amount * (fg & rmask) + (0xff - amount) * (bg & rmask)) >> 8) & rmask;
-	const uint32_t g = ((amount * (fg & gmask) + (0xff - amount) * (bg & gmask)) >> 8) & gmask;
-	const uint32_t b = ((amount * (fg & bmask) + (0xff - amount) * (bg & bmask)) >> 8) & bmask;
-
-	return amask | r | g | b;
-}
-
-// [crispy] TRANMAP blending emulation, used for Doom
-pixel_t I_BlendOverTranmap (const pixel_t bg, const pixel_t fg)
-{
-	return I_BlendOver(bg, fg, 0xB8); // [JN] 184, increased from 168 (72% opacity)
-}
-
-pixel_t (*blendfunc) (const pixel_t fg, const pixel_t bg) = I_BlendOverTranmap;
-
 pixel_t I_MapRGB (const uint8_t r, const uint8_t g, const uint8_t b)
 {
-/*
-	return amask |
-	        (((r * rmask) >> 8) & rmask) |
-	        (((g * gmask) >> 8) & gmask) |
-	        (((b * bmask) >> 8) & bmask);
-*/
 	return SDL_MapRGB(argbbuffer->format, r, g, b);
 }
-
-pixel_t I_BlendFuzz (const pixel_t bg, const pixel_t fg)
-{
-	const uint32_t r = ((64 * (fg & rmask) + (0xff - 64) * (bg & rmask)) >> 8) & rmask;
-	const uint32_t g = ((64 * (fg & gmask) + (0xff - 64) * (bg & gmask)) >> 8) & gmask;
-	const uint32_t b = ((64 * (fg & bmask) + (0xff - 64) * (bg & bmask)) >> 8) & bmask;
-
-	return amask | r | g | b;
-}
-
-// [JN] Shade factor used for menu and automap background shading.
-const int I_ShadeFactor[] =
-{
-    240, 224, 208, 192, 176, 160, 144, 112, 96, 80, 64, 48, 32
-};
-
-// [JN] Saturation percent array.
-// 0.66 = 0% saturation, 0.0 = 100% saturation.
-const float I_SaturationPercent[100] =
-{
-    0.660000f, 0.653400f, 0.646800f, 0.640200f, 0.633600f,
-    0.627000f, 0.620400f, 0.613800f, 0.607200f, 0.600600f,
-    0.594000f, 0.587400f, 0.580800f, 0.574200f, 0.567600f,
-    0.561000f, 0.554400f, 0.547800f, 0.541200f, 0.534600f,
-    0.528000f, 0.521400f, 0.514800f, 0.508200f, 0.501600f,
-    0.495000f, 0.488400f, 0.481800f, 0.475200f, 0.468600f,
-    0.462000f, 0.455400f, 0.448800f, 0.442200f, 0.435600f,
-    0.429000f, 0.422400f, 0.415800f, 0.409200f, 0.402600f,
-    0.396000f, 0.389400f, 0.382800f, 0.376200f, 0.369600f,
-    0.363000f, 0.356400f, 0.349800f, 0.343200f, 0.336600f,
-    0.330000f, 0.323400f, 0.316800f, 0.310200f, 0.303600f,
-    0.297000f, 0.290400f, 0.283800f, 0.277200f, 0.270600f,
-    0.264000f, 0.257400f, 0.250800f, 0.244200f, 0.237600f,
-    0.231000f, 0.224400f, 0.217800f, 0.211200f, 0.204600f,
-    0.198000f, 0.191400f, 0.184800f, 0.178200f, 0.171600f,
-    0.165000f, 0.158400f, 0.151800f, 0.145200f, 0.138600f,
-    0.132000f, 0.125400f, 0.118800f, 0.112200f, 0.105600f,
-    0.099000f, 0.092400f, 0.085800f, 0.079200f, 0.072600f,
-    0.066000f, 0.059400f, 0.052800f, 0.046200f, 0.039600f,
-    0.033000f, 0.026400f, 0.019800f, 0.013200f, 0
-};

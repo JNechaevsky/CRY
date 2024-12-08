@@ -357,7 +357,7 @@ void ID_RightWidgets (void)
 
 // -----------------------------------------------------------------------------
 // ID_HealthColor, ID_DrawTargetsHealth
-//  [JN] Indicates and colorizes current target's health.
+//  [JN/PN] Indicates and colorizes current target's health.
 // -----------------------------------------------------------------------------
 
 static byte *ID_HealthColor (const int val1, const int val2)
@@ -372,40 +372,32 @@ void ID_DrawTargetsHealth (void)
 {
     char  str[16];
     const player_t *player = &players[displayplayer];
+    byte *color;
 
     if (player->targetsheathTics <= 0 || !player->targetsheath)
     {
         return;  // No tics or target is dead, nothing to display.
     }
 
-    sprintf(str, "%d/%d", player->targetsheath, player->targetsmaxheath);
+    snprintf(str, sizeof(str), "%d/%d", player->targetsheath, player->targetsmaxheath);
+    color = ID_HealthColor(player->targetsheath, player->targetsmaxheath);
 
-    if (widget_health == 1)  // Top
+    switch (widget_health)
     {
-        M_WriteTextCentered(18, str, ID_HealthColor(player->targetsheath,
-                                                    player->targetsmaxheath));
-    }
-    else
-    if (widget_health == 2)  // Top + name
-    {
-        M_WriteTextCentered(9, player->targetsname, ID_HealthColor(player->targetsheath,
-                                                                   player->targetsmaxheath));
-        M_WriteTextCentered(18, str, ID_HealthColor(player->targetsheath,
-                                                    player->targetsmaxheath));
-    }
-    else
-    if (widget_health == 3)  // Bottom
-    {
-        M_WriteTextCentered(152, str, ID_HealthColor(player->targetsheath,
-                                                     player->targetsmaxheath));
-    }
-    else
-    if (widget_health == 4)  // Bottom + name
-    {
-        M_WriteTextCentered(144, player->targetsname, ID_HealthColor(player->targetsheath,
-                                                                     player->targetsmaxheath));
-        M_WriteTextCentered(152, str, ID_HealthColor(player->targetsheath,
-                                                     player->targetsmaxheath));
+        case 1:  // Top
+            M_WriteTextCentered(18, str, color);
+            break;
+        case 2:  // Top + name
+            M_WriteTextCentered(9, player->targetsname, color);
+            M_WriteTextCentered(18, str, color);
+            break;
+        case 3:  // Bottom
+            M_WriteTextCentered(152, str, color);
+            break;
+        case 4:  // Bottom + name
+            M_WriteTextCentered(144, player->targetsname, color);
+            M_WriteTextCentered(152, str, color);
+            break;
     }
 }
 
@@ -497,19 +489,26 @@ static const byte xhair_dot[] =
 
 static patch_t *ID_CrosshairShape (void)
 {
-    return
-        xhair_draw == 1 ? (patch_t*) &xhair_cross1   :
-        xhair_draw == 2 ? (patch_t*) &xhair_cross2   :
-        xhair_draw == 3 ? (patch_t*) &xhair_x        :
-        xhair_draw == 4 ? (patch_t*) &xhair_circle   :
-        xhair_draw == 5 ? (patch_t*) &xhair_angle    :
-        xhair_draw == 6 ? (patch_t*) &xhair_triangle :
-                          (patch_t*) &xhair_dot;
+    // [PN] Array of crosshair shapes with explicit type casting
+    patch_t *crosshair_shapes[] = {
+        NULL,                        // xhair_draw == 0 (no crosshair)
+        (patch_t*) &xhair_cross1,    // xhair_draw == 1
+        (patch_t*) &xhair_cross2,    // xhair_draw == 2
+        (patch_t*) &xhair_x,         // xhair_draw == 3
+        (patch_t*) &xhair_circle,    // xhair_draw == 4
+        (patch_t*) &xhair_angle,     // xhair_draw == 5
+        (patch_t*) &xhair_triangle,  // xhair_draw == 6
+        (patch_t*) &xhair_dot,       // xhair_draw == 7
+    };
+
+    // [PN] Return the appropriate crosshair shape
+    return crosshair_shapes[xhair_draw];
 }
 
 // -----------------------------------------------------------------------------
 // ID_CrosshairColor
-//  [JN] Coloring routine, depending on "xhair_color" variable.
+//  [JN/PN] Determines crosshair color depending on "xhair_color" variable.
+//  Supports static, health-based, target highlight, and combined modes.
 // -----------------------------------------------------------------------------
 
 static byte *ID_CrosshairColor (int type)
@@ -519,41 +518,27 @@ static byte *ID_CrosshairColor (int type)
     switch (type)
     {
         case 0:
-        {
             // Static/uncolored.
-            return
-                cr[CR_RED];
-            break;
-        }
+            return cr[CR_RED];
+
         case 1:
-        {
-            // Health.
-            // Values are same to status bar coloring (ST_WidgetColor).
-            return
-                player->health >= 67 ? cr[CR_GREEN]  :
-                player->health >= 34 ? cr[CR_YELLOW] :
-                                       cr[CR_RED]    ;
-            break;
-        }
+            // Health-based coloring.
+            // Same logic as status bar coloring (ST_WidgetColor).
+            return player->health >= 67 ? cr[CR_GREEN]  :
+                   player->health >= 34 ? cr[CR_YELLOW] :
+                                          cr[CR_RED];
+
         case 2:
-        {
             // Target highlight.
-            // "linetarget" is gathered via intercept-safe call 
-            // of P_AimLineAttack in G_Ticker.
-            return
-                linetarget ? cr[CR_BLUE2] : cr[CR_RED];
-            break;
-        }
+            // "linetarget" is set by intercept-safe P_AimLineAttack in G_Ticker.
+            return linetarget ? cr[CR_BLUE2] : cr[CR_RED];
+
         case 3:
-        {
             // Target highlight+health.
-            return
-                linetarget           ? cr[CR_BLUE2]  :
-                player->health >= 67 ? cr[CR_GREEN]  :
-                player->health >= 34 ? cr[CR_YELLOW] :
-                                       cr[CR_RED]    ;
-            break;
-        }
+            return linetarget           ? cr[CR_BLUE2]  :
+                   player->health >= 67 ? cr[CR_GREEN]  :
+                   player->health >= 34 ? cr[CR_YELLOW] :
+                                          cr[CR_RED];
     }
 
     return NULL;
@@ -627,35 +612,32 @@ void CRL_ReportPosition (fixed_t x, fixed_t y, fixed_t z, angle_t angle)
 
 void CRL_ImpulseCamera (fixed_t fwm, fixed_t swm, angle_t at)
 {
+    // [JN/PN] Precalculate values:
+    const fixed_t fwm_val = fwm * 32768;
+    const fixed_t swm_val = swm * 32768;
+
     // Rotate camera first
     CRL_camera_ang += at << FRACBITS;
 
     // Forward movement
     at = CRL_camera_ang >> ANGLETOFINESHIFT;
-    CRL_camera_x += FixedMul(fwm * 32768, finecosine[at]); 
-    CRL_camera_y += FixedMul(fwm * 32768, finesine[at]);
+    CRL_camera_x += FixedMul(fwm_val, finecosine[at]); 
+    CRL_camera_y += FixedMul(fwm_val, finesine[at]);
 
     // Sideways movement
     at = (CRL_camera_ang - ANG90) >> ANGLETOFINESHIFT;
-    CRL_camera_x += FixedMul(swm * 32768, finecosine[at]); 
-    CRL_camera_y += FixedMul(swm * 32768, finesine[at]);
+    CRL_camera_x += FixedMul(swm_val, finecosine[at]); 
+    CRL_camera_y += FixedMul(swm_val, finesine[at]);
 }
 
 // -----------------------------------------------------------------------------
 // CRL_ImpulseCameraVert
-//  [JN] Impulses the camera up/down.
+//  [JN/PN] Impulses the camera up/down.
 //  @param direction: true = up, false = down.
 //  @param intensity: 32 of 64 map unit, depending on player run mode.
 // -----------------------------------------------------------------------------
 
 void CRL_ImpulseCameraVert (boolean direction, fixed_t intensity)
 {
-    if (direction)
-    {
-        CRL_camera_z += FRACUNIT*intensity;
-    }
-    else
-    {
-        CRL_camera_z -= FRACUNIT*intensity;
-    }
+    CRL_camera_z += (direction ? 1 : -1) * FRACUNIT * intensity;
 }

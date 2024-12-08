@@ -363,9 +363,11 @@ typedef struct vissprite_s
     int         mobjflags;
     // [crispy] color translation table for blood colored by monster class
     byte         *translation;
-
-    pixel_t	    (*blendfunc)(const pixel_t fg, const pixel_t bg);
-
+    // [JN] Indicate if vissprite's frame is bright for choosing 
+    // blending option of colfunc:
+    // - tlcolfunc for overlay (unlit) blending.
+    // - tladdcolfunc for additive (lit) blending.
+    int         brightframe;
 } vissprite_t;
 
 //	
@@ -583,12 +585,16 @@ extern void R_DrawColumn (void);
 extern void R_DrawColumnLow (void);
 extern void R_DrawFuzzColumn (void);
 extern void R_DrawFuzzColumnLow (void);
+extern void R_DrawFuzzTLColumn (void);
+extern void R_DrawFuzzTLColumnLow (void);
+extern void R_DrawFuzzBWColumn (void);
+extern void R_DrawFuzzBWColumnLow (void);
 extern void R_DrawSpan (void);
 extern void R_DrawSpanLow (void);
 extern void R_DrawTLColumn (void);
 extern void R_DrawTLColumnLow (void);
-extern void R_DrawTLFuzzColumn (void);
-extern void R_DrawTLFuzzColumnLow (void);
+extern void R_DrawTLAddColumn (void);
+extern void R_DrawTLAddColumnLow (void);
 extern void R_DrawTranslatedColumn (void);
 extern void R_DrawTranslatedColumnLow (void);
 extern void R_DrawTransTLFuzzColumn (void);
@@ -600,7 +606,6 @@ extern void R_InitBuffer (int width, int height);
 extern void R_InitTranslationTables (void);
 extern void R_SetFuzzPosDraw (void);
 extern void R_SetFuzzPosTic (void);
-extern void R_VideoErase (unsigned ofs, int count);
 
 extern byte *dc_source, *dc_source2;
 extern byte *ds_source;		
@@ -644,7 +649,7 @@ extern angle_t R_PointToAngle2 (fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2);
 extern angle_t R_PointToAngleCrispy (fixed_t x, fixed_t y);
 extern fixed_t R_PointToDist (fixed_t x, fixed_t y);
 extern fixed_t R_ScaleFromGlobalAngle (angle_t visangle);
-extern int     R_PointOnSegSide (fixed_t x, fixed_t y, seg_t *line);
+extern int     R_PointOnSegSide (fixed_t x, fixed_t y, const seg_t *line);
 extern int     R_PointOnSide (fixed_t x, fixed_t y, const node_t *node);
 extern subsector_t *R_PointInSubsector (fixed_t x, fixed_t y);
 extern void    R_AddPointToBox (int x, int y, fixed_t *box);
@@ -685,9 +690,11 @@ inline static angle_t LerpAngle(angle_t oangle, angle_t nangle)
 extern void (*colfunc) (void);
 extern void (*basecolfunc) (void);
 extern void (*fuzzcolfunc) (void);
+extern void (*fuzztlcolfunc) (void);
+extern void (*fuzzbwcolfunc) (void);
 extern void (*transcolfunc) (void);
 extern void (*tlcolfunc) (void);
-extern void (*tlfuzzcolfunc) (void);
+extern void (*tladdcolfunc) (void);
 extern void (*transtlfuzzcolfunc) (void);
 extern void (*spanfunc) (void);
 
@@ -811,7 +818,7 @@ extern int skysmoothdelta;
 // -----------------------------------------------------------------------------
 
 extern void  R_InitDistortedFlats (void);
-extern char *R_DistortedFlat (int flatnum);
+extern byte *R_DistortedFlat (int flatnum);
 
 // -----------------------------------------------------------------------------
 // R_THINGS

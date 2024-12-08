@@ -1255,6 +1255,8 @@ void R_InitData (void)
     printf (".");    
     R_InitHSVColors ();
     printf (".");    
+    I_InitTCTransMaps ();
+    printf (".");
 }
 
 

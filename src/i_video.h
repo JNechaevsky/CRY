@@ -22,6 +22,7 @@
 #define __I_VIDEO__
 
 #include "doomtype.h"
+#include "i_truecolor.h"
 #include "m_fixed.h"
 
 
@@ -44,6 +45,7 @@ extern int WIDESCREENDELTA; // [crispy] horizontal widescreen offset
 extern void (*post_rendering_hook) (void); // [crispy]
 void I_GetScreenDimensions (void); // [crispy] re-calculate WIDESCREENDELTA
 extern void I_ToggleVsync (void);
+extern void I_UpdateExclusiveFullScreen(void);
 
 enum
 {
@@ -92,8 +94,6 @@ void I_RenderReadPixels (byte **data, int *w, int *h);
 // Takes full 8 bit values.
 void I_SetPalette (int palette);
 extern pixel_t I_MapRGB (const uint8_t r, const uint8_t g, const uint8_t b);
-extern const int I_ShadeFactor[];
-extern const float I_SaturationPercent[];
 
 void I_FinishUpdate (void);
 
@@ -132,6 +132,7 @@ extern int yel_pane_alpha;
 extern int screen_width;
 extern int screen_height;
 extern int vid_fullscreen;
+extern int vid_fullscreen_exclusive;
 extern int vid_aspect_ratio_correct;
 extern int vid_smooth_scaling;
 extern int vid_integer_scaling;

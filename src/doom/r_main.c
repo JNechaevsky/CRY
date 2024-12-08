@@ -115,9 +115,11 @@ int    max_project_slope = 4;  // [Woof!]
 void (*colfunc) (void);
 void (*basecolfunc) (void);
 void (*fuzzcolfunc) (void);
+void (*fuzztlcolfunc) (void);
+void (*fuzzbwcolfunc) (void);
 void (*transcolfunc) (void);
 void (*tlcolfunc) (void);
-void (*tlfuzzcolfunc) (void);
+void (*tladdcolfunc) (void);
 void (*transtlfuzzcolfunc) (void);
 void (*spanfunc) (void);
 
@@ -177,67 +179,35 @@ int R_PointOnSide (fixed_t x, fixed_t y, const node_t *node)
     return FixedMul(y, node->dx>>FRACBITS) >= FixedMul(node->dy>>FRACBITS, x);		
 }
 
+// -----------------------------------------------------------------------------
+// R_PointOnSegSide
+// [PN] killough 5/2/98: reformatted
+// -----------------------------------------------------------------------------
 
-int
-R_PointOnSegSide
-( fixed_t	x,
-  fixed_t	y,
-  seg_t*	line )
+int R_PointOnSegSide (fixed_t x, fixed_t y, const seg_t *line)
 {
-    fixed_t	lx;
-    fixed_t	ly;
-    fixed_t	ldx;
-    fixed_t	ldy;
-    fixed_t	dx;
-    fixed_t	dy;
-    fixed_t	left;
-    fixed_t	right;
-	
-    lx = line->v1->x;
-    ly = line->v1->y;
-	
-    ldx = line->v2->x - lx;
-    ldy = line->v2->y - ly;
-	
+    const fixed_t lx = line->v1->x;
+    const fixed_t ly = line->v1->y;
+    const fixed_t ldx = line->v2->x - lx;
+    const fixed_t ldy = line->v2->y - ly;
+    
     if (!ldx)
     {
-	if (x <= lx)
-	    return ldy > 0;
-	
-	return ldy < 0;
-    }
-    if (!ldy)
-    {
-	if (y <= ly)
-	    return ldx < 0;
-	
-	return ldx > 0;
-    }
-	
-    dx = (x - lx);
-    dy = (y - ly);
-	
-    // Try to quickly decide by looking at sign bits.
-    if ( (ldy ^ ldx ^ dx ^ dy)&0x80000000 )
-    {
-	if  ( (ldy ^ dx) & 0x80000000 )
-	{
-	    // (left is negative)
-	    return 1;
-	}
-	return 0;
+        return x <= lx ? ldy > 0 : ldy < 0;
     }
 
-    left = FixedMul ( ldy>>FRACBITS , dx );
-    right = FixedMul ( dy , ldx>>FRACBITS );
-	
-    if (right < left)
+    if (!ldy)
     {
-	// front side
-	return 0;
+        return y <= ly ? ldx < 0 : ldx > 0;
     }
-    // back side
-    return 1;			
+
+    x -= lx;
+    y -= ly;
+
+    // Try to quickly decide by looking at sign bits.
+    if ((ldy ^ ldx ^ x ^ y) < 0)
+        return (ldy ^ x) < 0; // (left is negative)
+            return FixedMul(y, ldx>>FRACBITS) >= FixedMul(ldy>>FRACBITS, x);
 }
 
 
@@ -610,7 +580,6 @@ void R_InitTextureMapping (void)
 // Only inits the zlight table,
 //  because the scalelight table changes with view size.
 //
-#define DISTMAP		2
 
 void R_InitLightTables (void)
 {
@@ -619,6 +588,8 @@ void R_InitLightTables (void)
     int		level;
     int		startmap; 	
     int		scale;
+    // [PN] Pre-calculate for slight optimization
+    const int fracwidth = (ORIGWIDTH / 2 * FRACUNIT);
     
     if (scalelight)
     {
@@ -677,19 +648,17 @@ void R_InitLightTables (void)
 	scalelight_INVULN[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight_INVULN));
 	zlight_INVULN[i] = malloc(MAXLIGHTZ * sizeof(**zlight_INVULN));
 
-	startmap = ((LIGHTLEVELS-LIGHTBRIGHT-i)*2)*NUMCOLORMAPS/LIGHTLEVELS;
+	// [PN] Use bit shifting for faster handling
+	startmap = ((LIGHTLEVELS - LIGHTBRIGHT - i) << 1) * NUMCOLORMAPS / LIGHTLEVELS;
 	for (j=0 ; j<MAXLIGHTZ ; j++)
 	{
-	    scale = FixedDiv ((ORIGWIDTH/2*FRACUNIT), (j+1)<<LIGHTZSHIFT);
-	    scale >>= LIGHTSCALESHIFT;
-	    level = startmap - scale/DISTMAP;
+	    // [PN] Use precalculated fracwidth value
+	    scale = (FixedDiv(fracwidth, (j + 1) << LIGHTZSHIFT)) >> LIGHTSCALESHIFT;
+	    // [PN] Use bit shifting for faster handling
+	    level = startmap - (scale >> 1);
+	    // [PN] Clamp light level values
+	    level = BETWEEN(0, NUMCOLORMAPS - 1, level);
 	    
-	    if (level < 0)
-		level = 0;
-
-	    if (level >= NUMCOLORMAPS)
-		level = NUMCOLORMAPS-1;
-
 	    zlight[i][j] = colormaps + level*256;
 	    zlight_INVULN[i][j] = invulmaps + level*256;
 	}
@@ -789,11 +758,11 @@ void R_ExecuteSetViewSize (void)
     // [JN] Enforce LOW detail for 1x resolution to represent vanilla render.
     if (vid_resolution == 1)
     {
-    detailshift = 1;
+        detailshift = 1;
     }
     else
     {
-    detailshift = setdetail;        
+        detailshift = setdetail;
     }
     viewwidth = scaledviewwidth>>detailshift;
     viewwidth_nonwide = scaledviewwidth_nonwide>>detailshift;
@@ -824,9 +793,11 @@ void R_ExecuteSetViewSize (void)
     {
 	colfunc = basecolfunc = R_DrawColumn;
 	fuzzcolfunc = R_DrawFuzzColumn;
+	fuzztlcolfunc = R_DrawFuzzTLColumn;
+	fuzzbwcolfunc = R_DrawFuzzBWColumn;
 	transcolfunc = R_DrawTranslatedColumn;
 	tlcolfunc = R_DrawTLColumn;
-	tlfuzzcolfunc = R_DrawTLFuzzColumn;
+	tladdcolfunc = R_DrawTLAddColumn;
 	transtlfuzzcolfunc = R_DrawTransTLFuzzColumn;
 	spanfunc = R_DrawSpan;
     }
@@ -834,9 +805,11 @@ void R_ExecuteSetViewSize (void)
     {
 	colfunc = basecolfunc = R_DrawColumnLow;
 	fuzzcolfunc = R_DrawFuzzColumnLow;
+	fuzztlcolfunc = R_DrawFuzzTLColumnLow;
+	fuzzbwcolfunc = R_DrawFuzzBWColumnLow;
 	transcolfunc = R_DrawTranslatedColumnLow;
 	tlcolfunc = R_DrawTLColumnLow;
-	tlfuzzcolfunc = R_DrawTLFuzzColumnLow;
+	tladdcolfunc = R_DrawTLAddColumnLow;
 	transtlfuzzcolfunc = R_DrawTransTLFuzzColumnLow;
 	spanfunc = R_DrawSpanLow;
     }
@@ -880,16 +853,14 @@ void R_ExecuteSetViewSize (void)
     for (i=0 ; i< LIGHTLEVELS ; i++)
     {
 
-	startmap = ((LIGHTLEVELS-LIGHTBRIGHT-i)*2)*NUMCOLORMAPS/LIGHTLEVELS;
+	// [PN] Use bit shifting for faster handling
+	startmap = ((LIGHTLEVELS - LIGHTBRIGHT - i) << 1) * NUMCOLORMAPS / LIGHTLEVELS;
 	for (j=0 ; j<MAXLIGHTSCALE ; j++)
 	{
-	    level = startmap - j*NONWIDEWIDTH/(viewwidth_nonwide<<detailshift)/DISTMAP;
-	    
-	    if (level < 0)
-		level = 0;
-
-	    if (level >= NUMCOLORMAPS)
-		level = NUMCOLORMAPS-1;
+	    // [PN] Use bit shifting for faster handling
+	    level = startmap - ((j * NONWIDEWIDTH / (viewwidth_nonwide << detailshift)) >> 1);
+	    // [PN] Clamp light level values
+	    level = BETWEEN(0, NUMCOLORMAPS - 1, level);
 
 	    scalelight[i][j] = colormaps + level*256;
 	    scalelight_INVULN[i][j] = invulmaps + level*256;
