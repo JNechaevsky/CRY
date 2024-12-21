@@ -121,6 +121,13 @@ static boolean initialized = false;
 static boolean nomouse = false;
 int usemouse = 1;
 
+// [JN/PN] Mouse coordinates for menu control.
+// Used by in-game menu
+int menu_mouse_x, menu_mouse_y;
+// Used by SDL cursor for position saving and resoring
+static int menu_mouse_x_sdl, menu_mouse_y_sdl;
+boolean menu_mouse_allow;
+
 // SDL video driver name
 
 char *vid_video_driver = "";
@@ -254,12 +261,6 @@ static boolean MouseShouldBeGrabbed(void)
 
     if (!window_focused)
         return false;
-
-    // always grab the mouse when full screen (dont want to 
-    // see the mouse pointer)
-
-    if (vid_fullscreen)
-        return true;
 
     // Don't grab the mouse if mouse input is disabled
 
@@ -537,6 +538,17 @@ void I_GetEvent(void)
 		I_HandleKeyboardEvent(&sdlevent);
                 break;
 
+            case SDL_MOUSEMOTION:
+                if (menu_mouse_allow && window_focused)
+                {
+                    // [PN] Get mouse coordinates for menu control
+                    menu_mouse_x = sdlevent.motion.x;
+                    menu_mouse_y = (int)(sdlevent.motion.y / 1.2); // Aspect ratio correction
+                    // [JN] Get mouse coordinates for SDL control
+                    SDL_GetMouseState(&menu_mouse_x_sdl, &menu_mouse_y_sdl);
+                }
+                break;
+
             case SDL_MOUSEBUTTONDOWN:
             case SDL_MOUSEBUTTONUP:
             case SDL_MOUSEWHEEL:
@@ -570,6 +582,18 @@ void I_GetEvent(void)
                 break;
         }
     }
+}
+
+// [JN] Reinitialize mouse cursor position on changing rendering resoluton
+void I_ReInitCursorPosition (void)
+{
+    SDL_Event sdlevent;
+    SDL_PollEvent(&sdlevent);
+    // [PN] Get mouse coordinates for menu control
+    menu_mouse_x = sdlevent.motion.x;
+    menu_mouse_y = (int)(sdlevent.motion.y / 1.2); // Aspect ratio correction
+    // [JN] Get mouse coordinates for SDL control
+    SDL_GetMouseState(&menu_mouse_x_sdl, &menu_mouse_y_sdl);
 }
 
 //
@@ -627,18 +651,11 @@ static void UpdateGrab(void)
     }
     else if (!grab && currently_grabbed)
     {
-        int screen_w, screen_h;
-
         SetShowCursor(true);
 
-        // When releasing the mouse from grab, warp the mouse cursor to
-        // the bottom-right of the screen. This is a minimally distracting
-        // place for it to appear - we may only have released the grab
-        // because we're at an end of level intermission screen, for
-        // example.
+        // [JN] Restore cursor position.
+        SDL_WarpMouseInWindow(screen, menu_mouse_x_sdl, menu_mouse_y_sdl);
 
-        SDL_GetWindowSize(screen, &screen_w, &screen_h);
-        SDL_WarpMouseInWindow(screen, screen_w - 16, screen_h - 16);
         SDL_GetRelativeMouseState(NULL, NULL);
     }
 
@@ -1551,6 +1568,14 @@ static void SetVideoMode(void)
     // Initially create the upscaled texture for rendering to screen
 
     CreateUpscaledTexture(true);
+
+    // [JN] Set the initial position of the mouse cursor.
+    {
+        int screen_w, screen_h;
+        SDL_GetWindowSize(screen, &screen_w, &screen_h);
+        menu_mouse_x_sdl = (int)(screen_w / 1.3);
+        menu_mouse_y_sdl = (int)(screen_h / 1.3);
+    }
 }
 
 // [crispy] re-calculate SCREENWIDTH, SCREENHEIGHT, NONWIDEWIDTH and WIDESCREENDELTA
