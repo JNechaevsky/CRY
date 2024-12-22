@@ -81,6 +81,7 @@ int mouse_look = 0;
 int widget_enable = 1;
 int widget_location = 0;
 int widget_kis = 0;
+int widget_kis_format = 0;
 int widget_time = 0;
 int widget_totaltime = 0;
 int widget_levelname = 0;
@@ -202,6 +203,7 @@ void ID_BindVariables (void)
     M_BindIntVariable("widget_enable",                  &widget_enable);
     M_BindIntVariable("widget_location",                &widget_location);
     M_BindIntVariable("widget_kis",                     &widget_kis);
+    M_BindIntVariable("widget_kis_format",              &widget_kis_format);
     M_BindIntVariable("widget_time",                    &widget_time);
     M_BindIntVariable("widget_totaltime",               &widget_totaltime);
     M_BindIntVariable("widget_levelname",               &widget_levelname);

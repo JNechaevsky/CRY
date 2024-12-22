@@ -82,6 +82,68 @@ static byte *ID_WidgetColor (const int i)
     return NULL;
 }
 
+// [JN/PN] Enum for widget type values.
+enum
+{
+    widget_kis_kills,
+    widget_kis_items,
+    widget_kis_secrets,
+} widget_kis_count_t;
+
+// [PN] Function for safe division to prevent division by zero.
+// Returns the percentage or 0 if the total is zero.
+static int safe_percent (int value, int total)
+{
+    return (total == 0) ? 0 : (value * 100) / total;
+}
+
+// [PN/JN] Main function to format KIS counts based on format and widget type.
+static void ID_WidgetKISCount (char *buffer, size_t buffer_size, const int i)
+{
+    int value = 0, total = 0;
+    
+    // [PN] Set values for kills, items, or secrets based on widget type
+    switch (i)
+    {
+        case widget_kis_kills:
+            value = IDWidget.kills;
+            total = IDWidget.totalkills;
+            break;
+        
+        case widget_kis_items:
+            value = IDWidget.items;
+            total = IDWidget.totalitems;
+            break;
+        
+        case widget_kis_secrets:
+            value = IDWidget.secrets;
+            total = IDWidget.totalsecrets;
+            break;
+        
+        default:
+            // [PN] Default case for unsupported widget type
+            snprintf(buffer, buffer_size, "N/A");
+            return;
+    }
+
+    // [PN] Format based on widget_kis_format
+    switch (widget_kis_format)
+    {
+        case 1: // Remaining
+            snprintf(buffer, buffer_size, "%d ", total - value);
+            break;
+
+        case 2: // Percent
+            snprintf(buffer, buffer_size, "%d%% ", 
+                     safe_percent(value, total));
+            break;
+
+        default: // Ratio
+            snprintf(buffer, buffer_size, "%d/%d ", value, total);
+            break;
+    }
+}
+
 // -----------------------------------------------------------------------------
 // ID_LeftWidgets.
 //  [JN] Draw all the widgets and counters.
@@ -104,17 +166,17 @@ void ID_LeftWidgets (void)
 
             // Kills:
             M_WriteText(0 - WIDESCREENDELTA, 9, "K:", cr[CR_GRAY]);
-            sprintf(str1, "%d/%d ", IDWidget.kills, IDWidget.totalkills);
+            ID_WidgetKISCount(str1, sizeof(str1), widget_kis_kills);
             M_WriteText(0 - WIDESCREENDELTA + 16, 9, str1, ID_WidgetColor(widget_kills));
 
             // Items:
             M_WriteText(0 - WIDESCREENDELTA, 18, "I:", cr[CR_GRAY]);
-            sprintf(str2, "%d/%d ", IDWidget.items, IDWidget.totalitems);
+            ID_WidgetKISCount(str2, sizeof(str2), widget_kis_items);
             M_WriteText(0 - WIDESCREENDELTA + 16, 18, str2, ID_WidgetColor(widget_items));
 
             // Secret:
             M_WriteText(0 - WIDESCREENDELTA, 27, "S:", cr[CR_GRAY]);
-            sprintf(str3, "%d/%d ", IDWidget.secrets, IDWidget.totalsecrets);
+            ID_WidgetKISCount(str3, sizeof(str3), widget_kis_secrets);
             M_WriteText(0 - WIDESCREENDELTA + 16, 27, str3, ID_WidgetColor(widget_secret));
         }
 
@@ -258,14 +320,14 @@ void ID_LeftWidgets (void)
             // Kills:
             sprintf(str1, "K ");
             M_WriteText(0 - WIDESCREENDELTA, 152 + yy, str1, cr[CR_GRAY]);
-            sprintf(str2, "%d/%d ", IDWidget.kills, IDWidget.totalkills);
+            ID_WidgetKISCount(str2, sizeof(str2), widget_kis_kills);
             M_WriteText(0 - WIDESCREENDELTA + M_StringWidth(str1), 152 + yy, str2, ID_WidgetColor(widget_kills));
     
             // Items:
             sprintf(str3, "I ");
             M_WriteText(0 - WIDESCREENDELTA + M_StringWidth(str1) + M_StringWidth(str2), 152 + yy, str3, cr[CR_GRAY]);
             
-            sprintf(str4, "%d/%d ", IDWidget.items, IDWidget.totalitems);
+            ID_WidgetKISCount(str4, sizeof(str4), widget_kis_items);
             M_WriteText(0 - WIDESCREENDELTA + M_StringWidth(str1) +
                         M_StringWidth(str2) +
                         M_StringWidth(str3), 152 + yy, str4, ID_WidgetColor(widget_items));
@@ -277,7 +339,7 @@ void ID_LeftWidgets (void)
                         M_StringWidth(str3) +
                         M_StringWidth(str4), 152 + yy, str5, cr[CR_GRAY]);
     
-            sprintf(str6, "%d/%d ", IDWidget.secrets, IDWidget.totalsecrets);
+            ID_WidgetKISCount(str6, sizeof(str6), widget_kis_secrets);
             M_WriteText(0 - WIDESCREENDELTA + M_StringWidth(str1) +
                         M_StringWidth(str2) + 
                         M_StringWidth(str3) +
