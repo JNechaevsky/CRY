@@ -956,7 +956,8 @@ boolean G_Responder (event_t* ev)
 	&&  gamestate == GS_DEMOSCREEN)
     { 
 	if (ev->type == ev_keydown ||  
-	    (ev->type == ev_mouse && ev->data1) || 
+	    (ev->type == ev_mouse && ev->data1 &&
+	    !ev->data2 && !ev->data3) || // [JN] Do not consider mouse movement as pressing.
 	    (ev->type == ev_joystick && ev->data1) ) 
 	{ 
 	    M_StartControlPanel (); 
