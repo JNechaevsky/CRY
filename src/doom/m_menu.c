@@ -773,9 +773,14 @@ static void M_ShadeBackground (void)
 {
     if (dp_menu_shading)
     {
-        for (int y = 0; y < SCREENWIDTH * SCREENHEIGHT; y++)
+        pixel_t *dest = I_VideoBuffer;
+        const int shade = dp_menu_shading;
+        const int scr = SCREENWIDTH * SCREENHEIGHT;
+        
+        for (int i = 0; i < scr; i++)
         {
-            I_VideoBuffer[y] = I_BlendDark(I_VideoBuffer[y], I_ShadeFactor[dp_menu_shading]);
+            *dest = I_BlendDark(*dest, I_ShadeFactor[shade]);
+            ++dest;
         }
     }
 }
@@ -1517,7 +1522,7 @@ static menuitem_t ID_Menu_Sound[]=
     { M_SKIP, "", 0, '\0' },
     { M_LFRT, "SFX PLAYBACK",              M_ID_SFXSystem,    's' },
     { M_LFRT, "MUSIC PLAYBACK",            M_ID_MusicSystem,  'm' },
-    { M_LFRT, "SOUNDS EFFECTS MODE",       M_ID_SFXMode,      's' },
+    { M_LFRT, "SOUND EFFECTS MODE",        M_ID_SFXMode,      's' },
     { M_LFRT, "JAGUAR SFX PITCH-SHIFTING", M_ID_PitchShift,   'j' },
     { M_LFRT, "NUMBER OF SFX TO MIX",      M_ID_SFXChannels,  'n' },
     { M_LFRT, "MUTE INACTIVE WINDOW",      M_ID_MuteInactive, 'm' },

@@ -77,7 +77,9 @@ int M_CheckParm(const char *check)
     return M_CheckParmWithArgs(check, 0);
 }
 
-#if defined(_WIN32)
+// [FG] compose a proper command line from loose file paths passed as arguments
+// to allow for loading WADs and DEHACKED patches by drag-and-drop
+
 enum
 {
     FILETYPE_UNKNOWN = 0x0,
@@ -163,8 +165,13 @@ void M_AddLooseFiles(void)
         if (strlen(arg) < 3 ||
             arg[0] == '-' ||
             arg[0] == '@' ||
+#if defined (_WIN32)
             ((!isalpha(arg[0]) || arg[1] != ':' || arg[2] != '\\') &&
-            (arg[0] != '\\' || arg[1] != '\\')))
+            (arg[0] != '\\' || arg[1] != '\\'))
+#else
+            (arg[0] != '/' && arg[0] != '.')
+#endif
+          )
         {
             free(arguments);
             return;
@@ -219,7 +226,6 @@ void M_AddLooseFiles(void)
     free(myargv);
     myargv = newargv;
 }
-#endif
 
 // Return the name of the executable used to start the program:
 

@@ -1060,53 +1060,43 @@ static byte *ST_WidgetColor (const int i)
 
 // -----------------------------------------------------------------------------
 // ST_DrawBigNumber
-// [JN] Draws a three digit big red number using NUM_* graphics.
+// [PN/JN] Draws a three digit big red number using STTNUM* graphics.
+// [PN] Supports negative values and ensures proper digit placement.
+//      Capped at 999 for positive numbers and 99 for negative numbers.
 // -----------------------------------------------------------------------------
 
-static void ST_DrawBigNumber (int val, const int x, const int y, byte *table)
+static void ST_DrawBigNumber (int val, int x, int y, byte *table)
 {
-    int oldval = val;
-    int xpos = x;
-
     dp_translation = table;
 
-    // [JN] Support for negative values.
-    if (val < 0)
-    {
-        val = -val;
-        
-        if (-val <= -99)
-        {
-            val = 99;
-        }
+    // [PN] Determine the sign and absolute value
+    const boolean negative = (val < 0);
+    int absVal = negative ? -val : val;
 
-        // [JN] Draw minus symbol with respection of digits placement.
-        // However, values below -10 requires some correction in "x" placement.
-        drawpatchfunc(xpos + (val <= 9 ? 20 : 5) - 4, y, tallminus);
-    }
-    if (val > 999)
-    {
-        val = 999;
-    }
+    // [PN] Apply limits based on the sign
+    absVal = negative ? (absVal > 99 ? 99 : absVal) : (absVal > 999 ? 999 : absVal);
 
-    if (val > 99)
-    {
-        drawpatchfunc(xpos - 4, y, tallnum[val / 100]);
-    }
+    // [PN] Draw minus symbol for negative values (adjust position based on digit count)
+    if (negative)
+        drawpatchfunc(x + (absVal <= 9 ? 20 : 5) - 4, y, tallminus);
 
-    val = val % 100;
-    xpos += 14;
+    // [PN] Draw hundreds place if applicable
+    if (absVal > 99)
+        drawpatchfunc(x - 4, y, tallnum[absVal / 100]);
 
-    if (val > 9 || oldval > 99)
-    {
-        drawpatchfunc(xpos - 4, y, tallnum[val / 10]);
-    }
+    absVal %= 100;
+    x += 14;
 
-    val = val % 10;
-    xpos += 14;
+    // [PN] Draw tens place if applicable or if original value had more than two digits
+    if (absVal > 9 || val >= 100 || val <= -100)
+        drawpatchfunc(x - 4, y, tallnum[absVal / 10]);
 
-    drawpatchfunc(xpos - 4, y, tallnum[val]);
-    
+    absVal %= 10;
+    x += 14;
+
+    // [PN] Draw ones place
+    drawpatchfunc(x - 4, y, tallnum[absVal]);
+
     dp_translation = NULL;
 }
 
@@ -1124,39 +1114,34 @@ static void ST_DrawPercent (const int x, const int y, byte *table)
 
 // -----------------------------------------------------------------------------
 // ST_DrawSmallNumberY
-// [JN] Draws a three digit yellow number using STYSNUM* graphics.
+// [PN] Draws a three digit yellow number using STYSNUM* graphics.
 // -----------------------------------------------------------------------------
 
 static void ST_DrawSmallNumberY (int val, const int x, const int y)
 {
-    int oldval = val;
-    int xpos = x;
+    // [JN] Limit the value between 0 and 999.
+    val = BETWEEN(0, 999, val);
 
-    if (val < 0)
-    {
-        val = 0;
-    }
-    if (val > 999)
-    {
-        val = 999;
-    }
+    // [PN] Check if we need to draw hundreds
+    const boolean showHundreds = (val > 99);
 
-    if (val > 99)
-    {
-        V_DrawPatch(xpos - 4, y, shortnum_y[val / 100]);
-    }
+    // [PN] Draw hundreds digit if applicable
+    if (showHundreds)
+        V_DrawPatch(x - 4, y, shortnum_y[val / 100]);
 
-    val = val % 100;
-    xpos += 4;
+    // [PN] Move to the next digit and reduce
+    val %= 100;
+    int xpos = x + 4;
 
-    if (val > 9 || oldval > 99)
-    {
+    // [PN] Draw tens digit if the number is > 9 or we drew hundreds
+    if (val > 9 || showHundreds)
         V_DrawPatch(xpos - 4, y, shortnum_y[val / 10]);
-    }
 
-    val = val % 10;
+    // [PN] Move to the last digit
+    val %= 10;
     xpos += 4;
 
+    // [PN] Draw ones digit
     V_DrawPatch(xpos - 4, y, shortnum_y[val]);
 }
 

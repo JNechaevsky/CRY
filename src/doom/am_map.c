@@ -1027,13 +1027,17 @@ static void AM_clearFB (void)
 
 static void AM_shadeBackground (void)
 {
-    const int height = dp_screen_size > 10 ?
-                       SCREENHEIGHT : (SCREENHEIGHT - (ST_HEIGHT * vid_resolution));
+    pixel_t *dest = I_VideoBuffer;
+    const int shade = automap_shading;
+    const int scr = (dp_screen_size > 10)
+                  ? SCREENWIDTH * SCREENHEIGHT
+                  : SCREENWIDTH * (SCREENHEIGHT - ST_HEIGHT * vid_resolution);
 
-        for (int y = 0; y < SCREENWIDTH * height ; y++)
-        {
-            I_VideoBuffer[y] = I_BlendDark(I_VideoBuffer[y], I_ShadeFactor[automap_shading]);
-        }
+    for (int i = 0; i < scr; i++)
+    {
+        *dest = I_BlendDark(*dest, I_ShadeFactor[shade]);
+        ++dest;
+    }
 }
 
 // -----------------------------------------------------------------------------

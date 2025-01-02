@@ -797,26 +797,22 @@ static void R_ProjectSprite (mobj_t* thing)
     }
 }
 
-
-
-
-//
+// -----------------------------------------------------------------------------
 // R_AddSprites
 // During BSP traversal, this adds sprites by sector.
-//
-void R_AddSprites (sector_t* sec)
+// -----------------------------------------------------------------------------
+
+void R_AddSprites (sector_t *sec)
 {
-    mobj_t*		thing;
-    int			lightnum;
-
-    lightnum = (sec->lightlevel >> LIGHTSEGSHIFT)+(extralight * LIGHTBRIGHT);
-
+    // [crispy] smooth diminishing lighting
+    const int lightnum = BETWEEN(0, LIGHTLEVELS - 1, (sec->lightlevel >> LIGHTSEGSHIFT)
+                       + (extralight * LIGHTBRIGHT));
     // [JN] Colorize sprite drawing.
 	spritelights = R_ColoredSegsColorize(lightnum, sec->color);
 
     // Handle all things in sector.
-    for (thing = sec->thinglist ; thing ; thing = thing->snext)
-	R_ProjectSprite (thing);
+    for (mobj_t *thing = sec->thinglist ; thing ; thing = thing->snext)
+    R_ProjectSprite (thing);
 }
 
 // -----------------------------------------------------------------------------
@@ -1039,25 +1035,20 @@ static void R_DrawPSprite (pspdef_t* psp)
     R_DrawVisSprite (vis);
 }
 
-
-
-//
+// -----------------------------------------------------------------------------
 // R_DrawPlayerSprites
-//
+// -----------------------------------------------------------------------------
+
 static void R_DrawPlayerSprites (void)
 {
-    int		i;
-    int		lightnum;
-    pspdef_t*	psp;
-    
-    // Do not draw player gun sprite if spectating
+    // RestlessRodent -- Do not draw player gun sprite if spectating
     if (crl_spectating)
-    	return;
-    
+        return;
+
     // get light level
-    lightnum =
-	(viewplayer->mo->subsector->sector->lightlevel >> LIGHTSEGSHIFT) 
-	+(extralight * LIGHTBRIGHT);
+    // [crispy] smooth diminishing lighting
+    const int lightnum = BETWEEN(0, LIGHTLEVELS - 1, (viewplayer->mo->subsector->sector->lightlevel >> LIGHTSEGSHIFT)
+                       + (extralight * LIGHTBRIGHT));
 
     // [JN] Colorize STbar sprite drawing.
     spritelights = R_ColoredSegsColorize(lightnum, viewplayer->mo->subsector->sector->color);
@@ -1065,14 +1056,14 @@ static void R_DrawPlayerSprites (void)
     // clip to screen bounds
     mfloorclip = screenheightarray;
     mceilingclip = negonearray;
-    
+
     // add all active psprites
-    for (i=0, psp=viewplayer->psprites;
-	 i<NUMPSPRITES;
-	 i++,psp++)
+    int i;
+    pspdef_t *psp;
+    for (i = 0, psp = viewplayer->psprites; i < NUMPSPRITES; i++, psp++)
     {
-	if (psp->state)
-	    R_DrawPSprite (psp);
+        if (psp->state)
+            R_DrawPSprite(psp);
     }
 }
 

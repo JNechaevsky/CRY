@@ -1,6 +1,8 @@
 [Desktop Entry]
 Type=Application
 Name=CRY
-Exec=cry
+Exec=cry %F
 Icon=cry
+TryExec=cry
 Categories=Game;
+MimeType=application/x-doom-wad;
