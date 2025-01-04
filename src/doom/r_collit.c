@@ -1,7 +1,7 @@
 //
 // Copyright(C) 2015-2024 Fabian Greffrath
 // Copyright(C) 2013-2024 Brad Harding
-// Copyright(C) 2024 Julia Nechaevskaya
+// Copyright(C) 2025 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
