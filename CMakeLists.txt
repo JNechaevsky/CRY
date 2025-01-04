@@ -1,6 +1,7 @@
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 cmake_minimum_required(VERSION 3.15)
+cmake_policy(SET CMP0091 NEW)
 project("CRY" VERSION 2.2.0 LANGUAGES C)
 set(CMAKE_C_STANDARD 99)
 
@@ -26,11 +27,6 @@ set(PACKAGE_LICENSE "GNU GPL (version 2)")
 if(MSVC)
     add_definitions("/D_CRT_SECURE_NO_WARNINGS" "/D_CRT_SECURE_NO_DEPRECATE"
                     "/D_CRT_NONSTDC_NO_DEPRECATE")
-# Disable several warnings for cl.exe.
-add_compile_options("/wd4018" # Signed/unsigned mismatch
-                    "/wd4244" # Conversion from 'type1' to 'type2', possible loss of data
-                    "/wd4267" # Conversion from 'size_t' to 'type', possible loss of data
-                    )
 else()
     add_compile_options("-Wall"
                         "-Wredundant-decls"
@@ -96,15 +92,9 @@ find_package(m)
 
 include(CheckSymbolExists)
 include(CheckIncludeFile)
-if(WIN32)
-    check_symbol_exists(_stricmp "string.h" HAVE_DECL_STRNCASECMP)
-    check_symbol_exists(_strnicmp "string.h" HAVE_DECL_STRNCASECMP)
-    check_include_file("windows.h" HAVE_DIRENT_H)
-else()
-    check_symbol_exists(strcasecmp "strings.h" HAVE_DECL_STRCASECMP)
-    check_symbol_exists(strncasecmp "strings.h" HAVE_DECL_STRNCASECMP)
-    check_include_file("dirent.h" HAVE_DIRENT_H)
-endif()
+check_symbol_exists(strcasecmp "strings.h" HAVE_DECL_STRCASECMP)
+check_symbol_exists(strncasecmp "strings.h" HAVE_DECL_STRNCASECMP)
+check_include_file("dirent.h" HAVE_DIRENT_H)
 
 string(CONCAT WINDOWS_RC_VERSION "${PROJECT_VERSION_MAJOR}, "
     "${PROJECT_VERSION_MINOR}, ${PROJECT_VERSION_PATCH}, 0")

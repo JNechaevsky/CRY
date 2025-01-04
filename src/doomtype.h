@@ -35,21 +35,11 @@
 #if !HAVE_DECL_STRCASECMP || !HAVE_DECL_STRNCASECMP
 
 #include <string.h>
-
-#ifdef _WIN32
-    #if !HAVE_DECL_STRCASECMP
-        #define strcasecmp _stricmp
-    #endif
-    #if !HAVE_DECL_STRNCASECMP
-        #define strncasecmp _strnicmp
-    #endif
-#else
-    #if !HAVE_DECL_STRCASECMP
-        #define strcasecmp stricmp
-    #endif
-    #if !HAVE_DECL_STRNCASECMP
-        #define strncasecmp strnicmp
-    #endif
+#if !HAVE_DECL_STRCASECMP
+#define strcasecmp stricmp
+#endif
+#if !HAVE_DECL_STRNCASECMP
+#define strncasecmp strnicmp
 #endif
 
 #else
@@ -57,7 +47,6 @@
 #include <strings.h>
 
 #endif
-
 
 
 //
