@@ -595,6 +595,9 @@ static void M_ID_Widget_LevelName (int choice);
 static void M_ID_Widget_Coords (int choice);
 static void M_ID_Widget_Render (int choice);
 static void M_ID_Widget_Health (int choice);
+
+static void M_Choose_ID_Automap (int choice);
+static void M_Draw_ID_Automap (void);
 static void M_ID_Automap_Smooth (int choice);
 static void M_ID_Automap_Square (int choice);
 static void M_ID_Automap_Secrets (int choice);
@@ -1067,6 +1070,7 @@ static menuitem_t ID_Menu_Main[]=
     { M_SWTC, "Audio",       M_Choose_ID_Sound,    'a' },
     { M_SWTC, "Controls",    M_Choose_ID_Controls, 'c' },
     { M_SWTC, "Widgets",     M_Choose_ID_Widgets,  'w' },
+    { M_SWTC, "Automap",     M_Choose_ID_Automap,  'a' },
     { M_SWTC, "Gameplay",    M_Choose_ID_Gameplay, 'g' },
     { M_SWTC, "End Game",    M_EndGame,            'e' },
     { M_SWTC, "Reset",       M_Choose_ID_Reset,    'r' },
@@ -1074,11 +1078,11 @@ static menuitem_t ID_Menu_Main[]=
 
 static menu_t ID_Def_Main =
 {
-    8,
+    9,
     &MainDef,
     ID_Menu_Main,
     M_Draw_ID_Main,
-    97, 24/*ID_MENU_TOPOFFSET*/,
+    97, 16/*ID_MENU_TOPOFFSET*/,
     0,
     false, false, false,
 };
@@ -1090,7 +1094,7 @@ static void M_Choose_ID_Main (int choice)
 
 static void M_Draw_ID_Main (void)
 {
-    M_WriteTextBigCentered(6, "Options", cr[CR_YELLOW]);
+    M_WriteTextBigCentered(1, "Options", cr[CR_YELLOW]);
 }
 
 // -----------------------------------------------------------------------------
@@ -2607,7 +2611,7 @@ static void M_Draw_ID_MouseBinds (void)
 }
 
 // -----------------------------------------------------------------------------
-// Widgets and Automap
+// Widgets
 // -----------------------------------------------------------------------------
 
 static menuitem_t ID_Menu_Widgets[]=
@@ -2621,18 +2625,11 @@ static menuitem_t ID_Menu_Widgets[]=
     { M_LFRT, "PLAYER COORDS",         M_ID_Widget_Coords,    'p' },
     { M_LFRT, "RENDER COUNTERS",       M_ID_Widget_Render,    'r' },
     { M_LFRT, "TARGET'S HEALTH",       M_ID_Widget_Health,    't' },
-    { M_SKIP, "", 0, '\0' },
-    { M_LFRT, "SMOOTH LINES",          M_ID_Automap_Smooth,   's' },
-    { M_LFRT, "SQUARE ASPECT RATIO",   M_ID_Automap_Square,   's' },
-    { M_LFRT, "MARK SECRET SECTORS",   M_ID_Automap_Secrets,  'm' },
-    { M_LFRT, "ROTATE MODE",           M_ID_Automap_Rotate,   'r' },
-    { M_LFRT, "OVERLAY MODE",          M_ID_Automap_Overlay,  'o' },
-    { M_LFRT, "OVERLAY SHADING LEVEL", M_ID_Automap_Shading,  'o' },
 };
 
 static menu_t ID_Def_Widgets =
 {
-    16,
+    9,
     &ID_Def_Main,
     ID_Menu_Widgets,
     M_Draw_ID_Widgets,
@@ -2704,41 +2701,6 @@ static void M_Draw_ID_Widgets (void)
                  widget_health == 4 ? "BOTTOM+NAME" : "OFF");
     M_WriteText (M_ItemRightAlign(str), 90, str,
                  M_Item_Glow(8, widget_health ? GLOW_GREEN : GLOW_DARKRED));
-
-    M_WriteTextCentered(99, "AUTOMAP", cr[CR_YELLOW]);
-
-    // Smooth lines
-    sprintf(str, automap_smooth ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 108, str,
-                 M_Item_Glow(10, automap_smooth ? GLOW_GREEN : GLOW_DARKRED));
-
-    // Square aspect ratio
-    sprintf(str, automap_square ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 117, str,
-                 M_Item_Glow(11, automap_square ? GLOW_GREEN : GLOW_DARKRED));
-
-    // Mark secret sectors
-    sprintf(str, automap_secrets == 1 ? "REVEALED" :
-                 automap_secrets == 2 ? "ALWAYS" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 126, str,
-                 M_Item_Glow(12, automap_secrets ? GLOW_GREEN : GLOW_DARKRED));
-
-    // Rotate mode
-    sprintf(str, automap_rotate ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 135, str,
-                 M_Item_Glow(13, automap_rotate ? GLOW_GREEN : GLOW_DARKRED));
-
-    // Overlay mode
-    sprintf(str, automap_overlay ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 144, str,
-                 M_Item_Glow(14, automap_overlay ? GLOW_GREEN : GLOW_DARKRED));
-
-    // Overlay shading level
-    sprintf(str,"%d", automap_shading);
-    M_WriteText (M_ItemRightAlign(str), 153, str,
-                 M_Item_Glow(15, !automap_overlay ? GLOW_DARKRED :
-                                  automap_shading ==  0 ? GLOW_RED :
-                                  automap_shading == 12 ? GLOW_YELLOW : GLOW_GREEN));
 }
 
 static void M_ID_Widget_Placement (int choice)
@@ -2784,6 +2746,76 @@ static void M_ID_Widget_Render (int choice)
 static void M_ID_Widget_Health (int choice)
 {
     widget_health = M_INT_Slider(widget_health, 0, 4, choice, false);
+}
+
+// -----------------------------------------------------------------------------
+// Automap
+// -----------------------------------------------------------------------------
+
+static menuitem_t ID_Menu_Automap[]=
+{
+    { M_LFRT, "SMOOTH LINES",          M_ID_Automap_Smooth,   's' },
+    { M_LFRT, "SQUARE ASPECT RATIO",   M_ID_Automap_Square,   's' },
+    { M_LFRT, "MARK SECRET SECTORS",   M_ID_Automap_Secrets,  'm' },
+    { M_LFRT, "ROTATE MODE",           M_ID_Automap_Rotate,   'r' },
+    { M_LFRT, "OVERLAY MODE",          M_ID_Automap_Overlay,  'o' },
+    { M_LFRT, "OVERLAY SHADING LEVEL", M_ID_Automap_Shading,  'o' },
+};
+
+static menu_t ID_Def_Automap =
+{
+    6,
+    &ID_Def_Main,
+    ID_Menu_Automap,
+    M_Draw_ID_Automap,
+    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET_SML,
+    0,
+    true, false, false,
+};
+
+static void M_Choose_ID_Automap (int choice)
+{
+    M_SetupNextMenu (&ID_Def_Automap);
+}
+
+static void M_Draw_ID_Automap (void)
+{
+    char str[32];
+
+    M_WriteTextCentered(9, "AUTOMAP", cr[CR_YELLOW]);
+
+    // Smooth lines
+    sprintf(str, automap_smooth ? "ON" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 18, str,
+                 M_Item_Glow(0, automap_smooth ? GLOW_GREEN : GLOW_DARKRED));
+
+    // Square aspect ratio
+    sprintf(str, automap_square ? "ON" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 27, str,
+                 M_Item_Glow(1, automap_square ? GLOW_GREEN : GLOW_DARKRED));
+
+    // Mark secret sectors
+    sprintf(str, automap_secrets == 1 ? "REVEALED" :
+                 automap_secrets == 2 ? "ALWAYS" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 36, str,
+                 M_Item_Glow(2, automap_secrets ? GLOW_GREEN : GLOW_DARKRED));
+
+    // Rotate mode
+    sprintf(str, automap_rotate ? "ON" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 45, str,
+                 M_Item_Glow(3, automap_rotate ? GLOW_GREEN : GLOW_DARKRED));
+
+    // Overlay mode
+    sprintf(str, automap_overlay ? "ON" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 54, str,
+                 M_Item_Glow(4, automap_overlay ? GLOW_GREEN : GLOW_DARKRED));
+
+    // Overlay shading level
+    sprintf(str,"%d", automap_shading);
+    M_WriteText (M_ItemRightAlign(str), 63, str,
+                 M_Item_Glow(5, !automap_overlay ? GLOW_DARKRED :
+                                 automap_shading ==  0 ? GLOW_RED :
+                                 automap_shading == 12 ? GLOW_YELLOW : GLOW_GREEN));
 }
 
 static void M_ID_Automap_Smooth (int choice)
