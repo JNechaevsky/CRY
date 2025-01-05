@@ -220,8 +220,6 @@ static void AM_transformPoint (mpoint_t *pt);
 static mpoint_t mapcenter;
 static angle_t mapangle;
 
-static void AM_drawCrosshair(boolean force);
-
 // -----------------------------------------------------------------------------
 // AM_Init
 // [JN] Predefine some variables at program startup.
@@ -516,7 +514,6 @@ void AM_LevelInit (boolean reinit)
     if (reinit && f_h_old)
     {
         scale_mtof = scale_mtof * f_h / f_h_old;
-        AM_drawCrosshair(true);
     }
     else
     {
@@ -1131,6 +1128,72 @@ static boolean AM_clipMline (mline_t *ml, fline_t *fl)
 }
 #undef DOOUTCODE
 
+
+#define PUTDOT_RAW(xx,yy,cc) I_VideoBuffer[(yy) * f_w + flipscreenwidth[(xx)]] = (cc)
+#define PUTDOT(xx,yy,cc) PUTDOT_RAW(xx,yy,palette_pointer[(cc)])
+
+// -----------------------------------------------------------------------------
+// PUTDOT_THICK
+// [PN] Draws a "thick" pixel by filling an area around the target pixel.
+// Takes the current resolution into account to determine the thickness.
+// Includes boundary checks to prevent out-of-bounds access.
+// [JN] With support for "user-defined" (1x...6x) and "auto" thickness.
+// -----------------------------------------------------------------------------
+
+static inline void PUTDOT_THICK (int x, int y, pixel_t color)
+{
+    // Cache the global setting for smooth rendering locally to avoid
+    // repeated access during the loop iterations.
+    const int smooth = automap_smooth;
+
+    // If the line thickness feature is disabled, draw the dot directly
+    // without performing any additional boundary checks.
+    if (!automap_thick)
+    {
+        if (smooth)
+            PUTDOT_RAW(x, y, color);
+        else
+            PUTDOT(x, y, color);
+        return;
+    }
+
+    // Determine the line thickness.
+    const int thickness = automap_thick == 6
+                        ? vid_resolution / 2 // Auto thickness
+                        : automap_thick;     // User-defined thickness
+
+    for (int dx = -thickness; dx <= thickness; dx++)
+    {
+        const int nx = x + dx;
+
+        // Skip out-of-bound x-coordinates.
+        if (nx < 0 || nx >= f_w)
+            continue;
+
+        for (int dy = -thickness; dy <= thickness; dy++)
+        {
+            const int ny = y + dy;
+
+            // Skip out-of-bound y-coordinates.
+            if (ny < 0 || ny >= f_h)
+                continue;
+
+            // Calculate the squared distance from the center.
+            const int distance2 = dx * dx + dy * dy;
+
+            // Skip pixels outside the desired radius.
+            if (distance2 > thickness * thickness)
+                continue;
+
+            // Draw the pixel with or without smoothing based on the setting.
+            if (smooth)
+                PUTDOT_RAW(nx, ny, color);
+            else
+                PUTDOT(nx, ny, color);
+        }
+    }
+}
+
 // -----------------------------------------------------------------------------
 // AM_drawFline
 // Classic Bresenham w/ whatever optimizations needed for speed.
@@ -1154,16 +1217,13 @@ static void AM_drawFline_Vanilla (fline_t *fl, int color)
         return;
     }
 
-#define PUTDOT_RAW(xx,yy,cc) I_VideoBuffer[(yy)*f_w+(flipscreenwidth[xx])]=(cc)
-#define PUTDOT(xx,yy,cc) PUTDOT_RAW(xx,yy,(palette_pointer[(cc)]))
-
     // [PN] Main loop for Bresenham's line algorithm
     if (ax > ay) // X-major case
     {
         d = ay - ax / 2;
         while (x != fl->b.x)
         {
-            PUTDOT(x, y, color);
+            PUTDOT_THICK(x, y, color);
             if (d >= 0) { y += sy; d -= ax; }
             x += sx;
             d += ay;
@@ -1174,14 +1234,14 @@ static void AM_drawFline_Vanilla (fline_t *fl, int color)
         d = ax - ay / 2;
         while (y != fl->b.y)
         {
-            PUTDOT(x, y, color);
+            PUTDOT_THICK(x, y, color);
             if (d >= 0) { x += sx; d -= ay; }
             y += sy;
             d += ax;
         }
     }
 
-    PUTDOT(x, y, color); // Final point
+    PUTDOT_THICK(x, y, color); // Final point
 }
 
 // -----------------------------------------------------------------------------
@@ -1208,7 +1268,7 @@ static void AM_drawFline_Smooth(fline_t* fl, int color)
     }
 
     /* Draw the initial pixel */
-    PUTDOT_RAW(X0, Y0, BaseColor[0]);
+    PUTDOT_THICK(X0, Y0, BaseColor[0]);
 
     DeltaX = X1 - X0;
     DeltaY = Y1 - Y0;
@@ -1221,7 +1281,7 @@ static void AM_drawFline_Smooth(fline_t* fl, int color)
         while (DeltaX--)
         {
             X0 += XDir;
-            PUTDOT_RAW(X0, Y0, BaseColor[0]);
+            PUTDOT_THICK(X0, Y0, BaseColor[0]);
         }
         return;
     }
@@ -1232,7 +1292,7 @@ static void AM_drawFline_Smooth(fline_t* fl, int color)
         while (DeltaY--)
         {
             Y0++;
-            PUTDOT_RAW(X0, Y0, BaseColor[0]);
+            PUTDOT_THICK(X0, Y0, BaseColor[0]);
         }
         return;
     }
@@ -1244,7 +1304,7 @@ static void AM_drawFline_Smooth(fline_t* fl, int color)
         {
             X0 += XDir;
             Y0++;
-            PUTDOT_RAW(X0, Y0, BaseColor[0]);
+            PUTDOT_THICK(X0, Y0, BaseColor[0]);
         }
         return;
     }
@@ -1266,8 +1326,8 @@ static void AM_drawFline_Smooth(fline_t* fl, int color)
             }
             Y0++;
             Weighting = ErrorAcc >> IntensityShift;
-            PUTDOT_RAW(X0, Y0, BaseColor[Weighting]);
-            PUTDOT_RAW(X0 + XDir, Y0, BaseColor[Weighting ^ WeightingComplementMask]);
+            PUTDOT_THICK(X0, Y0, BaseColor[Weighting]);
+            PUTDOT_THICK(X0 + XDir, Y0, BaseColor[Weighting ^ WeightingComplementMask]);
         }
     }
     /* X-major line */
@@ -1288,13 +1348,13 @@ static void AM_drawFline_Smooth(fline_t* fl, int color)
             }
             X0 += XDir;
             Weighting = ErrorAcc >> IntensityShift;
-            PUTDOT_RAW(X0, Y0, BaseColor[Weighting]);
-            PUTDOT_RAW(X0, Y0 + 1, BaseColor[Weighting ^ WeightingComplementMask]);
+            PUTDOT_THICK(X0, Y0, BaseColor[Weighting]);
+            PUTDOT_THICK(X0, Y0 + 1, BaseColor[Weighting ^ WeightingComplementMask]);
         }
     }
 
     /* Draw the final pixel */
-    PUTDOT_RAW(X1, Y1, BaseColor[0]);
+    PUTDOT_THICK(X1, Y1, BaseColor[0]);
 }
 
 // -----------------------------------------------------------------------------
@@ -1812,28 +1872,27 @@ static void AM_drawMarks (void)
 // AM_drawCrosshair
 // -----------------------------------------------------------------------------
 
-static void AM_drawCrosshair (boolean force)
+static void AM_drawCrosshair (void)
 {
-    // [crispy] draw an actual crosshair
-    if (!followplayer || force)
+    // [JN] Draw the crosshair as a graphical patch to keep it unaffected by
+    // map line thickness, following the logic of mark drawing. Coloring via
+    // dp_translation is still needed to ensure it won't be affected much
+    // by possible custom PLAYPAL palette and modified color index.
+    //
+    // Patch drawing coordinates are the center of the screen:
+    // x: 158 = (ORIGWIDTH  / 2) - 2
+    // y:  80 = (ORIGHEIGHT / 2) - 20
+
+    static const byte am_xhair[] =
     {
-        static fline_t h, v;
+        3,0,3,0,0,0,0,0,20,0,0,0,26,0,0,0,
+        34,0,0,0,1,1,90,90,90,255,0,3,90,90,90,90,
+        90,255,1,1,90,90,90,255
+    };
 
-        if (!h.a.x || force)
-        {
-            h.a.x = h.b.x = v.a.x = v.b.x = f_x + f_w / 2;
-            h.a.y = h.b.y = v.a.y = v.b.y = f_y + f_h / 2;
-            h.a.x -= 2; h.b.x += 2;
-            v.a.y -= 2; v.b.y += 2;
-        }
-
-        // [JN] Do not draw crosshair while video re-init functions.
-        if (!force)
-        {
-            AM_drawFline(&h, 96);
-            AM_drawFline(&v, 96);
-        }
-    }
+    dp_translation = cr[CR_LIGHTGRAY];
+    V_DrawPatch(158, 80, (patch_t*)&am_xhair);
+    dp_translation = NULL;
 }
 
 // -----------------------------------------------------------------------------
@@ -1920,7 +1979,7 @@ void AM_Drawer (void)
     // [JN] Do not draw in following mode.
     if (!followplayer)
     {
-        AM_drawCrosshair(false);
+        AM_drawCrosshair();
     }
 
     AM_drawMarks();

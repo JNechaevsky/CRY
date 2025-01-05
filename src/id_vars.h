@@ -71,6 +71,7 @@ extern int snd_mute_inactive;
 
 // Automap
 extern int automap_smooth;
+extern int automap_thick;
 extern int automap_square;
 extern int automap_secrets;
 extern int automap_rotate;

@@ -418,6 +418,7 @@ static default_t	doom_defaults_list[] =
 
     // Automap
     CONFIG_VARIABLE_INT(automap_smooth),
+    CONFIG_VARIABLE_INT(automap_thick),
     CONFIG_VARIABLE_INT(automap_square),
     CONFIG_VARIABLE_INT(automap_secrets),
     CONFIG_VARIABLE_INT(automap_rotate),
