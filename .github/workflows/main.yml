@@ -47,8 +47,7 @@ jobs:
         run: |
           .\vcpkg\vcpkg.exe install sdl2 sdl2-mixer[libflac,libmodplug,mpg123,opusfile] libsamplerate `
           --triplet x64-windows-static-release `
-          --overlay-triplets=cmake/triplets `
-          --jobs 4
+          --overlay-triplets=cmake/triplets
 
       - name: Configure CMake
         run: |
@@ -60,7 +59,7 @@ jobs:
                 -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake
 
       - name: Build
-        run: cmake --build build_vs_64 --config Release
+        run: cmake --build build_vs_64 --config Release --parallel
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
