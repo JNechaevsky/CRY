@@ -182,6 +182,8 @@ typedef struct menu_s
 #define M_SKIP -1,0  // Skippable, cursor can't get here.
 #define M_SWTC  1,0  // On/off type or entering function.
 #define M_LFRT  2,0  // Multichoice function.
+#define M_SLD1  3,0  // Slider 1st line.
+#define M_SLD2  4,0  // Slider 2st line.
 
 // [JN] Small cursor timer for glowing effect.
 static short   cursor_tics = 0;
@@ -351,9 +353,9 @@ enum
 static menuitem_t SoundMenu[]=
 {
     { M_LFRT, "Sfx Volume",   M_SfxVol,    's'  },
-    { M_SKIP, "",             0,           '\0' },
+    { M_SLD1, "",             0,           '\0' },
     { M_LFRT, "Music Volume", M_MusicVol,  'm'  },
-    { M_SKIP, "",             0,           '\0' }
+    { M_SLD1, "",             0,           '\0' }
 };
 
 static menu_t SoundDef =
@@ -1369,8 +1371,8 @@ static void M_ID_ScreenWipe (int choice)
 static menuitem_t ID_Menu_Display[]=
 {
     { M_LFRT, "GAMMA-CORRECTION",        M_ID_Gamma,             'g' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
+    { M_SLD1, "", 0, '\0' },
+    { M_SLD2, "", 0, '\0' },
     { M_LFRT, "EMULATE CRY PALETTE",     M_ID_CRYPalette,        'e' },
     { M_LFRT, "FIELD OF VIEW",           M_ID_FOV,               'f' },
     { M_LFRT, "MENU BACKGROUND SHADING", M_ID_MenuShading,       'm' },
@@ -1519,11 +1521,11 @@ static void M_ID_LocalTime (int choice)
 static menuitem_t ID_Menu_Sound[]=
 {
     { M_LFRT, "SFX VOLUME",                M_SfxVol,          's' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
+    { M_SLD1, "", 0, '\0' },
+    { M_SLD2, "", 0, '\0' },
     { M_LFRT, "MUSIC VOLUME",              M_MusicVol,        'm' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
+    { M_SLD1, "", 0, '\0' },
+    { M_SLD2, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
     { M_LFRT, "SFX PLAYBACK",              M_ID_SFXSystem,    's' },
     { M_LFRT, "MUSIC PLAYBACK",            M_ID_MusicSystem,  'm' },
@@ -1729,14 +1731,14 @@ static menuitem_t ID_Menu_Controls[]=
     { M_SWTC, "MOUSE BINDINGS",               M_Choose_ID_MouseBinds,     'm' },
     { M_SKIP, "", 0, '\0' },
     { M_LFRT, "SENSIVITY",                    M_ID_Controls_Sensivity,    's' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
+    { M_SLD1, "", 0, '\0' },
+    { M_SLD2, "", 0, '\0' },
     { M_LFRT, "ACCELERATION",                 M_ID_Controls_Acceleration, 'a' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
+    { M_SLD1, "", 0, '\0' },
+    { M_SLD2, "", 0, '\0' },
     { M_LFRT, "ACCELERATION THRESHOLD",       M_ID_Controls_Threshold,    'a' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
+    { M_SLD1, "", 0, '\0' },
+    { M_SLD2, "", 0, '\0' },
     { M_LFRT, "MOUSE LOOK",                   M_ID_Controls_MLook,        'm' },
     { M_LFRT, "VERTICAL MOUSE MOVEMENT",      M_ID_Controls_NoVert,       'v' },
     { M_LFRT, "INVERT VERTICAL AXIS",         M_ID_Controls_InvertY,      'v' },
@@ -5168,7 +5170,9 @@ boolean M_Responder (event_t* ev)
 		itemOn = 0;
 	    else itemOn++;
 	    S_StartSound(NULL,sfx_pstop);
-	} while(currentMenu->menuitems[itemOn].status==-1);
+    } while (currentMenu->menuitems[itemOn].status == -1 ||
+             currentMenu->menuitems[itemOn].status ==  3 || // [JN] Skip sliders
+             currentMenu->menuitems[itemOn].status ==  4);
 
 	return true;
     }
@@ -5182,7 +5186,9 @@ boolean M_Responder (event_t* ev)
 		itemOn = currentMenu->numitems-1;
 	    else itemOn--;
 	    S_StartSound(NULL,sfx_pstop);
-	} while(currentMenu->menuitems[itemOn].status==-1);
+    } while (currentMenu->menuitems[itemOn].status == -1 ||
+             currentMenu->menuitems[itemOn].status ==  3 || // [JN] Skip sliders
+             currentMenu->menuitems[itemOn].status ==  4);
 
 	return true;
     }
@@ -5391,7 +5397,14 @@ static void M_ID_MenuMouseControl (void)
             &&  menu_mouse_y <= (currentMenu->y + (i + 1) * line_height) * vid_resolution
             &&  currentMenu->menuitems[i].status != -1)
             {
-                itemOn = i; // [PN] Highlight the current menu item
+                // [PN] Highlight the current menu item
+                itemOn = i;
+
+                // [JN] Move menu cursor higher when hovering slider lines.
+                if (currentMenu->menuitems[itemOn].status == 3)
+                    itemOn -= 1;
+                if (currentMenu->menuitems[itemOn].status == 4)
+                    itemOn -= 2;
             }
         }
     }
