@@ -58,14 +58,18 @@ jobs:
                 -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /Ob2 /DNDEBUG /GL /Oy" `
                 -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake
 
-      - name: Build
-        run: cmake --build build_vs_64 --config Release --parallel
+      - name: Build and include cry.wad
+        run: |
+          cmake --build build_vs_64 --config Release --parallel
+          cp iwad/cry.wad build_vs_64/src/Release/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: cry-dev-win64
-          path: build_vs_64/src/Release/*.exe
+          path: |
+            build_vs_64/src/Release/*.exe
+            build_vs_64/src/Release/cry.wad
           retention-days: 90
 
   build-linux:
@@ -107,6 +111,7 @@ jobs:
         run: |
           mkdir -p appdir/usr/bin
           cp build_linux/src/cry appdir/usr/bin/
+          cp iwad/cry.wad .
 
       - name: Package as AppImage
         run: |
@@ -120,5 +125,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: cry-dev-linux64
-          path: "**/*.AppImage"
+          path: |
+            **/*.AppImage
+            cry.wad
           retention-days: 90
