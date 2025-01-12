@@ -236,7 +236,6 @@ static void M_DrawSave(void);
 static void M_DrawSaveLoadBorder(int x,int y);
 static void M_SetupNextMenu(menu_t *menudef);
 static void M_DrawThermo(int x,int y,int thermWidth,int thermDot,int itemPos);
-static void M_DrawGammaThermo(int x, int y, int width, int dot, int itemPos);
 static int  M_StringHeight(const char *string);
 static void M_StartMessage(const char *string, void (*routine)(int), boolean input);
 static void M_ClearMenus (void);
@@ -4196,28 +4195,6 @@ M_DrawThermo
 
     V_DrawPatch((x + 8) + thermDot * 8, y, W_CacheLumpName("M_THERMO", PU_CACHE));
 
-    dp_translation = NULL;
-}
-
-static void M_DrawGammaThermo (int x, int y, int width, int dot, int itemPos)
-{
-    int xx = x;
-
-    // [JN] Highlight active slider and gem.
-    if (itemPos == itemOn)
-    {
-        dp_translation = cr[CR_MENU_BRIGHT2];
-    }
-
-    V_DrawShadowedPatchOptional(xx, y, W_CacheLumpName("M_THERML", PU_CACHE));
-    xx += 8;
-    for (int i = 0 ; i < width ; i++)
-    {
-        V_DrawShadowedPatchOptional(xx, y, W_CacheLumpName("M_THERMM", PU_CACHE));
-        xx += 8;
-    }
-    V_DrawShadowedPatchOptional(xx, y, W_CacheLumpName("M_THERMR", PU_CACHE));
-    V_DrawPatch((x + 8) + dot * 3, y, W_CacheLumpName("M_THERMO", PU_CACHE));
     dp_translation = NULL;
 }
 
