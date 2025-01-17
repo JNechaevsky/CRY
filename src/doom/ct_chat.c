@@ -41,16 +41,16 @@ void CT_Init (void)
     int   j = HU_FONTSTART;  // Small font.
 	int   n = HU_FONTSTART2; // Big font.
 	int   i;
-    char  buffer[9];
+    char  buffer[17];
 
     for (i = 0 ; i < HU_FONTSIZE_S ; i++)
     {
-        snprintf(buffer, 9, "STCFN%.3d", j++);
+        snprintf(buffer, sizeof(buffer), "STCFN%.3d", j++);
         hu_font_s[i] = (patch_t *) W_CacheLumpName(buffer, PU_STATIC);
     }
     for (i = 0 ; i < HU_FONTSIZE_B ; i++)
     {
-        snprintf(buffer, 9, "CHAR_%.3d", n++);
+        snprintf(buffer, sizeof(buffer), "CHAR_%.3d", n++);
         hu_font_b[i] = (patch_t *) W_CacheLumpName(buffer, PU_STATIC);
     }
 }
