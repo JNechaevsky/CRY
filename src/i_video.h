@@ -21,6 +21,7 @@
 #ifndef __I_VIDEO__
 #define __I_VIDEO__
 
+#include "SDL.h"
 #include "doomtype.h"
 #include "i_truecolor.h"
 #include "m_fixed.h"
@@ -92,7 +93,22 @@ void I_RenderReadPixels (byte **data, int *w, int *h);
 
 // Takes full 8 bit values.
 void I_SetPalette (int palette);
-extern pixel_t I_MapRGB (const uint8_t r, const uint8_t g, const uint8_t b);
+
+// [PN] We define a macro that manually assembles a 32-bit pixel from separate R/G/B values.
+// It applies the format's shift and loss adjustments, then merges all components (and alpha mask) with bitwise OR.
+// This avoids the overhead of the SDL_MapRGB() function call.
+//
+// Original human-readable mapping function from Crispy Doom is preserved as commented example in i_video.c file.
+// extern inline const pixel_t I_MapRGB (const uint8_t r, const uint8_t g, const uint8_t b);
+extern SDL_Surface *argbbuffer;
+#define I_MapRGB(r, g, b) ( \
+    (pixel_t)( \
+        (((uint32_t)(r) >> argbbuffer->format->Rloss) << argbbuffer->format->Rshift) | \
+        (((uint32_t)(g) >> argbbuffer->format->Gloss) << argbbuffer->format->Gshift) | \
+        (((uint32_t)(b) >> argbbuffer->format->Bloss) << argbbuffer->format->Bshift) | \
+        (argbbuffer->format->Amask) \
+    ) \
+)
 
 void I_FinishUpdate (void);
 
