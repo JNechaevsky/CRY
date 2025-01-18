@@ -302,8 +302,6 @@ void R_GenerateColoredColormaps (const byte k, const float scale, const int j)
 //
 // =============================================================================
 
-#define DISTMAP 2
-
 void R_InitColoredLightTables (void)
 {
     int i, j;
@@ -443,7 +441,7 @@ void R_InitColoredLightTables (void)
         for (j = 0 ; j < MAXLIGHTZ ; j++)
         {
             scale = (FixedDiv ((ORIGWIDTH / 2 * FRACUNIT), (j + 1) << LIGHTZSHIFT)) >> LIGHTSCALESHIFT;
-            level = BETWEEN(0, NUMCOLORMAPS - 1, startmap - scale / DISTMAP) * 256;
+            level = BETWEEN(0, NUMCOLORMAPS - 1, startmap - (scale >> 1)) * 256;
 
             zlight_EEC06B[i][j] = colormaps_EEC06B + level;
             zlight_D97C45[i][j] = colormaps_D97C45 + level;
@@ -495,7 +493,7 @@ void R_GenerateColoredSClights (const int width)
 
         for (j = 0 ; j < MAXLIGHTSCALE ; j++)
         {
-            level = BETWEEN(0, NUMCOLORMAPS-1, startmap - j * NONWIDEWIDTH / (width << detailshift) / DISTMAP) * 256;
+            level = BETWEEN(0, NUMCOLORMAPS - 1, startmap - ((j * NONWIDEWIDTH / (width << detailshift)) >> 1)) * 256;
 
             scalelight_EEC06B[i][j] = colormaps_EEC06B + level;
             scalelight_D97C45[i][j] = colormaps_D97C45 + level;
