@@ -4587,8 +4587,8 @@ boolean M_Responder (event_t* ev)
     if (testcontrols)
     {
         if (ev->type == ev_quit
-         || (ev->type == ev_keydown
-          && (ev->data1 == key_menu_activate || ev->data1 == key_menu_quit)))
+        || (ev->type == ev_keydown
+        && (ev->data1 == key_menu_activate || ev->data1 == key_menu_quit)))
         {
             I_Quit();
             return true;
@@ -4617,35 +4617,37 @@ boolean M_Responder (event_t* ev)
     }
 
     // key is the key pressed, ch is the actual character typed
-  
+
     ch = 0;
     key = -1;
-	
+
     if (ev->type == ev_joystick)
     {
         // Simulate key presses from joystick events to interact with the menu.
 
-	if (ev->data3 < 0)
-	{
-	    key = key_menu_up;
-	    joywait = I_GetTime() + 5;
-	}
-	else if (ev->data3 > 0)
-	{
-	    key = key_menu_down;
-	    joywait = I_GetTime() + 5;
-	}
-		
-	if (ev->data2 < 0)
-	{
-	    key = key_menu_left;
-	    joywait = I_GetTime() + 2;
-	}
-	else if (ev->data2 > 0)
-	{
-	    key = key_menu_right;
-	    joywait = I_GetTime() + 2;
-	}
+        if (ev->data3 < 0)
+        {
+            key = key_menu_up;
+            joywait = I_GetTime() + 5;
+        }
+        else
+        if (ev->data3 > 0)
+        {
+            key = key_menu_down;
+            joywait = I_GetTime() + 5;
+        }
+
+        if (ev->data2 < 0)
+        {
+            key = key_menu_left;
+            joywait = I_GetTime() + 2;
+        }
+        else
+        if (ev->data2 > 0)
+        {
+            key = key_menu_right;
+            joywait = I_GetTime() + 2;
+        }
 
 #define JOY_BUTTON_MAPPED(x) ((x) >= 0)
 #define JOY_BUTTON_PRESSED(x) (JOY_BUTTON_MAPPED(x) && (ev->data1 & (1 << (x))) != 0)
@@ -4699,241 +4701,238 @@ boolean M_Responder (event_t* ev)
     }
     else
     {
-	// [JN] Shows the mouse cursor when moved.
-	{
-	if (ev->data2 || ev->data3)
-	menu_mouse_allow = true;
-	menu_mouse_allow_click = false;
-	}
-
-	if (ev->type == ev_mouse && mousewait < I_GetTime())
-	{
-	    // [crispy] mouse_novert disables controlling the menus with the mouse
-	    // [JN] Not needed, as menu is fully controllable by mouse wheel and buttons.
-	    /*
-	    if (!mouse_novert)
-	    {
-	    mousey += ev->data3;
-	    }
-	    */
-	    if (mousey < lasty-30)
-	    {
-		key = key_menu_down;
-		mousewait = I_GetTime() + 5;
-		mousey = lasty -= 30;
-	    }
-	    else if (mousey > lasty+30)
-	    {
-		key = key_menu_up;
-		mousewait = I_GetTime() + 5;
-		mousey = lasty += 30;
-	    }
-		
-        // [JN] Disable menu left/right controls by mouse movement.
-        /*
-	    mousex += ev->data2;
-	    if (mousex < lastx-30)
-	    {
-		key = key_menu_left;
-		mousewait = I_GetTime() + 5;
-		mousex = lastx -= 30;
-	    }
-	    else if (mousex > lastx+30)
-	    {
-		key = key_menu_right;
-		mousewait = I_GetTime() + 5;
-		mousex = lastx += 30;
-	    }
-        */
-		
-        // [JN] Handle mouse bindings before going any farther.
-        // Catch only button pressing events, i.e. ev->data1.
-        if (MouseIsBinding && ev->data1)
+        // [JN] Shows the mouse cursor when moved.
         {
-            M_CheckMouseBind(SDL_mouseButton);
-            M_DoMouseBind(btnToBind, SDL_mouseButton);
-            btnToBind = 0;
-            MouseIsBinding = false;
-            mousewait = I_GetTime() + 5;
-            return true;
+            if (ev->data2 || ev->data3)
+                menu_mouse_allow = true;
+            menu_mouse_allow_click = false;
         }
 
-	    if (ev->data1&1)
-	    {
-		if (menuactive && currentMenu->menuitems[itemOn].status == 3)
-		{
-		// [JN] Allow repetitive on sliders to move it while mouse movement.
-		menu_mouse_allow_click = true;            
-		}
-		else
-		if (!ev->data2 && !ev->data3) // [JN] Do not consider movement as pressing.
-		{
-		if (!menuactive && !usergame)
-		{
-		M_StartControlPanel();  // [JN] Open the main menu if the game is not active.
-		}
-		else
-		if (messageToPrint && messageNeedsInput)
-		{
-		key = key_menu_confirm;  // [JN] Confirm by left mouse button.
-		}
-		else
-		{
-		key = key_menu_forward;
-		}
-		mousewait = I_GetTime() + 1;
-	    }
-	    }
-			
-	    if (ev->data1&2
-	    && !ev->data2 && !ev->data3)  // [JN] Do not consider movement as pressing.
-	    {
-		if (!menuactive && !usergame)
-		{
-		M_StartControlPanel();  // [JN] Open the main menu if the game is not active.
-		}
-		else
-		if (messageToPrint && messageNeedsInput)
-		{
-		key = key_menu_abort;  // [JN] Cancel by right mouse button.
-		}
-		else
-		if (saveStringEnter)
-		{
-		key = key_menu_abort;
-		saveStringEnter = 0;
-        M_ReadSaveStrings();  // [JN] Reread save strings after cancelation.
-		}
-		else
-		{
-		key = key_menu_back;
-		}
-		mousewait = I_GetTime() + 1;
-	    }
+        if (ev->type == ev_mouse && mousewait < I_GetTime())
+        {
+            // [crispy] mouse_novert disables controlling the menus with the mouse
+            // [JN] Not needed, as menu is fully controllable by mouse wheel and buttons.
+            /*
+            if (!mouse_novert)
+            {
+                mousey += ev->data3;
+            }
+            */
+            if (mousey < lasty - 30)
+            {
+                key = key_menu_down;
+                mousewait = I_GetTime() + 5;
+                mousey = lasty -= 30;
+            }
+            else
+            if (mousey > lasty + 30)
+            {
+                key = key_menu_up;
+                mousewait = I_GetTime() + 5;
+                mousey = lasty += 30;
+            }
 
-	    // [JN] Scrolls through menu item values or navigates between pages.
-	    if (ev->data1 & (1 << 4) && menuactive)
-	    {
-            if (currentMenu->menuitems[itemOn].status > 1)
+            // [JN] Disable menu left/right controls by mouse movement.
+            /*
+            mousex += ev->data2;
+            if (mousex < lastx - 30)
             {
-                // Scroll menu item backward
-                currentMenu->menuitems[itemOn].routine(0);
-                S_StartSound(NULL,sfx_stnmov);
+                key = key_menu_left;
+                mousewait = I_GetTime() + 5;
+                mousex = lastx -= 30;
+            }
+            else if (mousex > lastx + 30)
+            {
+                key = key_menu_right;
+                mousewait = I_GetTime() + 5;
+                mousex = lastx += 30;
+            }
+            */
+
+            // [JN] Handle mouse bindings before going any farther.
+            // Catch only button pressing events, i.e. ev->data1.
+            if (MouseIsBinding && ev->data1)
+            {
+                M_CheckMouseBind(SDL_mouseButton);
+                M_DoMouseBind(btnToBind, SDL_mouseButton);
+                btnToBind = 0;
+                MouseIsBinding = false;
+                mousewait = I_GetTime() + 5;
+                return true;
+            }
+
+            if (ev->data1 & 1)
+            {
+                if (menuactive && currentMenu->menuitems[itemOn].status == 3)
+                {
+                    // [JN] Allow repetitive on sliders to move it while mouse movement.
+                    menu_mouse_allow_click = true;
+                }
+                else
+                if (!ev->data2 && !ev->data3)   // [JN] Do not consider movement as pressing.
+                {
+                    if (!menuactive && !usergame)
+                    {
+                        M_StartControlPanel();  // [JN] Open the main menu if the game is not active.
+                    }
+                    else
+                    if (messageToPrint && messageNeedsInput)
+                    {
+                        key = key_menu_confirm; // [JN] Confirm by left mouse button.
+                    }
+                    else
+                    {
+                        key = key_menu_forward;
+                    }
+                    mousewait = I_GetTime() + 1;
+                }
+            }
+
+            if (ev->data1 & 2
+            && !ev->data2 && !ev->data3)  // [JN] Do not consider movement as pressing.
+            {
+                if (!menuactive && !usergame)
+                {
+                    M_StartControlPanel();  // [JN] Open the main menu if the game is not active.
+                }
+                else
+                if (messageToPrint && messageNeedsInput)
+                {
+                    key = key_menu_abort;  // [JN] Cancel by right mouse button.
+                }
+                else
+                if (saveStringEnter)
+                {
+                    key = key_menu_abort;
+                    saveStringEnter = 0;
+                    M_ReadSaveStrings();  // [JN] Reread save strings after cancelation.
+                }
+                else
+                {
+                    key = key_menu_back;
+                }
+                mousewait = I_GetTime() + 1;
+            }
+
+            // [JN] Scrolls through menu item values or navigates between pages.
+            if (ev->data1 & (1 << 4) && menuactive)
+            {
+                if (currentMenu->menuitems[itemOn].status > 1)
+                {
+                    // Scroll menu item backward
+                    currentMenu->menuitems[itemOn].routine(0);
+                    S_StartSound(NULL, sfx_stnmov);
+                }
+                else
+                if (currentMenu->ScrollAR && !saveStringEnter && !KbdIsBinding)
+                {
+                    M_ScrollPages(1);
+                }
+                mousewait = I_GetTime();
             }
             else
-            if (currentMenu->ScrollAR && !saveStringEnter && !KbdIsBinding)
+            if (ev->data1 & (1 << 3) && menuactive)
             {
-                M_ScrollPages(1);
+                if (currentMenu->menuitems[itemOn].status > 1)
+                {
+                    // Scroll menu item forward
+                    currentMenu->menuitems[itemOn].routine(1);
+                    S_StartSound(NULL, sfx_stnmov);
+                }
+                else
+                if (currentMenu->ScrollAR && !saveStringEnter && !KbdIsBinding)
+                {
+                    M_ScrollPages(0);
+                }
+                mousewait = I_GetTime();
             }
-            mousewait = I_GetTime();
-	    }
-	    else
-	    if (ev->data1 & (1 << 3) && menuactive)
-	    {
-            if (currentMenu->menuitems[itemOn].status > 1)
+        }
+        else
+        {
+            if (ev->type == ev_keydown)
             {
-                // Scroll menu item forward
-                currentMenu->menuitems[itemOn].routine(1);
-                S_StartSound(NULL,sfx_stnmov);
+                key = ev->data1;
+                ch = ev->data2;
+                // [JN] Hide mouse cursor by pressing a key.
+                menu_mouse_allow = false;
             }
-            else
-            if (currentMenu->ScrollAR && !saveStringEnter && !KbdIsBinding)
-            {
-                M_ScrollPages(0);
-                
-            }
-            mousewait = I_GetTime();
-	    }
-	}
-	else
-	{
-	    if (ev->type == ev_keydown)
-	    {
-		key = ev->data1;
-		ch = ev->data2;
-		// [JN] Hide mouse cursor by pressing a key.
-		menu_mouse_allow = false;
-	    }
-	}
+        }
     }
-    
+
     if (key == -1)
-	return false;
+        return false;
 
     // Save Game string input
     if (saveStringEnter)
     {
-	switch(key)
-	{
-	  case KEY_BACKSPACE:
-	    if (saveCharIndex > 0)
-	    {
-		saveCharIndex--;
-		savegamestrings[saveSlot][saveCharIndex] = 0;
-	    }
-	    break;
-
-          case KEY_ESCAPE:
-            saveStringEnter = 0;
-            I_StopTextInput();
-            M_StringCopy(savegamestrings[saveSlot], saveOldString,
-                         SAVESTRINGSIZE);
-            break;
-
-	  case KEY_ENTER:
-	    saveStringEnter = 0;
-            I_StopTextInput();
-	    if (savegamestrings[saveSlot][0])
-		M_DoSave(saveSlot);
-	    break;
-
-	  default:
-            // Savegame name entry. This is complicated.
-            // Vanilla has a bug where the shift key is ignored when entering
-            // a savegame name. If vanilla_keyboard_mapping is on, we want
-            // to emulate this bug by using ev->data1. But if it's turned off,
-            // it implies the user doesn't care about Vanilla emulation:
-            // instead, use ev->data3 which gives the fully-translated and
-            // modified key input.
-
-            if (ev->type != ev_keydown)
-            {
+        switch(key)
+        {
+            case KEY_BACKSPACE:
+                if (saveCharIndex > 0)
+                {
+                    saveCharIndex--;
+                    savegamestrings[saveSlot][saveCharIndex] = 0;
+                }
                 break;
-            }
-            if (vanilla_keyboard_mapping)
-            {
-                ch = ev->data1;
-            }
-            else
-            {
-                ch = ev->data3;
-            }
 
-            ch = toupper(ch);
-
-            if (ch != ' '
-             && (ch - HU_FONTSTART < 0 || ch - HU_FONTSTART >= HU_FONTSIZE_S))
-            {
+            case KEY_ESCAPE:
+                saveStringEnter = 0;
+                I_StopTextInput();
+                M_StringCopy(savegamestrings[saveSlot], saveOldString, SAVESTRINGSIZE);
                 break;
-            }
 
-	    if (ch >= 32 && ch <= 127 &&
-		saveCharIndex < SAVESTRINGSIZE-1 &&
-		M_StringWidth(savegamestrings[saveSlot]) <
-		(SAVESTRINGSIZE-2)*8)
-	    {
-		savegamestrings[saveSlot][saveCharIndex++] = ch;
-		savegamestrings[saveSlot][saveCharIndex] = 0;
-	    }
-	    break;
-	}
-	return true;
+            case KEY_ENTER:
+                saveStringEnter = 0;
+                I_StopTextInput();
+                if (savegamestrings[saveSlot][0])
+                    M_DoSave(saveSlot);
+                break;
+
+            default:
+                // Savegame name entry. This is complicated.
+                // Vanilla has a bug where the shift key is ignored when entering
+                // a savegame name. If vanilla_keyboard_mapping is on, we want
+                // to emulate this bug by using ev->data1. But if it's turned off,
+                // it implies the user doesn't care about Vanilla emulation:
+                // instead, use ev->data3 which gives the fully-translated and
+                // modified key input.
+                if (ev->type != ev_keydown)
+                {
+                    break;
+                }
+                if (vanilla_keyboard_mapping)
+                {
+                    ch = ev->data1;
+                }
+                else
+                {
+                    ch = ev->data3;
+                }
+
+                ch = toupper(ch);
+
+                if (ch != ' '
+                && (ch - HU_FONTSTART < 0 || ch - HU_FONTSTART >= HU_FONTSIZE_S))
+                {
+                    break;
+                }
+
+                if (ch >= 32 && ch <= 127
+                && saveCharIndex < SAVESTRINGSIZE - 1
+                && M_StringWidth(savegamestrings[saveSlot]) < (SAVESTRINGSIZE - 2) * 8)
+                {
+                    savegamestrings[saveSlot][saveCharIndex++] = ch;
+                    savegamestrings[saveSlot][saveCharIndex] = 0;
+                }
+                break;
+        }
+        return true;
     }
 
     // Take care of any messages that need input
     if (messageToPrint)
     {
-	if (messageNeedsInput)
+        if (messageNeedsInput)
         {
              // [JN] Allow to exclusevely confirm quit game by pressing F10 again.
             if (key == key_menu_quit && messageRoutine == M_QuitResponse)
@@ -4943,28 +4942,30 @@ boolean M_Responder (event_t* ev)
             }
 
             if (key != ' ' && key != KEY_ESCAPE
-             && key != key_menu_confirm && key != key_menu_abort
-             // [JN] Allow to confirm nightmare, end game and quit by pressing Enter.
-             && key != key_menu_forward)
+            &&  key != key_menu_confirm && key != key_menu_abort
+            // [JN] Allow to confirm nightmare, end game and quit by pressing Enter.
+            &&  key != key_menu_forward)
             {
                 return false;
             }
-	}
+        }
 
-	menuactive = messageLastMenuActive;
-	messageToPrint = 0;
-	if (messageRoutine)
-	    messageRoutine(key);
+        menuactive = messageLastMenuActive;
+        messageToPrint = 0;
+        if (messageRoutine)
+            messageRoutine(key);
 
-	// [JN] Do not close Save/Load menu after deleting a savegame.
-	if (currentMenu != &SaveDef && currentMenu != &LoadDef
-	// [JN] Do not close Options menu after pressing "N" in End Game.
-	&&  currentMenu != &ID_Def_Main
-    // [JN] Do not close bindings menu after keyboard/mouse binds reset.
-    &&  currentMenu != &ID_Def_Keybinds_6 && currentMenu != &ID_Def_MouseBinds)
-	menuactive = false;
-	S_StartSound(NULL,sfx_swtchx);
-	return true;
+        // [JN] Do not close Save/Load menu after deleting a savegame.
+        if (currentMenu != &SaveDef && currentMenu != &LoadDef
+        // [JN] Do not close Options menu after pressing "N" in End Game.
+        &&  currentMenu != &ID_Def_Main
+        // [JN] Do not close bindings menu after keyboard/mouse binds reset.
+        &&  currentMenu != &ID_Def_Keybinds_6 && currentMenu != &ID_Def_MouseBinds)
+        {
+            menuactive = false;
+        }
+        S_StartSound(NULL,sfx_swtchx);
+        return true;
     }
 
     // [JN] Handle keyboard bindings:
@@ -5007,108 +5008,108 @@ boolean M_Responder (event_t* ev)
 
     if (key != 0 && key == key_menu_screenshot)
     {
-	S_StartSound(NULL,sfx_itemup);    // [JN] Add audible feedback
-	G_ScreenShot ();
-	return true;
+        S_StartSound(NULL,sfx_itemup);    // [JN] Add audible feedback
+        G_ScreenShot ();
+        return true;
     }
 
     // F-Keys
     if (!menuactive)
     {
-	if (key == key_menu_decscreen)      // Screen size down
+        if (key == key_menu_decscreen)      // Screen size down
         {
-	    if (automapactive)
-		return false;
-	    M_SizeDisplay(0);
-	    S_StartSound(NULL,sfx_stnmov);
-	    return true;
-	}
+            if (automapactive)
+                return false;
+            M_SizeDisplay(0);
+            S_StartSound(NULL, sfx_stnmov);
+            return true;
+        }
         else if (key == key_menu_incscreen) // Screen size up
         {
-	    if (automapactive)
-		return false;
-	    M_SizeDisplay(1);
-	    S_StartSound(NULL,sfx_stnmov);
-	    return true;
-	}
+            if (automapactive)
+                return false;
+            M_SizeDisplay(1);
+            S_StartSound(NULL, sfx_stnmov);
+            return true;
+        }
         else if (key == key_menu_help)     // Help key
         {
-	    M_StartControlPanel ();
+            M_StartControlPanel ();
 
-	    currentMenu = &HelpDef;
-	    itemOn = 0;
-	    S_StartSound(NULL,sfx_swtchn);
-	    return true;
-	}
+            currentMenu = &HelpDef;
+            itemOn = 0;
+            S_StartSound(NULL, sfx_swtchn);
+            return true;
+        }
         else if (key == key_menu_save)     // Save
         {
-	    M_StartControlPanel();
-	    S_StartSound(NULL,sfx_swtchn);
-	    M_SaveGame(0);
-	    return true;
+            M_StartControlPanel();
+            S_StartSound(NULL, sfx_swtchn);
+            M_SaveGame(0);
+            return true;
         }
         else if (key == key_menu_load)     // Load
         {
-	    M_StartControlPanel();
-	    S_StartSound(NULL,sfx_swtchn);
-	    M_LoadGame(0);
-	    return true;
+            M_StartControlPanel();
+            S_StartSound(NULL, sfx_swtchn);
+            M_LoadGame(0);
+            return true;
         }
         else if (key == key_menu_volume)   // Sound Volume
         {
-	    M_StartControlPanel ();
-	    currentMenu = &SoundDef;
-	    itemOn = currentMenu->lastOn;
-	    S_StartSound(NULL,sfx_swtchn);
-	    return true;
-	}
+            M_StartControlPanel ();
+            currentMenu = &SoundDef;
+            itemOn = currentMenu->lastOn;
+            S_StartSound(NULL, sfx_swtchn);
+            return true;
+        }
         else if (key == key_menu_detail)   // Detail toggle
         {
-	    M_ChangeDetail(0);
-	    S_StartSound(NULL,sfx_swtchn);
-	    return true;
+            M_ChangeDetail(0);
+            S_StartSound(NULL, sfx_swtchn);
+            return true;
         }
         else if (key == key_menu_qsave)    // Quicksave
         {
-	    S_StartSound(NULL,sfx_swtchn);
-	    M_QuickSave();
-	    return true;
+            S_StartSound(NULL, sfx_swtchn);
+            M_QuickSave();
+            return true;
         }
         else if (key == key_menu_endgame)  // End game
         {
-	    S_StartSound(NULL,sfx_swtchn);
-	    M_EndGame(0);
-	    return true;
+            S_StartSound(NULL, sfx_swtchn);
+            M_EndGame(0);
+            return true;
         }
         else if (key == key_menu_messages) // Toggle messages
         {
-	    M_ChangeMessages(0);
-	    S_StartSound(NULL,sfx_swtchn);
-	    return true;
+            M_ChangeMessages(0);
+            S_StartSound(NULL, sfx_swtchn);
+            return true;
         }
         else if (key == key_menu_qload)    // Quickload
         {
-	    S_StartSound(NULL,sfx_swtchn);
-	    M_QuickLoad();
-	    return true;
+            S_StartSound(NULL, sfx_swtchn);
+            M_QuickLoad();
+            return true;
         }
         else if (key == key_menu_quit)     // Quit DOOM
         {
-	    S_StartSound(NULL,sfx_swtchn);
-	    M_QuitDOOM(0);
-	    return true;
+            S_StartSound(NULL, sfx_swtchn);
+            M_QuitDOOM(0);
+            return true;
         }
         // [crispy] those two can be considered as shortcuts for the IDCLEV cheat
         // and should be treated as such, i.e. add "if (!netgame)"
         else if (key != 0 && key == key_reloadlevel)
         {
             if (G_ReloadLevel())
-            return true;
+                return true;
         }
         else if (key != 0 && key == key_nextlevel)
         {
             if (G_GotoNextLevel())
-            return true;
+                return true;
         }
     }
 
@@ -5117,7 +5118,7 @@ boolean M_Responder (event_t* ev)
     {
         vid_gamma = M_INT_Slider(vid_gamma, 0, MAXGAMMA-1, 1 /*right*/, false);
         CT_SetMessage(&players[consoleplayer], gammalvls[vid_gamma][0], true, NULL);
-        I_SetPalette (st_palette);
+        I_SetPalette(st_palette);
         R_InitColormaps();
         R_FillBackScreen();
         st_fullupdate = true;
@@ -5136,13 +5137,13 @@ boolean M_Responder (event_t* ev)
     // Pop-up menu?
     if (!menuactive)
     {
-	if (key == key_menu_activate)
-	{
-		M_StartControlPanel ();
-		S_StartSound(NULL,sfx_swtchn);
-		return true;
-	}
-	return false;
+        if (key == key_menu_activate)
+        {
+            M_StartControlPanel();
+            S_StartSound(NULL, sfx_swtchn);
+            return true;
+        }
+        return false;
     }
 
     // Keys usable within menu
@@ -5152,146 +5153,144 @@ boolean M_Responder (event_t* ev)
         // Move down to next item
 
         do
-	{
-	    if (itemOn+1 > currentMenu->numitems-1)
-		itemOn = 0;
-	    else itemOn++;
-	    S_StartSound(NULL,sfx_pstop);
-    } while (currentMenu->menuitems[itemOn].status == -1);
+        {
+            if (itemOn + 1 > currentMenu->numitems - 1)
+                itemOn = 0;
+            else
+                itemOn++;
+            S_StartSound(NULL, sfx_pstop);
+        } while (currentMenu->menuitems[itemOn].status == -1);
 
-	return true;
+        return true;
     }
     else if (key == key_menu_up)
     {
         // Move back up to previous item
 
-	do
-	{
-	    if (!itemOn)
-		itemOn = currentMenu->numitems-1;
-	    else itemOn--;
-	    S_StartSound(NULL,sfx_pstop);
-    } while (currentMenu->menuitems[itemOn].status == -1);
+        do
+        {
+            if (!itemOn)
+                itemOn = currentMenu->numitems - 1;
+            else
+                itemOn--;
+            S_StartSound(NULL, sfx_pstop);
+        } while (currentMenu->menuitems[itemOn].status == -1);
 
-	return true;
+        return true;
     }
     else if (key == key_menu_left)
     {
-	// [JN] Go to previous-left menu by pressing Left Arrow.
-	if (currentMenu->ScrollAR)
-	{
-	    M_ScrollPages(false);
-	}
+        // [JN] Go to previous-left menu by pressing Left Arrow.
+        if (currentMenu->ScrollAR)
+            M_ScrollPages(false);
 
         // Slide slider left
-	if (currentMenu->menuitems[itemOn].routine &&
-	    currentMenu->menuitems[itemOn].status > 1)
-	{
-	    S_StartSound(NULL,sfx_stnmov);
-	    currentMenu->menuitems[itemOn].routine(0);
-	}
-	return true;
+        if (currentMenu->menuitems[itemOn].routine
+        &&  currentMenu->menuitems[itemOn].status > 1)
+        {
+            S_StartSound(NULL, sfx_stnmov);
+            currentMenu->menuitems[itemOn].routine(0);
+        }
+        return true;
     }
     else if (key == key_menu_right)
     {
-	// [JN] Go to next-right menu by pressing Right Arrow.
-	if (currentMenu->ScrollAR)
-	{
-	    M_ScrollPages(true);
-	}
+        // [JN] Go to next-right menu by pressing Right Arrow.
+        if (currentMenu->ScrollAR)
+            M_ScrollPages(true);
 
         // Slide slider right
-	if (currentMenu->menuitems[itemOn].routine &&
-	    currentMenu->menuitems[itemOn].status > 1)
-	{
-	    S_StartSound(NULL,sfx_stnmov);
-	    currentMenu->menuitems[itemOn].routine(1);
-	}
-	return true;
+        if (currentMenu->menuitems[itemOn].routine
+        &&  currentMenu->menuitems[itemOn].status > 1)
+        {
+            S_StartSound(NULL, sfx_stnmov);
+            currentMenu->menuitems[itemOn].routine(1);
+        }
+        return true;
     }
     else if (key == key_menu_forward)
     {
         // Activate menu item
 
-	if (currentMenu->menuitems[itemOn].routine &&
-	    currentMenu->menuitems[itemOn].status)
-	{
-	    currentMenu->lastOn = itemOn;
-	    if (currentMenu->menuitems[itemOn].status == 2)
-	    {
-		currentMenu->menuitems[itemOn].routine(1);      // right arrow
-		S_StartSound(NULL,sfx_stnmov);
-	    }
-	    else
-	    {
-		currentMenu->menuitems[itemOn].routine(itemOn);
-		S_StartSound(NULL,sfx_pistol);
-	    }
-	}
-	return true;
+        if (currentMenu->menuitems[itemOn].routine
+        &&  currentMenu->menuitems[itemOn].status)
+        {
+            currentMenu->lastOn = itemOn;
+            if (currentMenu->menuitems[itemOn].status == 2)
+            {
+                currentMenu->menuitems[itemOn].routine(1);      // right arrow
+                S_StartSound(NULL, sfx_stnmov);
+            }
+            else
+            {
+                currentMenu->menuitems[itemOn].routine(itemOn);
+                S_StartSound(NULL, sfx_pistol);
+            }
+        }
+        return true;
     }
     else if (key == key_menu_activate)
     {
         // Deactivate menu
 
-	currentMenu->lastOn = itemOn;
-	M_ClearMenus ();
-	S_StartSound(NULL,sfx_swtchx);
-	return true;
+        currentMenu->lastOn = itemOn;
+        M_ClearMenus ();
+        S_StartSound(NULL, sfx_swtchx);
+        return true;
     }
     else if (key == key_menu_back)
     {
         // Go back to previous menu
 
-	currentMenu->lastOn = itemOn;
-	if (currentMenu->prevMenu)
-	{
-	    currentMenu = currentMenu->prevMenu;
-	    M_Reset_Line_Glow();
-	    itemOn = currentMenu->lastOn;
-	    S_StartSound(NULL,sfx_swtchn);
-	}
-	// [JN] Close menu if pressed "back" in Doom main or CRL main menu.
-	else
-	if (currentMenu == &MainDef || currentMenu == &ID_Def_Main)
-	{
-	    S_StartSound(NULL,sfx_swtchx);
-	    M_ClearMenus();
-	}
-	return true;
+        currentMenu->lastOn = itemOn;
+        if (currentMenu->prevMenu)
+        {
+            currentMenu = currentMenu->prevMenu;
+            M_Reset_Line_Glow();
+            itemOn = currentMenu->lastOn;
+            S_StartSound(NULL, sfx_swtchn);
+        }
+        // [JN] Close menu if pressed "back" in Doom main or CRL main menu.
+        else
+        if (currentMenu == &MainDef || currentMenu == &ID_Def_Main)
+        {
+            S_StartSound(NULL, sfx_swtchx);
+            M_ClearMenus();
+        }
+        return true;
     }
     // [crispy] delete a savegame
     else if (key == key_menu_del)
     {
-	if (currentMenu == &LoadDef || currentMenu == &SaveDef)
-	{
-	    if (LoadMenu[itemOn].status)
-	    {
-		currentMenu->lastOn = itemOn;
-		M_ConfirmDeleteGame();
-		return true;
-	    }
-	    else
-	    {
-		return true;
-	    }
-	}
-    // [JN] ...or clear key bind.
-	else
-	if (currentMenu == &ID_Def_Keybinds_1 || currentMenu == &ID_Def_Keybinds_2
-	||  currentMenu == &ID_Def_Keybinds_3 || currentMenu == &ID_Def_Keybinds_4
-	||  currentMenu == &ID_Def_Keybinds_5 || currentMenu == &ID_Def_Keybinds_6)
-	{
-	    M_ClearBind(itemOn);
-	    return true;
-	}
-    // [JN] ...or clear mouse bind.
-	else
-	if (currentMenu == &ID_Def_MouseBinds)
-	{
-	    M_ClearMouseBind(itemOn);
-	    return true;
-	}
+        if (currentMenu == &LoadDef || currentMenu == &SaveDef)
+        {
+            if (LoadMenu[itemOn].status)
+            {
+                currentMenu->lastOn = itemOn;
+                M_ConfirmDeleteGame();
+                return true;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        // [JN] ...or clear key bind.
+        else
+        if (currentMenu == &ID_Def_Keybinds_1 || currentMenu == &ID_Def_Keybinds_2
+        ||  currentMenu == &ID_Def_Keybinds_3 || currentMenu == &ID_Def_Keybinds_4
+        ||  currentMenu == &ID_Def_Keybinds_5 || currentMenu == &ID_Def_Keybinds_6)
+        {
+            M_ClearBind(itemOn);
+            return true;
+        }
+        // [JN] ...or clear mouse bind.
+        else
+        if (currentMenu == &ID_Def_MouseBinds)
+        {
+            M_ClearMouseBind(itemOn);
+            return true;
+        }
     }
     // [JN] Go to previous-left menu by pressing Page Up key.
     else if (key == KEY_PGUP)
@@ -5316,24 +5315,24 @@ boolean M_Responder (event_t* ev)
 
     else if (ch != 0 || IsNullKey(key))
     {
-	for (i = itemOn+1;i < currentMenu->numitems;i++)
+        for (i = itemOn + 1 ; i < currentMenu->numitems ; i++)
         {
-	    if (currentMenu->menuitems[i].alphaKey == ch)
-	    {
-		itemOn = i;
-		S_StartSound(NULL,sfx_pstop);
-		return true;
-	    }
+            if (currentMenu->menuitems[i].alphaKey == ch)
+            {
+                itemOn = i;
+                S_StartSound(NULL, sfx_pstop);
+                return true;
+            }
         }
 
-	for (i = 0;i <= itemOn;i++)
+        for (i = 0 ; i <= itemOn ; i++)
         {
-	    if (currentMenu->menuitems[i].alphaKey == ch)
-	    {
-		itemOn = i;
-		S_StartSound(NULL,sfx_pstop);
-		return true;
-	    }
+            if (currentMenu->menuitems[i].alphaKey == ch)
+            {
+                itemOn = i;
+                S_StartSound(NULL, sfx_pstop);
+                return true;
+            }
         }
     }
 
