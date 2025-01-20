@@ -875,10 +875,10 @@ static void ST_updateFaceWidget (void)
 
 void ST_doPaletteStuff (void)
 {
-    int palette;
     int red = plyr->damagecount;
     int yel = plyr->bonuscount;
     int grn = (plyr->powers[pw_ironfeet] > 4*32 || plyr->powers[pw_ironfeet] & 8);
+    int palette = 0;
 
     if (plyr->powers[pw_strength])
     {
@@ -906,6 +906,7 @@ void ST_doPaletteStuff (void)
     else if (yel)
     {
         palette = BONUSPAL;
+        yel_pane_alpha = MIN(yel * BONUSADD, 127);
         
         // [JN] If rad palette is active, use special bonus+radiation palette.
         if (grn)
@@ -916,10 +917,6 @@ void ST_doPaletteStuff (void)
     else if (grn)
     {
         palette = RADIATIONPAL;
-    }
-    else
-    {
-        palette = 0;
     }
 
     if (palette != st_palette || yel)

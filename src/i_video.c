@@ -1472,7 +1472,7 @@ static void SetVideoMode(void)
         SDL_SetTextureBlendMode(palette_01, SDL_BLENDMODE_MOD); // SDL_BLENDMODE_MUL
 
         SDL_FillRect(argbbuffer, NULL, I_MapRGB(255, 225, 225));
-        palette_01 = SDL_CreateTextureFromSurface(renderer, argbbuffer);
+        palette_02 = SDL_CreateTextureFromSurface(renderer, argbbuffer);
         SDL_SetTextureBlendMode(palette_02, SDL_BLENDMODE_MOD); // SDL_BLENDMODE_MUL
 
         SDL_FillRect(argbbuffer, NULL, I_MapRGB(255, 210, 210));
@@ -1534,7 +1534,7 @@ static void SetVideoMode(void)
         // Yellow palette
         SDL_FillRect(argbbuffer, NULL, I_MapRGB(255, 164, 0));
         palette_17 = SDL_CreateTextureFromSurface(renderer, argbbuffer);
-        SDL_SetTextureBlendMode(palette_17, SDL_BLENDMODE_ADD);
+        SDL_SetTextureBlendMode(palette_17, SDL_BLENDMODE_BLEND);
 
         // Green palette
         SDL_FillRect(argbbuffer, NULL, I_MapRGB(64, 255, 0));

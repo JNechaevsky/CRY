@@ -222,7 +222,6 @@ void P_GiveCard (player_t *player, card_t card)
 	if (player->cards[card])
 		return;		
 	player->bonuscount = BONUSADD;
-	yel_pane_alpha += player->bonuscount;  // [JN] CRY: smooth yellow palette fading.
 	player->cards[card] = 1;
 }
 
@@ -550,7 +549,6 @@ void P_TouchSpecialThing (mobj_t *special, mobj_t *toucher)
     P_RemoveMobj (special);
 
     player->bonuscount += BONUSADD;
-    yel_pane_alpha += player->bonuscount;  // [JN] CRY: smooth yellow palette fading.
     // [JN] Limit bonus palette duration to 4 seconds.
     if (player->bonuscount > 4 * TICRATE)
     player->bonuscount = 4 * TICRATE;
