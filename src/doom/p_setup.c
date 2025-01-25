@@ -393,6 +393,45 @@ void P_LoadSubsectors (int lump)
 
 
 
+// -----------------------------------------------------------------------------
+// PrepareSectorColors
+// [PN] Prepares an array of colors for sectors in the current map. 
+// This function populates a global array, `color_for_sector`, 
+// where each element corresponds to a sector's color based on 
+// the `sectorcolor` table for the given map. If no color is defined 
+// for a sector, it is initialized to 0 (default value).
+//
+// @param gamemap      The current map number.
+// @param colors       Pointer to the sectorcolor_t array defining colors.
+// @param numsectors   Number of sectors in the map.
+// -----------------------------------------------------------------------------
+
+static unsigned int *color_for_sector = NULL;
+
+static void P_PrepareSectorColors(int gamemap, const sectorcolor_t *colors, int numsectors)
+{
+    // [PN] Allocate memory for sector colors (numsectors elements)
+    color_for_sector = malloc(sizeof(unsigned) * numsectors);
+    
+    // [PN] Initialize the array with zeros (default values)
+    memset(color_for_sector, 0, sizeof(unsigned) * numsectors);
+
+    // [PN] Traverse the sectorcolor array until the end marker is found
+    for (int j = 0; colors[j].map != -1; j++)
+    {
+        // [PN] Check if the map matches, the sector index is valid, 
+        // and the color value is non-zero
+        if (colors[j].map == gamemap
+        &&  colors[j].sector >= 0
+        &&  colors[j].sector < numsectors
+        &&  colors[j].color != 0)
+        {
+            // [PN] Assign the color to the corresponding sector
+            color_for_sector[colors[j].sector] = colors[j].color;
+        }
+    }
+}
+
 //
 // P_LoadSectors
 //
@@ -415,6 +454,11 @@ void P_LoadSectors (int lump)
     // [crispy] fail on missing sectors
     if (!data || !numsectors)
 	I_Error("P_LoadSectors: No sectors in map!");
+
+    // [PN] Prepare the color mapping for sectors in the current map.
+    // This initializes the global array `color_for_sector` with
+    // the color values defined in the `sectorcolor` table.
+    P_PrepareSectorColors(gamemap, sectorcolor, numsectors);
 
     ms = (mapsector_t *)data;
     ss = sectors;
@@ -442,19 +486,14 @@ void P_LoadSectors (int lump)
 
         // [JN] Inject color tables into the sectors of IWAD levels.
         if (canmodify)
-        {
-            for (int j = 0; sectorcolor[j].map != -1; j++)
-            {
-                if (i == sectorcolor[j].sector && gamemap == sectorcolor[j].map)
-                {
-                    if (sectorcolor[j].color)
-                    {
-                        ss->color = sectorcolor[j].color;
-                    }
-                    break;
-                }
-            }
-        }
+        ss->color = color_for_sector[i];
+    }
+    
+    // [PN] Protection against accidental double-free
+    if (color_for_sector)
+    {
+        free(color_for_sector);
+        color_for_sector = NULL;
     }
 	
     W_ReleaseLumpNum(lump);
