@@ -41,11 +41,6 @@
 #define FIELDOFVIEW		2048	
 
 
-// [JN] Will be false if modified PLAYPAL lump is loaded.
-boolean original_playpal = true;
-// [JN] Will be false if modified COLORMAP lump is loaded.
-boolean original_colormap = true;
-
 int			viewangleoffset;
 
 // increment every time a check is made
@@ -860,18 +855,6 @@ void R_ExecuteSetViewSize (void)
 
 void R_Init (void)
 {
-    // [JN] Check for modified PLAYPAL lump.
-    if (W_CheckMultipleLumps("PLAYPAL") > 1)
-    {
-        original_playpal = false;
-    }
-
-    // [JN] Check for modified COLORMAP lump.
-    if (W_CheckMultipleLumps("COLORMAP") > 1)
-    {
-        original_colormap = false;
-    }
-
     R_InitData ();
     printf (".");
     // viewwidth / viewheight / dp_detail_level are set by the defaults
