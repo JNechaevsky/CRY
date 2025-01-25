@@ -2,40 +2,83 @@ name: Build-Static-Win64-and-Linux-AppImage
 
 on:
   push:
-    branches: [ main, simple ]
+    branches:
+      - main
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   build-windows:
     runs-on: windows-latest
+    env:
+      VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Export GitHub Actions cache environment variables
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
+      - name: Get latest VCPKG commit
+        shell: bash
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          cd vcpkg
+          export LATEST_COMMIT=$(git rev-parse HEAD)
+          echo "LATEST_COMMIT=$LATEST_COMMIT" >> $GITHUB_ENV
+
       - name: Install vcpkg
-        run: .\vcpkg\bootstrap-vcpkg.bat
-      - name: Install deps
-        run: .\vcpkg\vcpkg.exe install sdl2 sdl2-mixer[libflac,libmodplug,mpg123,opusfile] libsamplerate `
+        run: |
+          .\vcpkg\bootstrap-vcpkg.bat
+
+      - name: Remove vcpkg.json for classic mode
+        shell: bash
+        run: |
+          if [ -f "vcpkg.json" ]; then
+            rm "vcpkg.json"
+          fi
+
+      - name: Install Dependencies with vcpkg
+        run: |
+          .\vcpkg\vcpkg.exe install sdl2 sdl2-mixer[libflac,libmodplug,mpg123,opusfile] libsamplerate `
           --triplet x64-windows-static-release `
           --overlay-triplets=cmake/triplets
-      - name: Build & pack
+
+      - name: Configure CMake
         run: |
-          cmake -B build_vs_64 -S . -DCMAKE_BUILD_TYPE=Release -DENABLE_LTO=ON `
-            -DVCPKG_TARGET_TRIPLET="x64-windows-static-release" `
-            -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded `
-            -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /Ob2 /DNDEBUG /GL /Oy" `
-            -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake
+          cmake -B build_vs_64 -S . -DCMAKE_BUILD_TYPE=Release `
+                -DENABLE_LTO=ON `
+                -DVCPKG_TARGET_TRIPLET="x64-windows-static-release" `
+                -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded `
+                -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /Ob2 /DNDEBUG /GL /Oy" `
+                -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake
+
+      - name: Build and include cry.wad
+        run: |
           cmake --build build_vs_64 --config Release --parallel
           cp iwad/cry.wad build_vs_64/src/Release/
-      - uses: actions/upload-artifact@v4
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
           name: cry-dev-win64
-          path: build_vs_64/src/Release/*.exe
+          path: |
+            build_vs_64/src/Release/*.exe
+            build_vs_64/src/Release/cry.wad
+          retention-days: 90
 
   build-linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Install system deps
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y cmake g++ fuse patchelf \
@@ -45,30 +88,45 @@ jobs:
             libx11-dev libxext-dev libxrender-dev libxrandr-dev \
             libxcb1-dev libxcb-render0-dev libxcb-shape0-dev \
             libxcb-xfixes0-dev
-      - name: Download linuxdeploy
+
+      - name: Install linuxdeploy and plugin
         run: |
           wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
           wget -q https://github.com/linuxdeploy/linuxdeploy-plugin-appimage/releases/download/continuous/linuxdeploy-plugin-appimage-x86_64.AppImage
           chmod +x linuxdeploy*.AppImage
-      - name: Build
+
+      - name: Build the project
         run: |
-          cmake -B build_linux -S . -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_C_FLAGS_RELEASE="-O3 -march=x86-64-v2 -mtune=generic -flto -fno-math-errno -fomit-frame-pointer -funroll-loops -DNDEBUG"
+          cmake -B build_linux -S . -DCMAKE_BUILD_TYPE=Release -D \
+            CMAKE_C_FLAGS_RELEASE="-O3 -march=x86-64-v2 -mtune=generic -flto -fno-math-errno -fomit-frame-pointer -funroll-loops -DNDEBUG"
           cmake --build build_linux --config Release
-      - name: Package as AppImage
+
+      - name: Add desktop file and icon
         run: |
-          mkdir -p appdir/usr/bin
-          cp build_linux/src/cry appdir/usr/bin/
-          cp iwad/cry.wad .
           mkdir -p appdir/usr/share/applications
           cp data/doom.desktop appdir/usr/share/applications/cry.desktop
           mkdir -p appdir/usr/share/icons/hicolor/128x128/apps
           cp data/doom.png appdir/usr/share/icons/hicolor/128x128/apps/cry.png
+
+      - name: Add executable to AppDir
+        run: |
+          mkdir -p appdir/usr/bin
+          cp build_linux/src/cry appdir/usr/bin/
+          cp iwad/cry.wad .
+
+      - name: Package as AppImage
+        run: |
           ./linuxdeploy-x86_64.AppImage --appdir=appdir --output appimage
+
+      - name: Clean up unnecessary files
+        run: |
           rm -f linuxdeploy*.AppImage
-      - uses: actions/upload-artifact@v4
+
+      - name: Upload AppImage
+        uses: actions/upload-artifact@v4
         with:
           name: cry-dev-linux64
           path: |
             **/*.AppImage
             cry.wad
+          retention-days: 90
