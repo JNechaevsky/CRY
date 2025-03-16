@@ -177,12 +177,21 @@ typedef struct menu_s
     boolean		ScrollPG;	// [JN] Menu can be scrolled by PGUP/PGDN keys
 } menu_t;
 
+// [JN] For currentMenu->menuitems[itemOn].statuses:
+#define STS_SKIP -1
+#define STS_NONE  0
+#define STS_SWTC  1
+#define STS_MUL1  2
+#define STS_MUL2  3
+#define STS_SLDR  4
+
 // [JN] Macro definitions for first two items of menuitem_t.
 // Trailing zero initializes "tics" field.
-#define M_SKIP -1,0  // Skippable, cursor can't get here.
-#define M_SWTC  1,0  // On/off type or entering function.
-#define M_LFRT  2,0  // Multichoice function.
-#define M_SLDR  3,0  // Slider line.
+#define M_SKIP    STS_SKIP,0  // Skippable, cursor can't get here.
+#define M_SWTC    STS_SWTC,0  // On/off type or entering function.
+#define M_MUL1    STS_MUL1,0  // Multichoice function: increase by wheel up, decrease by wheel down
+#define M_MUL2    STS_MUL2,0  // Multichoice function: decrease by wheel up, increase by wheel down
+#define M_SLDR    STS_SLDR,0  // Slider line.
 
 // [JN] Small cursor timer for glowing effect.
 static short   cursor_tics = 0;
@@ -1096,15 +1105,15 @@ static void M_Draw_ID_Main (void)
 
 static menuitem_t ID_Menu_Video[]=
 {
-    { M_LFRT, "RENDERING RESOLUTION", M_ID_RenderingRes,  'r' },
-    { M_LFRT, "WIDESCREEN MODE",      M_ID_Widescreen,    'w' },
-    { M_LFRT, "EXCLUSIVE FULLSCREEN", M_ID_ExclusiveFS,  'e' },
-    { M_LFRT, "UNCAPPED FRAMERATE",   M_ID_UncappedFPS,   'u' },
-    { M_LFRT, "FRAMERATE LIMIT",      M_ID_LimitFPS,      'f' },
-    { M_LFRT, "ENABLE VSYNC",         M_ID_VSync,         'e' },
-    { M_LFRT, "SHOW FPS COUNTER",     M_ID_ShowFPS,       's' },
-    { M_LFRT, "PIXEL SCALING",        M_ID_PixelScaling,  'p' },
-    { M_LFRT, "SCREEN WIPE EFFECT",   M_ID_ScreenWipe,    's' },
+    { M_MUL1, "RENDERING RESOLUTION", M_ID_RenderingRes,  'r' },
+    { M_MUL1, "WIDESCREEN MODE",      M_ID_Widescreen,    'w' },
+    { M_MUL2, "EXCLUSIVE FULLSCREEN", M_ID_ExclusiveFS,  'e' },
+    { M_MUL2, "UNCAPPED FRAMERATE",   M_ID_UncappedFPS,   'u' },
+    { M_MUL1, "FRAMERATE LIMIT",      M_ID_LimitFPS,      'f' },
+    { M_MUL2, "ENABLE VSYNC",         M_ID_VSync,         'e' },
+    { M_MUL2, "SHOW FPS COUNTER",     M_ID_ShowFPS,       's' },
+    { M_MUL2, "PIXEL SCALING",        M_ID_PixelScaling,  'p' },
+    { M_MUL2, "SCREEN WIPE EFFECT",   M_ID_ScreenWipe,    's' },
 };
 
 static menu_t ID_Def_Video =
@@ -1363,15 +1372,15 @@ static menuitem_t ID_Menu_Display[]=
     { M_SLDR, "GAMMA-CORRECTION",        M_ID_Gamma,             'g' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
-    { M_LFRT, "EMULATE CRY PALETTE",     M_ID_CRYPalette,        'e' },
-    { M_LFRT, "FIELD OF VIEW",           M_ID_FOV,               'f' },
-    { M_LFRT, "MENU BACKGROUND SHADING", M_ID_MenuShading,       'm' },
-    { M_LFRT, "EXTRA LEVEL BRIGHTNESS",  M_ID_LevelBrightness,   'e' },
+    { M_MUL2, "EMULATE CRY PALETTE",     M_ID_CRYPalette,        'e' },
+    { M_MUL1, "FIELD OF VIEW",           M_ID_FOV,               'f' },
+    { M_MUL1, "MENU BACKGROUND SHADING", M_ID_MenuShading,       'm' },
+    { M_MUL1, "EXTRA LEVEL BRIGHTNESS",  M_ID_LevelBrightness,   'e' },
     { M_SKIP, "", 0, '\0' },
-    { M_LFRT, "MESSAGES ENABLED",        M_ChangeMessages,       'm' },
-    { M_LFRT, "MESSAGES ALIGNMENT",      M_ID_MessagesAlignment, 'm' },
-    { M_LFRT, "TEXT CASTS SHADOWS",      M_ID_TextShadows,       't' },
-    { M_LFRT, "LOCAL TIME",              M_ID_LocalTime,         'l' },
+    { M_MUL2, "MESSAGES ENABLED",        M_ChangeMessages,       'm' },
+    { M_MUL2, "MESSAGES ALIGNMENT",      M_ID_MessagesAlignment, 'm' },
+    { M_MUL2, "TEXT CASTS SHADOWS",      M_ID_TextShadows,       't' },
+    { M_MUL2, "LOCAL TIME",              M_ID_LocalTime,         'l' },
 };
 
 static menu_t ID_Def_Display =
@@ -1518,12 +1527,12 @@ static menuitem_t ID_Menu_Sound[]=
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
-    { M_LFRT, "SFX PLAYBACK",              M_ID_SFXSystem,    's' },
-    { M_LFRT, "MUSIC PLAYBACK",            M_ID_MusicSystem,  'm' },
-    { M_LFRT, "SOUND EFFECTS MODE",        M_ID_SFXMode,      's' },
-    { M_LFRT, "JAGUAR SFX PITCH-SHIFTING", M_ID_PitchShift,   'j' },
-    { M_LFRT, "NUMBER OF SFX TO MIX",      M_ID_SFXChannels,  'n' },
-    { M_LFRT, "MUTE INACTIVE WINDOW",      M_ID_MuteInactive, 'm' },
+    { M_MUL2, "SFX PLAYBACK",              M_ID_SFXSystem,    's' },
+    { M_MUL2, "MUSIC PLAYBACK",            M_ID_MusicSystem,  'm' },
+    { M_MUL1, "SOUND EFFECTS MODE",        M_ID_SFXMode,      's' },
+    { M_MUL2, "JAGUAR SFX PITCH-SHIFTING", M_ID_PitchShift,   'j' },
+    { M_MUL1, "NUMBER OF SFX TO MIX",      M_ID_SFXChannels,  'n' },
+    { M_MUL2, "MUTE INACTIVE WINDOW",      M_ID_MuteInactive, 'm' },
 };
 
 static menu_t ID_Def_Sound =
@@ -1732,9 +1741,9 @@ static menuitem_t ID_Menu_Controls[]=
     { M_SLDR, "ACCELERATION THRESHOLD",       M_ID_Controls_Threshold,    'a' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
-    { M_LFRT, "MOUSE LOOK",                   M_ID_Controls_MLook,        'm' },
-    { M_LFRT, "VERTICAL MOUSE MOVEMENT",      M_ID_Controls_NoVert,       'v' },
-    { M_LFRT, "INVERT VERTICAL AXIS",         M_ID_Controls_InvertY,      'v' },
+    { M_MUL2, "MOUSE LOOK",                   M_ID_Controls_MLook,        'm' },
+    { M_MUL2, "VERTICAL MOUSE MOVEMENT",      M_ID_Controls_NoVert,       'v' },
+    { M_MUL2, "INVERT VERTICAL AXIS",         M_ID_Controls_InvertY,      'v' },
 };
 
 static menu_t ID_Def_Controls =
@@ -2615,16 +2624,16 @@ static void M_Draw_ID_MouseBinds (void)
 
 static menuitem_t ID_Menu_Widgets[]=
 {
-    { M_LFRT, "PLACEMENT",             M_ID_Widget_Placement, 'p' },
-    { M_LFRT, "ALIGNMENT",             M_ID_Widget_Alignment, 'a' },
-    { M_LFRT, "KIS STATS",             M_ID_Widget_KIS,       'k' },
-    { M_LFRT, "- STATS FORMAT",        M_ID_Widget_KIS_Format,'s' },
-    { M_LFRT, "LEVEL TIME",            M_ID_Widget_Time,      'l' },
-    { M_LFRT, "TOTAL TIME",            M_ID_Widget_TotalTime, 't' },
-    { M_LFRT, "LEVEL NAME",            M_ID_Widget_LevelName, 'l' },
-    { M_LFRT, "PLAYER COORDS",         M_ID_Widget_Coords,    'p' },
-    { M_LFRT, "RENDER COUNTERS",       M_ID_Widget_Render,    'r' },
-    { M_LFRT, "TARGET'S HEALTH",       M_ID_Widget_Health,    't' },
+    { M_MUL2, "PLACEMENT",             M_ID_Widget_Placement, 'p' },
+    { M_MUL2, "ALIGNMENT",             M_ID_Widget_Alignment, 'a' },
+    { M_MUL2, "KIS STATS",             M_ID_Widget_KIS,       'k' },
+    { M_MUL2, "- STATS FORMAT",        M_ID_Widget_KIS_Format,'s' },
+    { M_MUL2, "LEVEL TIME",            M_ID_Widget_Time,      'l' },
+    { M_MUL2, "TOTAL TIME",            M_ID_Widget_TotalTime, 't' },
+    { M_MUL2, "LEVEL NAME",            M_ID_Widget_LevelName, 'l' },
+    { M_MUL2, "PLAYER COORDS",         M_ID_Widget_Coords,    'p' },
+    { M_MUL2, "RENDER COUNTERS",       M_ID_Widget_Render,    'r' },
+    { M_MUL2, "TARGET'S HEALTH",       M_ID_Widget_Health,    't' },
 };
 
 static menu_t ID_Def_Widgets =
@@ -2766,13 +2775,13 @@ static void M_ID_Widget_Health (int choice)
 
 static menuitem_t ID_Menu_Automap[]=
 {
-    { M_LFRT, "LINE SMOOTHING",        M_ID_Automap_Smooth,   'l' },
-    { M_LFRT, "LINE THICKNESS",        M_ID_Automap_Thick,    'l' },
-    { M_LFRT, "SQUARE ASPECT RATIO",   M_ID_Automap_Square,   's' },
-    { M_LFRT, "MARK SECRET SECTORS",   M_ID_Automap_Secrets,  'm' },
-    { M_LFRT, "ROTATE MODE",           M_ID_Automap_Rotate,   'r' },
-    { M_LFRT, "OVERLAY MODE",          M_ID_Automap_Overlay,  'o' },
-    { M_LFRT, "OVERLAY SHADING LEVEL", M_ID_Automap_Shading,  'o' },
+    { M_MUL2, "LINE SMOOTHING",        M_ID_Automap_Smooth,   'l' },
+    { M_MUL1, "LINE THICKNESS",        M_ID_Automap_Thick,    'l' },
+    { M_MUL2, "SQUARE ASPECT RATIO",   M_ID_Automap_Square,   's' },
+    { M_MUL2, "MARK SECRET SECTORS",   M_ID_Automap_Secrets,  'm' },
+    { M_MUL2, "ROTATE MODE",           M_ID_Automap_Rotate,   'r' },
+    { M_MUL2, "OVERLAY MODE",          M_ID_Automap_Overlay,  'o' },
+    { M_MUL1, "OVERLAY SHADING LEVEL", M_ID_Automap_Shading,  'o' },
 };
 
 static menu_t ID_Def_Automap =
@@ -2881,21 +2890,21 @@ static void M_ID_Automap_Secrets (int choice)
 
 static menuitem_t ID_Menu_Gameplay_1[]=
 {
-    { M_LFRT, "BRIGHTMAPS",                  M_ID_Brightmaps,        'b' },
-    { M_LFRT, "TRANSLUCENCY",                M_ID_Translucency,      't' },
-    { M_LFRT, "FUZZ EFFECT",                 M_ID_ImprovedFuzz,      'f' },
-    { M_LFRT, "COLORED LIGHTING",            M_ID_ColoredLighting,   'c' },
-    { M_LFRT, "COLORED BLOOD AND CORPSES",   M_ID_ColoredBlood,      'c' },
-    { M_LFRT, "LIQUIDS ANIMATION",           M_ID_SwirlingLiquids,   'l' },
-    { M_LFRT, "SKY ANIMATION",               M_ID_AnimatedSky,       's' },
-    { M_LFRT, "SKY DRAWING MODE",            M_ID_LinearSky,         's' },
-    { M_LFRT, "RANDOMLY MIRRORED CORPSES",   M_ID_FlipCorpses,       'r' },
+    { M_MUL1, "BRIGHTMAPS",                  M_ID_Brightmaps,        'b' },
+    { M_MUL2, "TRANSLUCENCY",                M_ID_Translucency,      't' },
+    { M_MUL1, "FUZZ EFFECT",                 M_ID_ImprovedFuzz,      'f' },
+    { M_MUL1, "COLORED LIGHTING",            M_ID_ColoredLighting,   'c' },
+    { M_MUL1, "COLORED BLOOD AND CORPSES",   M_ID_ColoredBlood,      'c' },
+    { M_MUL1, "LIQUIDS ANIMATION",           M_ID_SwirlingLiquids,   'l' },
+    { M_MUL1, "SKY ANIMATION",               M_ID_AnimatedSky,       's' },
+    { M_MUL1, "SKY DRAWING MODE",            M_ID_LinearSky,         's' },
+    { M_MUL1, "RANDOMLY MIRRORED CORPSES",   M_ID_FlipCorpses,       'r' },
     { M_SKIP, "", 0, '\0' },
-    { M_LFRT, "SHAPE",                       M_ID_Crosshair,         's' },
-    { M_LFRT, "INDICATION",                  M_ID_CrosshairColor,    'i' },
+    { M_MUL2, "SHAPE",                       M_ID_Crosshair,         's' },
+    { M_MUL2, "INDICATION",                  M_ID_CrosshairColor,    'i' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
-    { M_LFRT, "", /* < SCROLL PAGES >*/      M_ScrollGameplay,       's' },
+    { M_MUL2, "", /* < SCROLL PAGES >*/      M_ScrollGameplay,       's' },
 };
 
 static menu_t ID_Def_Gameplay_1 =
@@ -3072,21 +3081,21 @@ static void M_ID_CrosshairColor (int choice)
 
 static menuitem_t ID_Menu_Gameplay_2[]=
 {
-    { M_LFRT, "COLORED ELEMENTS",              M_ID_ColoredSTBar,      'c' },
-    { M_LFRT, "SHOW NEGATIVE HEALTH",          M_ID_NegativeHealth,    's' },
+    { M_MUL1, "COLORED ELEMENTS",              M_ID_ColoredSTBar,      'c' },
+    { M_MUL1, "SHOW NEGATIVE HEALTH",          M_ID_NegativeHealth,    's' },
     { M_SKIP, "", 0, '\0' },
-    { M_LFRT, "CORPSES SLIDING FROM LEDGES",   M_ID_Torque,            'c' },
-    { M_LFRT, "ITEMS ARE TOSSED WHEN DROPPED", M_ID_TossDrop,          'i' },
-    { M_LFRT, "FLOATING POWERUPS AMPLITUDE",   M_ID_FloatingPowerups,  'f' },
-    { M_LFRT, "WEAPON ATTACK ALIGNMENT",       M_ID_WeaponAlignment,   'w' },
-    { M_LFRT, "VERTICAL AIMING",               M_ID_VerticalAiming,    'v' },
-    { M_LFRT, "IMITATE PLAYER'S BREATHING",    M_ID_Breathing,         'i' },
+    { M_MUL1, "CORPSES SLIDING FROM LEDGES",   M_ID_Torque,            'c' },
+    { M_MUL1, "ITEMS ARE TOSSED WHEN DROPPED", M_ID_TossDrop,          'i' },
+    { M_MUL2, "FLOATING POWERUPS AMPLITUDE",   M_ID_FloatingPowerups,  'f' },
+    { M_MUL2, "WEAPON ATTACK ALIGNMENT",       M_ID_WeaponAlignment,   'w' },
+    { M_MUL2, "VERTICAL AIMING",               M_ID_VerticalAiming,    'v' },
+    { M_MUL1, "IMITATE PLAYER'S BREATHING",    M_ID_Breathing,         'i' },
     { M_SKIP, "", 0, '\0' },
-    { M_LFRT, "SOUND OF CRUSHED CORPSE",       M_ID_SndOfCrushedCorpse,'s' },
+    { M_MUL1, "SOUND OF CRUSHED CORPSE",       M_ID_SndOfCrushedCorpse,'s' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
-    { M_LFRT, "", /* < SCROLL PAGES >*/        M_ScrollGameplay,       's' },
+    { M_MUL2, "", /* < SCROLL PAGES >*/        M_ScrollGameplay,       's' },
 };
 
 static menu_t ID_Def_Gameplay_2 =
@@ -3216,21 +3225,21 @@ static void M_ID_SndOfCrushedCorpse (int choice)
 
 static menuitem_t ID_Menu_Gameplay_3[]=
 {
-    { M_LFRT, "DEFAULT SKILL LEVEL",           M_ID_DefaulSkill,       'd' },
-    { M_LFRT, "PISTOL START GAME MODE",        M_ID_PistolStart,       'p' },
-    { M_LFRT, "REPORT REVEALED SECRETS",       M_ID_RevealedSecrets,   'r' },
-    { M_LFRT, "FLIP LEVELS HORIZONTALLY",      M_ID_FlipLevels,        'f' },
-    { M_LFRT, "ON DEATH ACTION",               M_ID_OnDeathAction,     'o' },
+    { M_MUL2, "DEFAULT SKILL LEVEL",           M_ID_DefaulSkill,       'd' },
+    { M_MUL1, "PISTOL START GAME MODE",        M_ID_PistolStart,       'p' },
+    { M_MUL2, "REPORT REVEALED SECRETS",       M_ID_RevealedSecrets,   'r' },
+    { M_MUL1, "FLIP LEVELS HORIZONTALLY",      M_ID_FlipLevels,        'f' },
+    { M_MUL2, "ON DEATH ACTION",               M_ID_OnDeathAction,     'o' },
     { M_SKIP, "", 0, '\0' },
-    { M_LFRT, "MUSIC ARRANGEMENT",             M_ID_JaguarMusic,       'm' },
-    { M_LFRT, "ALERTED MONSTERS BEHAVIOUR",    M_ID_JaguarAlert,       'a' },
-    { M_LFRT, "EXPLOSION RADIUS IMPACT",       M_ID_JaguarExplosion,   'e' },
-    { M_LFRT, "SKY TEXTURES",                  M_ID_JaguarSkies,       's' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
+    { M_MUL1, "MUSIC ARRANGEMENT",             M_ID_JaguarMusic,       'm' },
+    { M_MUL1, "ALERTED MONSTERS BEHAVIOUR",    M_ID_JaguarAlert,       'a' },
+    { M_MUL1, "EXPLOSION RADIUS IMPACT",       M_ID_JaguarExplosion,   'e' },
+    { M_MUL1, "SKY TEXTURES",                  M_ID_JaguarSkies,       's' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
-    { M_LFRT, "", /* < SCROLL PAGES >*/        M_ScrollGameplay,       's' },
+    { M_SKIP, "", 0, '\0' },
+    { M_SKIP, "", 0, '\0' },
+    { M_MUL2, "", /* < SCROLL PAGES >*/        M_ScrollGameplay,       's' },
 };
 
 static menu_t ID_Def_Gameplay_3 =
@@ -4716,6 +4725,8 @@ boolean M_Responder (event_t* ev)
     }
     else
     {
+        const int item_status = currentMenu->menuitems[itemOn].status;
+
         // [JN] Shows the mouse cursor when moved.
         {
             if (ev->data2 || ev->data3)
@@ -4778,7 +4789,7 @@ boolean M_Responder (event_t* ev)
 
             if (ev->data1 & 1)
             {
-                if (menuactive && currentMenu->menuitems[itemOn].status == 3)
+                if (menuactive && item_status == STS_SLDR)
                 {
                     // [JN] Allow repetitive on sliders to move it while mouse movement.
                     menu_mouse_allow_click = true;
@@ -4830,12 +4841,12 @@ boolean M_Responder (event_t* ev)
             }
 
             // [JN] Scrolls through menu item values or navigates between pages.
-            if (ev->data1 & (1 << 4) && menuactive)
+            if (ev->data1 & (1 << 4) && menuactive)  // Wheel down
             {
-                if (currentMenu->menuitems[itemOn].status > 1)
+                if (item_status > 1)
                 {
-                    // Scroll menu item backward
-                    currentMenu->menuitems[itemOn].routine(0);
+                    // Scroll menu item backward normally, or forward for STS_MUL2
+                    currentMenu->menuitems[itemOn].routine(item_status != STS_MUL2 ? 0 : 1);
                     S_StartSound(NULL, sfx_stnmov);
                 }
                 else
@@ -4846,12 +4857,12 @@ boolean M_Responder (event_t* ev)
                 mousewait = I_GetTime();
             }
             else
-            if (ev->data1 & (1 << 3) && menuactive)
+            if (ev->data1 & (1 << 3) && menuactive)  // Wheel up
             {
-                if (currentMenu->menuitems[itemOn].status > 1)
+                if (item_status > 1)
                 {
-                    // Scroll menu item forward
-                    currentMenu->menuitems[itemOn].routine(1);
+                    // Scroll menu item forward normally, or backward for STS_MUL2
+                     currentMenu->menuitems[itemOn].routine(item_status != STS_MUL2 ? 1 : 0);
                     S_StartSound(NULL, sfx_stnmov);
                 }
                 else
@@ -5174,7 +5185,7 @@ boolean M_Responder (event_t* ev)
             else
                 itemOn++;
             S_StartSound(NULL, sfx_pstop);
-        } while (currentMenu->menuitems[itemOn].status == -1);
+        } while (currentMenu->menuitems[itemOn].status == STS_SKIP);
 
         return true;
     }
@@ -5189,7 +5200,7 @@ boolean M_Responder (event_t* ev)
             else
                 itemOn--;
             S_StartSound(NULL, sfx_pstop);
-        } while (currentMenu->menuitems[itemOn].status == -1);
+        } while (currentMenu->menuitems[itemOn].status == STS_SKIP);
 
         return true;
     }
@@ -5201,7 +5212,7 @@ boolean M_Responder (event_t* ev)
 
         // Slide slider left
         if (currentMenu->menuitems[itemOn].routine
-        &&  currentMenu->menuitems[itemOn].status > 1)
+        &&  currentMenu->menuitems[itemOn].status > STS_SWTC)
         {
             S_StartSound(NULL, sfx_stnmov);
             currentMenu->menuitems[itemOn].routine(0);
@@ -5216,7 +5227,7 @@ boolean M_Responder (event_t* ev)
 
         // Slide slider right
         if (currentMenu->menuitems[itemOn].routine
-        &&  currentMenu->menuitems[itemOn].status > 1)
+        &&  currentMenu->menuitems[itemOn].status > STS_SWTC)
         {
             S_StartSound(NULL, sfx_stnmov);
             currentMenu->menuitems[itemOn].routine(1);
@@ -5231,7 +5242,8 @@ boolean M_Responder (event_t* ev)
         &&  currentMenu->menuitems[itemOn].status)
         {
             currentMenu->lastOn = itemOn;
-            if (currentMenu->menuitems[itemOn].status == 2)
+            if (currentMenu->menuitems[itemOn].status == STS_MUL1
+            ||  currentMenu->menuitems[itemOn].status == STS_MUL2)
             {
                 currentMenu->menuitems[itemOn].routine(1);      // right arrow
                 S_StartSound(NULL, sfx_stnmov);
@@ -5389,7 +5401,7 @@ static void M_ID_MenuMouseControl (void)
         for (int i = 0; i < currentMenu->numitems; i++)
         {
             // [JN] Slider takes three lines.
-            const int line_item = currentMenu->menuitems[i].status == 3 ? 3 : 1;
+            const int line_item = currentMenu->menuitems[i].status == STS_SLDR ? 3 : 1;
 
             if (menu_mouse_x >= (currentMenu->x + WIDESCREENDELTA) * vid_resolution
             &&  menu_mouse_x <= (ORIGWIDTH + WIDESCREENDELTA - currentMenu->x) * vid_resolution
@@ -5418,7 +5430,7 @@ static void M_ID_HandleSliderMouseControl (int x, int y, int width, void *value,
     // [PN] Check cursor position and item status
     if (menu_mouse_x < adj_x || menu_mouse_x > adj_x + adj_width
     ||  menu_mouse_y < adj_y || menu_mouse_y > adj_y + adj_height
-    ||  currentMenu->menuitems[itemOn].status != 3)
+    ||  currentMenu->menuitems[itemOn].status != STS_SLDR)
         return;
 
     // [PN] Calculate and update slider value
