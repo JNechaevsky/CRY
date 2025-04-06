@@ -482,6 +482,11 @@ void R_InitTextureMapping (void)
     // Scan viewangletox[] to generate xtoviewangle[]:
     //  xtoviewangle will give the smallest view angle
     //  that maps to x.	
+
+    // [JN] Precalculate linearskyangle[] multipler.
+    const int linear_factor = (((SCREENWIDTH << 6) / viewwidth)
+                            * (ANG90 / (NONWIDEWIDTH << 6))) / fovdiff;
+
     for (x=0;x<=viewwidth;x++)
     {
 	i = 0;
@@ -490,16 +495,12 @@ void R_InitTextureMapping (void)
 	xtoviewangle[x] = (i<<ANGLETOFINESHIFT)-ANG90;
 	// [crispy] calculate sky angle for drawing horizontally linear skies.
 	// Taken from GZDoom and refactored for integer math.
-	linearskyangle[x] = ((viewwidth / 2 - x) * ((SCREENWIDTH<<6) / viewwidth)) 
-	                                         * (ANG90 / (NONWIDEWIDTH<<6)) / fovdiff;
+	linearskyangle[x] = (viewwidth / 2 - x) * linear_factor;
     }
     
     // Take out the fencepost cases from viewangletox.
     for (i=0 ; i<FINEANGLES/2 ; i++)
     {
-	t = FixedMul (finetangent[i], focallength);
-	t = centerx - t;
-	
 	if (viewangletox[i] == -1)
 	    viewangletox[i] = 0;
 	else if (viewangletox[i] == viewwidth+1)
