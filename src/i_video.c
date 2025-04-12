@@ -54,6 +54,7 @@ static int vid_startup_delay = 35;
 static int vid_resize_delay = 35;
 
 int SCREENWIDTH, SCREENHEIGHT, SCREENHEIGHT_4_3;
+int SCREENAREA; // [JN] SCREENWIDTH * SCREENHEIGHT
 int NONWIDEWIDTH; // [crispy] non-widescreen SCREENWIDTH
 int WIDESCREENDELTA; // [crispy] horizontal widescreen offset
 
@@ -706,14 +707,14 @@ static void LimitTextureSize(int *w_upscale, int *h_upscale)
     // huge textures, so the user can use this to reduce the maximum texture
     // size if desired.
 
-    if (vid_max_scaling_buffer_pixels < SCREENWIDTH * SCREENHEIGHT)
+    if (vid_max_scaling_buffer_pixels < SCREENAREA)
     {
         I_Error("CreateUpscaledTexture: vid_max_scaling_buffer_pixels too small "
                 "to create a texture buffer: %d < %d",
-                vid_max_scaling_buffer_pixels, SCREENWIDTH * SCREENHEIGHT);
+                vid_max_scaling_buffer_pixels, SCREENAREA);
     }
 
-    while (*w_upscale * *h_upscale * SCREENWIDTH * SCREENHEIGHT
+    while (*w_upscale * *h_upscale * SCREENAREA
            > vid_max_scaling_buffer_pixels)
     {
         if (*w_upscale > *h_upscale)
@@ -971,7 +972,7 @@ void I_FinishUpdate (void)
 //
 void I_ReadScreen (pixel_t* scr)
 {
-    memcpy(scr, I_VideoBuffer, SCREENWIDTH*SCREENHEIGHT*sizeof(*scr));
+    memcpy(scr, I_VideoBuffer, SCREENAREA*sizeof(*scr));
 }
 
 
@@ -1602,6 +1603,7 @@ void I_GetScreenDimensions (void)
 		SCREENWIDTH = MIN(SCREENWIDTH, MAXWIDTH);
 	}
 
+    SCREENAREA = SCREENWIDTH * SCREENHEIGHT;
 	WIDESCREENDELTA = ((SCREENWIDTH - NONWIDEWIDTH) / vid_resolution) / 2;
 }
 
@@ -1699,7 +1701,7 @@ void I_InitGraphics(void)
 
     // Clear the screen to black.
 
-    memset(I_VideoBuffer, 0, SCREENWIDTH * SCREENHEIGHT * sizeof(*I_VideoBuffer));
+    memset(I_VideoBuffer, 0, SCREENAREA * sizeof(*I_VideoBuffer));
 
     // clear out any events waiting at the start and center the mouse
   
