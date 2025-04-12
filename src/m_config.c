@@ -172,6 +172,13 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_INT(vid_showfps),
     CONFIG_VARIABLE_INT(vid_smooth_scaling),
     CONFIG_VARIABLE_INT(vid_screenwipe),
+    CONFIG_VARIABLE_INT(post_supersample),
+    CONFIG_VARIABLE_INT(post_overglow),
+    CONFIG_VARIABLE_INT(post_rgbdrift),
+    CONFIG_VARIABLE_INT(post_vhsdist),
+    CONFIG_VARIABLE_INT(post_vignette),
+    CONFIG_VARIABLE_INT(post_motionblur),
+    CONFIG_VARIABLE_INT(post_dofblur),
 
     // Display options
     CONFIG_VARIABLE_INT(vid_gamma),

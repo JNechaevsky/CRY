@@ -54,6 +54,7 @@
 #include "d_main.h"
 #include "ct_chat.h"
 #include "r_local.h"
+#include "v_postproc.h"
 #include "v_trans.h"
 
 #include "icon.c"
@@ -325,6 +326,12 @@ static void D_Display (void)
 
     // menus go directly to the screen
     M_Drawer ();   // menu is drawn even on top of everything
+
+    // [JN] Apply post-processing effects and forcefully
+    // update status bar if any effect is active.
+    V_PProc_Display();
+    if (V_PProc_EffectsActive())
+        st_fullupdate = true;
 
     // normal update
     if (!wipe)

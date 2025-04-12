@@ -30,6 +30,7 @@
 #include "r_local.h"
 #include "doomstat.h"
 #include "r_collit.h"
+#include "v_postproc.h"
 #include "v_trans.h" // [crispy] colored blood sprites
 #include "v_video.h" // [JN] translucency tables
 
@@ -1363,6 +1364,15 @@ void R_DrawMasked (void)
     for (ds = ds_p ; ds-- > drawsegs ; )
         if (ds->maskedtexturecol)
             R_RenderMaskedSegRange (ds, ds->x1, ds->x2);
+
+    // [JN] Post-processing effect: Supersampled Smoothing.
+    // Call before PSPrites (player weapons) drawing.
+    if (post_supersample)
+    {
+        const boolean st_background_on = 
+            dp_screen_size <= 10 || (automapactive && !automap_overlay);
+        V_PProc_SupersampledSmoothing(st_background_on, 32 * vid_resolution);
+    }
 
     // draw the psprites on top of everything
     //  but does not draw on side views

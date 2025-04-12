@@ -42,6 +42,14 @@ int vid_vsync = 1;
 int vid_showfps = 0;
 int vid_smooth_scaling = 0;
 int vid_screenwipe = 1;
+// Post-processing
+int post_supersample = 0;
+int post_overglow = 0;
+int post_rgbdrift = 0;
+int post_vhsdist = 0;
+int post_vignette = 0;
+int post_motionblur = 0;
+int post_dofblur = 0;
 
 //
 // Display options
@@ -166,6 +174,14 @@ void ID_BindVariables (void)
     M_BindIntVariable("vid_showfps",                    &vid_showfps);
     M_BindIntVariable("vid_smooth_scaling",             &vid_smooth_scaling);
     M_BindIntVariable("vid_screenwipe",                 &vid_screenwipe);
+    // Post-processing
+    M_BindIntVariable("post_supersample",               &post_supersample);
+    M_BindIntVariable("post_overglow",                  &post_overglow);
+    M_BindIntVariable("post_rgbdrift",                  &post_rgbdrift);
+    M_BindIntVariable("post_vhsdist",                   &post_vhsdist);
+    M_BindIntVariable("post_vignette",                  &post_vignette);
+    M_BindIntVariable("post_motionblur",                &post_motionblur);
+    M_BindIntVariable("post_dofblur",                   &post_dofblur);
 
     //
     // Display options

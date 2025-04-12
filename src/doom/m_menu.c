@@ -469,7 +469,7 @@ static player_t *player;
 static void M_Draw_ID_Main (void);
 
 static void M_Choose_ID_Video (int choice);
-static void M_Draw_ID_Video (void);
+static void M_Draw_ID_Video_1 (void);
 static void M_ID_RenderingRes (int choice);
 static void M_ID_Widescreen (int choice);
 static void M_ID_ExclusiveFS (int choice);
@@ -480,6 +480,17 @@ static void M_ID_VSync (int choice);
 static void M_ID_ShowFPS (int choice);
 static void M_ID_PixelScaling (int choice);
 static void M_ID_ScreenWipe (int choice);
+
+static void M_Draw_ID_Video_2 (void);
+static void M_ID_SuperSmoothing (int choice);
+static void M_ID_OverbrightGlow (int choice);
+static void M_ID_AnalogRGBDrift (int choice);
+static void M_ID_VHSLineDistortion (int choice);
+static void M_ID_ScreenVignette (int choice);
+static void M_ID_MotionBlur (int choice);
+static void M_ID_DepthOfFieldBlur (int choice);
+ 
+static void M_ScrollVideo (int choice);
 
 static void M_Choose_ID_Display (int choice);
 static void M_Draw_ID_Display (void);
@@ -687,6 +698,8 @@ static void    M_DrawBindButton (int itemNum, int yPos, int btn);
 static void    M_ResetMouseBinds (void);
 
 // Forward declarations for scrolling and remembering last pages.
+static menu_t ID_Def_Video_1;
+static menu_t ID_Def_Video_2;
 static menu_t ID_Def_Keybinds_1;
 static menu_t ID_Def_Keybinds_2;
 static menu_t ID_Def_Keybinds_3;
@@ -765,8 +778,12 @@ static void M_ScrollPages (boolean direction)
     }
     */
 
+    // Video options:
+         if (currentMenu == &ID_Def_Video_1) nextMenu = &ID_Def_Video_2;
+    else if (currentMenu == &ID_Def_Video_2) nextMenu = &ID_Def_Video_1;
+
     // Keyboard bindings:
-         if (currentMenu == &ID_Def_Keybinds_1) nextMenu = (direction ? &ID_Def_Keybinds_2 : &ID_Def_Keybinds_6);
+    else if (currentMenu == &ID_Def_Keybinds_1) nextMenu = (direction ? &ID_Def_Keybinds_2 : &ID_Def_Keybinds_6);
     else if (currentMenu == &ID_Def_Keybinds_2) nextMenu = (direction ? &ID_Def_Keybinds_3 : &ID_Def_Keybinds_1);
     else if (currentMenu == &ID_Def_Keybinds_3) nextMenu = (direction ? &ID_Def_Keybinds_4 : &ID_Def_Keybinds_2);
     else if (currentMenu == &ID_Def_Keybinds_4) nextMenu = (direction ? &ID_Def_Keybinds_5 : &ID_Def_Keybinds_3);
@@ -1116,39 +1133,42 @@ static void M_Draw_ID_Main (void)
 }
 
 // -----------------------------------------------------------------------------
-// Video options
+// Video options 1
 // -----------------------------------------------------------------------------
 
-static menuitem_t ID_Menu_Video[]=
+static menuitem_t ID_Menu_Video_1[]=
 {
     { M_MUL1, "RENDERING RESOLUTION", M_ID_RenderingRes,  'r' },
     { M_MUL1, "WIDESCREEN MODE",      M_ID_Widescreen,    'w' },
-    { M_MUL2, "EXCLUSIVE FULLSCREEN", M_ID_ExclusiveFS,  'e' },
+    { M_MUL2, "EXCLUSIVE FULLSCREEN", M_ID_ExclusiveFS,   'e' },
     { M_MUL2, "UNCAPPED FRAMERATE",   M_ID_UncappedFPS,   'u' },
     { M_MUL1, "FRAMERATE LIMIT",      M_ID_LimitFPS,      'f' },
     { M_MUL2, "ENABLE VSYNC",         M_ID_VSync,         'e' },
     { M_MUL2, "SHOW FPS COUNTER",     M_ID_ShowFPS,       's' },
     { M_MUL2, "PIXEL SCALING",        M_ID_PixelScaling,  'p' },
     { M_MUL2, "SCREEN WIPE EFFECT",   M_ID_ScreenWipe,    's' },
+    { M_SKIP, "", 0, '\0' },
+    { M_SKIP, "", 0, '\0' },
+    { M_MUL1, "", /* NEXT PAGE > */   M_ScrollVideo,      'n' },
 };
 
-static menu_t ID_Def_Video =
+static menu_t ID_Def_Video_1 =
 {
-    9,
+    12,
     &ID_Def_Main,
-    ID_Menu_Video,
-    M_Draw_ID_Video,
+    ID_Menu_Video_1,
+    M_Draw_ID_Video_1,
     ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET_SML,
     0,
-    true, false, false,
+    true, false, true,
 };
 
 static void M_Choose_ID_Video (int choice)
 {
-    M_SetupNextMenu (&ID_Def_Video);
+    M_SetupNextMenu (&ID_Def_Video_1);
 }
 
-static void M_Draw_ID_Video (void)
+static void M_Draw_ID_Video_1 (void)
 {
     char str[32];
 
@@ -1212,7 +1232,7 @@ static void M_Draw_ID_Video (void)
     M_WriteText (M_ItemRightAlign(str), 81, str, 
                  M_Item_Glow(7, vid_smooth_scaling ? GLOW_GREEN : GLOW_DARKRED));
 
-    // Loading banner
+    // Screen wipe effect
     sprintf(str, vid_screenwipe == 1 ? "LOADING" :
                  vid_screenwipe == 2 ? "MELT" :
                  vid_screenwipe == 3 ? "CROSSFADE" : "OFF");
@@ -1230,8 +1250,11 @@ static void M_Draw_ID_Video (void)
         M_snprintf(height, 8, "%d", (ORIGHEIGHT * vid_resolution));
         resolution = M_StringJoin("CURRENT RESOLUTION: ", width, "x", height, NULL);
 
-        M_WriteTextCentered(143, resolution, cr[CR_LIGHTGRAY_DARK1]);
+        M_WriteTextCentered(103, resolution, cr[CR_LIGHTGRAY_DARK1]);
     }
+
+    M_WriteText (ID_MENU_LEFTOFFSET, 117, "NEXT PAGE >",
+                  M_Item_Glow(11, GLOW_LIGHTGRAY));
 }
 
 static void M_ID_RenderingResHook (void)
@@ -1377,6 +1400,132 @@ static void M_ID_PixelScaling (int choice)
 static void M_ID_ScreenWipe (int choice)
 {
     vid_screenwipe = M_INT_Slider(vid_screenwipe, 0, 3, choice, false);
+}
+
+// -----------------------------------------------------------------------------
+// Video options 2
+// -----------------------------------------------------------------------------
+
+static menuitem_t ID_Menu_Video_2[]=
+{
+    { M_MUL1, "SUPERSAMPLED SMOOTHING", M_ID_SuperSmoothing,    's' },
+    { M_MUL2, "OVERBRIGHT GLOW",        M_ID_OverbrightGlow,    't' },
+    { M_MUL1, "ANALOG RGB DRIFT",       M_ID_AnalogRGBDrift,    'a' },
+    { M_MUL2, "VHS LINE DISTORTION",    M_ID_VHSLineDistortion, 'v' },
+    { M_MUL1, "SCREEN VIGNETTE",        M_ID_ScreenVignette,    's' },
+    { M_MUL1, "MOTION BLUR",            M_ID_MotionBlur,        'm' },
+    { M_MUL2, "DEPTH OF FIELD BLUR",    M_ID_DepthOfFieldBlur,  'd' },
+    { M_SKIP, "", 0, '\0' },
+    { M_SKIP, "", 0, '\0' },
+    { M_SKIP, "", 0, '\0' },
+    { M_SKIP, "", 0, '\0' },
+    { M_MUL1, "", /* PREV PAGE > */     M_ScrollVideo,          'p' },
+};
+
+static menu_t ID_Def_Video_2 =
+{
+    12,
+    &ID_Def_Main,
+    ID_Menu_Video_2,
+    M_Draw_ID_Video_2,
+    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET_SML,
+    0,
+    true, false, true,
+};
+
+static void M_Draw_ID_Video_2 (void)
+{
+    char str[32];
+    const char *sample_factors[] = { "NONE", "1x", "2x", "3x", "4x", "5x", "6x" };
+
+    M_WriteTextCentered(9, "POST-PROCESSING EFFECTS", cr[CR_YELLOW]);
+
+    // Supersampled smoothing
+    sprintf(str, "%s", sample_factors[post_supersample]);
+    M_WriteText (M_ItemRightAlign(str), 18, str,
+                 M_Item_Glow(0, post_supersample ? GLOW_GREEN : GLOW_DARKRED));
+
+    // Overbright glow
+    sprintf(str, post_overglow ? "ON" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 27, str, 
+                 M_Item_Glow(1, post_overglow ? GLOW_GREEN : GLOW_DARKRED));
+
+    // Analog RGB drift
+    sprintf(str, post_rgbdrift == 1 ? "SUBTLE" :
+                 post_rgbdrift == 2 ? "STRONG" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 36, str, 
+                 M_Item_Glow(2, post_rgbdrift ? GLOW_GREEN : GLOW_DARKRED));
+
+    // VHS line distortion
+    sprintf(str, post_vhsdist ? "ON" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 45, str, 
+                 M_Item_Glow(3, post_vhsdist ? GLOW_GREEN : GLOW_DARKRED));
+
+    // Screen vignette
+    sprintf(str, post_vignette == 1 ? "SUBTLE" :
+                 post_vignette == 2 ? "SOFT"   : 
+                 post_vignette == 3 ? "STRONG" : 
+                 post_vignette == 4 ? "DARK"   : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 54, str, 
+                 M_Item_Glow(4, post_vignette ? GLOW_GREEN : GLOW_DARKRED));
+
+    // Analog RGB drift
+    sprintf(str, post_motionblur == 1 ? "SOFT"   :
+                 post_motionblur == 2 ? "LIGHT"  : 
+                 post_motionblur == 3 ? "MEDIUM" : 
+                 post_motionblur == 4 ? "HEAVY"  : 
+                 post_motionblur == 5 ? "GHOST"  : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 63, str, 
+                 M_Item_Glow(5, post_motionblur ? GLOW_GREEN : GLOW_DARKRED));
+
+    // Depth if field blur
+    sprintf(str, post_dofblur ? "ON" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 72, str, 
+                 M_Item_Glow(6, post_dofblur ? GLOW_GREEN : GLOW_DARKRED));
+
+    M_WriteText (ID_MENU_LEFTOFFSET, 117, "< PREV PAGE",
+                 M_Item_Glow(11, GLOW_LIGHTGRAY));
+}
+
+static void M_ID_SuperSmoothing (int choice)
+{
+    post_supersample = M_INT_Slider(post_supersample, 0, 6, choice, false);
+}
+
+static void M_ID_OverbrightGlow (int choice)
+{
+    post_overglow ^= 1;
+}
+
+static void M_ID_AnalogRGBDrift (int choice)
+{
+    post_rgbdrift = M_INT_Slider(post_rgbdrift, 0, 2, choice, false);
+}
+
+static void M_ID_VHSLineDistortion (int choice)
+{
+    post_vhsdist ^= 1;
+}
+
+static void M_ID_ScreenVignette (int choice)
+{
+    post_vignette = M_INT_Slider(post_vignette, 0, 4, choice, false);
+}
+
+static void M_ID_MotionBlur (int choice)
+{
+    post_motionblur = M_INT_Slider(post_motionblur, 0, 5, choice, false);
+}
+
+static void M_ID_DepthOfFieldBlur (int choice)
+{
+    post_dofblur ^= 1;
+}
+
+static void M_ScrollVideo (int choice)
+{
+         if (currentMenu == &ID_Def_Video_1) { ID_Def_Video_2.lastOn = 11; M_SetupNextMenu(&ID_Def_Video_2); }
+    else if (currentMenu == &ID_Def_Video_2) { ID_Def_Video_1.lastOn = 11; M_SetupNextMenu(&ID_Def_Video_1); }
 }
 
 // -----------------------------------------------------------------------------
@@ -3480,6 +3629,14 @@ static void M_ID_ApplyResetHook (void)
     vid_smooth_scaling = 0;
     // Miscellaneous
     vid_screenwipe = 1;
+    // Post-processing effects
+    post_supersample = 0;
+    post_overglow = 0;
+    post_rgbdrift = 0;
+    post_vhsdist = 0;
+    post_vignette = 0;
+    post_motionblur = 0;
+    post_dofblur = 0;
 
     //
     // Display options

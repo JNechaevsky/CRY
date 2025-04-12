@@ -37,6 +37,14 @@ extern int dp_screen_size;
 extern int vid_screenwipe;
 extern int msg_text_shadows;
 
+extern int post_supersample;
+extern int post_overglow;
+extern int post_rgbdrift;
+extern int post_vhsdist;
+extern int post_vignette;
+extern int post_motionblur;
+extern int post_dofblur;
+
 // Display
 extern int dp_detail_level;
 extern int dp_cry_palette;

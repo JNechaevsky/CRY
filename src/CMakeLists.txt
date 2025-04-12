@@ -41,6 +41,7 @@ set(GAME_SOURCE_FILES
     m_fixed.c           m_fixed.h
     memio.c             memio.h
     tables.c            tables.h
+    v_postproc.c        v_postproc.h
     v_video.c           v_video.h
                         v_patch.h
     v_trans.c           v_trans.h

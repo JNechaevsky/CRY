@@ -32,6 +32,7 @@
 #include "w_wad.h"
 #include "r_collit.h"
 #include "st_bar.h"
+#include "v_postproc.h"
 
 #include "id_vars.h"
 #include "id_func.h"
@@ -1034,4 +1035,10 @@ void R_RenderPlayerView (player_t *player)
     // [crispy] draw fuzz effect independent of rendering frame rate
     R_SetFuzzPosDraw();
     R_DrawMasked ();
+
+    // [JN] Apply post-processing effects and forcefully
+    // update status bar if any effect is active.
+    V_PProc_PlayerView();
+    if (V_PProc_EffectsActive())
+        st_fullupdate = true;
 }

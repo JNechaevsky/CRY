@@ -38,6 +38,7 @@
 #include "v_video.h"
 #include "doomstat.h"
 #include "d_englsh.h"
+#include "v_postproc.h"
 #include "v_trans.h"
 #include "ct_chat.h"
 #include "st_bar.h"
@@ -1176,7 +1177,7 @@ static void ST_UpdateElementsBackground (void)
 
 void ST_Drawer (boolean force)
 {
-    if (force)
+    if (force || pproc_display_effects || pproc_plyrview_effects)
     {
     // [JN] Wide status bar.
     const int wide_x = dp_screen_size > 12 && (!automapactive || automap_overlay) ?
