@@ -81,9 +81,9 @@ void V_PProc_SupersampledSmoothing (boolean st_background_on, int st_height)
 
 // -----------------------------------------------------------------------------
 // V_PProc_OverbrightGlow
-// [PN] Applies dynamic exposure adjustment based on average frame brightness.
-// Implements "Overbright Glow" — an inverse HDR effect that intensifies 
-// already bright scenes and slightly fades darker ones.
+//  [PN] Applies a soft, color-tinted glow to the frame based on the dominant
+//  hue of bright areas. Glow intensity and color adapt over time using
+//  exponential smoothing.
 // -----------------------------------------------------------------------------
 
 static void V_PProc_OverbrightGlow (void)
@@ -101,7 +101,9 @@ static void V_PProc_OverbrightGlow (void)
     int bright_count = 0;
     int bright_r = 0, bright_g = 0, bright_b = 0;
 
-    // [PN] Measure number and color of bright pixels
+    const int rate = 13; // how quickly we adapt (~0.05 in Q8.8)
+
+    // [PN] Single loop to calculate brightness and apply glow simultaneously
     for (Uint32 *restrict p = pixels, *end = pixels + (w * h); p < end; ++p)
     {
         Uint32 c = *p;
@@ -109,39 +111,31 @@ static void V_PProc_OverbrightGlow (void)
         int g = (c >> 8) & 0xFF;
         int b = c & 0xFF;
 
-        bright_count++;
+        // [PN] Accumulate values for bright pixel count and average color
         bright_r += r;
         bright_g += g;
         bright_b += b;
+        bright_count++;
+
+        // [PN] Apply glow effect dynamically during the same loop
+        int glow_r_adj = ((256 + glow_r) * r) >> 8;
+        int glow_g_adj = ((256 + glow_g) * g) >> 8;
+        int glow_b_adj = ((256 + glow_b) * b) >> 8;
+
+        // [PN] Branchless clamping (ensuring values don't exceed 255)
+        glow_r_adj = glow_r_adj > 255 ? 255 : glow_r_adj;
+        glow_g_adj = glow_g_adj > 255 ? 255 : glow_g_adj;
+        glow_b_adj = glow_b_adj > 255 ? 255 : glow_b_adj;
+
+        *p = (0xFF << 24) | (glow_r_adj << 16) | (glow_g_adj << 8) | glow_b_adj;
     }
 
-    // [PN] Adapt exposure smoothly
-    const int rate = 13; // how quickly we adapt (~0.05 in Q8.8)
-
-    // [PN] Compute average glow color from bright pixels
+    // [PN] Adapt exposure based on the average brightness of bright pixels
     if (bright_count > 0)
     {
         glow_r = ((glow_r * (rate - 1)) + (bright_r / bright_count)) / rate;
         glow_g = ((glow_g * (rate - 1)) + (bright_g / bright_count)) / rate;
         glow_b = ((glow_b * (rate - 1)) + (bright_b / bright_count)) / rate;
-    }
-
-    // [PN] Apply glow to the screen
-    for (Uint32 *restrict p = pixels, *end = pixels + (w * h); p < end; ++p)
-    {
-        Uint32 c = *p;
-
-        // Multiple blending
-        int r = (((c >> 16) & 0xFF) * (256 + glow_r)) >> 8;
-        int g = (((c >> 8) & 0xFF) * (256 + glow_g)) >> 8;
-        int b = ((c & 0xFF) * (256 + glow_b)) >> 8;
-
-        // Branchless clamping
-        r = r > 255 ? 255 : r;
-        g = g > 255 ? 255 : g;
-        b = b > 255 ? 255 : b;
-
-        *p = (0xFF << 24) | (r << 16) | (g << 8) | b;
     }
 }
 
@@ -155,19 +149,20 @@ static void V_PProc_OverbrightGlow (void)
 
 static void V_PProc_AnalogRGBDrift (void)
 {
+    // [PN] Check if the framebuffer is valid.
     if (!argbbuffer)
         return;
 
     const int width = SCREENWIDTH;
     const int height = SCREENHEIGHT;
-    const int total_pixels = SCREENAREA;
+    const size_t total_pixels = SCREENAREA;
+    const size_t needed_size = total_pixels * sizeof(pixel_t);
 
-    // Static buffer to store the original frame for safe sampling during modification
+    // [PN] Static buffer to store the original frame for safe sampling during modification
     static pixel_t *restrict chromabuf = NULL;
     static size_t chromabuf_size = 0;
 
-    // Reallocate buffer if resolution has changed
-    const size_t needed_size = total_pixels * sizeof(pixel_t);
+    // [PN] Reallocate buffer if resolution has changed
     if (chromabuf_size != needed_size)
     {
         free(chromabuf);
@@ -177,86 +172,65 @@ static void V_PProc_AnalogRGBDrift (void)
         chromabuf_size = needed_size;
     }
 
-    // Copy the current frame into the temporary buffer
-    pixel_t *const restrict src = (pixel_t*)argbbuffer->pixels;
+    // [PN] Copy the current frame into the temporary buffer
+    pixel_t *restrict const src = (pixel_t*)argbbuffer->pixels;
     memcpy(chromabuf, src, needed_size);
 
-    // [JN] Calculate RGB drift offset depending on resolution.
-    const int dx = post_rgbdrift + (vid_resolution > 2 ? (vid_resolution - 2) : 0);
+    // [JN] Calculate the RGB drift offset depending on resolution.
+    const int dx = post_rgbdrift + ((vid_resolution > 2) ? (vid_resolution - 2) : 0);
 
-    // Precompute shifted column indices for red (left) and blue (right) channels
+    // [PN] Precompute shifted column indices for red (left) and blue (right) channels
     static int *restrict x_src_r = NULL;
     static int *restrict x_src_b = NULL;
     static int allocated_width = 0;
     static int last_dx = -1;
-    
+
     if (allocated_width != width || last_dx != dx)
     {
         free(x_src_r);
         free(x_src_b);
+
         x_src_r = malloc(sizeof(int) * width);
         x_src_b = malloc(sizeof(int) * width);
         if (!x_src_r || !x_src_b)
         {
-            free(x_src_r);
-            free(x_src_b);
-            x_src_r = x_src_b = NULL;
+            free(x_src_r); x_src_r = NULL;
+            free(x_src_b); x_src_b = NULL;
             return;
         }
-        allocated_width = width;
-        last_dx = dx;
-        
+
+        // [PN] Precompute the column indices for the red and blue channel shifts
         for (int x = 0; x < width; ++x)
         {
-            x_src_r[x] = (x - dx) < 0 ? 0 : x - dx;
-            x_src_b[x] = (x + dx) >= width ? width - 1 : x + dx;
+            x_src_r[x] = (x - dx < 0) ? 0 : x - dx; // Red shifts left
+            x_src_b[x] = (x + dx >= width) ? width - 1 : x + dx; // Blue shifts right
         }
+
+        allocated_width = width;
+        last_dx = dx;
     }
 
-    // Use row pointers to avoid repeated multiplications in pixel indexing
+    // [PN] Loop through each row of pixels
     for (int y = 0; y < height; ++y)
     {
-        pixel_t *const restrict srcRow = src + y * width;
-        const pixel_t *const restrict chromaRow = chromabuf + y * width;
-        
-        int x = 0;
-        for (; x < width - 3; x += 4)
+        pixel_t *restrict const dst = src + y * width;
+        const pixel_t *restrict const row = chromabuf + y * width;
+
+        // [PN] Process each pixel in the row
+        for (int x = 0; x < width; ++x)
         {
-            // Pixel 0
-            pixel_t orig0 = chromaRow[x];
-            pixel_t red0  = chromaRow[x_src_r[x]];
-            pixel_t blue0 = chromaRow[x_src_b[x]];
-            srcRow[x] = ((red0 >> 16 & 0xff) << 16) | ((orig0 >> 8 & 0xff) << 8) | (blue0 & 0xff) | 0xff000000;
+            // [PN] Fetch original pixel and shifted red/blue samples
+            const pixel_t orig = row[x];
+            const pixel_t rsrc = row[x_src_r[x]]; // Shifted red
+            const pixel_t bsrc = row[x_src_b[x]]; // Shifted blue
 
-            // Pixel 1
-            pixel_t orig1 = chromaRow[x+1];
-            pixel_t red1  = chromaRow[x_src_r[x+1]];
-            pixel_t blue1 = chromaRow[x_src_b[x+1]];
-            srcRow[x+1] = ((red1 >> 16 & 0xff) << 16) | ((orig1 >> 8 & 0xff) << 8) | (blue1 & 0xff) | 0xff000000;
+            // [PN] Extract RGB components and apply the shift
+            const int r = (rsrc >> 16) & 0xFF;
+            const int g = (orig >> 8) & 0xFF; // Keep original green
+            const int b = bsrc & 0xFF;
 
-            // Pixel 2
-            pixel_t orig2 = chromaRow[x+2];
-            pixel_t red2  = chromaRow[x_src_r[x+2]];
-            pixel_t blue2 = chromaRow[x_src_b[x+2]];
-            srcRow[x+2] = ((red2 >> 16 & 0xff) << 16) | ((orig2 >> 8 & 0xff) << 8) | (blue2 & 0xff) | 0xff000000;
-
-            // Pixel 3
-            pixel_t orig3 = chromaRow[x+3];
-            pixel_t red3  = chromaRow[x_src_r[x+3]];
-            pixel_t blue3 = chromaRow[x_src_b[x+3]];
-            srcRow[x+3] = ((red3 >> 16 & 0xff) << 16) | ((orig3 >> 8 & 0xff) << 8) | (blue3 & 0xff) | 0xff000000;
-        }
-        
-        // Render remaining pixels
-        for (; x < width; ++x)
-        {
-            // Fetch original pixel and shifted red/blue samples
-            pixel_t orig = chromaRow[x];
-            pixel_t red  = chromaRow[x_src_r[x]];
-            pixel_t blue = chromaRow[x_src_b[x]];
-
-            // Compose the final pixel with altered red/blue and original green; alpha is fixed
-            srcRow[x] = ((red >> 16 & 0xff) << 16) | ((orig >> 8 & 0xff) << 8) | (blue & 0xff) | 0xff000000;
+            // [PN] Compose the final pixel with altered red/blue and original green
+            dst[x] = 0xFF000000 | (r << 16) | (g << 8) | b;
         }
     }
 }
@@ -333,47 +307,63 @@ static void V_PProc_VHSLineDistortion (void)
 
 static void V_PProc_ScreenVignette (void)
 {
-    // Validate input buffer and 32-bit pixel format
+    // [PN] Validate input buffer and 32-bit pixel format
     if (!argbbuffer || argbbuffer->format->BytesPerPixel != 4)
         return;
 
-    const int width  = argbbuffer->w;
-    const int height = argbbuffer->h;
-    Uint32 *restrict pixels = (Uint32 *)argbbuffer->pixels;
+    const int  w  = argbbuffer->w;
+    const int  h  = argbbuffer->h;
+    Uint32 *restrict const fb = (Uint32 *)argbbuffer->pixels;
 
-    const int cx = width / 2;
-    const int cy = height / 2;
+    // [PN] Geometry & pre‑computed constants
+    const int cx = w >> 1;                 // centre‑x
+    const int cy = h >> 1;                 // centre‑y
     const int max_dist2 = cx * cx + cy * cy;
 
-    // Attenuation levels by post_vignette (Q8.8 fixed-point)
-    // 0 = OFF, higher = stronger vignette
-    static const int attenuation_table[] = { 0, 80, 146, 200, 255 };
-    const int attenuation_max = attenuation_table[post_vignette];
+    // [PN] 0 = off … 4 = strongest
+    static const int att_tbl[] = { 0, 80, 146, 200, 255 };
+    const int att_max = att_tbl[post_vignette];
+    if (att_max == 0)                      // early‑out if vignette disabled
+        return;
 
-    for (int y = 0; y < height; ++y)
+    // [PN] Main loop — per scan‑line
+    for (int y = 0; y < h; ++y)
     {
-        const int dy = y - cy;
-        const int dy2 = dy * dy;
+        const int dy   = y - cy;
+        const int dy2  = dy * dy;
+        Uint32 *restrict row = fb + (size_t)y * w;
 
-        for (int x = 0; x < width; ++x)
+        /* Incremental x² logic:
+           dist2  = (‑cx)² + dy²  at x = 0
+           inc    = 2·x + 1       derivative of x²
+           After each pixel:
+             dist2 += inc
+             inc   += 2
+         */
+        int x      = 0;
+        int dx     = -cx;
+        int dist2  = dx * dx + dy2;
+        int inc    = (dx << 1) + 1;
+
+        for (; x < w; ++x)
         {
-            const int dx = x - cx;
-            const int dist2 = dx * dx + dy2;
+            // [PN] Attenuation (Q8.8): 0..255
+            const int atten  = (dist2 >= max_dist2)
+                               ? att_max
+                               : (dist2 * att_max) / max_dist2;
+            const int scale  = 256 - atten;          // 1.0 – attenuation
 
-            // attenuation = distance² scaled to max attenuation
-            const int atten = dist2 >= max_dist2 ? attenuation_max : (dist2 * attenuation_max) / max_dist2;
+            // [PN] Apply scale
+            const Uint32 px = row[x];
+            const int r = (((px >> 16) & 0xFF) * scale) >> 8;
+            const int g = (((px >>  8) & 0xFF) * scale) >> 8;
+            const int b = (( px        & 0xFF) * scale) >> 8;
 
-            // scale = 1.0 - attenuation (in Q8.8)
-            const int scale = 256 - atten;
+            row[x] = 0xFF000000 | (r << 16) | (g << 8) | b;
 
-            const int i = y * width + x;
-            const Uint32 px = pixels[i];
-
-            const int r = ((px >> 16) & 0xFF) * scale >> 8;
-            const int g = ((px >> 8) & 0xFF) * scale >> 8;
-            const int b = (px & 0xFF) * scale >> 8;
-
-            pixels[i] = (0xFF << 24) | (r << 16) | (g << 8) | b;
+            // [PN] Incremental x² update
+            dist2 += inc;
+            inc   += 2;
         }
     }
 }
@@ -400,119 +390,104 @@ static void V_PProc_ScreenVignette (void)
 
 static void V_PProc_MotionBlur (void)
 {
-    // Validate input buffer and 32-bit pixel format.
+    // [PN] Validate framebuffer & format
     if (!argbbuffer || argbbuffer->format->BytesPerPixel != 4)
         return;
 
-    const int width  = argbbuffer->w;
-    const int height = argbbuffer->h;
-    Uint32 *restrict pixels = (Uint32*)argbbuffer->pixels;
-    const size_t size = (size_t)width * height * sizeof(Uint32);
-    const int total_pixels = width * height;
+    const int  w   = argbbuffer->w;
+    const int  h   = argbbuffer->h;
+    Uint32 *restrict const fb = (Uint32 *)argbbuffer->pixels;
+    const size_t pix_cnt = (size_t)w * h;
+    const size_t buf_sz  = pix_cnt * sizeof(Uint32);
 
-    // Declare static buffers for previous frame and ring buffer.
-    static Uint32 *prev_frame = NULL;
-    static size_t prev_size = 0;
-    static Uint32 *frame_ring[MAX_BLUR_LAG + 1] = {0};
-    static int ring_index = 0;
-    static size_t ring_size = 0;
-
-    // [JN] Modulate effect intensity
-    int blend_curr = 0, blend_prev = 0;
-    static const int blend_table[5][2] = {
-        {8, 2}, // Soft
-        {7, 3}, // Light
-        {6, 4}, // Medium
-        {5, 5}, // Heavy
-        {1, 9}  // Ghost
+    // [PN] Q8.8 weight table (≈curr/10 * 256, prev/10 * 256) ↴
+    static const uint16_t Wtbl[5][2] = {
+        {205,  51}, // Soft  ( 0.8, 0.2 )
+        {179,  77}, // Light ( 0.7, 0.3 )
+        {154, 102}, // Med   ( 0.6, 0.4 )
+        {128, 128}, // Heavy ( 0.5, 0.5 )
+        { 26, 230}  // Ghost ( 0.1, 0.9 )
     };
-    if (post_motionblur >= 1 && post_motionblur <= 5)
-    {
-        blend_curr = blend_table[post_motionblur - 1][0];
-        blend_prev = blend_table[post_motionblur - 1][1];
-    }
 
-    // Allocate or reallocate memory for the buffers if frame size changed.
-    if (vid_uncapped_fps)
+    const uint16_t w_cur  = Wtbl[post_motionblur - 1][0];
+    const uint16_t w_prev = Wtbl[post_motionblur - 1][1];
+
+    // [PN] Buffer management
+    static Uint32 *prev_frame = NULL;              // single‑buffer mode
+    static size_t prev_size   = 0;
+
+    static Uint32 *ring[MAX_BLUR_LAG + 1] = {0};   // uncapped‑FPS ring
+    static size_t ring_size = 0;
+    static int    ring_idx  = 0;
+
+    const int uncapped = vid_uncapped_fps;
+
+    if (uncapped)
     {
-        if (ring_size != size)
+        if (ring_size != buf_sz)
         {
             for (int i = 0; i <= MAX_BLUR_LAG; ++i)
             {
-                Uint32 *tmp = realloc(frame_ring[i], size);
+                Uint32 *tmp = realloc(ring[i], buf_sz);
                 if (!tmp)
                 {
-                    free(frame_ring[i]);
-                    frame_ring[i] = NULL;
+                    free(ring[i]);
+                    ring[i] = NULL;
                 }
                 else
                 {
-                    frame_ring[i] = tmp;
+                    ring[i] = tmp;
+                    memset(tmp, 0, buf_sz);
                 }
-                if (frame_ring[i])
-                    memset(frame_ring[i], 0, size);
             }
-            ring_size = size;
+            ring_size = buf_sz;
         }
+    }
+    else if (prev_size != buf_sz)
+    {
+        Uint32 *tmp = realloc(prev_frame, buf_sz);
+        if (!tmp)
+        {
+            free(prev_frame);
+            prev_frame = NULL;
+        }
+        else
+        {
+            prev_frame = tmp;
+            memset(tmp, 0, buf_sz);
+        }
+        prev_size = buf_sz;
+    }
+
+    // [PN] Choose previous‑frame source
+    Uint32 *restrict const oldF = uncapped
+        ? ring[(ring_idx + MAX_BLUR_LAG) & MAX_BLUR_LAG]
+        : prev_frame;
+
+    if (!oldF) return;   // nothing to blend with yet
+
+    // [PN] Blend loop
+    for (size_t i = 0; i < pix_cnt; ++i)
+    {
+        const Uint32 c = fb[i];
+        const Uint32 o = oldF[i];
+
+        const int r = (((c >> 16 & 0xFF) * w_cur)  + ((o >> 16 & 0xFF) * w_prev)) >> 8;
+        const int g = (((c >>  8 & 0xFF) * w_cur)  + ((o >>  8 & 0xFF) * w_prev)) >> 8;
+        const int b = (((c       & 0xFF) * w_cur)  + ((o       & 0xFF) * w_prev)) >> 8;
+
+        fb[i] = 0xFF000000 | (r << 16) | (g << 8) | b;
+    }
+
+    // [PN] Save current frame
+    if (uncapped)
+    {
+        ring_idx = (ring_idx + 1) & MAX_BLUR_LAG;  // mod power‑of‑two
+        memcpy(ring[ring_idx], fb, buf_sz);
     }
     else
     {
-        if (prev_size != size)
-        {
-            Uint32 *tmp = realloc(prev_frame, size);
-            if (!tmp)
-            {
-                free(prev_frame);
-                prev_frame = NULL;
-            }
-            else
-            {
-                prev_frame = tmp;
-            }
-            if (prev_frame)
-                memset(prev_frame, 0, size);
-            prev_size = size;
-        }
-    }
-
-    // Motion blur blending.
-    if (vid_uncapped_fps)
-    {
-        // Use ring buffer: retrieve previous frame at an index based on delay.
-        const int prev_index = (ring_index + MAX_BLUR_LAG) % (MAX_BLUR_LAG + 1);
-        Uint32 *restrict ring_prev = frame_ring[prev_index];
-        if (!ring_prev)
-            return;
-
-        // Blending loop using pointer arithmetic.
-        for (int i = 0; i < total_pixels; ++i)
-        {
-            const Uint32 curr = pixels[i];
-            const Uint32 old  = ring_prev[i];
-            const int r = ((((curr >> 16) & 0xFF) * blend_curr) + (((old >> 16) & 0xFF) * blend_prev)) / 10;
-            const int g = ((((curr >> 8)  & 0xFF) * blend_curr) + (((old >> 8)  & 0xFF) * blend_prev)) / 10;
-            const int b = ((((curr)       & 0xFF) * blend_curr) + (((old)       & 0xFF) * blend_prev)) / 10;
-            pixels[i] = (0xFF << 24) | (r << 16) | (g << 8) | b;
-        }
-        // Advance ring buffer index and save current frame.
-        ring_index = (ring_index + 1) % (MAX_BLUR_LAG + 1);
-        memcpy(frame_ring[ring_index], pixels, size);
-    }
-    else
-    {
-        // Single-buffer mode: blend current frame with prev_frame.
-        if (!prev_frame)
-            return;
-        for (int i = 0; i < total_pixels; ++i)
-        {
-            const Uint32 curr = pixels[i];
-            const Uint32 old  = prev_frame[i];
-            const int r = ((((curr >> 16) & 0xFF) * blend_curr) + (((old >> 16) & 0xFF) * blend_prev)) / 10;
-            const int g = ((((curr >> 8)  & 0xFF) * blend_curr) + (((old >> 8)  & 0xFF) * blend_prev)) / 10;
-            const int b = ((((curr)       & 0xFF) * blend_curr) + (((old)       & 0xFF) * blend_prev)) / 10;
-            pixels[i] = (0xFF << 24) | (r << 16) | (g << 8) | b;
-        }
-        memcpy(prev_frame, pixels, size);
+        memcpy(prev_frame, fb, buf_sz);
     }
 }
 
