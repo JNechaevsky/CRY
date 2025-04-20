@@ -284,7 +284,6 @@ void R_DrawFuzzColumn(void)
     // Local pointers to improve memory access
     const int *restrict const fuzzoffsetbase = fuzzoffset;
     int local_fuzzpos = fuzzpos;
-    const int fuzzalpha = FUZZ_ALPHA;
     const pixel_t *restrict const vbuf_start = I_VideoBuffer;
     const pixel_t *restrict const vbuf_end = I_VideoBuffer + SCREENAREA;
     const int screenwidth = SCREENWIDTH;
@@ -300,7 +299,7 @@ void R_DrawFuzzColumn(void)
         src = (src < vbuf_start) ? dest + screenwidth - 1 : src;
 
         if (src < vbuf_end)
-            *dest = I_BlendDark(*src, fuzzalpha);
+            *dest = I_BlendDark(*src, 0xD3); // 211 (17% darkening)
 
         // Update fuzzpos aggressively, avoiding modulo
         if (++local_fuzzpos == FUZZTABLE)
@@ -317,7 +316,7 @@ void R_DrawFuzzColumn(void)
     if (cutoff)
     {
         const int fuzz_offset = screenwidth * (fuzzoffsetbase[local_fuzzpos] - FUZZOFF) / 2;
-        *dest = I_BlendDark(dest[fuzz_offset], fuzzalpha);
+        *dest = I_BlendDark(dest[fuzz_offset], 0xD3); // 211 (17% darkening)
     }
 
     // Restore fuzzpos
@@ -353,7 +352,6 @@ void R_DrawFuzzColumnLow(void)
     // Local pointers to improve memory access
     const int *restrict const fuzzoffsetbase = fuzzoffset;
     int local_fuzzpos = fuzzpos;
-    const int fuzzalpha = FUZZ_ALPHA;
     const int screenwidth = SCREENWIDTH;
     const pixel_t *restrict const vbuf_start = I_VideoBuffer;
     const pixel_t *restrict const vbuf_end = I_VideoBuffer + SCREENAREA;
@@ -371,9 +369,9 @@ void R_DrawFuzzColumnLow(void)
         src2 = (src2 < vbuf_start) ? dest2 + screenwidth - 1 : src2;
 
         if (src1 < vbuf_end)
-            *dest = I_BlendDark(*src1, fuzzalpha);
+            *dest = I_BlendDark(*src1, 0xD3); // 211 (17% darkening)
         if (src2 < vbuf_end)
-            *dest2 = I_BlendDark(*src2, fuzzalpha);
+            *dest2 = I_BlendDark(*src2, 0xD3); // 211 (17% darkening)
 
         // Update fuzz position aggressively
         if (++local_fuzzpos == FUZZTABLE)
@@ -391,8 +389,8 @@ void R_DrawFuzzColumnLow(void)
     if (cutoff)
     {
         const int fuzz_offset = screenwidth * (fuzzoffsetbase[local_fuzzpos] - FUZZOFF) / 2;
-        *dest = I_BlendDark(dest[fuzz_offset], fuzzalpha);
-        *dest2 = I_BlendDark(dest2[fuzz_offset], fuzzalpha);
+        *dest = I_BlendDark(dest[fuzz_offset], 0xD3); // 211 (17% darkening)
+        *dest2 = I_BlendDark(dest2[fuzz_offset], 0xD3); // 211 (17% darkening)
     }
 
     // Restore fuzz position
@@ -427,7 +425,7 @@ void R_DrawFuzzTLColumn(void)
     for (int i = 0; i < iterations; ++i)
     {
         const unsigned s = sourcebase[frac >> FRACBITS]; // Texture sample
-        *dest = I_BlendOver(*dest, colormap0[s], FUZZTL_ALPHA); // Blend operation inline
+        *dest = I_BlendOver_64(*dest, colormap0[s]); // Blend operation inline
 
         dest += screenwidth; // Move to next line
         frac += fracstep;    // Increment texture coordinate
@@ -469,8 +467,8 @@ void R_DrawFuzzTLColumnLow(void)
         const pixel_t sourcecolor = colormap0[s];        // Extract color
 
         // Blend operation inline
-        *dest = I_BlendOver(*dest, sourcecolor, FUZZTL_ALPHA);
-        *dest2 = I_BlendOver(*dest2, sourcecolor, FUZZTL_ALPHA);
+        *dest = I_BlendOver_64(*dest, sourcecolor);
+        *dest2 = I_BlendOver_64(*dest2, sourcecolor);
 
         // Advance destination pointers and texture coordinate
         dest += screenwidth;
@@ -500,7 +498,6 @@ void R_DrawFuzzBWColumn(void)
     // Local pointers for improved memory access
     const int *restrict const fuzzoffsetbase = fuzzoffset;
     int local_fuzzpos = fuzzpos;
-    const int fuzzalpha = FUZZ_ALPHA;
     const int screenwidth = SCREENWIDTH;
     const pixel_t *restrict const vbuf_start = I_VideoBuffer;
     const pixel_t *restrict const vbuf_end = I_VideoBuffer + SCREENAREA;
@@ -516,7 +513,7 @@ void R_DrawFuzzBWColumn(void)
         src = (src < vbuf_start) ? dest + screenwidth - 1 : src;
 
         if (src < vbuf_end)
-            *dest = I_BlendDarkGrayscale(*src, fuzzalpha);
+            *dest = I_BlendDarkGrayscale(*src, 0xD3); // 211 (17% darkening)
 
         // Update fuzz position aggressively
         if (++local_fuzzpos == FUZZTABLE)
@@ -529,7 +526,7 @@ void R_DrawFuzzBWColumn(void)
     if (cutoff)
     {
         const int fuzz_offset = screenwidth * (fuzzoffsetbase[local_fuzzpos] - FUZZOFF) / 2;
-        *dest = I_BlendDarkGrayscale(dest[fuzz_offset], fuzzalpha);
+        *dest = I_BlendDarkGrayscale(dest[fuzz_offset], 0xD3); // 211 (17% darkening)
     }
 
     // Restore fuzz position
@@ -561,7 +558,6 @@ void R_DrawFuzzBWColumnLow(void)
     // Local pointers for improved memory access
     const int *restrict const fuzzoffsetbase = fuzzoffset;
     int local_fuzzpos = fuzzpos;
-    const int fuzzalpha = FUZZ_ALPHA;
     const int screenwidth = SCREENWIDTH;
     const pixel_t *restrict const vbuf_start = I_VideoBuffer;
     const pixel_t *restrict const vbuf_end = I_VideoBuffer + SCREENAREA;
@@ -579,9 +575,9 @@ void R_DrawFuzzBWColumnLow(void)
         src2 = (src2 < vbuf_start) ? dest2 + screenwidth - 1 : src2;
 
         if (src1 < vbuf_end)
-            *dest = I_BlendDarkGrayscale(*src1, fuzzalpha);
+            *dest = I_BlendDarkGrayscale(*src1, 0xD3); // 211 (17% darkening)
         if (src2 < vbuf_end)
-            *dest2 = I_BlendDarkGrayscale(*src2, fuzzalpha);
+            *dest2 = I_BlendDarkGrayscale(*src2, 0xD3); // 211 (17% darkening)
 
         // Update fuzz position efficiently
         if (++local_fuzzpos == FUZZTABLE)
@@ -596,8 +592,8 @@ void R_DrawFuzzBWColumnLow(void)
     {
         const int fuzz_offset = screenwidth * (fuzzoffsetbase[local_fuzzpos] - FUZZOFF) / 2;
 
-        *dest = I_BlendDarkGrayscale(dest[fuzz_offset], fuzzalpha);
-        *dest2 = I_BlendDarkGrayscale(dest2[fuzz_offset], fuzzalpha);
+        *dest = I_BlendDarkGrayscale(dest[fuzz_offset], 0xD3); // 211 (17% darkening)
+        *dest2 = I_BlendDarkGrayscale(dest2[fuzz_offset], 0xD3); // 211 (17% darkening)
     }
 
     // Restore fuzz position
@@ -634,7 +630,7 @@ void R_DrawTransTLFuzzColumn(void)
     {
         const unsigned s = sourcebase[frac >> FRACBITS];   // Texture sample
         const unsigned t = translation[s];                // Translation lookup
-        *dest = I_BlendOver(*dest, colormap0[t], FUZZTL_ALPHA); // Blend operation inline
+        *dest = I_BlendOver_64(*dest, colormap0[t]); // Blend operation inline
 
         dest += screenwidth; // Advance destination pointer
         frac += fracstep;    // Increment texture coordinate
@@ -677,8 +673,8 @@ void R_DrawTransTLFuzzColumnLow(void)
         const pixel_t destrgb = colormap0[translation[s]]; // Translation + colormap lookup
 
         // Blend operation inline
-        *dest = I_BlendOver(*dest, destrgb, FUZZTL_ALPHA);
-        *dest2 = I_BlendOver(*dest2, destrgb, FUZZTL_ALPHA);
+        *dest = I_BlendOver_64(*dest, destrgb);
+        *dest2 = I_BlendOver_64(*dest2, destrgb);
 
         // Advance destination pointers and texture coordinate
         dest += screenwidth;
@@ -805,7 +801,7 @@ void R_DrawTLColumn (void)
     {
         const unsigned s = sourcebase[frac >> FRACBITS];         // Texture sample
         const pixel_t destrgb = brightmap[s] ? colormap1[s] : colormap0[s]; // Conditionally apply colormap
-        *dest = I_BlendOver(*dest, destrgb, TRANMAP_ALPHA);      // Blend operation inline
+        *dest = I_BlendOver_168(*dest, destrgb);      // Blend operation inline
 
         // Advance destination pointer and increment texture coordinate
         dest += screenwidth;
@@ -849,8 +845,8 @@ void R_DrawTLColumnLow(void)
         const pixel_t destrgb = brightmap[s] ? colormap1[s] : colormap0[s]; // Conditional colormap lookup
 
         // Blend operation inline for both destination pointers
-        *dest = I_BlendOver(*dest, destrgb, TRANMAP_ALPHA);
-        *dest2 = I_BlendOver(*dest2, destrgb, TRANMAP_ALPHA);
+        *dest = I_BlendOver_168(*dest, destrgb);
+        *dest2 = I_BlendOver_168(*dest2, destrgb);
 
         // Advance destination pointers and increment texture coordinate
         dest += screenwidth;

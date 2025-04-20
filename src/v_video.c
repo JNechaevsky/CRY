@@ -139,10 +139,10 @@ static inline pixel_t drawpatchpx01 (const pixel_t dest, const pixel_t source)
 {return palette_pointer[dp_translation[source]];}
 // (3) normal, translucent patch
 static inline pixel_t drawpatchpx10 (const pixel_t dest, const pixel_t source)
-{return I_BlendOver(dest, palette_pointer[source], 168);}
+{return I_BlendOver_168(dest, palette_pointer[source]);}
 // (4) color-translated, translucent patch
 static inline pixel_t drawpatchpx11 (const pixel_t dest, const pixel_t source)
-{return I_BlendOver(dest, palette_pointer[dp_translation[source]], 168);}
+{return I_BlendOver_168(dest, palette_pointer[dp_translation[source]]);}
 
 // [JN] The shadow of the patch rendering function:
 static inline pixel_t drawshadow_doom (const pixel_t dest, const pixel_t source)
