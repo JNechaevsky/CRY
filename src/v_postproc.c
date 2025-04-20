@@ -247,50 +247,56 @@ static void V_PProc_AnalogRGBDrift (void)
 
 static void V_PProc_VHSLineDistortion (void)
 {
-    // Check if argbbuffer exists and is in 32-bit pixel format
+    // [PN] Check if argbbuffer exists and is in 32-bit pixel format
     if (!argbbuffer || argbbuffer->format->BytesPerPixel != 4)
         return;
 
-    const int width = argbbuffer->w;
+    // [PN] Dimensions and row stride
+    const int width  = argbbuffer->w;
     const int height = argbbuffer->h;
-    Uint32 *pixels = (Uint32*)argbbuffer->pixels;
-
-    // Determine the number of glitch blocks and block height
-    const int max_blocks = 1;
-    const int block_height = (4 + rand() % 3) * vid_resolution; // Each block is 4–6 lines per resolution
-    const int glitch_intensity = (vid_resolution > 3 ? 4 : 2) + rand() % 3;
     const int stride = width;
 
-    for (int i = 0; i < glitch_intensity && i < max_blocks; ++i)
-    {
-        const int y_start = rand() % (height - block_height);
-        // Horizontal shift in the range [-5 .. +5]
-        const int shift_val = (rand() % 11) - 5;
-        // Skip when shift is zero (no change)
-        if (shift_val == 0)
-            continue;
+    // [PN] Framebuffer pointer; restrict allows better compiler optimization
+    Uint32 *restrict pixels = (Uint32 *restrict)argbbuffer->pixels;
 
-        for (int y = y_start; y < y_start + block_height; ++y)
+    // [PN] Block height: 4–6 lines scaled by resolution
+    const int block_height = (4 + rand() % 3) * vid_resolution;
+
+    // [PN] Start line: random, but ensures block fits within frame
+    const int y_start = rand() % (height > block_height ? height - block_height : 1);
+
+    // [PN] Horizontal shift: range [-5..+5]
+    const int shift_val = (rand() % 11) - 5;
+    if (shift_val == 0)
+        return;
+
+    const int abs_shift = (shift_val > 0) ? shift_val : -shift_val;
+    const Uint32 black_pixel = 0xFF000000;
+
+    // [PN] Apply line distortion per row within the selected block
+    for (int y = y_start; y < y_start + block_height; ++y)
+    {
+        Uint32 *restrict row = pixels + y * stride;
+
+        if (shift_val > 0)
         {
-            Uint32* row = pixels + y * stride;
-            if (shift_val > 0)
-            {
-                // For positive shifts, move current row to the right.
-                // memmove handles overlapping memory areas efficiently.
-                memmove(row + shift_val, row, (width - shift_val) * sizeof(Uint32));
-                // Fill the gap on the left with opaque black
-                for (int x = 0; x < shift_val; ++x)
-                    row[x] = 0xFF000000;
-            }
-            else // shift_val < 0
-            {
-                const int shift = -shift_val;
-                // For negative shifts, move current row to the left
-                memmove(row, row + shift, (width - shift) * sizeof(Uint32));
-                // Fill the gap on the right with opaque black
-                for (int x = width - shift; x < width; ++x)
-                    row[x] = 0xFF000000;
-            }
+            // [PN] Right shift — copy pixels rightward
+            for (int x = width - 1; x >= abs_shift; --x)
+                row[x] = row[x - abs_shift];
+
+            // [PN] Fill left edge with black
+            for (int x = 0; x < abs_shift; ++x)
+                row[x] = black_pixel;
+        }
+        else
+        {
+            // [PN] Left shift — copy pixels leftward
+            for (int x = abs_shift; x < width; ++x)
+                row[x - abs_shift] = row[x];
+
+            // [PN] Fill right edge with black
+            for (int x = width - abs_shift; x < width; ++x)
+                row[x] = black_pixel;
         }
     }
 }
@@ -502,139 +508,174 @@ static void V_PProc_MotionBlur (void)
 
 static void V_PProc_DepthOfFieldBlur (void)
 {
-    // Validate input buffer and 32-bit pixel format
+    // [PN] Validate input buffer and 32-bit pixel format
     if (!argbbuffer || argbbuffer->format->BytesPerPixel != 4)
         return;
 
-    const int width  = argbbuffer->w;
-    const int height = argbbuffer->h;
+    const int width       = argbbuffer->w;
+    const int height      = argbbuffer->h;
     if (width < 7 || height < 7)
         return;
 
-    Uint32 *restrict pixels = (Uint32*)argbbuffer->pixels;
-    const int cx = width / 2;
-    const int cy = height / 2;
-    const int stride = width;  // Precomputed row stride
+    Uint32 *restrict pixels = (Uint32 *restrict)argbbuffer->pixels;
+    const int stride       = width;
+    const int cx           = width >> 1;
+    const int cy           = height >> 1;
+    const int resolution   = vid_resolution;
+    const int radius       = (resolution <= 2) ? 1 : (resolution <= 4) ? 2 : 3;
+    const int thresh       = 150 * resolution;
+    const int threshSq     = thresh * thresh;
 
-    // Adaptive blur radius based on resolution
-    const int radius = (vid_resolution <= 2) ? 1 :
-                       (vid_resolution <= 4) ? 2 : 3;
-    const int diameter = 2 * radius + 1;
-    const int kernel_size = diameter * diameter;
-
-    // Threshold for blur application
-    const int threshold = 150 * vid_resolution;
-    const int thresholdSq = threshold * threshold;
-
-    // Main blur pass
-    for (int y = radius; y < height - radius; ++y)
+    // [PN] Central blur pass with radius-specific unrolling
+    switch (radius)
     {
-        const int dy = y - cy;
-        const int dy2 = dy * dy;
-        Uint32 *restrict row_center = pixels + y * stride;  // Central row
-
-        for (int x = radius; x < width - radius; ++x)
+        case 1:
         {
-            const int dx = x - cx;
-            if (dx * dx + dy2 < thresholdSq)
-                continue; // Pixel is in focus – skip
-
-            int r_sum = 0, g_sum = 0, b_sum = 0;
-
-            // Precomputed pointers to rows
-            for (int ky = -radius; ky <= radius; ++ky)
+            const int ksz = 9;
+            for (int y = 1; y < height - 1; ++y)
             {
-                const Uint32 *restrict row = pixels + (y + ky) * stride;
-                const int x_start = x - radius;
-                
-                // Unrolled inner loop for radii 1-3
-                if (radius == 1)
+                const int dy    = y - cy;
+                const int dy2   = dy * dy;
+                Uint32 *restrict dst  = pixels + y * stride;
+                const Uint32 *restrict prev = dst - stride;
+                const Uint32 *restrict next = dst + stride;
+                for (int x = 1; x < width - 1; ++x)
                 {
-                    Uint32 c0 = row[x_start];
-                    Uint32 c1 = row[x_start + 1];
-                    Uint32 c2 = row[x_start + 2];
-                    
-                    r_sum += ((c0 >> 16) & 0xFF) + ((c1 >> 16) & 0xFF) + ((c2 >> 16) & 0xFF);
-                    g_sum += ((c0 >> 8) & 0xFF) + ((c1 >> 8) & 0xFF) + ((c2 >> 8) & 0xFF);
-                    b_sum += (c0 & 0xFF) + (c1 & 0xFF) + (c2 & 0xFF);
-                }
-                else if (radius == 2)
-                {
-                    // Similarly for radius 2 (5x5)
-                    for (int kx = -2; kx <= 2; ++kx)
+                    const int dx = x - cx;
+                    if (dx * dx + dy2 >= threshSq)
                     {
-                        Uint32 c = row[x + kx];
-                        r_sum += (c >> 16) & 0xFF;
-                        g_sum += (c >> 8) & 0xFF;
-                        b_sum += c & 0xFF;
-                    }
-                }
-                else // radius == 3
-                {
-                    // Similarly for radius 3 (7x7)
-                    for (int kx = -3; kx <= 3; ++kx)
-                    {
-                        Uint32 c = row[x + kx];
-                        r_sum += (c >> 16) & 0xFF;
-                        g_sum += (c >> 8) & 0xFF;
-                        b_sum += c & 0xFF;
+                        Uint32 c0 = prev[x - 1], c1 = prev[x], c2 = prev[x + 1];
+                        Uint32 c3 = dst[x - 1],               c5 = dst[x + 1];
+                        Uint32 c6 = next[x - 1], c7 = next[x], c8 = next[x + 1];
+                        int r_sum = ((c0 >> 16) & 0xFF) + ((c1 >> 16) & 0xFF) + ((c2 >> 16) & 0xFF)
+                                  + ((c3 >> 16) & 0xFF) + ((dst[x] >> 16) & 0xFF) + ((c5 >> 16) & 0xFF)
+                                  + ((c6 >> 16) & 0xFF) + ((c7 >> 16) & 0xFF) + ((c8 >> 16) & 0xFF);
+                        int g_sum = ((c0 >> 8)  & 0xFF) + ((c1 >> 8)  & 0xFF) + ((c2 >> 8)  & 0xFF)
+                                  + ((c3 >> 8)  & 0xFF) + ((dst[x] >> 8)  & 0xFF) + ((c5 >> 8)  & 0xFF)
+                                  + ((c6 >> 8)  & 0xFF) + ((c7 >> 8)  & 0xFF) + ((c8 >> 8)  & 0xFF);
+                        int b_sum = (c0 & 0xFF) + (c1 & 0xFF) + (c2 & 0xFF)
+                                  + (c3 & 0xFF) + (dst[x] & 0xFF) + (c5 & 0xFF)
+                                  + (c6 & 0xFF) + (c7 & 0xFF) + (c8 & 0xFF);
+                        dst[x] = (0xFFu << 24) | ((r_sum / ksz) << 16) | ((g_sum / ksz) << 8) | (b_sum / ksz);
                     }
                 }
             }
-
-            // Fast division using precomputed kernel_size
-            const int r_avg = r_sum / kernel_size;
-            const int g_avg = g_sum / kernel_size;
-            const int b_avg = b_sum / kernel_size;
-
-            row_center[x] = (0xFF << 24) | (r_avg << 16) | (g_avg << 8) | b_avg;
         }
+        break;
+
+        case 2:
+        {
+            const int ksz = 25;
+            for (int y = 2; y < height - 2; ++y)
+            {
+                const int dy  = y - cy;
+                const int dy2 = dy * dy;
+                Uint32 *restrict dst = pixels + y * stride;
+                for (int x = 2; x < width - 2; ++x)
+                {
+                    const int dx = x - cx;
+                    if (dx * dx + dy2 < threshSq) continue;
+                    int r_sum = 0, g_sum = 0, b_sum = 0;
+                    const Uint32 *restrict rows[5] = {
+                        dst - 2 * stride,
+                        dst -     stride,
+                        dst,
+                        dst +     stride,
+                        dst + 2 * stride
+                    };
+                    for (int ry = 0; ry < 5; ++ry) {
+                        const Uint32 *restrict row = rows[ry];
+                        r_sum += (row[x - 2] >> 16) & 0xFF;
+                        g_sum += (row[x - 2] >>  8) & 0xFF;
+                        b_sum +=  row[x - 2]        & 0xFF;
+                        r_sum += (row[x - 1] >> 16) & 0xFF;
+                        g_sum += (row[x - 1] >>  8) & 0xFF;
+                        b_sum +=  row[x - 1]        & 0xFF;
+                        r_sum += (row[x    ] >> 16) & 0xFF;
+                        g_sum += (row[x    ] >>  8) & 0xFF;
+                        b_sum +=  row[x    ]        & 0xFF;
+                        r_sum += (row[x + 1] >> 16) & 0xFF;
+                        g_sum += (row[x + 1] >>  8) & 0xFF;
+                        b_sum +=  row[x + 1]        & 0xFF;
+                        r_sum += (row[x + 2] >> 16) & 0xFF;
+                        g_sum += (row[x + 2] >>  8) & 0xFF;
+                        b_sum +=  row[x + 2]        & 0xFF;
+                    }
+                    dst[x] = (0xFFu << 24) | ((r_sum / ksz) << 16) | ((g_sum / ksz) << 8) | (b_sum / ksz);
+                }
+            }
+        }
+        break;
+
+        default:
+        {   // radius == 3
+            const int ksz = 49;
+            for (int y = 3; y < height - 3; ++y)
+            {
+                const int dy  = y - cy;
+                const int dy2 = dy * dy;
+                Uint32 *restrict dst = pixels + y * stride;
+                for (int x = 3; x < width - 3; ++x)
+                {
+                    const int dx = x - cx;
+                    if (dx * dx + dy2 < threshSq) continue;
+                    int r_sum = 0, g_sum = 0, b_sum = 0;
+                    const Uint32 *restrict rows[7] = {
+                        dst - 3 * stride,
+                        dst - 2 * stride,
+                        dst -     stride,
+                        dst,
+                        dst +     stride,
+                        dst + 2 * stride,
+                        dst + 3 * stride
+                    };
+                    for (int ry = 0; ry < 7; ++ry)
+                    {
+                        const Uint32 *restrict row = rows[ry];
+                            for (int kx = -3; kx <= 3; ++kx) {
+                            Uint32 c = row[x + kx];
+                            r_sum += (c >> 16) & 0xFF;
+                            g_sum += (c >>  8) & 0xFF;
+                            b_sum +=  c        & 0xFF;
+                        }
+                    }
+                    dst[x] = (0xFFu << 24) | ((r_sum / ksz) << 16) | ((g_sum / ksz) << 8) | (b_sum / ksz);
+                }
+            }
+        }
+        break;
     }
 
-    // Optimized border processing
+    // [PN] Border blur (3x3) for left/right edges only
     for (int y = 1; y < height - 1; ++y)
     {
-        const int dy = y - cy;
+        const int dy  = y - cy;
         const int dy2 = dy * dy;
-        Uint32 *restrict row = pixels + y * stride;
-
-        // Processing left and right borders
+        Uint32 *restrict dst = pixels + y * stride;
         for (int x = 0; x < width; x += (width - 1))
         {
             const int dx = x - cx;
-            if (dx * dx + dy2 < thresholdSq)
-                continue;
-
-            int r_sum = 0, g_sum = 0, b_sum = 0;
-            int count = 0;
-
-            // Explicit handling of 3x3 kernel with boundary checks
-            for (int ky = (y == 0) ? 0 : -1; ky <= (y == height - 1) ? 0 : 1; ++ky)
+            if (dx * dx + dy2 < threshSq) continue;
+            int r_sum = 0, g_sum = 0, b_sum = 0, count = 0;
+            for (int ky = -1; ky <= 1; ++ky)
             {
-                const Uint32 *restrict sample_row = pixels + (y + ky) * stride;
-                const int x_start = (x == 0) ? 0 : -1;
-                const int x_end = (x == width - 1) ? 0 : 1;
-                
-                for (int kx = x_start; kx <= x_end; ++kx)
+                const Uint32 *restrict row = pixels + (y + ky) * stride;
+                for (int kx = -1; kx <= 1; ++kx)
                 {
-                    Uint32 c = sample_row[x + kx];
+                    int xx = x + kx;
+                    if ((unsigned)xx >= (unsigned)width) continue;
+                    Uint32 c = row[xx];
                     r_sum += (c >> 16) & 0xFF;
-                    g_sum += (c >> 8) & 0xFF;
-                    b_sum += c & 0xFF;
+                    g_sum += (c >>  8) & 0xFF;
+                    b_sum +=  c        & 0xFF;
                     ++count;
                 }
             }
-
-            if (count > 0)
-            {
-                row[x] = (0xFF << 24) | 
-                        ((r_sum / count) << 16) | 
-                        ((g_sum / count) << 8) | 
-                        (b_sum / count);
-            }
+            if (count) dst[x] = (0xFFu << 24) | ((r_sum / count) << 16) | ((g_sum / count) << 8) | (b_sum / count);
         }
     }
 }
+
 
 // -----------------------------------------------------------------------------
 // V_PProc_Display and V_PProc_PlayerView
