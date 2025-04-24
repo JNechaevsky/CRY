@@ -1010,6 +1010,15 @@ void R_RenderPlayerView (player_t *player)
     // Start frame
     R_SetupFrame (player);
 
+    // [JN] Fill view buffer with black color to prevent
+    // overbrighting from post-processing effects and 
+    // forcefully update status bar if any effect is active.
+    if (V_PProc_EffectsActive())
+    {
+        V_DrawFilledBox(viewwindowx, viewwindowy, scaledviewwidth, viewheight, 0);
+        st_fullupdate = true;
+    }
+
     // Clear buffers.
     R_ClearClipSegs ();
     R_ClearDrawSegs ();
@@ -1036,9 +1045,6 @@ void R_RenderPlayerView (player_t *player)
     R_SetFuzzPosDraw();
     R_DrawMasked ();
 
-    // [JN] Apply post-processing effects and forcefully
-    // update status bar if any effect is active.
+    // [JN] Apply post-processing effects.
     V_PProc_PlayerView();
-    if (V_PProc_EffectsActive())
-        st_fullupdate = true;
 }
