@@ -488,6 +488,7 @@ static void M_ID_SoftBloom (int choice);
 static void M_ID_AnalogRGBDrift (int choice);
 static void M_ID_VHSLineDistortion (int choice);
 static void M_ID_ScreenVignette (int choice);
+static void M_ID_FilmGrain (int choice);
 static void M_ID_MotionBlur (int choice);
 static void M_ID_DepthOfFieldBlur (int choice);
  
@@ -666,7 +667,6 @@ static void M_ID_JaguarExplosion (int choice);
 static void M_ID_JaguarSkies (int choice);
 
 static void M_ScrollGameplay (int choice);
-static void M_DrawGameplayFooter (char *pagenum);
 
 static void M_Choose_ID_Reset (int choice);
 static int  resetplaque_tics;
@@ -1094,6 +1094,17 @@ static char *const DefSkillName[5] =
     "NM"     
 };
 
+static void M_DrawScrollPages (int x, int y, int itemOnGlow, const char *pagenum)
+{
+    char str[32];
+    
+    M_WriteText(x, y, "< SCROLL PAGES >",
+                M_Item_Glow(itemOnGlow, GLOW_LIGHTGRAY));
+
+    M_snprintf(str, 32, "%s", M_StringJoin("PAGE ", pagenum, NULL));
+    M_WriteText(M_ItemRightAlign(str), y, str,
+                M_Item_Glow(itemOnGlow, GLOW_GRAY));
+}
 
 // -----------------------------------------------------------------------------
 // Main ID Menu
@@ -1236,7 +1247,8 @@ static void M_Draw_ID_Video_1 (void)
     // Screen wipe effect
     sprintf(str, vid_screenwipe == 1 ? "LOADING" :
                  vid_screenwipe == 2 ? "MELT" :
-                 vid_screenwipe == 3 ? "CROSSFADE" : "OFF");
+                 vid_screenwipe == 3 ? "CROSSFADE" :
+                 vid_screenwipe == 4 ? "FIZZLE" : "OFF");
     M_WriteText (M_ItemRightAlign(str), 90, str,
                  M_Item_Glow(8, vid_screenwipe == 1 ? GLOW_DARKRED : GLOW_GREEN));
 
@@ -1254,8 +1266,8 @@ static void M_Draw_ID_Video_1 (void)
         M_WriteTextCentered(103, resolution, cr[CR_LIGHTGRAY_DARK1]);
     }
 
-    M_WriteText (ID_MENU_LEFTOFFSET, 117, "NEXT PAGE >",
-                  M_Item_Glow(11, GLOW_LIGHTGRAY));
+    // < Scroll pages >
+    M_DrawScrollPages(ID_MENU_LEFTOFFSET, 117, 11, "1/2");
 }
 
 static void M_ID_RenderingResHook (void)
@@ -1400,7 +1412,7 @@ static void M_ID_PixelScaling (int choice)
 
 static void M_ID_ScreenWipe (int choice)
 {
-    vid_screenwipe = M_INT_Slider(vid_screenwipe, 0, 3, choice, false);
+    vid_screenwipe = M_INT_Slider(vid_screenwipe, 0, 4, choice, false);
 }
 
 // -----------------------------------------------------------------------------
@@ -1415,9 +1427,9 @@ static menuitem_t ID_Menu_Video_2[]=
     { M_MUL1, "ANALOG RGB DRIFT",       M_ID_AnalogRGBDrift,    'a' },
     { M_MUL2, "VHS LINE DISTORTION",    M_ID_VHSLineDistortion, 'v' },
     { M_MUL1, "SCREEN VIGNETTE",        M_ID_ScreenVignette,    's' },
+    { M_MUL1, "FILM GRAIN",             M_ID_FilmGrain,         'f' },
     { M_MUL1, "MOTION BLUR",            M_ID_MotionBlur,        'm' },
     { M_MUL2, "DEPTH OF FIELD BLUR",    M_ID_DepthOfFieldBlur,  'd' },
-    { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
     { M_MUL1, "", /* PREV PAGE > */     M_ScrollVideo,          'p' },
@@ -1475,22 +1487,31 @@ static void M_Draw_ID_Video_2 (void)
     M_WriteText (M_ItemRightAlign(str), 63, str, 
                  M_Item_Glow(5, post_vignette ? GLOW_GREEN : GLOW_DARKRED));
 
-    // Analog RGB drift
+    // Film grain
+     sprintf(str, post_filmgrain == 1 ? "SOFT"      :
+                  post_filmgrain == 2 ? "LIGHT"     : 
+                  post_filmgrain == 3 ? "MEDIUM"    : 
+                  post_filmgrain == 4 ? "HEAVY"     : 
+                  post_filmgrain == 5 ? "NIGHTMARE" : "OFF");
+    M_WriteText (M_ItemRightAlign(str), 72, str, 
+                 M_Item_Glow(6, post_filmgrain ? GLOW_GREEN : GLOW_DARKRED));
+
+    // Motion blur
     sprintf(str, post_motionblur == 1 ? "SOFT"   :
                  post_motionblur == 2 ? "LIGHT"  : 
                  post_motionblur == 3 ? "MEDIUM" : 
                  post_motionblur == 4 ? "HEAVY"  : 
                  post_motionblur == 5 ? "GHOST"  : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 72, str, 
-                 M_Item_Glow(6, post_motionblur ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 81, str, 
+                 M_Item_Glow(7, post_motionblur ? GLOW_GREEN : GLOW_DARKRED));
 
     // Depth if field blur
     sprintf(str, post_dofblur ? "ON" : "OFF");
-    M_WriteText (M_ItemRightAlign(str), 81, str, 
-                 M_Item_Glow(7, post_dofblur ? GLOW_GREEN : GLOW_DARKRED));
+    M_WriteText (M_ItemRightAlign(str), 90, str, 
+                 M_Item_Glow(8, post_dofblur ? GLOW_GREEN : GLOW_DARKRED));
 
-    M_WriteText (ID_MENU_LEFTOFFSET, 117, "< PREV PAGE",
-                 M_Item_Glow(11, GLOW_LIGHTGRAY));
+    // < Scroll pages >
+    M_DrawScrollPages(ID_MENU_LEFTOFFSET, 117, 11, "2/2");
 }
 
 static void M_ID_SuperSmoothing (int choice)
@@ -1523,6 +1544,11 @@ static void M_ID_ScreenVignette (int choice)
     post_vignette = M_INT_Slider(post_vignette, 0, 4, choice, false);
 }
 
+static void M_ID_FilmGrain (int choice)
+{
+    post_filmgrain = M_INT_Slider(post_filmgrain, 0, 5, choice, false);
+}
+
 static void M_ID_MotionBlur (int choice)
 {
     post_motionblur = M_INT_Slider(post_motionblur, 0, 5, choice, false);
@@ -1535,8 +1561,9 @@ static void M_ID_DepthOfFieldBlur (int choice)
 
 static void M_ScrollVideo (int choice)
 {
-         if (currentMenu == &ID_Def_Video_1) { ID_Def_Video_2.lastOn = 11; M_SetupNextMenu(&ID_Def_Video_2); }
-    else if (currentMenu == &ID_Def_Video_2) { ID_Def_Video_1.lastOn = 11; M_SetupNextMenu(&ID_Def_Video_1); }
+         if (currentMenu == &ID_Def_Video_1) { M_SetupNextMenu(&ID_Def_Video_2); }
+    else if (currentMenu == &ID_Def_Video_2) { M_SetupNextMenu(&ID_Def_Video_1); }
+    itemOn = 11;
 }
 
 // -----------------------------------------------------------------------------
@@ -3145,7 +3172,7 @@ static void M_Draw_ID_Gameplay_1 (void)
                  M_Item_Glow(4, vis_colored_blood ? GLOW_GREEN : GLOW_DARKRED));
 
     // Liquids animation
-    sprintf(str, vis_swirling_liquids ? "SWIRLING" : "ORIGINAL");
+    sprintf(str, vis_swirling_liquids ? "IMPROVED" : "ORIGINAL");
     M_WriteText (M_ItemRightAlign(str), 63, str,
                  M_Item_Glow(5, vis_swirling_liquids ? GLOW_GREEN : GLOW_DARKRED));
 
@@ -3184,8 +3211,8 @@ static void M_Draw_ID_Gameplay_1 (void)
     M_WriteText (M_ItemRightAlign(str), 117, str,
                  M_Item_Glow(11, xhair_color ? GLOW_GREEN : GLOW_DARKRED));
 
-    // Footer
-    M_DrawGameplayFooter("1");
+    // < Scroll pages >
+    M_DrawScrollPages(ID_MENU_LEFTOFFSET_BIG, 144, 14, "1/3");
 }
 
 static void M_ID_Brightmaps (int choice)
@@ -3360,8 +3387,8 @@ static void M_Draw_ID_Gameplay_2 (void)
     M_WriteText (M_ItemRightAlign(str), 108, str,
                  M_Item_Glow(10, aud_crushed_corpse ? GLOW_GREEN : GLOW_DARKRED));
 
-    // Footer
-    M_DrawGameplayFooter("2");
+    // < Scroll pages >
+    M_DrawScrollPages(ID_MENU_LEFTOFFSET_BIG, 144, 14, "2/3");
 }
 
 static void M_ID_ColoredSTBar (int choice)
@@ -3522,8 +3549,8 @@ static void M_Draw_ID_Gameplay_3 (void)
         M_WriteTextCentered(126, "AREA 24 USES HELLISH SKY", cr[CR_GRAY]);
     }
 
-    // Footer
-    M_DrawGameplayFooter("3");
+    // < Scroll pages >
+    M_DrawScrollPages(ID_MENU_LEFTOFFSET_BIG, 144, 14, "3/3");
 }
 
 static void M_ID_DefaulSkill (int choice)
@@ -3596,28 +3623,17 @@ static void M_ScrollGameplay (int choice)
 {
     if (choice) // Scroll right
     {
-             if (currentMenu == &ID_Def_Gameplay_1) { ID_Def_Gameplay_2.lastOn = 14; M_SetupNextMenu(&ID_Def_Gameplay_2); }
-        else if (currentMenu == &ID_Def_Gameplay_2) { ID_Def_Gameplay_3.lastOn = 14; M_SetupNextMenu(&ID_Def_Gameplay_3); }
-        else if (currentMenu == &ID_Def_Gameplay_3) { ID_Def_Gameplay_1.lastOn = 14; M_SetupNextMenu(&ID_Def_Gameplay_1); }
+             if (currentMenu == &ID_Def_Gameplay_1) { M_SetupNextMenu(&ID_Def_Gameplay_2); }
+        else if (currentMenu == &ID_Def_Gameplay_2) { M_SetupNextMenu(&ID_Def_Gameplay_3); }
+        else if (currentMenu == &ID_Def_Gameplay_3) { M_SetupNextMenu(&ID_Def_Gameplay_1); }
     }
     else
     {           // Scroll left
-             if (currentMenu == &ID_Def_Gameplay_1) { ID_Def_Gameplay_3.lastOn = 14; M_SetupNextMenu(&ID_Def_Gameplay_3); }
-        else if (currentMenu == &ID_Def_Gameplay_2) { ID_Def_Gameplay_1.lastOn = 14; M_SetupNextMenu(&ID_Def_Gameplay_1); }
-        else if (currentMenu == &ID_Def_Gameplay_3) { ID_Def_Gameplay_2.lastOn = 14; M_SetupNextMenu(&ID_Def_Gameplay_2); }
+             if (currentMenu == &ID_Def_Gameplay_1) { M_SetupNextMenu(&ID_Def_Gameplay_3); }
+        else if (currentMenu == &ID_Def_Gameplay_2) { M_SetupNextMenu(&ID_Def_Gameplay_1); }
+        else if (currentMenu == &ID_Def_Gameplay_3) { M_SetupNextMenu(&ID_Def_Gameplay_2); }
     }
-}
-
-static void M_DrawGameplayFooter (char *pagenum)
-{
-    char str[32];
-    
-    M_WriteText(ID_MENU_LEFTOFFSET_BIG, 144, "< SCROLL PAGES >",
-                M_Item_Glow(14, GLOW_LIGHTGRAY));
-
-    M_snprintf(str, 32, "%s", M_StringJoin("PAGE ", pagenum, "/3", NULL));
-    M_WriteText(M_ItemRightAlign(str), 144, str,
-                M_Item_Glow(14, GLOW_GRAY));
+    itemOn = 14;
 }
 
 // -----------------------------------------------------------------------------
@@ -3647,6 +3663,7 @@ static void M_ID_ApplyResetHook (void)
     post_rgbdrift = 0;
     post_vhsdist = 0;
     post_vignette = 0;
+    post_filmgrain = 0;
     post_motionblur = 0;
     post_dofblur = 0;
 

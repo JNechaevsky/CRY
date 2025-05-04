@@ -223,7 +223,6 @@ static const uint8_t alpha_table[] = {
 
 static void wipe_initCrossfade (void)
 {
-    y = (int *) malloc(SCREENWIDTH*sizeof(int));
     memcpy(wipe_scr, wipe_scr_start, SCREENAREA*sizeof(*wipe_scr));
     // [JN] Arm fail-safe crossfade counter with...
     // 32 screen screen transitions in TrueColor render,
@@ -259,6 +258,63 @@ static boolean wipe_doCrossfade (int ticks)
     return !changed;
 }
 
+// =============================================================================
+// [PN] Fizzle
+// =============================================================================
+
+static void wipe_initFizzle (void)
+{
+    const int scale = vid_resolution;
+
+    memcpy(wipe_scr, wipe_scr_start, SCREENAREA * sizeof(*wipe_scr));
+    y = (int *) malloc(SCREENAREA*sizeof(int));
+
+    for (int yy = 0; yy < SCREENHEIGHT; yy += scale)
+    {
+        for (int xx = 0; xx < SCREENWIDTH; xx += scale)
+        {
+            const uint8_t burn_value = rand() % 256;
+
+            for (int dy = 0; dy < scale; ++dy)
+            {
+                for (int dx = 0; dx < scale; ++dx)
+                {
+                    const int sx = xx + dx;
+                    const int sy = yy + dy;
+
+                    if (sx < SCREENWIDTH && sy < SCREENHEIGHT)
+                    {
+                        y[sy * SCREENWIDTH + sx] = burn_value;
+                    }
+                }
+            }
+        }
+    }
+
+    fade_counter = 0;
+}
+
+static boolean wipe_doFizzle (const int ticks)
+{
+    pixel_t *cur_screen = wipe_scr;
+    pixel_t *end_screen = wipe_scr_end;
+
+    fade_counter += 8;
+
+    for (int i = 0; i < SCREENAREA; ++i)
+    {
+        if (y[i] <= fade_counter)
+        {
+            if (cur_screen[i] != end_screen[i])
+            {
+                cur_screen[i] = end_screen[i];
+            }
+        }
+    }
+
+    V_DrawBlock(0, 0, SCREENWIDTH, SCREENHEIGHT, wipe_scr);
+    return fade_counter >= 256;
+}
 
 // -----------------------------------------------------------------------------
 // wipe_exitMelt
@@ -266,6 +322,7 @@ static boolean wipe_doCrossfade (int ticks)
 
 static void wipe_exit (void)
 {
+    if (vid_screenwipe != 3)  // [JN] y is not allocated in crossfade wipe.
     free(y);
     free(wipe_scr_start);
     free(wipe_scr_end);
@@ -317,6 +374,10 @@ boolean wipe_ScreenWipe (const int ticks)
         case 3: // Crossfade
             wipe_init = wipe_initCrossfade;
             wipe_do = wipe_doCrossfade;
+        break;
+        case 4: // Fizzle
+            wipe_init = wipe_initFizzle;
+            wipe_do = wipe_doFizzle;
         break;
     }
 

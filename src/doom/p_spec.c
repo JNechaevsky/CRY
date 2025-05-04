@@ -99,13 +99,13 @@ static animdef_t animdefs_swirling[] =
 	{true,	"FLAME03",	"FLAME01",	8},
 	{true,	"TVSNOW03",	"TVSNOW01",	4},
 
-	{false,	"BLOOD3",	"BLOOD1",	65536},
-	{false,	"BSLIME01",	"BSLIME01",	65536},
-	{false,	"CSLIME04",	"CSLIME01",	65536},
+	{false,	"BLOOD3",	"BLOOD1",	65537},
+	{false,	"BSLIME01",	"BSLIME01",	65537},
+	{false,	"CSLIME04",	"CSLIME01",	65539},
 	{false,	"FWATER4",	"FWATER1",	65536},
 	{false,	"GLOW04",	"GLOW01",	8},
-	{false,	"LAVA4",	"LAVA1",	65536},
-	{false,	"NUKAGE3",	"NUKAGE1",	65536},
+	{false,	"LAVA4",	"LAVA1",	65538},
+	{false,	"NUKAGE3",	"NUKAGE1",	65537},
 	
     {-1,    "",         "",         0},
 };
@@ -848,7 +848,11 @@ void P_UpdateSpecials (void)
 			// [crispy] add support for SMMU swirling flats
 			if (anim->speed > 65535 || anim->numpics == 1)
 			{
-				flattranslation[i] = -1;
+                flattranslation[i] = 
+                    anim->speed == 65537 ? -2 : // Warp 1
+                    anim->speed == 65538 ? -3 : // Warp 2
+                    anim->speed == 65539 ? -4 : // Warp 3
+                                           -1 ; // Swirl
 			}
 			else
 			flattranslation[i] = pic;

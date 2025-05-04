@@ -49,6 +49,7 @@ int post_bloom = 0;
 int post_rgbdrift = 0;
 int post_vhsdist = 0;
 int post_vignette = 0;
+int post_filmgrain = 0;
 int post_motionblur = 0;
 int post_dofblur = 0;
 
@@ -182,6 +183,7 @@ void ID_BindVariables (void)
     M_BindIntVariable("post_rgbdrift",                  &post_rgbdrift);
     M_BindIntVariable("post_vhsdist",                   &post_vhsdist);
     M_BindIntVariable("post_vignette",                  &post_vignette);
+    M_BindIntVariable("post_filmgrain",                 &post_filmgrain);
     M_BindIntVariable("post_motionblur",                &post_motionblur);
     M_BindIntVariable("post_dofblur",                   &post_dofblur);
 
