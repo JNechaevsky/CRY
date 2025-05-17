@@ -249,6 +249,7 @@ static int  M_StringHeight(const char *string);
 static void M_StartMessage(const char *string, void (*routine)(int), boolean input);
 static void M_ClearMenus (void);
 
+static void M_ID_MenuMouseControl (void);
 static void M_ID_HandleSliderMouseControl (int x, int y, int width, void *value, boolean is_float, float min, float max);
 
 // =============================================================================
@@ -5444,6 +5445,8 @@ boolean M_Responder (event_t* ev)
             M_Reset_Line_Glow();
             itemOn = currentMenu->lastOn;
             S_StartSound(NULL, sfx_swtchn);
+            // [JN] Update mouse cursor position.
+            M_ID_MenuMouseControl();
         }
         // [JN] Close menu if pressed "back" in Doom main or CRL main menu.
         else
@@ -5826,6 +5829,8 @@ static void M_SetupNextMenu(menu_t *menudef)
     currentMenu = menudef;
     M_Reset_Line_Glow();
     itemOn = currentMenu->lastOn;
+    // [JN] Update mouse cursor position.
+    M_ID_MenuMouseControl();
 }
 
 
