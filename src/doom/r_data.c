@@ -1355,9 +1355,6 @@ int R_TextureNumForName(const char *name)
 
 void R_PrecacheLevel(void)
 {
-    if (demoplayback)
-        return;
-
     const size_t maxsize = MAX3(numtextures, numflats, numsprites);
     byte *restrict hitlist = (byte*)calloc(maxsize, 1);
 
