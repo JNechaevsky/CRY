@@ -57,10 +57,11 @@ extern void M_ConfirmDeleteGame (void);
 
 extern void M_WriteText (int x, int y, const char *string, byte *table);
 extern void M_WriteTextCentered (const int y, const char *string, byte *table);
-extern void M_WriteTextCritical (const int y, const char *string1, const char *string2, byte *table);
+extern void M_WriteTextGlow (int x, int y, const char *string, byte *table1, byte *table2, int alpha);
 extern int  M_StringWidth (const char *string);
 extern void M_WriteTextBig (int x, int y, const char *string, byte *table);
 extern void M_WriteTextBigCentered (const int y, const char *string, byte *table);
+extern void M_WriteTextBigGlow (int x, int y, const char *string, byte *table1, byte *table2, int alpha);
 
 // [FG] support up to 8 pages of savegames
 // extern int savepage;

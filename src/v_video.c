@@ -438,6 +438,48 @@ void V_DrawPatchFinale (int x, int y, patch_t *patch)
 	}
 }
 
+// -----------------------------------------------------------------------------
+// V_DrawFadePatch
+// [JN/PN] Draws translucent patch with given alpha value. For TrueColor only.
+// -----------------------------------------------------------------------------
+
+void V_DrawFadePatch (int x, int y, const patch_t *restrict patch, int alpha)
+{
+    x += WIDESCREENDELTA - SHORT(patch->leftoffset);
+    y -= SHORT(patch->topoffset);
+    
+    const int pw = SHORT(patch->width);
+    const int ph = SHORT(patch->height);
+    const int sw = SCREENWIDTH / vid_resolution;
+    const int sh = SCREENHEIGHT / vid_resolution;
+
+    if (x < 0 || x + pw > sw || y < 0 || y + ph > sh)
+        return;
+
+    pixel_t *restrict desttop = dest_screen + ((y * dy) >> FRACBITS) * SCREENWIDTH + ((x * dx) >> FRACBITS);
+
+    for (int col = 0; col < (pw << FRACBITS); col += dxi, desttop++)
+    {
+        const column_t *column = (const column_t *)((const byte *)patch + LONG(patch->columnofs[col >> FRACBITS]));
+
+        while (column->topdelta != 0xff)
+        {
+            const int count = (column->length * dy) >> FRACBITS;
+            pixel_t *restrict dest = desttop + ((column->topdelta * dy) >> FRACBITS) * SCREENWIDTH;
+            const byte *restrict source = (const byte *)column + 3;
+
+            for (int i = 0, srccol = 0; i < count; i++, srccol += dyi, dest += SCREENWIDTH)
+            {
+                const byte src = source[srccol >> FRACBITS];
+                const byte src_trans = dp_translation ? dp_translation[src] : src;
+                *dest = I_BlendOver(*dest, palette_pointer[src_trans], alpha);
+            }
+
+            column = (const column_t *)((const byte *)column + column->length + 4);
+        }
+    }
+}
+
 //
 // V_DrawBlock
 // Draw a linear block of pixels into the view buffer.
