@@ -299,48 +299,6 @@ R_PointToAngle2
 }
 
 
-fixed_t
-R_PointToDist
-( fixed_t	x,
-  fixed_t	y )
-{
-    int		angle;
-    fixed_t	dx;
-    fixed_t	dy;
-    fixed_t	temp;
-    fixed_t	dist;
-    fixed_t     frac;
-	
-    dx = abs(x - viewx);
-    dy = abs(y - viewy);
-	
-    if (dy>dx)
-    {
-	temp = dx;
-	dx = dy;
-	dy = temp;
-    }
-
-    // Fix crashes in udm1.wad
-
-    if (dx != 0)
-    {
-        frac = FixedDiv(dy, dx);
-    }
-    else
-    {
-	frac = 0;
-    }
-	
-    angle = (tantoangle[frac>>DBITS]+ANG90) >> ANGLETOFINESHIFT;
-
-    // use as cosine
-    dist = FixedDiv (dx, finesine[angle] );	
-	
-    return dist;
-}
-
-
 // [crispy] WiggleFix: move R_ScaleFromGlobalAngle function to r_segs.c,
 // above R_StoreWallRange
 #if 0
@@ -527,11 +485,6 @@ void R_InitLightTables (void)
 {
     int		i;
     int		j;
-    int		level;
-    int		startmap; 	
-    int		scale;
-    // [PN] Pre-calculate for slight optimization
-    const int fracwidth = (ORIGWIDTH / 2 * FRACUNIT);
     
     if (scalelight)
     {
@@ -573,7 +526,6 @@ void R_InitLightTables (void)
 	}
 	free(zlight_INVULN);
     }
-    
 
     scalelight = malloc(LIGHTLEVELS * sizeof(*scalelight));
     scalelightfixed = malloc(MAXLIGHTSCALE * sizeof(*scalelightfixed));
@@ -581,31 +533,42 @@ void R_InitLightTables (void)
     scalelight_INVULN = malloc(LIGHTLEVELS * sizeof(*scalelight_INVULN));
     zlight_INVULN = malloc(LIGHTLEVELS * sizeof(*zlight_INVULN));
 
+    // [PN] Precalculate lighting scale table before generating zlight[][]
+    int *scale_table = malloc(MAXLIGHTZ * sizeof(*scale_table));
+    {
+        const int fracwidth = (ORIGWIDTH >> 1) * FRACUNIT;
+        for (int j = 0; j < MAXLIGHTZ; ++j)
+            scale_table[j] = (FixedDiv(fracwidth, (j + 1) << LIGHTZSHIFT)) >> LIGHTSCALESHIFT;
+    }
+
     // Calculate the light levels to use
     //  for each level / distance combination.
-    for (i=0 ; i< LIGHTLEVELS ; i++)
+    for (i = 0 ; i < LIGHTLEVELS ; i++)
     {
-	scalelight[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
-	zlight[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
-	scalelight_INVULN[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight_INVULN));
-	zlight_INVULN[i] = malloc(MAXLIGHTZ * sizeof(**zlight_INVULN));
+        scalelight[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
+        zlight[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
+        scalelight_INVULN[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight_INVULN));
+        zlight_INVULN[i] = malloc(MAXLIGHTZ * sizeof(**zlight_INVULN));
+        const int startmap = ((LIGHTLEVELS - LIGHTBRIGHT - i) << 1) * NUMCOLORMAPS / LIGHTLEVELS;
 
-	// [PN] Use bit shifting for faster handling
-	startmap = ((LIGHTLEVELS - LIGHTBRIGHT - i) << 1) * NUMCOLORMAPS / LIGHTLEVELS;
-	for (j=0 ; j<MAXLIGHTZ ; j++)
-	{
-	    // [PN] Use precalculated fracwidth value
-	    scale = (FixedDiv(fracwidth, (j + 1) << LIGHTZSHIFT)) >> LIGHTSCALESHIFT;
-	    // [PN] Use bit shifting for faster handling
-	    level = startmap - (scale >> 1);
-	    // [PN] Clamp light level values
-	    level = BETWEEN(0, NUMCOLORMAPS - 1, level);
-	    
-	    zlight[i][j] = colormaps + level*256;
-	    zlight_INVULN[i][j] = invulmaps + level*256;
-	}
-    }
+        for (j = 0; j < MAXLIGHTZ; j++)
+        {
+            const int scale = scale_table[j];
+            int level = startmap - (scale >> 1);
     
+            if (level < 0)
+                level = 0;
+            else if (level >= NUMCOLORMAPS)
+                level = NUMCOLORMAPS - 1;
+    
+            zlight[i][j] = colormaps + (level << 8);
+            zlight_INVULN[i][j] = invulmaps + (level << 8);
+        }
+    }
+
+    // [PN] Free after zlight[][] is built
+    free(scale_table);
+
     // [JN] Initialize and generate colored scalelights and zlights. 
     R_InitColoredLightTables();
 }
@@ -654,11 +617,8 @@ R_SetViewSize
 void R_ExecuteSetViewSize (void)
 {
     fixed_t	cosadj;
-    fixed_t	dy;
     int		i;
     int		j;
-    int		level;
-    int		startmap; 	
     double	WIDEFOVDELTA;  // [JN] FOV from DOOM Retro and Nugget Doom
 
     setsizeneeded = false;
@@ -769,18 +729,24 @@ void R_ExecuteSetViewSize (void)
 	screenheightarray[i] = viewheight;
     
     // planes
-    for (i=0 ; i<viewheight ; i++)
     {
-	// [crispy] re-generate lookup-table for yslope[] (free look)
-	// whenever "detailshift" or "screenblocks" change
-	// [JN] FOV from DOOM Retro and Nugget Doom
-	const fixed_t num = FixedMul(FixedDiv(FRACUNIT, fovscale), (viewwidth<<detailshift)*FRACUNIT/2);
-	for (j = 0; j < LOOKDIRS; j++)
-	{
-	dy = ((i-(viewheight/2 + ((j-LOOKDIRMIN) * (1 * vid_resolution)) * (dp_screen_size < 11 ? dp_screen_size : 11) / 10))<<FRACBITS)+FRACUNIT/2;
-	dy = abs(dy);
-	yslopes[j][i] = FixedDiv (num, dy);
-	}
+        // [crispy] re-generate lookup-table for yslope[] (free look)
+        // whenever "dp_detail_level" or "dp_screen_size" change
+        // [JN] FOV from DOOM Retro and Nugget Doom
+        // [PN] Optimized: moved invariant calculations out of loops for better performance
+        const fixed_t half_fracunit = FRACUNIT >> 1;
+        const fixed_t half_viewheight = viewheight >> 1;
+        const fixed_t num = FixedMul(FixedDiv(FRACUNIT, fovscale), (viewwidth << detailshift) * half_fracunit);
+        const fixed_t step = (dp_screen_size < 11 ? dp_screen_size : 11);
+
+        for (i = 0; i < viewheight; i++)
+        {
+            for (j = 0; j < LOOKDIRS; j++)
+            {
+                const fixed_t dy = abs((i - (half_viewheight + ((j - LOOKDIRMIN) * vid_resolution) * step / 10)) << FRACBITS) + half_fracunit;
+                yslopes[j][i] = FixedDiv(num, dy);
+            }
+        }
     }
     yslope = yslopes[LOOKDIRMIN];
 	
@@ -790,24 +756,36 @@ void R_ExecuteSetViewSize (void)
 	distscale[i] = FixedDiv (FRACUNIT,cosadj);
     }
     
+    // [PN] Precalculate lighting scale table before generating scalelight[][]
+    int *scale_table = malloc(MAXLIGHTSCALE * sizeof(*scale_table));
+    {
+        const int divisor = viewwidth_nonwide << detailshift;
+        for (j = 0; j < MAXLIGHTSCALE; ++j)
+            scale_table[j] = (j * NONWIDEWIDTH / divisor) >> 1;
+    }
+
     // Calculate the light levels to use
     //  for each level / scale combination.
-    for (i=0 ; i< LIGHTLEVELS ; i++)
+    for (i = 0 ; i < LIGHTLEVELS ; i++)
     {
+        const int startmap = ((LIGHTLEVELS - LIGHTBRIGHT - i) << 1) * NUMCOLORMAPS / LIGHTLEVELS;
 
-	// [PN] Use bit shifting for faster handling
-	startmap = ((LIGHTLEVELS - LIGHTBRIGHT - i) << 1) * NUMCOLORMAPS / LIGHTLEVELS;
-	for (j=0 ; j<MAXLIGHTSCALE ; j++)
-	{
-	    // [PN] Use bit shifting for faster handling
-	    level = startmap - ((j * NONWIDEWIDTH / (viewwidth_nonwide << detailshift)) >> 1);
-	    // [PN] Clamp light level values
-	    level = BETWEEN(0, NUMCOLORMAPS - 1, level);
+        for (j = 0 ; j < MAXLIGHTSCALE ; j++)
+        {
+            int level = startmap - scale_table[j];
 
-	    scalelight[i][j] = colormaps + level*256;
-	    scalelight_INVULN[i][j] = invulmaps + level*256;
-	}
+            if (level < 0)
+                level = 0;
+            else if (level >= NUMCOLORMAPS)
+                level = NUMCOLORMAPS - 1;
+
+            scalelight[i][j] = colormaps + (level << 8);
+            scalelight_INVULN[i][j] = invulmaps + (level << 8);
+        }
     }
+
+    // [PN] Free after scalelight[][] is built
+    free(scale_table);
 
     // [JN] (Re-)generate colored scalelight levels.
     R_GenerateColoredSClights(viewwidth_nonwide);

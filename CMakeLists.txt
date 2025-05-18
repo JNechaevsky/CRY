@@ -1,6 +1,7 @@
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 cmake_minimum_required(VERSION 3.15)
+cmake_policy(SET CMP0069 NEW)
 cmake_policy(SET CMP0091 NEW)
 project("CRY" VERSION 2.2.0 LANGUAGES C)
 set(CMAKE_C_STANDARD 99)
@@ -27,11 +28,18 @@ set(PACKAGE_LICENSE "GNU GPL (version 2)")
 if(MSVC)
     add_definitions("/D_CRT_SECURE_NO_WARNINGS" "/D_CRT_SECURE_NO_DEPRECATE"
                     "/D_CRT_NONSTDC_NO_DEPRECATE")
+# Disable several warnings for cl.exe.
+add_compile_options(
+                    "/W3"     # Reasonable warning level
+                    "/wd4018" # Signed/unsigned mismatch
+                    "/wd4244" # Conversion from 'type1' to 'type2', possible loss of data
+                    "/wd4267" # Conversion from 'size_t' to 'type', possible loss of data
+                    )
 else()
     add_compile_options("-Wall"
                         "-Wredundant-decls"
-                        "-Wmissing-field-initializers"
-                        "-Wignored-qualifiers"
+                        "-Wformat-security"
+                        "-Wno-ignored-qualifiers"
                         "-Wpedantic"
                         # "-Wextra"
                         )
@@ -40,10 +48,6 @@ endif()
 # Enable LTO if available.  Hovewer, CMake does not appear to support
 # LTO properly for MinGW GCC which results in much longer linking time.
 # Consider only enabling it when making a release.
-if(POLICY CMP0069)
-    cmake_policy(SET CMP0069 NEW)
-endif()
-
 include(CheckIPOSupported)
 check_ipo_supported(RESULT HAVE_LTO)
 
@@ -51,9 +55,9 @@ include(CMakeDependentOption) # Note: replace first ON to OFF to disable.
 cmake_dependent_option(ENABLE_LTO "Use link-time optimization" ON "HAVE_LTO" OFF)
 
 if(ENABLE_LTO)
-    message(STATUS "LTO is ENABLED")
+    message(STATUS "LTO - enabled")
 else()
-    message(STATUS "LTO is DISABLED")
+    message(STATUS "LTO - disabled")
 endif()
 
 # Enable ASan (AddressSanitizer).
