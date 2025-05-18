@@ -29,8 +29,6 @@
 // by means of actual color space conversions in r_data:R_InitColormaps().
 // -----------------------------------------------------------------------------
 
-static byte cr_dark[256];
-
 static byte cr_menu_bright5[256];
 static byte cr_menu_bright4[256];
 static byte cr_menu_bright3[256];
@@ -42,78 +40,36 @@ static byte cr_menu_dark3[256];
 static byte cr_menu_dark4[256];
 
 static byte cr_red[256];
-static byte cr_red_bright5[256];
-static byte cr_red_bright4[256];
-static byte cr_red_bright3[256];
-static byte cr_red_bright2[256];
-static byte cr_red_bright1[256];
-static byte cr_red_dark1[256];
-static byte cr_red_dark2[256];
-static byte cr_red_dark3[256];
-static byte cr_red_dark4[256];
-static byte cr_red_dark5[256];
+static byte cr_red_bright[256];
 
 static byte cr_darkred[256];
 
 static byte cr_green[256];
-static byte cr_green_bright5[256];
-static byte cr_green_bright4[256];
-static byte cr_green_bright3[256];
-static byte cr_green_bright2[256];
-static byte cr_green_bright1[256];
+static byte cr_green_bright[256];
 
 static byte cr_darkgreen[256];
-static byte cr_darkgreen_bright5[256];
-static byte cr_darkgreen_bright4[256];
-static byte cr_darkgreen_bright3[256];
-static byte cr_darkgreen_bright2[256];
-static byte cr_darkgreen_bright1[256];
+static byte cr_darkgreen_bright[256];
 
 static byte cr_olive[256];
-static byte cr_olive_bright5[256];
-static byte cr_olive_bright4[256];
-static byte cr_olive_bright3[256];
-static byte cr_olive_bright2[256];
-static byte cr_olive_bright1[256];
+static byte cr_olive_bright[256];
 
 static byte cr_blue2[256];
-static byte cr_blue2_bright5[256];
-static byte cr_blue2_bright4[256];
-static byte cr_blue2_bright3[256];
-static byte cr_blue2_bright2[256];
-static byte cr_blue2_bright1[256];
+static byte cr_blue2_bright[256];
 
 static byte cr_yellow[256];
-static byte cr_yellow_bright5[256];
-static byte cr_yellow_bright4[256];
-static byte cr_yellow_bright3[256];
-static byte cr_yellow_bright2[256];
-static byte cr_yellow_bright1[256];
+static byte cr_yellow_bright[256];
 
 static byte cr_orange[256];
-static byte cr_orange_bright5[256];
-static byte cr_orange_bright4[256];
-static byte cr_orange_bright3[256];
-static byte cr_orange_bright2[256];
-static byte cr_orange_bright1[256];
+static byte cr_orange_bright[256];
 
 static byte cr_white[256];
+
 static byte cr_gray[256];
-static byte cr_gray_bright5[256];
-static byte cr_gray_bright4[256];
-static byte cr_gray_bright3[256];
-static byte cr_gray_bright2[256];
-static byte cr_gray_bright1[256];
+static byte cr_gray_bright[256];
 
 static byte cr_lightgray[256];
-static byte cr_lightgray_bright5[256];
-static byte cr_lightgray_bright4[256];
-static byte cr_lightgray_bright3[256];
-static byte cr_lightgray_bright2[256];
-static byte cr_lightgray_bright1[256];
-static byte cr_lightgray_dark1[256];
-
-static byte cr_brown[256];
+static byte cr_lightgray_bright[256];
+static byte cr_lightgray_dark[256];
 
 static const byte cr_red2blue[256] =
     {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,
@@ -153,8 +109,6 @@ static const byte cr_red2green[256] =
 
 byte *cr[] =
 {
-    (byte *) &cr_dark,
-    
     (byte *) &cr_menu_bright5,
     (byte *) &cr_menu_bright4,
     (byte *) &cr_menu_bright3,
@@ -166,78 +120,36 @@ byte *cr[] =
     (byte *) &cr_menu_dark4,
 
     (byte *) &cr_red,
-    (byte *) &cr_red_bright5,
-    (byte *) &cr_red_bright4,
-    (byte *) &cr_red_bright3,
-    (byte *) &cr_red_bright2,
-    (byte *) &cr_red_bright1,
-    (byte *) &cr_red_dark1,
-    (byte *) &cr_red_dark2,
-    (byte *) &cr_red_dark3,
-    (byte *) &cr_red_dark4,
-    (byte *) &cr_red_dark5,
+    (byte *) &cr_red_bright,
 
     (byte *) &cr_darkred,
 
     (byte *) &cr_green,
-    (byte *) &cr_green_bright5,
-    (byte *) &cr_green_bright4,
-    (byte *) &cr_green_bright3,
-    (byte *) &cr_green_bright2,
-    (byte *) &cr_green_bright1,
+    (byte *) &cr_green_bright,
 
     (byte *) &cr_darkgreen,
-    (byte *) &cr_darkgreen_bright5,
-    (byte *) &cr_darkgreen_bright4,
-    (byte *) &cr_darkgreen_bright3,
-    (byte *) &cr_darkgreen_bright2,
-    (byte *) &cr_darkgreen_bright1,
+    (byte *) &cr_darkgreen_bright,
 
     (byte *) &cr_olive,
-    (byte *) &cr_olive_bright5,
-    (byte *) &cr_olive_bright4,
-    (byte *) &cr_olive_bright3,
-    (byte *) &cr_olive_bright2,
-    (byte *) &cr_olive_bright1,
+    (byte *) &cr_olive_bright,
 
     (byte *) &cr_blue2,
-    (byte *) &cr_blue2_bright5,
-    (byte *) &cr_blue2_bright4,
-    (byte *) &cr_blue2_bright3,
-    (byte *) &cr_blue2_bright2,
-    (byte *) &cr_blue2_bright1,
+    (byte *) &cr_blue2_bright,
 
     (byte *) &cr_yellow,
-    (byte *) &cr_yellow_bright5,
-    (byte *) &cr_yellow_bright4,
-    (byte *) &cr_yellow_bright3,
-    (byte *) &cr_yellow_bright2,
-    (byte *) &cr_yellow_bright1,
+    (byte *) &cr_yellow_bright,
 
     (byte *) &cr_orange,
-    (byte *) &cr_orange_bright5,
-    (byte *) &cr_orange_bright4,
-    (byte *) &cr_orange_bright3,
-    (byte *) &cr_orange_bright2,
-    (byte *) &cr_orange_bright1,
+    (byte *) &cr_orange_bright,
 
     (byte *) &cr_white,
+
     (byte *) &cr_gray,
-    (byte *) &cr_gray_bright5,
-    (byte *) &cr_gray_bright4,
-    (byte *) &cr_gray_bright3,
-    (byte *) &cr_gray_bright2,
-    (byte *) &cr_gray_bright1,
+    (byte *) &cr_gray_bright,
 
     (byte *) &cr_lightgray,
-    (byte *) &cr_lightgray_bright5,
-    (byte *) &cr_lightgray_bright4,
-    (byte *) &cr_lightgray_bright3,
-    (byte *) &cr_lightgray_bright2,
-    (byte *) &cr_lightgray_bright1,
-    (byte *) &cr_lightgray_dark1,
-
-    (byte *) &cr_brown,
+    (byte *) &cr_lightgray_bright,
+    (byte *) &cr_lightgray_dark,
 
     (byte *) &cr_red2blue,
     (byte *) &cr_red2green,
@@ -454,12 +366,8 @@ byte V_Colorize (byte *playpal, int cr, byte source, boolean keepgray109)
 
     rgb_to_hsv(&rgb, &hsv);
 
-    if (cr == CR_DARK)
-    {
-        hsv.z *= 0.666f;
-    }
     // [JN] Menu glowing effects.
-    else if (cr == CR_MENU_BRIGHT5)
+    if (cr == CR_MENU_BRIGHT5)
     {
         hsv.y *= 0.8f;
         hsv.z *= 1.5f;
@@ -509,55 +417,10 @@ byte V_Colorize (byte *playpal, int cr, byte source, boolean keepgray109)
         {
             hsv.x = 0.;
         }
-        else if (cr == CR_RED_BRIGHT5)
+        else if (cr == CR_RED_BRIGHT)
         {
             hsv.x = 0.;
             hsv.z *= 1.5f;
-        }
-        else if (cr == CR_RED_BRIGHT4)
-        {
-            hsv.x = 0.;
-            hsv.z *= 1.4f;
-        }
-        else if (cr == CR_RED_BRIGHT3)
-        {
-            hsv.x = 0.;
-            hsv.z *= 1.3f;
-        }
-        else if (cr == CR_RED_BRIGHT2)
-        {
-            hsv.x = 0.;
-            hsv.z *= 1.2f;
-        }
-        else if (cr == CR_RED_BRIGHT1)
-        {
-            hsv.x = 0.;
-            hsv.z *= 1.1f;
-        }
-        else if (cr == CR_RED_DARK1)
-        {
-            hsv.x = 0.;
-            hsv.z *= 0.900f;
-        }
-        else if (cr == CR_RED_DARK2)
-        {
-            hsv.x = 0.;
-            hsv.z *= 0.850f;
-        }
-        else if (cr == CR_RED_DARK3)
-        {
-            hsv.x = 0.;
-            hsv.z *= 0.800f;
-        }
-        else if (cr == CR_RED_DARK4)
-        {
-            hsv.x = 0.;
-            hsv.z *= 0.750f;
-        }
-        else if (cr == CR_RED_DARK5)
-        {
-            hsv.x = 0.;
-            hsv.z *= 0.700f;
         }
 
         else if (cr == CR_DARKRED)
@@ -570,30 +433,10 @@ byte V_Colorize (byte *playpal, int cr, byte source, boolean keepgray109)
         {
             hsv.x = (144. * hsv.z + 140. * (1. - hsv.z))/360.;
         }
-        else if (cr == CR_GREEN_BRIGHT5)
+        else if (cr == CR_GREEN_BRIGHT)
         {
             hsv.x = 0.3f;
             hsv.z *= 1.5f;
-        }
-        else if (cr == CR_GREEN_BRIGHT4)
-        {
-            hsv.x = 0.3f;
-            hsv.z *= 1.4f;
-        }
-        else if (cr == CR_GREEN_BRIGHT3)
-        {
-            hsv.x = 0.3f;
-            hsv.z *= 1.3f;
-        }
-        else if (cr == CR_GREEN_BRIGHT2)
-        {
-            hsv.x = 0.3f;
-            hsv.z *= 1.2f;
-        }
-        else if (cr == CR_GREEN_BRIGHT1)
-        {
-            hsv.x = 0.3f;
-            hsv.z *= 1.1f;
         }
 
         else if (cr == CR_DARKGREEN)
@@ -601,30 +444,10 @@ byte V_Colorize (byte *playpal, int cr, byte source, boolean keepgray109)
             hsv.x = 0.3f;
             hsv.z *= 0.666f;
         }
-        else if (cr == CR_DARKGREEN_BRIGHT5)
+        else if (cr == CR_DARKGREEN_BRIGHT)
         {
             hsv.x = 0.3f;
             hsv.z *= 0.888f;
-        }
-        else if (cr == CR_DARKGREEN_BRIGHT4)
-        {
-            hsv.x = 0.3f;
-            hsv.z *= 0.844f;
-        }
-        else if (cr == CR_DARKGREEN_BRIGHT3)
-        {
-            hsv.x = 0.3f;
-            hsv.z *= 0.8f;
-        }
-        else if (cr == CR_DARKGREEN_BRIGHT2)
-        {
-            hsv.x = 0.3f;
-            hsv.z *= 0.756f;
-        }
-        else if (cr == CR_DARKGREEN_BRIGHT1)
-        {
-            hsv.x = 0.3f;
-            hsv.z *= 0.712f;
         }
 
         else if (cr == CR_OLIVE)
@@ -633,35 +456,11 @@ byte V_Colorize (byte *playpal, int cr, byte source, boolean keepgray109)
             hsv.y = 0.5f;
             hsv.z *= 0.5f;
         }
-        else if (cr == CR_OLIVE_BRIGHT5)
+        else if (cr == CR_OLIVE_BRIGHT)
         {
             hsv.x = 0.25f;
             hsv.y = 0.5f;
             hsv.z *= 0.65f;
-        }
-        else if (cr == CR_OLIVE_BRIGHT4)
-        {
-            hsv.x = 0.25f;
-            hsv.y = 0.5f;
-            hsv.z *= 0.625;
-        }
-        else if (cr == CR_OLIVE_BRIGHT3)
-        {
-            hsv.x = 0.25f;
-            hsv.y = 0.5f;
-            hsv.z *= 0.6f;
-        }
-        else if (cr == CR_OLIVE_BRIGHT2)
-        {
-            hsv.x = 0.25f;
-            hsv.y = 0.5f;
-            hsv.z *= 0.575f;
-        }
-        else if (cr == CR_OLIVE_BRIGHT1)
-        {
-            hsv.x = 0.25f;
-            hsv.y = 0.5f;
-            hsv.z *= 0.55f;
         }
 
         else if (cr == CR_BLUE2)
@@ -669,30 +468,10 @@ byte V_Colorize (byte *playpal, int cr, byte source, boolean keepgray109)
             hsv.x = 0.65f;
             hsv.z *= 1.2f;
         }
-        else if (cr == CR_BLUE2_BRIGHT5)
+        else if (cr == CR_BLUE2_BRIGHT)
         {
             hsv.x = 0.65f;
             hsv.z *= 1.55f;
-        }
-        else if (cr == CR_BLUE2_BRIGHT4)
-        {
-            hsv.x = 0.65f;
-            hsv.z *= 1.48f;
-        }
-        else if (cr == CR_BLUE2_BRIGHT3)
-        {
-            hsv.x = 0.65f;
-            hsv.z *= 1.41f;
-        }
-        else if (cr == CR_BLUE2_BRIGHT2)
-        {
-            hsv.x = 0.65f;
-            hsv.z *= 1.34f;
-        }
-        else if (cr == CR_BLUE2_BRIGHT1)
-        {
-            hsv.x = 0.65f;
-            hsv.z *= 1.27f;
         }
 
         else if (cr == CR_YELLOW)
@@ -701,35 +480,11 @@ byte V_Colorize (byte *playpal, int cr, byte source, boolean keepgray109)
             hsv.y = 1.0 - 0.4 * hsv.z;
             hsv.z = 0.2 + 0.8 * hsv.z;
         }
-        else if (cr == CR_YELLOW_BRIGHT5)
+        else if (cr == CR_YELLOW_BRIGHT)
         {
             hsv.x = (7.0 + 53. * hsv.z)/360.;
             hsv.y = 1.0 - 0.4 * hsv.z;
             hsv.z = 0.2 + 1.05 * hsv.z;
-        }
-        else if (cr == CR_YELLOW_BRIGHT4)
-        {
-            hsv.x = (7.0 + 53. * hsv.z)/360.;
-            hsv.y = 1.0 - 0.4 * hsv.z;
-            hsv.z = 0.2 + 1.0 * hsv.z;
-        }
-        else if (cr == CR_YELLOW_BRIGHT3)
-        {
-            hsv.x = (7.0 + 53. * hsv.z)/360.;
-            hsv.y = 1.0 - 0.4 * hsv.z;
-            hsv.z = 0.2 + 0.95 * hsv.z;
-        }
-        else if (cr == CR_YELLOW_BRIGHT2)
-        {
-            hsv.x = (7.0 + 53. * hsv.z)/360.;
-            hsv.y = 1.0 - 0.4 * hsv.z;
-            hsv.z = 0.2 + 0.90 * hsv.z;
-        }
-        else if (cr == CR_YELLOW_BRIGHT1)
-        {
-            hsv.x = (7.0 + 53. * hsv.z)/360.;
-            hsv.y = 1.0 - 0.4 * hsv.z;
-            hsv.z = 0.2 + 0.85 * hsv.z;
         }
 
         else if (cr == CR_ORANGE)
@@ -737,65 +492,26 @@ byte V_Colorize (byte *playpal, int cr, byte source, boolean keepgray109)
             hsv.x = 0.075f;
             hsv.z *= 1.15f;
         }
-        else if (cr == CR_ORANGE_BRIGHT5)
+        else if (cr == CR_ORANGE_BRIGHT)
         {
             hsv.x = 0.075f;
             hsv.z *= 1.40f;
-        }
-        else if (cr == CR_ORANGE_BRIGHT4)
-        {
-            hsv.x = 0.075f;
-            hsv.z *= 1.35f;
-        }
-        else if (cr == CR_ORANGE_BRIGHT3)
-        {
-            hsv.x = 0.075f;
-            hsv.z *= 1.30f;
-        }
-        else if (cr == CR_ORANGE_BRIGHT2)
-        {
-            hsv.x = 0.075f;
-            hsv.z *= 1.25f;
-        }
-        else if (cr == CR_ORANGE_BRIGHT1)
-        {
-            hsv.x = 0.075f;
-            hsv.z *= 1.20f;
         }
 
         else if (cr == CR_WHITE)
         {
             hsv.y = 0.;
         }
+
         else if (cr == CR_GRAY)
         {
             hsv.y = 0.;
             hsv.z *= 0.5f;
         }
-        else if (cr == CR_GRAY_BRIGHT5)
+        else if (cr == CR_GRAY_BRIGHT)
         {
             hsv.y = 0.;
             hsv.z *= 0.75f;
-        }
-        else if (cr == CR_GRAY_BRIGHT4)
-        {
-            hsv.y = 0.;
-            hsv.z *= 0.70f;
-        }
-        else if (cr == CR_GRAY_BRIGHT3)
-        {
-            hsv.y = 0.;
-            hsv.z *= 0.65f;
-        }
-        else if (cr == CR_GRAY_BRIGHT2)
-        {
-            hsv.y = 0.;
-            hsv.z *= 0.60f;
-        }
-        else if (cr == CR_GRAY_BRIGHT1)
-        {
-            hsv.y = 0.;
-            hsv.z *= 0.55f;
         }
 
         else if (cr == CR_LIGHTGRAY)
@@ -803,41 +519,15 @@ byte V_Colorize (byte *playpal, int cr, byte source, boolean keepgray109)
             hsv.y = 0.;
             hsv.z *= 0.80f;
         }
-        else if (cr == CR_LIGHTGRAY_BRIGHT5)
+        else if (cr == CR_LIGHTGRAY_BRIGHT)
         {
             hsv.y = 0.;
             hsv.z *= 1.05f;
         }
-        else if (cr == CR_LIGHTGRAY_BRIGHT4)
-        {
-            hsv.y = 0.;
-            hsv.z *= 1.0f;
-        }
-        else if (cr == CR_LIGHTGRAY_BRIGHT3)
-        {
-            hsv.y = 0.;
-            hsv.z *= 0.95f;
-        }
-        else if (cr == CR_LIGHTGRAY_BRIGHT2)
-        {
-            hsv.y = 0.;
-            hsv.z *= 0.90f;
-        }
-        else if (cr == CR_LIGHTGRAY_BRIGHT1)
-        {
-            hsv.y = 0.;
-            hsv.z *= 0.85f;
-        }
-        else if (cr == CR_LIGHTGRAY_DARK1)
+        else if (cr == CR_LIGHTGRAY_DARK)
         {
             hsv.y = 0.;
             hsv.z *= 0.6f;
-        }
-        else if (cr == CR_BROWN)
-        {
-            hsv.x = 0.1f;
-            hsv.y = 0.75f;
-            hsv.z *= 0.65f;
         }
     }
 

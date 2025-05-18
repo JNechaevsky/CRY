@@ -406,9 +406,9 @@ void ID_RightWidgets (void)
         sprintf(fps_str, "FPS");
 
         M_WriteText(ORIGWIDTH + WIDESCREENDELTA - 11 - M_StringWidth(fps) 
-                              - M_StringWidth(fps_str), 9 + yy, fps, cr[CR_LIGHTGRAY_DARK1]);
+                              - M_StringWidth(fps_str), 9 + yy, fps, cr[CR_LIGHTGRAY_DARK]);
 
-        M_WriteText(ORIGWIDTH + WIDESCREENDELTA - 7 - M_StringWidth(fps_str), 9 + yy, "FPS", cr[CR_LIGHTGRAY_DARK1]);
+        M_WriteText(ORIGWIDTH + WIDESCREENDELTA - 7 - M_StringWidth(fps_str), 9 + yy, "FPS", cr[CR_LIGHTGRAY_DARK]);
 
         yy += 9;
     }
