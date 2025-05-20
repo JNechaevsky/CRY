@@ -42,7 +42,6 @@
 #define FIELDOFVIEW		2048	
 
 
-int			viewangleoffset;
 
 // increment every time a check is made
 int			validcount = 1;		
@@ -927,11 +926,11 @@ void R_SetupFrame (player_t* player)
             {
                 viewangle = (player->mo->angle + localview.angle -
                             localview.ticangle + LerpAngle(localview.oldticangle,
-                                                           localview.ticangle)) + viewangleoffset;
+                                                           localview.ticangle));
             }
             else
             {
-                viewangle = LerpAngle(player->mo->oldangle, player->mo->angle) + viewangleoffset;
+                viewangle = LerpAngle(player->mo->oldangle, player->mo->angle);
             }
 
             pitch = LerpInt(player->oldlookdir, player->lookdir) / MLOOKUNIT;
@@ -941,7 +940,7 @@ void R_SetupFrame (player_t* player)
             viewx = player->mo->x;
             viewy = player->mo->y;
             viewz = player->viewz;
-            viewangle = player->mo->angle + viewangleoffset;
+            viewangle = player->mo->angle;
 
             // [crispy] pitch is actual lookdir and weapon pitch
             pitch = player->lookdir / MLOOKUNIT;
