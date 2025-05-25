@@ -6,9 +6,10 @@ The project is created by [Julia Nechaevskaya](mailto:julia.nechaevskaya@live.co
 
 ### Download
 
-**CRY 2.1 (released: October 6, 2024)**
-* Windows (64-bit): [cry-2.1-win-64.zip](https://github.com/JNechaevsky/CRY/releases/download/2.1/cry-2.1-win-64.zip)
-* Windows (32-bit): [cry-2.1-win-32.zip](https://github.com/JNechaevsky/CRY/releases/download/2.1/cry-2.1-win-32.zip)
+**CRY 2.2 (released: May 25, 2025)**
+* Windows (64-bit): [cry-2.2-win-64.zip](https://github.com/JNechaevsky/CRY/releases/download/2.2/cry-2.2-win-64.zip)
+* Windows (32-bit): [cry-2.2-win-32.zip](https://github.com/JNechaevsky/CRY/releases/download/2.2/cry-2.2-win-32.zip)
+* Linux AppImage (64-bit): [cry-2.2-linux-64-appimage.zip](https://github.com/JNechaevsky/CRY/releases/download/2.2/cry-2.2-linux-64-appimage.zip)
 
 ### Major features
 
@@ -17,6 +18,7 @@ The project is created by [Julia Nechaevskaya](mailto:julia.nechaevskaya@live.co
 * Uncapped framerate.
 * Colored sector lighting.
 * Additional darker gamma-correction levels.
+* Post-processing effects.
 * In-game keyboard and mouse bindings.
 * Various optional visual and gameplay enhacements.
 * Preserved most original Jaguar Doom playstate quirks.
