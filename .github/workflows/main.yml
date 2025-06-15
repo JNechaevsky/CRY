@@ -9,7 +9,7 @@ on:
       - main
 
 env:
-  VCPKG_BINARY_SOURCES: "clear;files,C:\Users\runneradmin\AppData\Local\vcpkg\archives,readwrite"
+  VCPKG_BINARY_SOURCES: "clear;files,C:\\Users\\runneradmin\\AppData\\Local\\vcpkg\\archives,readwrite"
 
 jobs:
   build-windows:
