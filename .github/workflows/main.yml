@@ -78,10 +78,57 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: cry-dev-win64
+          name: cry-win64
           path: |
             build_vs_64/src/Release/*.exe
             build_vs_64/src/Release/cry.wad
+          retention-days: 90
+
+  windows_32bit:
+    name: Windows (32-bit)
+    runs-on: windows-2022
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Visual Studio 2019 Build Tools with v141_xp
+        run: |
+          choco install visualstudio2019buildtools --package-parameters "
+            --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64
+            --add Microsoft.Component.VC.Runtime.UCRTSDK
+            --add Microsoft.VisualStudio.Component.WinXP
+            --add Microsoft.VisualStudio.Component.VC.v141.x86.x64
+            --includeRecommended --includeOptional" -y
+
+      - name: Configure CMake (XP target)
+        shell: cmd
+        run: |
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" x86
+          cmake -B build_vs_32 ^
+            -G "Visual Studio 16 2019" ^
+            -T v141_xp ^
+            -A Win32 ^
+            -DCMAKE_BUILD_TYPE="Release" ^
+            -DSDL2_DIR="win32/SDL2-2.32.8" ^
+            -DSDL2_MIXER_DIR="win32/SDL2_mixer-2.8.1" ^
+            -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=Off ^
+            -DSAMPLERATE_DIR="win32/libsamplerate-0.2.2-win32"
+
+      - name: Build
+        run: cmake --build build_vs_32 --config Release --parallel
+
+      - name: Prepare for packaging
+        run: |
+          mkdir upload
+          copy build_vs_32/src/Release/*.exe upload
+          copy iwad/*.wad upload
+          copy win32/dlls-vc-win32/*.dll upload
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cry-win32
+          path: upload/*
           retention-days: 90
 
   linux_64bit:
