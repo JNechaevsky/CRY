@@ -1,8 +1,10 @@
 ![](https://raw.githubusercontent.com/JNechaevsky/jnechaevsky.github.io/main/cry/cry-logo-dw.png)
 ### About
-CRY is a non-conservative recreation of Jaguar Doom for PC.
+CRY is a reimagining of Jaguar Doom for PC, built on top of the [International Doom](https://github.com/jnechaevsky/international-doom) engine. To ensure high emulation accuracy, substantial parts of the original Jaguar Doom code were integrated — including damage formulas, monster behavior, Nightmare difficulty mechanics, and sector/line specials.
 
-The project is created by [Julia Nechaevskaya](mailto:julia.nechaevskaya@live.com).
+The goal was never to create a 1:1 port of Jaguar Doom for modern systems. Instead, I aimed to strike a balance between authenticity, visual polish, and overall enjoyment — while paying close attention to detail wherever possible.
+
+The project is created by [Julia Nechaevskaya](https://jnechaevsky.github.io/author.html).
 
 ### Download
 
@@ -20,10 +22,10 @@ The project is created by [Julia Nechaevskaya](mailto:julia.nechaevskaya@live.co
 * Additional darker gamma-correction levels.
 * Post-processing effects.
 * In-game keyboard and mouse bindings.
-* Various optional visual and gameplay enhacements.
+* Various optional visual and gameplay enhancements.
 * Preserved most original Jaguar Doom playstate quirks.
 
 ### License
 
-CRY source code is licensed under the [GNU General Public License v2](https://github.com/JNechaevsky/yaguar-doom/blob/main/COPYING.txt) and [Jaguar Doom Source Code license](https://github.com/JNechaevsky/yaguar-doom/blob/main/COPYING-JAG.txt).
-<br>Information about game assets is provided in [COPYING-RES.txt](https://github.com/JNechaevsky/yaguar-doom/blob/main/COPYING-RES.txt) file.
+CRY source code is licensed under the [GNU General Public License v2](https://github.com/JNechaevsky/CRY/blob/main/COPYING.txt) and [Jaguar Doom Source Code license](https://github.com/JNechaevsky/CRY/blob/main/COPYING-JAG.txt).
+<br>Information about game assets is provided in [COPYING-RES.txt](https://github.com/JNechaevsky/CRY/blob/main/COPYING-RES.txt) file.
