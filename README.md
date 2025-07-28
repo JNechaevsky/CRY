@@ -9,14 +9,14 @@ The project is created by [Julia Nechaevskaya](https://jnechaevsky.github.io/aut
 ### Download
 
 **CRY 2.2 (released: May 25, 2025)**
-* &nbsp;<img src="https://jnechaevsky.github.io/img/icon_win64.png" width="16" height="16" />&nbsp;&nbsp;Windows (64-bit): [cry-2.2-win-64.zip](https://github.com/JNechaevsky/CRY/releases/download/2.2/cry-2.2-win-64.zip)
-* &nbsp;<img src="https://jnechaevsky.github.io/img/icon_win32.png" width="16" height="16" />&nbsp;&nbsp;Windows (32-bit): [cry-2.2-win-32.zip](https://github.com/JNechaevsky/CRY/releases/download/2.2/cry-2.2-win-32.zip)
-* &nbsp;<img src="https://jnechaevsky.github.io/img/icon_linux64.png" width="16" height="16" />&nbsp;&nbsp;Linux AppImage (64-bit): [cry-2.2-linux-64-appimage.zip](https://github.com/JNechaevsky/CRY/releases/download/2.2/cry-2.2-linux-64-appimage.zip)
+* &nbsp;<img src="https://jnechaevsky.github.io/assets/img/icon_win64.png" width="16" height="16" />&nbsp;&nbsp;Windows (64-bit): [cry-2.2-win-64.zip](https://github.com/JNechaevsky/CRY/releases/download/2.2/cry-2.2-win-64.zip)
+* &nbsp;<img src="https://jnechaevsky.github.io/assets/img/icon_win32.png" width="16" height="16" />&nbsp;&nbsp;Windows (32-bit): [cry-2.2-win-32.zip](https://github.com/JNechaevsky/CRY/releases/download/2.2/cry-2.2-win-32.zip)
+* &nbsp;<img src="https://jnechaevsky.github.io/assets/img/icon_linux64.png" width="16" height="16" />&nbsp;&nbsp;Linux AppImage (64-bit): [cry-2.2-linux-64-appimage.zip](https://github.com/JNechaevsky/CRY/releases/download/2.2/cry-2.2-linux-64-appimage.zip)
 
 ### Major features
 
-* True Color render.
-* Up to x6 (1200p) rendering resolutions.
+* True Color rendering.
+* Rendering resolutions up to 6× (1200p).
 * Uncapped framerate.
 * Colored sector lighting.
 * Additional darker gamma-correction levels.
