@@ -1106,11 +1106,10 @@ static const byte colormap[256] = {
 
 void R_InitColormaps (void)
 {
-	int c, i, j = 0;
+	int i, j = 0;
 	byte r, g, b;
 	// [JN] Invulnerability colormap with diminished lighting
 	int ji = 0;
-	byte ri, gi, bi;
 
 	byte *const playpal = W_CacheLumpName("PLAYPAL", PU_STATIC);
 	byte *const crypal = W_CacheLumpName("CRYPAL", PU_STATIC);
@@ -1128,31 +1127,59 @@ void R_InitColormaps (void)
 		R_AllocateColoredColormaps();
 	}
 
-	for (c = 0; c < NUMCOLORMAPS; c++)
-	{
-		const float scale = 1. * c / NUMCOLORMAPS;
-
-		for (i = 0; i < 256; i++)
-		{
-			const byte k = colormap[i];
-
-			r = gammatable[vid_gamma][render_pointer[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			g = gammatable[vid_gamma][render_pointer[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			b = gammatable[vid_gamma][render_pointer[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-
-			// [JN] Generate colored colormaps.
-			R_GenerateColoredColormaps(k, scale, j);
-
-			colormaps[j++] = 0xff000000 | (r << 16) | (g << 8) | b;
-
-			// [JN] Generate invulnerability colormaps.
-			ri = gammatable[vid_gamma][invul_pointer[3 * k + 0]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			gi = gammatable[vid_gamma][invul_pointer[3 * k + 1]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-			bi = gammatable[vid_gamma][invul_pointer[3 * k + 2]] * (1. - scale) + gammatable[vid_gamma][0] * scale;
-
-			invulmaps[ji++] = 0xff000000 | (ri << 16) | (gi << 8) | bi;
-		}
-	}
+    // [PN] Precompute gamma'ed base RGB for both palettes (once per index)
+    const byte *const restrict gtab = gammatable[vid_gamma];
+    const int gamma_black = gtab[0];
+    
+    byte base_gamma_render[256][3];
+    byte base_gamma_invul [256][3];
+    
+    for (int p = 0; p < 256; ++p)
+    {
+        // [PN] Render palette (CRYPAL or PLAYPAL)
+        base_gamma_render[p][0] = gtab[render_pointer[3 * p + 0]];
+        base_gamma_render[p][1] = gtab[render_pointer[3 * p + 1]];
+        base_gamma_render[p][2] = gtab[render_pointer[3 * p + 2]];
+    
+        // [PN] Invulnerability palette (CRYINVL or PLAYINVL)
+        base_gamma_invul[p][0]  = gtab[invul_pointer [3 * p + 0]];
+        base_gamma_invul[p][1]  = gtab[invul_pointer [3 * p + 1]];
+        base_gamma_invul[p][2]  = gtab[invul_pointer [3 * p + 2]];
+    }
+    
+    // [PN] Build colormaps with simple gamma-space fade to black
+    for (int c = 0; c < NUMCOLORMAPS; ++c)
+    {
+        const double scale = (double)c / (double)NUMCOLORMAPS;
+        const double k0    = 1.0 - scale;          // weight of base color
+        const double kB    = (double)gamma_black * scale; // weight of black (gamma(0))
+    
+        lighttable_t *const restrict row_col  = &colormaps [c * 256];
+        lighttable_t *const restrict row_inv  = &invulmaps [c * 256];
+    
+        for (int i = 0; i < 256; ++i)
+        {
+            const byte k = colormap[i]; // mapping index (identity in your table)
+    
+            // [PN] Normal colormap (render palette)
+            const int R = (int)(base_gamma_render[k][0] * k0 + kB);
+            const int G = (int)(base_gamma_render[k][1] * k0 + kB);
+            const int B = (int)(base_gamma_render[k][2] * k0 + kB);
+    
+            row_col[i] = 0xff000000 | ((byte)R << 16) | ((byte)G << 8) | (byte)B;
+    
+            // [PN] Colored colormaps generator still expects a linear index.
+            // Use computed absolute index instead of j-counter.
+            R_GenerateColoredColormaps(k, (float)scale, c * 256 + i);
+    
+            // [PN] Invulnerability colormap (invul palette)
+            const int Ri = (int)(base_gamma_invul[k][0] * k0 + kB);
+            const int Gi = (int)(base_gamma_invul[k][1] * k0 + kB);
+            const int Bi = (int)(base_gamma_invul[k][2] * k0 + kB);
+    
+            row_inv[i] = 0xff000000 | ((byte)Ri << 16) | ((byte)Gi << 8) | (byte)Bi;
+        }
+    }
 
 	if (!pal_color)
 	{
