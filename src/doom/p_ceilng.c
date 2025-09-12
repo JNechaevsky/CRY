@@ -42,6 +42,9 @@ void T_MoveCeiling (ceiling_t *ceiling)
 {
 	result_e	res;
 	
+	// [JN] Z-axis sfx distance: sound invoked from the ceiling.
+	ceiling->sector->soundorg.z = ceiling->sector->ceilingheight;
+
 	switch(ceiling->direction)
 	{
 		case 0:		/* IN STASIS */

@@ -195,6 +195,10 @@ void T_MoveFloor(floormove_t *floor)
 	
 	res = T_MovePlane(floor->sector,floor->speed,
 			floor->floordestheight,floor->crush,0,floor->direction);
+
+	// [JN] Z-axis sfx distance: sound invoked from the floor.
+	floor->sector->soundorg.z = floor->sector->floorheight;
+
 	if (!(leveltime&7)) // [JN] Jaguar is using value 3 here.
 		S_StartSound((mobj_t *)&floor->sector->soundorg,sfx_stnmov);
 	if (res == pastdest)
