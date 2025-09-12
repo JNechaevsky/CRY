@@ -218,7 +218,7 @@ static boolean wipe_doCrossfade (int ticks)
             if (*cur_screen != *end_screen && fade_counter)
             {
                 changed = true;
-                *cur_screen = I_BlendOver(*end_screen, *cur_screen, alpha_table[fade_counter]);
+                *cur_screen = I_BlendOver_32(*end_screen, *cur_screen, alpha_table[fade_counter]);
             }
             ++cur_screen;
             ++end_screen;

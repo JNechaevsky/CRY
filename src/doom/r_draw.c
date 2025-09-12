@@ -592,7 +592,7 @@ void R_DrawFuzzTLColumn(void)
     {
         const unsigned s = sourcebase[frac >> FRACBITS];
         const pixel_t destrgb = brightmap[s] ? colormap1[s] : colormap0[s];
-        const pixel_t blended = I_BlendOver_64(*dest, destrgb);
+        const pixel_t blended = I_BlendOver64_32(*dest, destrgb);
 
         // Write two pixels (current and next line)
         dest[0] = blended;
@@ -608,7 +608,7 @@ void R_DrawFuzzTLColumn(void)
     if (y_start == y_end)
     {
         const unsigned s = sourcebase[frac >> FRACBITS];
-        dest[0] = I_BlendOver_64(*dest, brightmap[s] ? colormap1[s] : colormap0[s]);
+        dest[0] = I_BlendOver64_32(*dest, brightmap[s] ? colormap1[s] : colormap0[s]);
     }
 }
 
@@ -651,11 +651,11 @@ void R_DrawFuzzTLColumnLow(void)
         const pixel_t destrgb = brightmap[s] ? colormap1[s] : colormap0[s];
         
         // Process two lines for both columns
-        const pixel_t blended = I_BlendOver_64(*dest1, destrgb);
+        const pixel_t blended = I_BlendOver64_32(*dest1, destrgb);
         dest1[0] = blended;
         dest1[screenwidth] = blended;
         
-        const pixel_t blended2 = I_BlendOver_64(*dest2, destrgb);
+        const pixel_t blended2 = I_BlendOver64_32(*dest2, destrgb);
         dest2[0] = blended2;
         dest2[screenwidth] = blended2;
 
@@ -672,8 +672,8 @@ void R_DrawFuzzTLColumnLow(void)
         const unsigned s = sourcebase[frac >> FRACBITS];
         const pixel_t destrgb = brightmap[s] ? colormap1[s] : colormap0[s];
         
-        dest1[0] = I_BlendOver_64(*dest1, destrgb);
-        dest2[0] = I_BlendOver_64(*dest2, destrgb);
+        dest1[0] = I_BlendOver64_32(*dest1, destrgb);
+        dest2[0] = I_BlendOver64_32(*dest2, destrgb);
     }
 }
 
@@ -713,7 +713,7 @@ void R_DrawFuzzBWColumn(void)
         src = (src < vbuf_start) ? dest + screenwidth - 1 : src;
 
         if (src < vbuf_end)
-            *dest = I_BlendDarkGrayscale(*src, 0xD3); // 211 (17% darkening)
+            *dest = I_BlendDarkGrayscale_32(*src, 0xD3); // 211 (17% darkening)
 
         // Update fuzz position aggressively
         if (++local_fuzzpos == FUZZTABLE)
@@ -726,7 +726,7 @@ void R_DrawFuzzBWColumn(void)
     if (cutoff)
     {
         const int fuzz_offset = screenwidth * (fuzzoffsetbase[local_fuzzpos] - FUZZOFF) / 2;
-        *dest = I_BlendDarkGrayscale(dest[fuzz_offset], 0xD3); // 211 (17% darkening)
+        *dest = I_BlendDarkGrayscale_32(dest[fuzz_offset], 0xD3); // 211 (17% darkening)
     }
 
     // Restore fuzz position
@@ -775,9 +775,9 @@ void R_DrawFuzzBWColumnLow(void)
         src2 = (src2 < vbuf_start) ? dest2 + screenwidth - 1 : src2;
 
         if (src1 < vbuf_end)
-            *dest = I_BlendDarkGrayscale(*src1, 0xD3); // 211 (17% darkening)
+            *dest = I_BlendDarkGrayscale_32(*src1, 0xD3); // 211 (17% darkening)
         if (src2 < vbuf_end)
-            *dest2 = I_BlendDarkGrayscale(*src2, 0xD3); // 211 (17% darkening)
+            *dest2 = I_BlendDarkGrayscale_32(*src2, 0xD3); // 211 (17% darkening)
 
         // Update fuzz position efficiently
         if (++local_fuzzpos == FUZZTABLE)
@@ -792,8 +792,8 @@ void R_DrawFuzzBWColumnLow(void)
     {
         const int fuzz_offset = screenwidth * (fuzzoffsetbase[local_fuzzpos] - FUZZOFF) / 2;
 
-        *dest = I_BlendDarkGrayscale(dest[fuzz_offset], 0xD3); // 211 (17% darkening)
-        *dest2 = I_BlendDarkGrayscale(dest2[fuzz_offset], 0xD3); // 211 (17% darkening)
+        *dest = I_BlendDarkGrayscale_32(dest[fuzz_offset], 0xD3); // 211 (17% darkening)
+        *dest2 = I_BlendDarkGrayscale_32(dest2[fuzz_offset], 0xD3); // 211 (17% darkening)
     }
 
     // Restore fuzz position
@@ -830,7 +830,7 @@ void R_DrawTransTLFuzzColumn(void)
     {
         const unsigned s = sourcebase[frac >> FRACBITS];   // Texture sample
         const unsigned t = translation[s];                // Translation lookup
-        *dest = I_BlendOver_64(*dest, colormap0[t]); // Blend operation inline
+        *dest = I_BlendOver64_32(*dest, colormap0[t]); // Blend operation inline
 
         dest += screenwidth; // Advance destination pointer
         frac += fracstep;    // Increment texture coordinate
@@ -873,8 +873,8 @@ void R_DrawTransTLFuzzColumnLow(void)
         const pixel_t destrgb = colormap0[translation[s]]; // Translation + colormap lookup
 
         // Blend operation inline
-        *dest = I_BlendOver_64(*dest, destrgb);
-        *dest2 = I_BlendOver_64(*dest2, destrgb);
+        *dest = I_BlendOver64_32(*dest, destrgb);
+        *dest2 = I_BlendOver64_32(*dest2, destrgb);
 
         // Advance destination pointers and texture coordinate
         dest += screenwidth;
@@ -1004,7 +1004,7 @@ void R_DrawTLColumn(void)
     {
         const unsigned s = sourcebase[frac >> FRACBITS];
         const pixel_t destrgb = brightmap[s] ? colormap1[s] : colormap0[s];
-        const pixel_t blended = I_BlendOver_168(*dest, destrgb);
+        const pixel_t blended = I_BlendOver168_32(*dest, destrgb);
 
         // Write two pixels (current and next line)
         dest[0] = blended;
@@ -1020,7 +1020,7 @@ void R_DrawTLColumn(void)
     if (y_start == y_end)
     {
         const unsigned s = sourcebase[frac >> FRACBITS];
-        dest[0] = I_BlendOver_168(*dest, brightmap[s] ? colormap1[s] : colormap0[s]);
+        dest[0] = I_BlendOver168_32(*dest, brightmap[s] ? colormap1[s] : colormap0[s]);
     }
 }
 
@@ -1063,11 +1063,11 @@ void R_DrawTLColumnLow(void)
         const pixel_t destrgb = brightmap[s] ? colormap1[s] : colormap0[s];
         
         // Process two lines for both columns
-        const pixel_t blended = I_BlendOver_168(*dest1, destrgb);
+        const pixel_t blended = I_BlendOver168_32(*dest1, destrgb);
         dest1[0] = blended;
         dest1[screenwidth] = blended;
         
-        const pixel_t blended2 = I_BlendOver_168(*dest2, destrgb);
+        const pixel_t blended2 = I_BlendOver168_32(*dest2, destrgb);
         dest2[0] = blended2;
         dest2[screenwidth] = blended2;
 
@@ -1084,8 +1084,8 @@ void R_DrawTLColumnLow(void)
         const unsigned s = sourcebase[frac >> FRACBITS];
         const pixel_t destrgb = brightmap[s] ? colormap1[s] : colormap0[s];
         
-        dest1[0] = I_BlendOver_168(*dest1, destrgb);
-        dest2[0] = I_BlendOver_168(*dest2, destrgb);
+        dest1[0] = I_BlendOver168_32(*dest1, destrgb);
+        dest2[0] = I_BlendOver168_32(*dest2, destrgb);
     }
 }
 
@@ -1122,7 +1122,7 @@ void R_DrawTLAddColumn(void)
     {
         const unsigned s = sourcebase[frac >> FRACBITS];
         const pixel_t destrgb = brightmap[s] ? colormap1[s] : colormap0[s];
-        const pixel_t blended = I_BlendAdd(*dest, destrgb);
+        const pixel_t blended = I_BlendAdd_32(*dest, destrgb);
 
         // Write two pixels (current and next line)
         dest[0] = blended;
@@ -1138,7 +1138,7 @@ void R_DrawTLAddColumn(void)
     if (y_start == y_end)
     {
         const unsigned s = sourcebase[frac >> FRACBITS];
-        dest[0] = I_BlendAdd(*dest, brightmap[s] ? colormap1[s] : colormap0[s]);
+        dest[0] = I_BlendAdd_32(*dest, brightmap[s] ? colormap1[s] : colormap0[s]);
     }
 }
 
@@ -1182,11 +1182,11 @@ void R_DrawTLAddColumnLow(void)
         const pixel_t destrgb = brightmap[s] ? colormap1[s] : colormap0[s];
         
         // Process two lines for both columns
-        const pixel_t blended = I_BlendAdd(*dest1, destrgb);
+        const pixel_t blended = I_BlendAdd_32(*dest1, destrgb);
         dest1[0] = blended;
         dest1[screenwidth] = blended;
         
-        const pixel_t blended2 = I_BlendAdd(*dest2, destrgb);
+        const pixel_t blended2 = I_BlendAdd_32(*dest2, destrgb);
         dest2[0] = blended2;
         dest2[screenwidth] = blended2;
 
@@ -1203,8 +1203,8 @@ void R_DrawTLAddColumnLow(void)
         const unsigned s = sourcebase[frac >> FRACBITS];
         const pixel_t destrgb = brightmap[s] ? colormap1[s] : colormap0[s];
         
-        dest1[0] = I_BlendAdd(*dest1, destrgb);
-        dest2[0] = I_BlendAdd(*dest2, destrgb);
+        dest1[0] = I_BlendAdd_32(*dest1, destrgb);
+        dest2[0] = I_BlendAdd_32(*dest2, destrgb);
     }
 }
 

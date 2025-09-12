@@ -1026,7 +1026,7 @@ static void AM_shadeBackground (void)
 
     for (int i = 0; i < scr; i++)
     {
-        *dest = I_BlendDark(*dest, I_ShadeFactor[shade]);
+        *dest = I_BlendDark_32(*dest, I_ShadeFactor[shade]);
         ++dest;
     }
 }
