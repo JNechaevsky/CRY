@@ -26,7 +26,7 @@ typedef struct
     int64_t x,y;
 } mpoint_t;
 
-extern boolean AM_Responder (event_t *ev);
+extern boolean AM_Responder (const event_t *ev);
 
 extern cheatseq_t cheat_amap;
 
