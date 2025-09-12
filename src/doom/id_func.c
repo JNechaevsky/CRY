@@ -85,10 +85,10 @@ static byte *ID_WidgetColor (const int i)
 // [JN/PN] Enum for widget type values.
 enum
 {
-    widget_kis_kills,
-    widget_kis_items,
-    widget_kis_secrets,
-} widget_kis_count_t;
+    widgets_kis_kills,
+    widgets_kis_items,
+    widgets_kis_secrets,
+} widgets_kis_count_t;
 
 // [PN] Function for safe division to prevent division by zero.
 // Returns the percentage or 0 if the total is zero.
@@ -105,17 +105,17 @@ static void ID_WidgetKISCount (char *buffer, size_t buffer_size, const int i)
     // [PN] Set values for kills, items, or secrets based on widget type
     switch (i)
     {
-        case widget_kis_kills:
+        case widgets_kis_kills:
             value = IDWidget.kills;
             total = IDWidget.totalkills;
             break;
         
-        case widget_kis_items:
+        case widgets_kis_items:
             value = IDWidget.items;
             total = IDWidget.totalitems;
             break;
         
-        case widget_kis_secrets:
+        case widgets_kis_secrets:
             value = IDWidget.secrets;
             total = IDWidget.totalsecrets;
             break;
@@ -172,24 +172,33 @@ void ID_LeftWidgets (void)
         if (widget_kis == 1
         || (widget_kis == 2 && automapactive))
         {
+            int yy = 0;
             char str1[16];  // kills
             char str2[16];  // items
             char str3[16];  // secret
 
             // Kills:
             M_WriteText(left_align, 9, "K:", cr[CR_GRAY]);
-            ID_WidgetKISCount(str1, sizeof(str1), widget_kis_kills);
+            ID_WidgetKISCount(str1, sizeof(str1), widgets_kis_kills);
             M_WriteText(left_align + 16, 9, str1, ID_WidgetColor(widget_kills));
 
             // Items:
+            if (widget_kis_items)
+            {
             M_WriteText(left_align, 18, "I:", cr[CR_GRAY]);
-            ID_WidgetKISCount(str2, sizeof(str2), widget_kis_items);
+            ID_WidgetKISCount(str2, sizeof(str2), widgets_kis_items);
             M_WriteText(left_align + 16, 18, str2, ID_WidgetColor(widget_items));
+            }
+            else
+            {
+            str2[0] = '\0';
+            yy = 9;
+            }
 
             // Secret:
-            M_WriteText(left_align, 27, "S:", cr[CR_GRAY]);
-            ID_WidgetKISCount(str3, sizeof(str3), widget_kis_secrets);
-            M_WriteText(left_align + 16, 27, str3, ID_WidgetColor(widget_secret));
+            M_WriteText(left_align, 27 - yy, "S:", cr[CR_GRAY]);
+            ID_WidgetKISCount(str3, sizeof(str3), widgets_kis_secrets);
+            M_WriteText(left_align + 16, 27 - yy, str3, ID_WidgetColor(widget_secret));
         }
 
         // Level timer. Time gathered in G_Ticker.
@@ -332,18 +341,26 @@ void ID_LeftWidgets (void)
             // Kills:
             sprintf(str1, "K ");
             M_WriteText(left_align, 152 + yy, str1, cr[CR_GRAY]);
-            ID_WidgetKISCount(str2, sizeof(str2), widget_kis_kills);
+            ID_WidgetKISCount(str2, sizeof(str2), widgets_kis_kills);
             M_WriteText(left_align + M_StringWidth(str1), 152 + yy, str2, ID_WidgetColor(widget_kills));
     
             // Items:
+            if (widget_kis_items)
+            {
             sprintf(str3, " I ");
             M_WriteText(left_align + M_StringWidth(str1) + M_StringWidth(str2), 152 + yy, str3, cr[CR_GRAY]);
             
-            ID_WidgetKISCount(str4, sizeof(str4), widget_kis_items);
+            ID_WidgetKISCount(str4, sizeof(str4), widgets_kis_items);
             M_WriteText(left_align + M_StringWidth(str1) +
                         M_StringWidth(str2) +
                         M_StringWidth(str3), 152 + yy, str4, ID_WidgetColor(widget_items));
-    
+            }
+            else
+            {
+            str3[0] = '\0';
+            str4[0] = '\0';
+            }
+
             // Secret:
             sprintf(str5, " S ");
             M_WriteText(left_align + M_StringWidth(str1) +
@@ -351,7 +368,7 @@ void ID_LeftWidgets (void)
                         M_StringWidth(str3) +
                         M_StringWidth(str4), 152 + yy, str5, cr[CR_GRAY]);
     
-            ID_WidgetKISCount(str6, sizeof(str6), widget_kis_secrets);
+            ID_WidgetKISCount(str6, sizeof(str6), widgets_kis_secrets);
             M_WriteText(left_align + M_StringWidth(str1) +
                         M_StringWidth(str2) + 
                         M_StringWidth(str3) +
