@@ -72,37 +72,20 @@ static void wipe_initLoading (void)
 {
     // copy start screen to main screen
     memcpy(wipe_scr, wipe_scr_start, SCREENAREA*sizeof(*wipe_scr));
-
-    // setup initial column positions
-    // (y<0 => not ready to scroll yet)
-    y[0] = -1;
-
-    for (int i = 1 ; i < SCREENWIDTH ; i++)
-    {
-        y[i] = y[i-1] + 2;
-    }
+    fade_counter = 28;
 }
 
 static boolean wipe_doLoading (int ticks)
 {
-    const int delay = 12 * vid_resolution;
-    const int width = SCREENWIDTH/2;
-
     boolean	done = true;
 
-    while (ticks--)
+    if (--fade_counter > 0)
     {
-        for (int i = 0 ; i < width ; i++)
-        {
-            if (y[i] < SCREENHEIGHT)
-            {
-                y[i] += delay;
-                done = false;
-            }
-        }
+        done = false;
     }
 
     V_DrawPatch(132, 72, W_CacheLumpName("LOADING", PU_CACHE));
+    st_fullupdate = true;
 
     return done;
 }
