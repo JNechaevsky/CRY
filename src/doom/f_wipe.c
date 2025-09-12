@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "z_zone.h"
+#include "i_system.h" // I_Realloc
 #include "i_video.h"
 #include "v_trans.h" // [crispy] blending functions
 #include "v_video.h"
@@ -44,25 +45,22 @@ static boolean (*wipe_do) (int ticks);
 static int fade_counter;
 
 // -----------------------------------------------------------------------------
-// wipe_shittyColMajorXform
+// wipe_EnsureBuffers
+//  [PN] Lazy allocation / resize of wipe buffers.
 // -----------------------------------------------------------------------------
 
-static void wipe_shittyColMajorXform (dpixel_t *array)
+static void wipe_EnsureBuffers (void)
 {
-    const int width = SCREENWIDTH/2;
-    dpixel_t *dest = (dpixel_t*) malloc(width*SCREENHEIGHT*sizeof(*dest));
+    static size_t wipe_capacity = 0;
+    const size_t need_area = (size_t)SCREENAREA;
 
-    for (int y = 0 ; y < SCREENHEIGHT ; y++)
+    if (need_area > wipe_capacity)
     {
-        for (int x = 0 ; x < width ; x++)
-        {
-            dest[x*SCREENHEIGHT+y] = array[y*width+x];
-        }
+        wipe_scr_start = (pixel_t *)I_Realloc(wipe_scr_start, need_area * sizeof(*wipe_scr_start));
+        wipe_scr_end   = (pixel_t *)I_Realloc(wipe_scr_end, need_area * sizeof(*wipe_scr_end));
+        y              =     (int *)I_Realloc(y, need_area * sizeof(*y));
+        wipe_capacity  = need_area;
     }
-
-    memcpy(array, dest, width*SCREENHEIGHT*sizeof(*dest));
-
-    free(dest);
 }
 
 
@@ -75,14 +73,8 @@ static void wipe_initLoading (void)
     // copy start screen to main screen
     memcpy(wipe_scr, wipe_scr_start, SCREENAREA*sizeof(*wipe_scr));
 
-    // makes this wipe faster (in theory)
-    // to have stuff in column-major format
-    wipe_shittyColMajorXform((dpixel_t*)wipe_scr_start);
-    wipe_shittyColMajorXform((dpixel_t*)wipe_scr_end);
-
     // setup initial column positions
     // (y<0 => not ready to scroll yet)
-    y = (int *) malloc(SCREENWIDTH*sizeof(int));
     y[0] = -1;
 
     for (int i = 1 ; i < SCREENWIDTH ; i++)
@@ -124,11 +116,6 @@ static void wipe_initMelt (void)
     // copy start screen to main screen
     memcpy(wipe_scr, wipe_scr_start, SCREENAREA*sizeof(*wipe_scr));
 
-    // makes this wipe faster (in theory)
-    // to have stuff in column-major format
-    wipe_shittyColMajorXform((dpixel_t*)wipe_scr_start);
-    wipe_shittyColMajorXform((dpixel_t*)wipe_scr_end);
-
     // setup initial column positions
     // (y<0 => not ready to scroll yet)
     y = (int *) malloc(SCREENWIDTH*sizeof(int));
@@ -156,11 +143,8 @@ static boolean wipe_doMelt (int ticks)
 {
     int j;
     int dy;
-    int idx;
     const int width = SCREENWIDTH/2;
 
-    dpixel_t *s;
-    dpixel_t *d;
     boolean	done = true;
 
     while (ticks--)
@@ -181,25 +165,28 @@ static boolean wipe_doMelt (int ticks)
                     dy = SCREENHEIGHT - y[i];
                 }
 
-                s = &((dpixel_t *)wipe_scr_end)[i*SCREENHEIGHT+y[i]];
-                d = &((dpixel_t *)wipe_scr)[y[i]*width+i];
-                idx = 0;
+                // [PN] Row-major: copy the falling part from end-screen column (i)
+                // source starts at row y[i], destination at the same row
+                const dpixel_t *s1 = &((dpixel_t *)wipe_scr_end)[ y[i] * width + i ];
+                dpixel_t       *d1 = &((dpixel_t *)wipe_scr    )[ y[i] * width + i ];
 
-                for (j = dy ; j ; j--)
+                for (j = dy ; j ; --j)
                 {
-                    d[idx] = *(s++);
-                    idx += width;
+                    *d1 = *s1;
+                    d1 += width;  // next row
+                    s1 += width;  // next row
                 }
 
                 y[i] += dy;
-                s = &((dpixel_t *)wipe_scr_start)[i*SCREENHEIGHT];
-                d = &((dpixel_t *)wipe_scr)[y[i]*width+i];
-                idx = 0;
+                // [PN] Row-major: fill the area above with start-screen column (i)
+                const dpixel_t *s2 = &((dpixel_t *)wipe_scr_start)[i]; // row 0
+                dpixel_t       *d2 = &((dpixel_t *)wipe_scr      )[y[i] * width + i ];
 
-                for (j=SCREENHEIGHT-y[i];j;j--)
+                for (j = SCREENHEIGHT - y[i]; j; --j)
                 {
-                    d[idx] = *(s++);
-                    idx += width;
+                    *d2 = *s2;
+                    d2 += width;  // next row
+                    s2 += width;  // next row
                 }
 
                 done = false;
@@ -267,7 +254,6 @@ static void wipe_initFizzle (void)
     const int scale = vid_resolution;
 
     memcpy(wipe_scr, wipe_scr_start, SCREENAREA * sizeof(*wipe_scr));
-    y = (int *) malloc(SCREENAREA*sizeof(int));
 
     for (int yy = 0; yy < SCREENHEIGHT; yy += scale)
     {
@@ -317,26 +303,12 @@ static boolean wipe_doFizzle (const int ticks)
 }
 
 // -----------------------------------------------------------------------------
-// wipe_exitMelt
-// -----------------------------------------------------------------------------
-
-static void wipe_exit (void)
-{
-    if (vid_screenwipe != 3)  // [JN] y is not allocated in crossfade wipe.
-    free(y);
-    free(wipe_scr_start);
-    free(wipe_scr_end);
-    // [JN] Refresh status bar background after loading is finished.
-    st_fullupdate = true;
-}
-
-// -----------------------------------------------------------------------------
 // wipe_StartScreen
 // -----------------------------------------------------------------------------
 
 void wipe_StartScreen (void)
 {
-    wipe_scr_start = malloc(SCREENAREA * sizeof(*wipe_scr_start));
+    wipe_EnsureBuffers();
     I_ReadScreen(wipe_scr_start);
 }
 
@@ -346,7 +318,7 @@ void wipe_StartScreen (void)
 
 void wipe_EndScreen (void)
 {
-    wipe_scr_end = malloc(SCREENAREA * sizeof(*wipe_scr_end));
+    wipe_EnsureBuffers();
     I_ReadScreen(wipe_scr_end);
     V_DrawBlock(0, 0, SCREENWIDTH, SCREENHEIGHT, wipe_scr_start); // restore start scr.
 }
@@ -393,7 +365,6 @@ boolean wipe_ScreenWipe (const int ticks)
     if ((*wipe_do)(ticks))
     {
         go = false;
-        wipe_exit();
     }
 
     return !go;
