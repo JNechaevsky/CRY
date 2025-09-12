@@ -58,6 +58,35 @@ extern const double colorblind_matrix[][3][3];
     (((((bg) & 0x0000FF00) * (amount)) >> 8) & 0x0000FF00))  \
 )
 
+// -----------------------------------------------------------------------------
+//
+//                     Blending lambdas with fixed alphas                       
+//
+// -----------------------------------------------------------------------------
+
+
+//
+// I_BlendOver
+//
+
+#define I_BlendOver_32(bg, fg, amount) ( \
+    (0xFF000000U) | \
+    ((((amount) * ((fg) & 0xFF00FF) + ((0xFFU - (amount)) * ((bg) & 0xFF00FF))) >> 8) & 0xFF00FF) | \
+    ((((amount) * ((fg) & 0x00FF00) + ((0xFFU - (amount)) * ((bg) & 0x00FF00))) >> 8) & 0x00FF00)   \
+)
+
+//
+// [PN] Fastest algorithm for 50% opacity
+//
+
+#define I_BlendOver128_32(bg, fg) ( \
+    (0xFF000000U) |                                               \
+    (((((fg) & 0xFF00FF) + ((bg) & 0xFF00FF)) >> 1) & 0xFF00FF) | \
+    (((((fg) & 0x00FF00) + ((bg) & 0x00FF00)) >> 1) & 0x00FF00)   \
+)
+
+
+
 // [PN] Converted functions to macros for optimization:
 //
 // 1. Eliminating function call overhead:
