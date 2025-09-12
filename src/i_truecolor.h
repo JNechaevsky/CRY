@@ -48,6 +48,16 @@ extern const float I_SaturationPercent[];
 extern const double colorblind_matrix[][3][3];
 
 
+//
+// I_BlendDark
+//
+
+#define I_BlendDark_32(bg, amount) ( \
+    ((0xFF000000U) | \
+    (((((bg) & 0x00FF00FF) * (amount)) >> 8) & 0x00FF00FF) | \
+    (((((bg) & 0x0000FF00) * (amount)) >> 8) & 0x0000FF00))  \
+)
+
 // [PN] Converted functions to macros for optimization:
 //
 // 1. Eliminating function call overhead:
