@@ -887,10 +887,6 @@ fixed_t fractionaltic;
 //
 void I_FinishUpdate (void)
 {
-    // static int lasttic;
-    // int tics;
-    int i;
-
     if (!initialized)
         return;
 
@@ -936,15 +932,15 @@ void I_FinishUpdate (void)
 #endif
 
 	// [crispy] [AM] Real FPS counter
+    if (vid_showfps)
 	{
 		static int lastmili;
 		static int fpscount;
-		int mili;
 
 		fpscount++;
 
-		i = SDL_GetTicks();
-		mili = i - lastmili;
+		const uint32_t i = SDL_GetTicks();
+		const int mili = i - lastmili;
 
 		// Update FPS counter every second
 		if (mili >= 1000)
