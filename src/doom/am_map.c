@@ -753,7 +753,7 @@ boolean AM_Responder (event_t *ev)
             // scaled by resolution and sensitivity.
             // The >> 5 keeps movement smooth across wide FPS ranges and DPI setups.
             mouse_pan_x += (dx * vid_resolution * mouseSensitivity) >> 5;
-            mouse_pan_y += (dy * vid_resolution * mouseSensitivity) >> 5; // TODO - mouse_sensitivity_y
+            mouse_pan_y += (dy * vid_resolution * mouse_sensitivity_y) >> 5;
 
             rc = true;
         }

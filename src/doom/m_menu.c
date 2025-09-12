@@ -3000,10 +3000,10 @@ static void M_Draw_ID_Automap (void)
 
     // Mouse panning mode
     sprintf(str, automap_mouse_pan ? "ON" : "OFF");
-    M_WriteTextGlow(M_ItemRightAlign(str), 90, str,
+    M_WriteTextGlow(M_ItemRightAlign(str), 81, str,
                         automap_mouse_pan ? cr[CR_GREEN] : cr[CR_DARKRED],
                             automap_mouse_pan ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
-                                LINE_ALPHA(8));
+                                LINE_ALPHA(7));
 }
 
 static void M_ID_Automap_Smooth (int choice)
