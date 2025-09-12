@@ -13,12 +13,10 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// DESCRIPTION:
-//	Preparation of data for rendering,
-//	generation of lookups, caching, retrieval by name.
-//
+
 
 #include <stdio.h>
+
 #include "i_swap.h"
 #include "i_system.h"
 #include "z_zone.h"
@@ -39,9 +37,7 @@
 // is stored in vertical runs of opaque pixels (posts).
 // A column is composed of zero or more posts,
 // a patch or sprite is composed of zero or more columns.
-// 
-
-
+//
 
 //
 // Texture definition.
@@ -51,46 +47,46 @@
 // into the rectangular texture space using origin
 // and possibly other attributes.
 //
+
 typedef PACKED_STRUCT (
 {
-    short	originx;
-    short	originy;
-    short	patch;
-    short	stepdir;
-    short	colormap;
+    short originx;
+    short originy;
+    short patch;
+    short stepdir;
+    short colormap;
 }) mappatch_t;
-
 
 //
 // Texture definition.
 // A DOOM wall texture is a list of patches
 // which are to be combined in a predefined order.
 //
+
 typedef PACKED_STRUCT (
 {
-    char		name[8];
-    int			masked;	
-    short		width;
-    short		height;
-    int                 obsolete;
-    short		patchcount;
-    mappatch_t	patches[1];
+    char  name[8];
+    int   masked;
+    short width;
+    short height;
+    int   obsolete;
+    short patchcount;
+    mappatch_t patches[1];
 }) maptexture_t;
-
 
 // A single patch from a texture definition,
 //  basically a rectangular area within
 //  the texture rectangle.
+
 typedef struct
 {
     // Block origin (allways UL),
     // which has allready accounted
     // for the internal origin of the patch.
-    short	originx;	
-    short	originy;
-    int		patch;
+    short originx;
+    short originy;
+    int	  patch;
 } texpatch_t;
-
 
 // A maptexturedef_t describes a rectangular texture,
 //  which is composed of one or more mappatch_t structures
@@ -101,68 +97,59 @@ typedef struct texture_s texture_t;
 struct texture_s
 {
     // Keep name for switch changing, etc.
-    char	name[8];		
-    short	width;
-    short	height;
+    char  name[8];
+    short width;
+    short height;
 
     // Index in textures list
-
-    int         index;
+    int index;
 
     // Next in hash table chain
-
-    texture_t  *next;
+    texture_t *next;
     
     // All the patches[patchcount]
     //  are drawn back to front into the cached texture.
-    short	patchcount;
-    texpatch_t	patches[1];		
+    short patchcount;
+    texpatch_t patches[1];
 };
 
+int firstflat;
+int lastflat;
+int numflats;
+
+int firstspritelump;
+int lastspritelump;
+int numspritelumps;
+
+int numtextures;
+texture_t **textures;
+texture_t **textures_hashtable;
 
 
-int		firstflat;
-int		lastflat;
-int		numflats;
-
-int		firstpatch;
-int		lastpatch;
-int		numpatches;
-
-int		firstspritelump;
-int		lastspritelump;
-int		numspritelumps;
-
-int		numtextures;
-texture_t**	textures;
-texture_t**     textures_hashtable;
-
-
-int*			texturewidthmask;
-int*			texturewidth; // [crispy] texture width for wrapping column getter function
-// needed for texture pegging
-fixed_t*		textureheight; // [crispy] texture height for Tutti-Frutti fix
-int*			texturecompositesize;
-short**			texturecolumnlump;
-unsigned**		texturecolumnofs; // [crispy] column offsets for composited translucent mid-textures on 2S walls
-unsigned**		texturecolumnofs2; // [crispy] column offsets for composited opaque textures
-byte**			texturecomposite; // [crispy] composited translucent mid-textures on 2S walls
-byte**			texturecomposite2; // [crispy] composited opaque textures
-const byte**	texturebrightmap; // [crispy] brightmaps
+int *texturewidthmask;
+int *texturewidth;             // [crispy] texture width for wrapping column getter function
+fixed_t *textureheight;        // [crispy] texture height for Tutti-Frutti fix
+int *texturecompositesize;
+short    **texturecolumnlump;
+unsigned **texturecolumnofs;   // [crispy] column offsets for composited translucent mid-textures on 2S walls
+unsigned **texturecolumnofs2;  // [crispy] column offsets for composited opaque textures
+byte **texturecomposite;       // [crispy] composited translucent mid-textures on 2S walls
+byte **texturecomposite2;      // [crispy] composited opaque textures
+const byte **texturebrightmap; // [crispy] brightmaps
 
 // for global animation
-int*		flattranslation;
-int*		texturetranslation;
+int *flattranslation;
+int *texturetranslation;
 
 // needed for pre rendering
-fixed_t*	spritewidth;	
-fixed_t*	spriteoffset;
-fixed_t*	spritetopoffset;
+fixed_t *spritewidth;
+fixed_t *spriteoffset;
+fixed_t *spritetopoffset;
 
-lighttable_t	*colormaps;
-lighttable_t	*invulmaps;
-lighttable_t	*pal_color; // [crispy] array holding palette colors for true color mode
-lighttable_t	*cry_color; // [JN] array holding CRY patch drawing palette colors
+lighttable_t *colormaps;
+lighttable_t *invulmaps;
+lighttable_t *pal_color; // [crispy] array holding palette colors for true color mode
+lighttable_t *cry_color; // [JN] array holding CRY patch drawing palette colors
 
 
 //
@@ -178,12 +165,11 @@ lighttable_t	*cry_color; // [JN] array holding CRY patch drawing palette colors
 //
 
 
-
 // -----------------------------------------------------------------------------
 // R_DrawColumnInCache
-// [PN] Clips and draws a patch column into the cache with branch-reduced
-// clipping and restrict hints for faster execution. Based on Killough’s
-// rewrite that fixed the Medusa bug.
+//  [PN] Clips and draws a patch column into the cache with branch-reduced
+//  clipping and restrict hints for faster execution. Based on Killough’s
+//  rewrite that fixed the Medusa bug.
 // -----------------------------------------------------------------------------
 
 static void R_DrawColumnInCache
@@ -195,15 +181,15 @@ static void R_DrawColumnInCache
     byte *restrict           marks
 )
 {
-    // [PN] Aliasing hints + const where applicable
+    // Aliasing hints + const where applicable
     const column_t *restrict col   = (const column_t *)patch;
     byte           *restrict dst   = cache;
     byte           *restrict mark  = marks;
 
-    // [PN] Hot locals, declared near use
+    // Hot locals, declared near use
     int top = -1;
 
-    // [PN] Single-pass, clamp with start/end to reduce branches
+    // Single-pass, clamp with start/end to reduce branches
     while (col->topdelta != 0xff)
     {
         const int topdelta = col->topdelta;
@@ -244,7 +230,7 @@ static void R_DrawColumnInCache
 
 // -----------------------------------------------------------------------------
 // R_GenerateComposite
-// [PN] Builds composite columns for a texture and reconstructs true posts from
+//  [PN] Builds composite columns for a texture and reconstructs true posts from
 //  transparency marks with fewer branches and restrict-qualified pointers.
 //  Based on Killough’s rewrite that fixed the Medusa bug.
 // -----------------------------------------------------------------------------
@@ -500,7 +486,7 @@ static void R_GenerateLookup (int texnum)
 
 // -----------------------------------------------------------------------------
 // R_GetColumn
-// [crispy] wrapping column getter function for any non-power-of-two textures
+//  [crispy] wrapping column getter function for any non-power-of-two textures
 // -----------------------------------------------------------------------------
 
 byte *R_GetColumn (int tex, int col)
@@ -531,7 +517,7 @@ byte *R_GetColumn (int tex, int col)
 
 // -----------------------------------------------------------------------------
 // R_GetColumnMod
-// [crispy] wrapping column getter function for composited translucent mid-textures on 2S walls
+//  [crispy] wrapping column getter function for composited translucent mid-textures on 2S walls
 // -----------------------------------------------------------------------------
 
 byte *R_GetColumnMod (int tex, int col)
@@ -550,20 +536,18 @@ byte *R_GetColumnMod (int tex, int col)
     return texturecomposite[tex] + ofs;
 }
 
+// -----------------------------------------------------------------------------
+// GenerateTextureHashTable
+// -----------------------------------------------------------------------------
+
 static void GenerateTextureHashTable(void)
 {
-    texture_t **rover;
-    int i;
-    int key;
-
-    textures_hashtable 
-            = Z_Malloc(sizeof(texture_t *) * numtextures, PU_STATIC, 0);
-
+    textures_hashtable = Z_Malloc(sizeof(texture_t *) * numtextures, PU_STATIC, 0);
     memset(textures_hashtable, 0, sizeof(texture_t *) * numtextures);
 
     // Add all textures to hash table
 
-    for (i=0; i<numtextures; ++i)
+    for (int i = 0; i < numtextures; ++i)
     {
         // Store index
 
@@ -575,9 +559,8 @@ static void GenerateTextureHashTable(void)
         // wins. The new entry must therefore be added at the end
         // of the hash chain, so that earlier entries win.
 
-        key = W_LumpNameHash(textures[i]->name) % numtextures;
-
-        rover = &textures_hashtable[key];
+        const int key = W_LumpNameHash(textures[i]->name) % numtextures;
+        texture_t **rover = &textures_hashtable[key];
 
         while (*rover != NULL)
         {
@@ -934,9 +917,9 @@ void R_InitSpriteLumps (void)
     lastspritelump = W_GetNumForName ("S_END") - 1;
 
     numspritelumps = lastspritelump - firstspritelump + 1;
-    spritewidth = Z_Malloc (numspritelumps*sizeof(*spritewidth), PU_STATIC, 0);
-    spriteoffset = Z_Malloc (numspritelumps*sizeof(*spriteoffset), PU_STATIC, 0);
-    spritetopoffset = Z_Malloc (numspritelumps*sizeof(*spritetopoffset), PU_STATIC, 0);
+    spritewidth = Z_Malloc (numspritelumps * sizeof(*spritewidth), PU_STATIC, 0);
+    spriteoffset = Z_Malloc (numspritelumps * sizeof(*spriteoffset), PU_STATIC, 0);
+    spritetopoffset = Z_Malloc (numspritelumps * sizeof(*spritetopoffset), PU_STATIC, 0);
 
     for (int i = 0; i < numspritelumps; i++)
     {
@@ -1087,152 +1070,132 @@ void R_InitColormaps (void)
 	W_ReleaseLumpName("CRYINVL");
 }
 
-
-//
+// -----------------------------------------------------------------------------
 // R_InitHSVColors
-// [crispy] initialize color translation and color strings tables
-//
+//  [crispy] initialize color translation and color strings tables
+// -----------------------------------------------------------------------------
+
 static void R_InitHSVColors (void)
 {
-	byte *playpal = W_CacheLumpName("PLAYPAL", PU_STATIC);
-	char c[3];
-	int i, j;
-	boolean keepgray = false;
+    const long long int starttime = I_GetTimeUS();
+    
+    byte *restrict playpal = W_CacheLumpName("PLAYPAL", PU_STATIC);
+    const boolean kg = (W_CheckMultipleLumps("sttnum0") < 2);
 
-	if (!crstr)
-	    crstr = I_Realloc(NULL, CRMAX * sizeof(*crstr));
+    if (!crstr)
+        crstr = I_Realloc(NULL, CRMAX * sizeof(*crstr));
 
-	// [crispy] check for status bar graphics replacements
-	i = W_CheckNumForName("sttnum0"); // [crispy] Status Bar '0'
-    keepgray = W_CheckMultipleLumps("sttnum0") < 2;
+    // [crispy] CRMAX - 2: don't override the original GREN and BLUE2 Boom tables
+    for (int i = 0; i < CRMAX - 2; ++i)
+    {
+        for (int j = 0; j < 256; ++j)
+        {
+            cr[i][j] = V_Colorize(playpal, i, j, kg);
+        }
 
-	// [crispy] CRMAX - 2: don't override the original GREN and BLUE2 Boom tables
-	for (i = 0; i < CRMAX - 2; i++)
-	{
-	    for (j = 0; j < 256; j++)
-	    {
-		cr[i][j] = V_Colorize(playpal, i, j, keepgray);
-	    }
+        char buf[3] = { cr_esc, (char)('0' + i), 0 };
+        crstr[i] = M_StringDuplicate(buf);
+    }
 
-	    M_snprintf(c, sizeof(c), "%c%c", cr_esc, '0' + i);
-	    crstr[i] = M_StringDuplicate(c);
-	}
+    W_ReleaseLumpName("PLAYPAL");
 
-	W_ReleaseLumpName("PLAYPAL");
+    int lump = W_CheckNumForName("CRGREEN");
+    if (lump >= 0)
+        cr[CR_RED2GREEN] = W_CacheLumpNum(lump, PU_STATIC);
 
-	i = W_CheckNumForName("CRGREEN");
-	if (i >= 0)
-	{
-	    cr[CR_RED2GREEN] = W_CacheLumpNum(i, PU_STATIC);
-	}
-
-	i = W_CheckNumForName("CRBLUE2");
-	if (i == -1)
-	    i = W_CheckNumForName("CRBLUE");
-	if (i >= 0)
-	{
-	    cr[CR_RED2BLUE] = W_CacheLumpNum(i, PU_STATIC);
-	}
+    lump = W_CheckNumForName("CRBLUE2");
+    if (lump == -1)
+        lump = W_CheckNumForName("CRBLUE");
+    if (lump >= 0)
+        cr[CR_RED2BLUE] = W_CacheLumpNum(lump, PU_STATIC);
+    
+    printf("\n:: done in %lld us.\n", I_GetTimeUS() - starttime);
 }
 
-
-//
+// -----------------------------------------------------------------------------
 // R_InitData
-// Locates all the lumps
-//  that will be used by all views
+// Locates all the lumps that will be used by all views.
 // Must be called after W_Init.
-//
+// -----------------------------------------------------------------------------
+
 void R_InitData (void)
 {
-    R_InitFlats ();
+    R_InitFlats();
     printf (".");
-    R_InitTextures ();
+    R_InitTextures();
     printf (".");
-    R_InitSpriteLumps ();
+    R_InitSpriteLumps();
     printf (".");
-    R_InitColormaps ();
-    printf (".");    
-    R_InitHSVColors ();
-    printf (".");    
-    I_InitTCTransMaps ();
+    R_InitColormaps();
+    printf (".");
+    R_InitHSVColors();
+    printf (".");
+    I_InitTCTransMaps();
     printf (".");
 }
 
-
-
-//
+// -----------------------------------------------------------------------------
 // R_FlatNumForName
-// Retrieval, get a flat number for a flat name.
-//
+//  Retrieval, get a flat number for a flat name.
+// -----------------------------------------------------------------------------
+
 int R_FlatNumForName(const char *name)
 {
-    int		i;
-
-    i = W_CheckNumForNameFromTo (name, lastflat, firstflat);
+    const int i = W_CheckNumForNameFromTo (name, lastflat, firstflat);
 
     if (i == -1)
     {
-	// [crispy] make missing flat non-fatal
-	// and fix absurd flat name in error message
-	fprintf (stderr, "R_FlatNumForName: %.8s not found\n", name);
-	// [crispy] since there is no "No Flat" marker,
-	// render missing flats as SKY
-	return skyflatnum;
+        // [crispy] make missing flat non-fatal
+        // and fix absurd flat name in error message
+        fprintf (stderr, "R_FlatNumForName: %.8s not found\n", name);
+        // [crispy] since there is no "No Flat" marker,
+        // render missing flats as SKY
+        return skyflatnum;
     }
     return i - firstflat;
 }
 
-
-
-
-//
+// -----------------------------------------------------------------------------
 // R_CheckTextureNumForName
-// Check whether texture is available.
-// Filter out NoTexture indicator.
-//
+//  Check whether texture is available. Filter out NoTexture indicator.
+// -----------------------------------------------------------------------------
+
 int R_CheckTextureNumForName (const char *name)
 {
-    texture_t *texture;
-    int key;
-
     // "NoTexture" marker.
-    if (name[0] == '-')		
-	return 0;
-		
-    key = W_LumpNameHash(name) % numtextures;
+    if (name[0] == '-')	
+        return 0;
 
-    texture=textures_hashtable[key]; 
+    const int key = W_LumpNameHash(name) % numtextures;
+    const texture_t *texture = textures_hashtable[key]; 
     
     while (texture != NULL)
     {
-	if (!strncasecmp (texture->name, name, 8) )
-	    return texture->index;
+        if (!strncasecmp (texture->name, name, 8) )
+            return texture->index;
 
         texture = texture->next;
     }
-    
+
     return -1;
 }
 
-
-
-//
+// -----------------------------------------------------------------------------
 // R_TextureNumForName
-// Calls R_CheckTextureNumForName,
-//  aborts with error message.
-//
+//  Calls R_CheckTextureNumForName, aborts with error message.
+// -----------------------------------------------------------------------------
+
 int R_TextureNumForName(const char *name)
 {
-    int		i;
-	
-    i = R_CheckTextureNumForName (name);
+
+    const int i = R_CheckTextureNumForName (name);
 
     if (i==-1)
     {
-	// [crispy] make missing texture non-fatal
-	// and fix absurd texture name in error message
-	fprintf (stderr, "R_TextureNumForName: %.8s not found\n", name);
-	return 0;
+        // [crispy] make missing texture non-fatal
+        // and fix absurd texture name in error message
+        fprintf (stderr, "R_TextureNumForName: %.8s not found\n", name);
+        return 0;
     }
     return i;
 }
