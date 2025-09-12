@@ -321,6 +321,7 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_KEY(key_map_follow),
     CONFIG_VARIABLE_KEY(key_map_rotate),
     CONFIG_VARIABLE_KEY(key_map_overlay),
+    CONFIG_VARIABLE_KEY(key_map_mousepan),
     CONFIG_VARIABLE_KEY(key_map_grid),
     CONFIG_VARIABLE_KEY(key_map_mark),
     CONFIG_VARIABLE_KEY(key_map_clearmark),
@@ -464,6 +465,7 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_INT(automap_rotate),
     CONFIG_VARIABLE_INT(automap_overlay),
     CONFIG_VARIABLE_INT(automap_shading),
+    CONFIG_VARIABLE_INT(automap_mouse_pan),
     CONFIG_VARIABLE_COMMENT(""),
 
     //

@@ -35,6 +35,8 @@ extern int markpointnum, markpointnum_max;
 
 extern mpoint_t *markpoints;
 
+extern int followplayer;
+
 extern void AM_clearMarks (void);
 extern void AM_Drawer (void);
 extern void AM_Init (void);
