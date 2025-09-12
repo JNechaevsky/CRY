@@ -27,6 +27,7 @@
 #include "w_wad.h" // [crispy] for lumpindex_t
 
 extern byte *dp_translation;
+extern boolean V_IsPatchLump(const int lump);
 extern boolean dp_translucent;
 extern pixel_t *palette_pointer;
 
