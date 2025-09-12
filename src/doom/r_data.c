@@ -625,68 +625,57 @@ void R_GenerateLookup (int texnum)
     Z_Free(postcount);
 }
 
-
-
-
-//
+// -----------------------------------------------------------------------------
 // R_GetColumn
-//
-byte*
-R_GetColumn
-( int		tex,
-  int		col )
+// [crispy] wrapping column getter function for any non-power-of-two textures
+// -----------------------------------------------------------------------------
+
+byte *R_GetColumn (int tex, int col)
 {
-    int		ofs;
-	
-    col &= texturewidthmask[tex];
-    ofs = texturecolumnofs2[tex][col];
+    const int width = texturewidth[tex];
+    const int mask = texturewidthmask[tex];
+
+    if (mask + 1 == width)
+    {
+        col &= mask;
+    }
+    else
+    {
+        while (col < 0)
+        {
+          col += width;
+        }
+        col %= width;
+    }
 
     if (!texturecomposite2[tex])
-	R_GenerateComposite (tex);
+        R_GenerateComposite(tex);
+
+    const int ofs = texturecolumnofs2[tex][col];
 
     return texturecomposite2[tex] + ofs;
 }
 
+// -----------------------------------------------------------------------------
+// R_GetColumnMod
 // [crispy] wrapping column getter function for composited translucent mid-textures on 2S walls
-byte*
-R_GetColumnMod
-( int		tex,
-  int		col )
+// -----------------------------------------------------------------------------
+
+byte *R_GetColumnMod (int tex, int col)
 {
-    int		ofs;
+    int ofs;
 
     while (col < 0)
-	col += texturewidth[tex];
+        col += texturewidth[tex];
 
     col %= texturewidth[tex];
     ofs = texturecolumnofs[tex][col];
 
     if (!texturecomposite[tex])
-	R_GenerateComposite (tex);
+        R_GenerateComposite (tex);
 
     return texturecomposite[tex] + ofs;
 }
-
-// [FG] wrapping column getter function for non-power-of-two wide sky textures
-byte*
-R_GetColumnMod2
-( int		tex,
-  int		col )
-{
-    int		ofs;
-
-    while (col < 0)
-	col += texturewidth[tex];
-
-    col %= texturewidth[tex];
-    ofs = texturecolumnofs2[tex][col];
-
-    if (!texturecomposite2[tex])
-	R_GenerateComposite(tex);
-
-    return texturecomposite2[tex] + ofs;
-}
-
 
 static void GenerateTextureHashTable(void)
 {
@@ -1108,8 +1097,6 @@ void R_InitColormaps (void)
 {
 	int i, j = 0;
 	byte r, g, b;
-	// [JN] Invulnerability colormap with diminished lighting
-	int ji = 0;
 
 	byte *const playpal = W_CacheLumpName("PLAYPAL", PU_STATIC);
 	byte *const crypal = W_CacheLumpName("CRYPAL", PU_STATIC);
