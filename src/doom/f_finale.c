@@ -65,7 +65,7 @@ static unsigned int finaleendcount;
 static void F_StartCast (void);
 static void F_CastTicker (void);
 static void F_CastDrawer (void);
-static boolean F_CastResponder (event_t *ev);
+static boolean F_CastResponder (const event_t *ev);
 
 
 // -----------------------------------------------------------------------------
@@ -96,7 +96,7 @@ void F_StartFinale (void)
 // F_Responder
 // -----------------------------------------------------------------------------
 
-boolean F_Responder (event_t *event)
+boolean F_Responder (const event_t *event)
 {
 	if (finalestage == F_STAGE_CAST)
 	return F_CastResponder (event);
@@ -371,7 +371,7 @@ void F_CastTicker (void)
 		}
 	}
 	casttics = caststate->tics;
-    
+
 	if (casttics == -1)
 	casttics = 15;
 }
@@ -380,7 +380,7 @@ void F_CastTicker (void)
 // F_CastResponder
 // -----------------------------------------------------------------------------
 
-static boolean F_CastResponder (event_t *ev)
+static boolean F_CastResponder (const event_t *ev)
 {
 	if (ev->type != ev_keydown)
 	return false;
@@ -397,7 +397,7 @@ static boolean F_CastResponder (event_t *ev)
 	if (mobjinfo[castorder[castnum].type].deathsound)
 	S_StartSound (NULL, mobjinfo[castorder[castnum].type].deathsound);
 
-    return true;
+	return true;
 }
 
 // -----------------------------------------------------------------------------
@@ -406,22 +406,17 @@ static boolean F_CastResponder (event_t *ev)
 
 static void F_CastDrawer (void)
 {
-	int            lump;
-	spritedef_t   *sprdef;
-	spriteframe_t *sprframe;
-	patch_t       *patch;
-
 	// erase the entire screen to a background
 	V_DrawPatchFullScreen(W_CacheLumpName("M_TITLE", PU_CACHE), false);
 
 	// [JN] Simplify to use common text drawing function.
 	M_WriteTextBigCentered(15, castorder[castnum].name, NULL);
-	
+
 	// draw the current frame in the middle of the screen
-	sprdef = &sprites[caststate->sprite];
-	sprframe = &sprdef->spriteframes[ caststate->frame & FF_FRAMEMASK];
-	lump = sprframe->lump[0];
-	patch = W_CacheLumpNum (lump+firstspritelump, PU_CACHE);
+	const spritedef_t *sprdef = &sprites[caststate->sprite];
+	const spriteframe_t *sprframe = &sprdef->spriteframes[ caststate->frame & FF_FRAMEMASK];
+	const int lump = sprframe->lump[0];
+	patch_t *patch = W_CacheLumpNum (lump+firstspritelump, PU_CACHE);
 
 	V_DrawPatchFinale(ORIGWIDTH/4, 90, patch);
 }
@@ -435,14 +430,14 @@ void F_Drawer (void)
 	switch (finalestage)
 	{
 		case F_STAGE_CAST:
-		F_CastDrawer();
-		break;
+			F_CastDrawer();
+			break;
 
 		case F_STAGE_TEXT:
-		F_TextWrite();
-		break;
+			F_TextWrite();
+			break;
 
 		case F_STAGE_ARTSCREEN:
-		break;
+			break;
 	}
 }
