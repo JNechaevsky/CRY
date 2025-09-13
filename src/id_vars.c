@@ -93,6 +93,7 @@ int widget_location = 0;
 int widget_alignment = 0;
 int widget_kis = 0;
 int widget_kis_format = 0;
+int widget_kis_items = 1;
 int widget_time = 0;
 int widget_totaltime = 0;
 int widget_levelname = 0;
@@ -107,6 +108,7 @@ int automap_secrets = 0;
 int automap_rotate = 0;
 int automap_overlay = 0;
 int automap_shading = 0;
+int automap_mouse_pan = 0;
 
 //
 // Gameplay features
@@ -227,6 +229,7 @@ void ID_BindVariables (void)
     M_BindIntVariable("widget_alignment",               &widget_alignment);
     M_BindIntVariable("widget_kis",                     &widget_kis);
     M_BindIntVariable("widget_kis_format",              &widget_kis_format);
+    M_BindIntVariable("widget_kis_items",               &widget_kis_items);
     M_BindIntVariable("widget_time",                    &widget_time);
     M_BindIntVariable("widget_totaltime",               &widget_totaltime);
     M_BindIntVariable("widget_levelname",               &widget_levelname);
@@ -241,6 +244,7 @@ void ID_BindVariables (void)
     M_BindIntVariable("automap_rotate",                 &automap_rotate);
     M_BindIntVariable("automap_overlay",                &automap_overlay);
     M_BindIntVariable("automap_shading",                &automap_shading);
+    M_BindIntVariable("automap_mouse_pan",              &automap_mouse_pan);
 
     //
     // Gameplay features

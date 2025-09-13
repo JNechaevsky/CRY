@@ -165,7 +165,7 @@ typedef struct
 
 typedef struct menu_s
 {
-    short		numitems;	// # of menu items
+    short		numitems;	// # of menu items ([PN] Automatic count via ITEMCOUNT() macro below)
     struct menu_s*	prevMenu;	// previous menu
     menuitem_t*		menuitems;	// menu items
     void		(*routine)(void);	// draw routine
@@ -176,6 +176,8 @@ typedef struct menu_s
     boolean		ScrollAR;	// [JN] Menu can be scrolled by arrow keys
     boolean		ScrollPG;	// [JN] Menu can be scrolled by PGUP/PGDN keys
 } menu_t;
+
+#define ITEMCOUNT(items) (sizeof(items) / sizeof((items)[0]))
 
 // [JN] For currentMenu->menuitems[itemOn].statuses:
 #define STS_SKIP -1
@@ -277,7 +279,7 @@ static menuitem_t MainMenu[]=
 
 static menu_t MainDef =
 {
-    main_end,
+    ITEMCOUNT(MainMenu),
     NULL,
     MainMenu,
     M_DrawMainMenu,
@@ -311,7 +313,7 @@ static menuitem_t NewGameMenu[]=
 
 static menu_t NewDef =
 {
-    newg_end,       // # of menu items
+    ITEMCOUNT(NewGameMenu), // # of menu items
     &MainDef,       // previous menu
     NewGameMenu,    // menuitem_t ->
     M_DrawNewGame,  // drawing routine ->
@@ -337,7 +339,7 @@ static menuitem_t HelpMenu[] =
 
 static menu_t HelpDef =
 {
-    help_end,
+    ITEMCOUNT(HelpMenu),
     &MainDef,
     HelpMenu,
     M_DrawHelp,
@@ -369,7 +371,7 @@ static menuitem_t SoundMenu[]=
 
 static menu_t SoundDef =
 {
-    sound_end,
+    ITEMCOUNT(SoundMenu),
     &ID_Def_Main,
     SoundMenu,
     M_DrawSound,
@@ -409,7 +411,7 @@ static menuitem_t LoadMenu[]=
 
 static menu_t LoadDef =
 {
-    load_end,
+    ITEMCOUNT(LoadMenu),
     &MainDef,
     LoadMenu,
     M_DrawLoad,
@@ -436,7 +438,7 @@ static menuitem_t SaveMenu[]=
 
 static menu_t SaveDef =
 {
-    load_end,
+    ITEMCOUNT(SaveMenu),
     &MainDef,
     SaveMenu,
     M_DrawSave,
@@ -571,6 +573,7 @@ static void M_Bind_MaxZoom (int choice);
 static void M_Bind_FollowMode (int choice);
 static void M_Bind_RotateMode (int choice);
 static void M_Bind_OverlayMode (int choice);
+static void M_Bind_PanMode (int choice);
 static void M_Bind_ToggleGrid (int choice);
 static void M_Bind_AddMark (int choice);
 static void M_Bind_ClearMarks (int choice);
@@ -614,6 +617,7 @@ static void M_Draw_ID_Widgets (void);
 static void M_ID_Widget_Placement (int choice);
 static void M_ID_Widget_Alignment (int choice);
 static void M_ID_Widget_KIS (int choice);
+static void M_ID_Widget_KIS_Items (int choice);
 static void M_ID_Widget_KIS_Format (int choice);
 static void M_ID_Widget_Time (int choice);
 static void M_ID_Widget_TotalTime (int choice);
@@ -631,6 +635,7 @@ static void M_ID_Automap_Secrets (int choice);
 static void M_ID_Automap_Rotate (int choice);
 static void M_ID_Automap_Overlay (int choice);
 static void M_ID_Automap_Shading (int choice);
+static void M_ID_Automap_Pan (int choice);
 
 static void M_Draw_ID_Gameplay_1 (void);
 static void M_ID_Brightmaps (int choice);
@@ -819,7 +824,7 @@ static void M_ShadeBackground (void)
         
         for (int i = 0; i < scr; i++)
         {
-            *dest = I_BlendDark(*dest, I_ShadeFactor[shade]);
+            *dest = I_BlendDark_32(*dest, I_ShadeFactor[shade]);
             ++dest;
         }
     }
@@ -926,7 +931,7 @@ static menuitem_t ID_Menu_Main[]=
 
 static menu_t ID_Def_Main =
 {
-    9,
+    ITEMCOUNT(ID_Menu_Main),
     &MainDef,
     ID_Menu_Main,
     M_Draw_ID_Main,
@@ -967,7 +972,7 @@ static menuitem_t ID_Menu_Video_1[]=
 
 static menu_t ID_Def_Video_1 =
 {
-    12,
+    ITEMCOUNT(ID_Menu_Video_1),
     &ID_Def_Main,
     ID_Menu_Video_1,
     M_Draw_ID_Video_1,
@@ -1259,7 +1264,7 @@ static menuitem_t ID_Menu_Video_2[]=
 
 static menu_t ID_Def_Video_2 =
 {
-    12,
+    ITEMCOUNT(ID_Menu_Video_2),
     &ID_Def_Main,
     ID_Menu_Video_2,
     M_Draw_ID_Video_2,
@@ -1428,7 +1433,7 @@ static menuitem_t ID_Menu_Display[]=
 
 static menu_t ID_Def_Display =
 {
-    12,
+    ITEMCOUNT(ID_Menu_Display),
     &ID_Def_Main,
     ID_Menu_Display,
     M_Draw_ID_Display,
@@ -1600,7 +1605,7 @@ static menuitem_t ID_Menu_Sound[]=
 
 static menu_t ID_Def_Sound =
 {
-    13,
+    ITEMCOUNT(ID_Menu_Sound),
     &ID_Def_Main,
     ID_Menu_Sound,
     M_Draw_ID_Sound,
@@ -1823,7 +1828,7 @@ static menuitem_t ID_Menu_Controls[]=
 
 static menu_t ID_Def_Controls =
 {
-    14,
+    ITEMCOUNT(ID_Menu_Controls),
     &ID_Def_Main,
     ID_Menu_Controls,
     M_Draw_ID_Controls,
@@ -1976,7 +1981,7 @@ static menuitem_t ID_Menu_Keybinds_1[]=
 
 static menu_t ID_Def_Keybinds_1 =
 {
-    12,
+    ITEMCOUNT(ID_Menu_Keybinds_1),
     &ID_Def_Controls,
     ID_Menu_Keybinds_1,
     M_Draw_ID_Keybinds_1,
@@ -2093,7 +2098,7 @@ static menuitem_t ID_Menu_Keybinds_2[]=
 
 static menu_t ID_Def_Keybinds_2 =
 {
-    13,
+    ITEMCOUNT(ID_Menu_Keybinds_2),
     &ID_Def_Controls,
     ID_Menu_Keybinds_2,
     M_Draw_ID_Keybinds_2,
@@ -2213,7 +2218,7 @@ static menuitem_t ID_Menu_Keybinds_3[]=
 
 static menu_t ID_Def_Keybinds_3 =
 {
-    10,
+    ITEMCOUNT(ID_Menu_Keybinds_3),
     &ID_Def_Controls,
     ID_Menu_Keybinds_3,
     M_Draw_ID_Keybinds_3,
@@ -2301,27 +2306,22 @@ static void M_Draw_ID_Keybinds_3 (void)
 
 static menuitem_t ID_Menu_Keybinds_4[]=
 {
-    { M_SWTC, "TOGGLE MAP",       M_Bind_ToggleMap,   't' },
-    { M_SWTC, "ZOOM IN",          M_Bind_ZoomIn,      'z' },
-    { M_SWTC, "ZOOM OUT",         M_Bind_ZoomOut,     'z' },
-    { M_SWTC, "MAXIMUM ZOOM OUT", M_Bind_MaxZoom,     'm' },
-    { M_SWTC, "FOLLOW MODE",      M_Bind_FollowMode,  'f' },
-    { M_SWTC, "ROTATE MODE",      M_Bind_RotateMode,  'r' },
-    { M_SWTC, "OVERLAY MODE",     M_Bind_OverlayMode, 'o' },
-    { M_SWTC, "TOGGLE GRID",      M_Bind_ToggleGrid,  't' },
-    { M_SWTC, "MARK LOCATION",    M_Bind_AddMark,     'm' },
-    { M_SWTC, "CLEAR ALL MARKS",  M_Bind_ClearMarks,  'c' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
+    { M_SWTC, "TOGGLE MAP",         M_Bind_ToggleMap,   't' },
+    { M_SWTC, "ZOOM IN",            M_Bind_ZoomIn,      'z' },
+    { M_SWTC, "ZOOM OUT",           M_Bind_ZoomOut,     'z' },
+    { M_SWTC, "MAXIMUM ZOOM OUT",   M_Bind_MaxZoom,     'm' },
+    { M_SWTC, "FOLLOW MODE",        M_Bind_FollowMode,  'f' },
+    { M_SWTC, "ROTATE MODE",        M_Bind_RotateMode,  'r' },
+    { M_SWTC, "OVERLAY MODE",       M_Bind_OverlayMode, 'o' },
+    { M_SWTC, "MOUSE PANNING MODE", M_Bind_PanMode,     'm' },
+    { M_SWTC, "TOGGLE GRID",        M_Bind_ToggleGrid,  't' },
+    { M_SWTC, "MARK LOCATION",      M_Bind_AddMark,     'm' },
+    { M_SWTC, "CLEAR ALL MARKS",    M_Bind_ClearMarks,  'c' },
 };
 
 static menu_t ID_Def_Keybinds_4 =
 {
-    10,
+    ITEMCOUNT(ID_Menu_Keybinds_4),
     &ID_Def_Controls,
     ID_Menu_Keybinds_4,
     M_Draw_ID_Keybinds_4,
@@ -2365,19 +2365,24 @@ static void M_Bind_OverlayMode (int choice)
     M_StartBind(406);  // key_map_overlay
 }
 
+static void M_Bind_PanMode (int choice)
+{
+    M_StartBind(407);  // key_map_mousepan
+}
+
 static void M_Bind_ToggleGrid (int choice)
 {
-    M_StartBind(407);  // key_map_grid
+    M_StartBind(408);  // key_map_grid
 }
 
 static void M_Bind_AddMark (int choice)
 {
-    M_StartBind(408);  // key_map_mark
+    M_StartBind(409);  // key_map_mark
 }
 
 static void M_Bind_ClearMarks (int choice)
 {
-    M_StartBind(409);  // key_map_clearmark
+    M_StartBind(410);  // key_map_clearmark
 }
 
 static void M_Draw_ID_Keybinds_4 (void)
@@ -2396,9 +2401,10 @@ static void M_Draw_ID_Keybinds_4 (void)
     M_DrawBindKey(4, 54, key_map_follow);
     M_DrawBindKey(5, 63, key_map_rotate);
     M_DrawBindKey(6, 72, key_map_overlay);
-    M_DrawBindKey(7, 81, key_map_grid);
-    M_DrawBindKey(8, 90, key_map_mark);
-    M_DrawBindKey(9, 99, key_map_clearmark);
+    M_DrawBindKey(7, 81, key_map_mousepan);
+    M_DrawBindKey(8, 90, key_map_grid);
+    M_DrawBindKey(9, 99, key_map_mark);
+    M_DrawBindKey(10, 108, key_map_clearmark);
 
     M_DrawBindFooter("4", true);
 }
@@ -2429,7 +2435,7 @@ static menuitem_t ID_Menu_Keybinds_5[]=
 
 static menu_t ID_Def_Keybinds_5 =
 {
-    12,
+    ITEMCOUNT(ID_Menu_Keybinds_5),
     &ID_Def_Controls,
     ID_Menu_Keybinds_5,
     M_Draw_ID_Keybinds_5,
@@ -2537,7 +2543,7 @@ static menuitem_t ID_Menu_Keybinds_6[]=
 
 static menu_t ID_Def_Keybinds_6 =
 {
-    5,
+    ITEMCOUNT(ID_Menu_Keybinds_6),
     &ID_Def_Controls,
     ID_Menu_Keybinds_6,
     M_Draw_ID_Keybinds_6,
@@ -2620,7 +2626,7 @@ static menuitem_t ID_Menu_MouseBinds[]=
 
 static menu_t ID_Def_MouseBinds =
 {
-    12,
+    ITEMCOUNT(ID_Menu_MouseBinds),
     &ID_Def_Controls,
     ID_Menu_MouseBinds,
     M_Draw_ID_MouseBinds,
@@ -2737,6 +2743,7 @@ static menuitem_t ID_Menu_Widgets[]=
     { M_MUL2, "ALIGNMENT",             M_ID_Widget_Alignment, 'a' },
     { M_MUL2, "KIS STATS",             M_ID_Widget_KIS,       'k' },
     { M_MUL2, "- STATS FORMAT",        M_ID_Widget_KIS_Format,'s' },
+    { M_MUL2, "- SHOW ITEMS",          M_ID_Widget_KIS_Items, 'i' },
     { M_MUL2, "LEVEL TIME",            M_ID_Widget_Time,      'l' },
     { M_MUL2, "TOTAL TIME",            M_ID_Widget_TotalTime, 't' },
     { M_MUL2, "LEVEL NAME",            M_ID_Widget_LevelName, 'l' },
@@ -2747,7 +2754,7 @@ static menuitem_t ID_Menu_Widgets[]=
 
 static menu_t ID_Def_Widgets =
 {
-    10,
+    ITEMCOUNT(ID_Menu_Widgets),
     &ID_Def_Main,
     ID_Menu_Widgets,
     M_Draw_ID_Widgets,
@@ -2798,53 +2805,60 @@ static void M_Draw_ID_Widgets (void)
                             widget_kis_format ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
                                 LINE_ALPHA(3));
 
+    // Show items
+    sprintf(str, widget_kis_items ? "ON" : "OFF");
+    M_WriteTextGlow(M_ItemRightAlign(str), 54, str,
+                        widget_kis_items ? cr[CR_GREEN] : cr[CR_DARKRED],
+                            widget_kis_items ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
+                                LINE_ALPHA(4));
+
     // Level time
     sprintf(str, widget_time == 1 ? "ALWAYS"  :
                  widget_time == 2 ? "AUTOMAP" : "OFF");
-    M_WriteTextGlow(M_ItemRightAlign(str), 54, str,
+    M_WriteTextGlow(M_ItemRightAlign(str), 63, str,
                         widget_time ? cr[CR_GREEN] : cr[CR_DARKRED],
                             widget_time ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
-                                LINE_ALPHA(4));
+                                LINE_ALPHA(5));
 
     // Total time
     sprintf(str, widget_totaltime == 1 ? "ALWAYS"  :
                  widget_totaltime == 2 ? "AUTOMAP" : "OFF");
-    M_WriteTextGlow(M_ItemRightAlign(str), 63, str,
+    M_WriteTextGlow(M_ItemRightAlign(str), 72, str,
                         widget_totaltime ? cr[CR_GREEN] : cr[CR_DARKRED],
                             widget_totaltime ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
-                                LINE_ALPHA(5));
+                                LINE_ALPHA(6));
 
     // Level name
     sprintf(str, widget_levelname ? "ALWAYS" : "AUTOMAP");
-    M_WriteTextGlow(M_ItemRightAlign(str), 72, str,
+    M_WriteTextGlow(M_ItemRightAlign(str), 81, str,
                         widget_levelname ? cr[CR_GREEN] : cr[CR_DARKRED],
                             widget_levelname ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
-                                LINE_ALPHA(6));
+                                LINE_ALPHA(7));
 
     // Player coords
     sprintf(str, widget_coords == 1 ? "ALWAYS"  :
                  widget_coords == 2 ? "AUTOMAP" : "OFF");
-    M_WriteTextGlow(M_ItemRightAlign(str), 81, str,
+    M_WriteTextGlow(M_ItemRightAlign(str), 90, str,
                         widget_coords ? cr[CR_GREEN] : cr[CR_DARKRED],
                             widget_coords ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
-                                LINE_ALPHA(7));
+                                LINE_ALPHA(8));
 
     // Rendering counters
     sprintf(str, widget_render ? "ON" : "OFF");
-    M_WriteTextGlow(M_ItemRightAlign(str), 90, str,
+    M_WriteTextGlow(M_ItemRightAlign(str), 99, str,
                         widget_render ? cr[CR_GREEN] : cr[CR_DARKRED],
                             widget_render ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
-                                LINE_ALPHA(8));
+                                LINE_ALPHA(9));
 
     // Target's health
     sprintf(str, widget_health == 1 ? "TOP" :
                  widget_health == 2 ? "TOP+NAME" :
                  widget_health == 3 ? "BOTTOM" :
                  widget_health == 4 ? "BOTTOM+NAME" : "OFF");
-    M_WriteTextGlow(M_ItemRightAlign(str), 99, str,
+    M_WriteTextGlow(M_ItemRightAlign(str), 108, str,
                         widget_health ? cr[CR_GREEN] : cr[CR_DARKRED],
                             widget_health ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
-                                LINE_ALPHA(9));
+                                LINE_ALPHA(10));
 }
 
 static void M_ID_Widget_Placement (int choice)
@@ -2866,6 +2880,11 @@ static void M_ID_Widget_KIS (int choice)
 static void M_ID_Widget_KIS_Format (int choice)
 {
     widget_kis_format = M_INT_Slider(widget_kis_format, 0, 2, choice, false);
+}
+
+static void M_ID_Widget_KIS_Items (int choice)
+{
+    widget_kis_items ^= 1;
 }
 
 static void M_ID_Widget_Time (int choice)
@@ -2911,11 +2930,12 @@ static menuitem_t ID_Menu_Automap[]=
     { M_MUL2, "ROTATE MODE",           M_ID_Automap_Rotate,   'r' },
     { M_MUL2, "OVERLAY MODE",          M_ID_Automap_Overlay,  'o' },
     { M_MUL1, "OVERLAY SHADING LEVEL", M_ID_Automap_Shading,  'o' },
+    { M_MUL2, "MOUSE PANNING MODE",    M_ID_Automap_Pan,      'm' },
 };
 
 static menu_t ID_Def_Automap =
 {
-    7,
+    ITEMCOUNT(ID_Menu_Automap),
     &ID_Def_Main,
     ID_Menu_Automap,
     M_Draw_ID_Automap,
@@ -2991,6 +3011,13 @@ static void M_Draw_ID_Automap (void)
                              automap_shading ==  0 ? cr[CR_RED_BRIGHT] :
                              automap_shading == 12 ? cr[CR_YELLOW_BRIGHT] : cr[CR_GREEN_BRIGHT],
                                 LINE_ALPHA(6));
+
+    // Mouse panning mode
+    sprintf(str, automap_mouse_pan ? "ON" : "OFF");
+    M_WriteTextGlow(M_ItemRightAlign(str), 81, str,
+                        automap_mouse_pan ? cr[CR_GREEN] : cr[CR_DARKRED],
+                            automap_mouse_pan ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
+                                LINE_ALPHA(7));
 }
 
 static void M_ID_Automap_Smooth (int choice)
@@ -3009,6 +3036,11 @@ static void M_ID_Automap_Square (int choice)
     automap_square ^= 1;
 }
 
+static void M_ID_Automap_Secrets (int choice)
+{
+    automap_secrets = M_INT_Slider(automap_secrets, 0, 2, choice, false);
+}
+
 static void M_ID_Automap_Rotate (int choice)
 {
     automap_rotate ^= 1;
@@ -3024,9 +3056,9 @@ static void M_ID_Automap_Shading (int choice)
     automap_shading = M_INT_Slider(automap_shading, 0, 12, choice, true);
 }
 
-static void M_ID_Automap_Secrets (int choice)
+static void M_ID_Automap_Pan (int choice)
 {
-    automap_secrets = M_INT_Slider(automap_secrets, 0, 2, choice, false);
+    automap_mouse_pan ^= 1;
 }
 
 // -----------------------------------------------------------------------------
@@ -3054,7 +3086,7 @@ static menuitem_t ID_Menu_Gameplay_1[]=
 
 static menu_t ID_Def_Gameplay_1 =
 {
-    15,
+    ITEMCOUNT(ID_Menu_Gameplay_1),
     &ID_Def_Main,
     ID_Menu_Gameplay_1,
     M_Draw_ID_Gameplay_1,
@@ -3267,7 +3299,7 @@ static menuitem_t ID_Menu_Gameplay_2[]=
 
 static menu_t ID_Def_Gameplay_2 =
 {
-    15,
+    ITEMCOUNT(ID_Menu_Gameplay_2),
     &ID_Def_Main,
     ID_Menu_Gameplay_2,
     M_Draw_ID_Gameplay_2,
@@ -3428,7 +3460,7 @@ static menuitem_t ID_Menu_Gameplay_3[]=
 
 static menu_t ID_Def_Gameplay_3 =
 {
-    15,
+    ITEMCOUNT(ID_Menu_Gameplay_3),
     &ID_Def_Main,
     ID_Menu_Gameplay_3,
     M_Draw_ID_Gameplay_3,
@@ -3700,6 +3732,7 @@ static void M_ID_ApplyResetHook (void)
     widget_alignment = 0;
     widget_kis = 0;
     widget_kis_format = 0;
+    widget_kis_items = 1;
     widget_time = 0;
     widget_totaltime = 0;
     widget_levelname = 0;
@@ -3714,6 +3747,7 @@ static void M_ID_ApplyResetHook (void)
     automap_rotate = 0;
     automap_overlay = 0;
     automap_shading = 0;
+    automap_mouse_pan = 0;
 
     //
     // Gameplay features
@@ -6157,6 +6191,7 @@ static void M_CheckBind (int key)
         if (key_map_follow == key)     key_map_follow     = 0;
         if (key_map_rotate == key)     key_map_rotate     = 0;
         if (key_map_overlay == key)    key_map_overlay    = 0;
+        if (key_map_mousepan == key)   key_map_mousepan   = 0;
         if (key_map_grid == key)       key_map_grid       = 0;
         if (key_map_mark == key)       key_map_mark       = 0;
         if (key_map_clearmark == key)  key_map_clearmark  = 0;
@@ -6233,9 +6268,10 @@ static void M_DoBind (int keynum, int key)
         case 404:  key_map_follow = key;        break;
         case 405:  key_map_rotate = key;        break;
         case 406:  key_map_overlay = key;       break;
-        case 407:  key_map_grid = key;          break;
-        case 408:  key_map_mark = key;          break;
-        case 409:  key_map_clearmark = key;     break;
+        case 407:  key_map_mousepan = key;      break;
+        case 408:  key_map_grid = key;          break;
+        case 409:  key_map_mark = key;          break;
+        case 410:  key_map_clearmark = key;     break;
         // Page 5  
         case 500:  key_menu_help = key;         break;
         case 501:  key_menu_save = key;         break;
@@ -6327,9 +6363,10 @@ static void M_ClearBind (int itemOn)
             case 4:   key_map_follow = 0;       break;
             case 5:   key_map_rotate = 0;       break;
             case 6:   key_map_overlay = 0;      break;
-            case 7:   key_map_grid = 0;         break;
-            case 8:   key_map_mark = 0;         break;
-            case 9:   key_map_clearmark = 0;    break;
+            case 7:   key_map_mousepan = 0;     break;
+            case 8:   key_map_grid = 0;         break;
+            case 9:   key_map_mark = 0;         break;
+            case 10:  key_map_clearmark = 0;    break;
         }
     }
     if (currentMenu == &ID_Def_Keybinds_5)
@@ -6411,6 +6448,7 @@ static void M_ResetBinds (void)
     key_map_follow = 'f';
     key_map_rotate = 'r';
     key_map_overlay = 'o';
+    key_map_mousepan = 0;
     key_map_grid = 'g';
     key_map_mark = 'm';
     key_map_clearmark = 'c';

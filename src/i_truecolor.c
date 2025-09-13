@@ -2,6 +2,8 @@
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
 // Copyright(C) 2015-2024 Fabian Greffrath
+// Copyright(C) 2025 Polina "Aura" N.
+// Copyright(C) 2025 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -19,95 +21,34 @@
 
 #include <stdlib.h> // malloc
 #include "config.h"
-
-
 #include "i_truecolor.h"
 #include "m_fixed.h"
-
 #include "id_vars.h"
 
 
+// =============================================================================
+//
+//                       Blending initialization functions
+//
+// =============================================================================
 
+// -----------------------------------------------------------------------------
+// TrueColor blending. 
+//
 // [PN] Initializes a 511-entry 1D saturation LUT for additive blending.
 // The LUT maps all possible sums of two 8-bit color channels (0..255 + 0..255),
 // clamping any result above 255 to 255.
-uint8_t additive_lut[511];
+// -----------------------------------------------------------------------------
+
+uint8_t additive_lut_32[511];
 
 void I_InitTCTransMaps (void)
 {
     for (int i = 0; i < 511; ++i)
     {
-        additive_lut[i] = (uint8_t)(i > 255 ? 255 : i);
+        additive_lut_32[i] = (uint8_t)(i > 255 ? 255 : i);
     }
 }
-
-// [PN] All original human-readable blending functions from Crispy Doom
-/*
-const uint32_t I_BlendAdd (const uint32_t bg_i, const uint32_t fg_i)
-{
-    tcpixel_t bg, fg, ret;
-
-    bg.i = bg_i;
-    fg.i = fg_i;
-
-    ret.a = 0xFFU;
-    ret.r = additive_lut[bg.r][fg.r];
-    ret.g = additive_lut[bg.g][fg.g];
-    ret.b = additive_lut[bg.b][fg.b];
-
-    return ret.i;
-}
-
-const uint32_t I_BlendDark (const uint32_t bg_i, const int d)
-{
-    tcpixel_t bg, ret;
-
-    bg.i = bg_i;
-
-    ret.a = 0xFFU;
-    ret.r = (bg.r * d) >> 8;
-    ret.g = (bg.g * d) >> 8;
-    ret.b = (bg.b * d) >> 8;
-
-    return ret.i;
-}
-
-const uint32_t I_BlendDarkGrayscale (const uint32_t bg_i, const int d)
-{
-    tcpixel_t bg, ret;
-    uint8_t r, g, b, gray;
-
-    bg.i = bg_i;
-
-    r = bg.r;
-    g = bg.g;
-    b = bg.b;
-    // [PN] Do not use Rec. 601 formula here: 
-    // gray = (((r * 299 + g * 587 + b * 114) / 1000) * d) >> 8;
-    // Weights are equalized to balance all color contributions equally.
-    gray = (((r + g + b) / 3) * d) >> 8;
-
-    ret.a = 0xFFU;
-    ret.r = ret.g = ret.b = gray;
-
-    return ret.i;
-}
-
-const uint32_t I_BlendOver (const uint32_t bg_i, const uint32_t fg_i, const int amount)
-{
-    tcpixel_t bg, fg, ret;
-
-    bg.i = bg_i;
-    fg.i = fg_i;
-
-    ret.a = 0xFFU;
-    ret.r = (amount * fg.r + (0XFFU - amount) * bg.r) >> 8;
-    ret.g = (amount * fg.g + (0XFFU - amount) * bg.g) >> 8;
-    ret.b = (amount * fg.b + (0XFFU - amount) * bg.b) >> 8;
-
-    return ret.i;
-}
-*/
 
 // [JN] Shade factor used for menu and automap background shading.
 const int I_ShadeFactor[] =
@@ -141,6 +82,12 @@ const float I_SaturationPercent[100] =
     0.033000f, 0.026400f, 0.019800f, 0.013200f, 0
 };
 
+// =============================================================================
+//
+//                                 Colorblind
+//
+// =============================================================================
+
 // [JN] Color matrices to emulate colorblind modes.
 // Original source: http://web.archive.org/web/20081014161121/http://www.colorjack.com/labs/colormatrix/
 // Converted from 100.000 ... 0 range to 1.00000 ... 0 to support Doom palette format.
@@ -155,4 +102,3 @@ const double colorblind_matrix[][3][3] = {
     { {0.29900, 0.58700, 0.11400}, {0.29900, 0.58700, 0.11400}, {0.29900, 0.58700, 0.11400} }, // Achromatopsia
     { {0.61800, 0.32000, 0.06200}, {0.16300, 0.77500, 0.06200}, {0.16300, 0.32000, 0.51600} }, // Achromatomaly
 };
-

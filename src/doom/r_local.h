@@ -513,7 +513,6 @@ extern angle_t  xtoviewangle[MAXWIDTH+1];
 extern angle_t  linearskyangle[MAXWIDTH+1];
 extern fixed_t  rw_distance;
 extern angle_t  rw_normalangle;
-extern angle_t  rw_angle1;
 extern angle_t  clipangle;
 
 extern visplane_t *floorplane;
@@ -564,7 +563,6 @@ extern unsigned   maxdrawsegs;
 
 extern byte *R_GetColumn (int tex, int col);
 extern byte *R_GetColumnMod (int tex, int col);
-extern byte *R_GetColumnMod2 (int tex, int col);
 extern int   R_CheckTextureNumForName (const char *name);
 extern int   R_FlatNumForName (const char *name);
 extern int   R_TextureNumForName (const char *name);

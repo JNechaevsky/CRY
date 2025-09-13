@@ -154,6 +154,8 @@ static int  f_y;
 static int  f_w;
 static int  f_h;
 
+#define fb I_VideoBuffer // [crispy] simplify
+
 static mpoint_t m_paninc;     // how far the window pans each tic (map coords)
 static fixed_t  mtof_zoommul; // how far the window zooms in each tic (map coords)
 static fixed_t  ftom_zoommul; // how far the window zooms in each tic (fb coords)
@@ -197,7 +199,10 @@ mpoint_t *markpoints = NULL;     // where the points are
 int       markpointnum = 0;      // next point to be assigned (also number of points now)
 int       markpointnum_max = 0;  // killough 2/22/98
 
-static int followplayer = 1; // specifies whether to follow the player around
+int followplayer = 1; // specifies whether to follow the player around
+// [PN] Accumulated automap pan delta from mouse movement
+static int mouse_pan_x = 0;
+static int mouse_pan_y = 0;
 
 static boolean stopped = true;
 
@@ -388,70 +393,102 @@ static void AM_findMinMaxBoundaries (void)
 
 // -----------------------------------------------------------------------------
 // AM_changeWindowLoc
-// Moves the map window by the global variables m_paninc.x, m_paninc.y
+//  [PN] Moves the map window by the global variables m_paninc.x, m_paninc.y
 // -----------------------------------------------------------------------------
 
 static void AM_changeWindowLoc (void)
 {
-    int64_t incx, incy;
+    static fixed_t prev_frac = 0;
 
     if (m_paninc.x || m_paninc.y)
-    {
         followplayer = 0;
-    }
 
-    if (vid_uncapped_fps && realleveltime > oldleveltime)
-    {
-        // [PN] Accumulator for FPS‑independent panning
-        static fixed_t prev_frac = 0;
+    // Compute frame delta
+    const fixed_t delta = (vid_uncapped_fps && realleveltime > oldleveltime)
+                        ? (fractionaltic - prev_frac + FRACUNIT) & (FRACUNIT - 1)
+                        : FRACUNIT;
 
-        // [PN] Accumulate delta between frames using `fractionaltic`,
-        // so pan speed stays consistent regardless of frame rate.
-        // Delta may wrap around after a tic; we correct for that.
-        fixed_t delta = fractionaltic - prev_frac;
+    prev_frac = fractionaltic;
 
-        if (delta < 0)
-            delta += FRACUNIT;
+    // Compute movement delta scaled by frame fraction
+    const int64_t incx = FixedMul(m_paninc.x, delta);
+    const int64_t incy = FixedMul(m_paninc.y, delta);
 
-        incx = FixedMul(m_paninc.x, delta);
-        incy = FixedMul(m_paninc.y, delta);
+    int64_t dx = incx;
+    int64_t dy = incy;
 
-        prev_frac = fractionaltic;
-    }
-    else
-    {
-        incx = m_paninc.x;
-        incy = m_paninc.y;
-    }
-
+    // Rotate movement vector if automap is rotated
     if (automap_rotate)
-    {
-        AM_rotate(&incx, &incy, 0 - mapangle);
-    }
+        AM_rotate(&dx, &dy, 0-mapangle);
 
-    // [PN] Apply frame-scaled pan delta to already-zoomed coordinates.
-    // Keeps direction stable when zooming and panning simultaneously.
-    m_x += incx;
-    m_y += incy;
+    // Apply panning movement
+    m_x += dx;
+    m_y += dy;
 
-    if (m_x + m_w/2 > max_x)
-    {
-        m_x = max_x - m_w/2;
-    }
-    else if (m_x + m_w/2 < min_x)
-    {
-        m_x = min_x - m_w/2;
-    }
+    const int32_t half_w = m_w >> 1;
+    const int32_t half_h = m_h >> 1;
 
-    if (m_y + m_h/2 > max_y)
-    {
-        m_y = max_y - m_h/2;
-    }
-    else if (m_y + m_h/2 < min_y)
-    {
-        m_y = min_y - m_h/2;
-    }
+    const int32_t center_x = m_x + half_w;
+    const int32_t center_y = m_y + half_h;
 
+    // Clamp to map bounds
+    if (center_x > max_x) m_x = max_x - half_w;
+    else if (center_x < min_x) m_x = min_x - half_w;
+
+    if (center_y > max_y) m_y = max_y - half_h;
+    else if (center_y < min_y) m_y = min_y - half_h;
+
+    // Update extents
+    m_x2 = m_x + m_w;
+    m_y2 = m_y + m_h;
+}
+
+// -----------------------------------------------------------------------------
+// AM_MousePanning
+//  [PN] Moves the map window by using the mouse.
+// -----------------------------------------------------------------------------
+
+static void AM_MousePanning (void)
+{
+    static fixed_t prev_frac = 0;
+
+    // Compute frame delta
+    fixed_t delta = (vid_uncapped_fps && realleveltime > oldleveltime)
+                  ? (fractionaltic - prev_frac + FRACUNIT) & (FRACUNIT - 1)
+                  : FRACUNIT;
+
+    prev_frac = fractionaltic;
+
+    // Interpolated movement step
+    int64_t step_x = FixedMul(mouse_pan_x, delta);
+    int64_t step_y = FixedMul(mouse_pan_y, delta);
+
+    // Save original unrotated values
+    const int64_t original_x = step_x;
+    const int64_t original_y = step_y;
+
+    if (!(step_x | step_y))
+        return;
+
+    const int32_t center_x = m_x + (m_w >> 1) + FTOM(step_x);
+    const int32_t center_y = m_y + (m_h >> 1) + FTOM(step_y);
+
+    // Clamp to map bounds
+    if (center_x > max_x) step_x -= MTOF(center_x - max_x);
+    else if (center_x < min_x) step_x += MTOF(min_x - center_x);
+
+    if (center_y > max_y) step_y -= MTOF(center_y - max_y);
+    else if (center_y < min_y) step_y += MTOF(min_y - center_y);
+
+    // Apply pan
+    m_x += FTOM(step_x);
+    m_y += FTOM(step_y);
+
+    // Remove applied portion from accumulator
+    mouse_pan_x -= original_x;
+    mouse_pan_y -= original_y;
+
+    // Update extents
     m_x2 = m_x + m_w;
     m_y2 = m_y + m_h;
 }
@@ -608,7 +645,7 @@ static void AM_maxOutWindowScale (void)
 // Handle events (user inputs) in automap mode.
 // -----------------------------------------------------------------------------
 
-boolean AM_Responder (event_t *ev)
+boolean AM_Responder (const event_t *ev)
 {
     int         rc;
     static int  bigstate=0;
@@ -692,6 +729,34 @@ boolean AM_Responder (event_t *ev)
             ftom_zoommul = m_zoomout_mouse;
             curr_mtof_zoommul = mtof_zoommul;
             mousewheelzoom = true;
+            rc = true;
+        }
+        else // [PN] Move the map window by using the mouse
+        if (!followplayer && automap_mouse_pan && (ev->data2 || ev->data3))
+        {
+            int dx = ev->data2;
+            int dy = ev->data3;
+
+            // Invert horizontal movement if the level is flipped
+            if (gp_flip_levels)
+                dx = -dx;
+
+            // Rotate pan direction if automap is in rotate mode
+            if (automap_rotate)
+            {
+                int64_t incx = dx;
+                int64_t incy = dy;
+                AM_rotate(&incx, &incy, 0 - mapangle);
+                dx = (int)incx;
+                dy = (int)incy;
+            }
+
+            // Accumulate mouse movement into pan buffer,
+            // scaled by resolution and sensitivity.
+            // The >> 5 keeps movement smooth across wide FPS ranges and DPI setups.
+            mouse_pan_x += (dx * vid_resolution * mouseSensitivity) >> 5;
+            mouse_pan_y += (dy * vid_resolution * mouse_sensitivity_y) >> 5;
+
             rc = true;
         }
     }
@@ -830,6 +895,14 @@ boolean AM_Responder (event_t *ev)
                 // [JN] Redraw status bar background.
                 st_fullupdate = true;
             }
+        }
+        else if (key == key_map_mousepan)
+        {
+            // [PN] Mouse panning mode.
+            automap_mouse_pan = !automap_mouse_pan;
+            CT_SetMessage(plr, automap_mouse_pan ?
+                          ID_AUTOMAPMOUSEPAN_ON : ID_AUTOMAPMOUSEPAN_OFF, false, NULL);
+
         }
         else
         {
@@ -1004,18 +1077,11 @@ void AM_Ticker (void)
     // Active:
     iddt_reds_active = (172) + ((gametic >> 1) % IDDT_REDS_RANGE);
 
-    // [JN] Pulse player arrow in Spectator mode:
-
-    // Brightening
-    if (!arrow_color_direction && ++arrow_color == ARROW_WHITE_MAX)
+    // [JN/PN] Pulse player arrow in Spectator mode:
+    arrow_color += arrow_color_direction ? -1 : 1;
+    if (arrow_color == ARROW_WHITE_MAX || arrow_color == ARROW_WHITE_MIN)
     {
-        arrow_color_direction = true;
-    }
-    // Darkening
-    else
-    if (arrow_color_direction && --arrow_color == ARROW_WHITE_MIN)
-    {
-        arrow_color_direction = false;
+        arrow_color_direction = !arrow_color_direction;
     }
 }
 
@@ -1044,7 +1110,7 @@ static void AM_shadeBackground (void)
 
     for (int i = 0; i < scr; i++)
     {
-        *dest = I_BlendDark(*dest, I_ShadeFactor[shade]);
+        *dest = I_BlendDark_32(*dest, I_ShadeFactor[shade]);
         ++dest;
     }
 }
@@ -1141,14 +1207,16 @@ static boolean AM_clipMline (mline_t *ml, fline_t *fl)
 #undef DOOUTCODE
 
 
-#define PUTDOT_RAW(xx,yy,cc) I_VideoBuffer[(yy) * f_w + flipscreenwidth[(xx)]] = (cc)
+#define PUTDOT_RAW(xx,yy,cc) fb[(yy) * f_w + flipscreenwidth[(xx)]] = (cc)
 #define PUTDOT(xx,yy,cc) PUTDOT_RAW(xx,yy,palette_pointer[(cc)])
 
 // -----------------------------------------------------------------------------
 // PUTDOT_THICK
-// [PN] Draws a "thick" pixel by filling an area around the target pixel.
-// Takes the current resolution into account to determine the thickness.
-// Includes boundary checks to prevent out-of-bounds access.
+// [PN] Draws a resolution-aware thick pixel (filled disc) at (x, y).
+// - Thickness: user-defined (1x..6x) or auto (scales with resolution).
+// - Bounds safety: clamps the drawing bbox to [0..f_w-1] ? [0..f_h-1].
+// - Hot-path optimizations: cached fb pointer and width, dx^2 hoisted out of
+//   inner loop, per-column flip index, pointer walking per row.
 // [JN] With support for "user-defined" (1x...6x) and "auto" thickness.
 // -----------------------------------------------------------------------------
 
@@ -1158,48 +1226,68 @@ static inline void PUTDOT_THICK (int x, int y, pixel_t color)
     // repeated access during the loop iterations.
     const int smooth = automap_smooth;
 
-    // If the line thickness feature is disabled, draw the dot directly
-    // without performing any additional boundary checks.
+    // Thin point fast path
     if (!automap_thick)
     {
-        // Choose between smooth and regular drawing.
         if (smooth) PUTDOT_RAW(x, y, color);
         else        PUTDOT(x, y, color);
         return;
     }
 
-    // Determine the line thickness. Auto mode uses half of the resolution.
-    const int thickness = (automap_thick == 6) 
-        ? vid_resolution / 2   // Auto thickness
-        : automap_thick;       // User-defined thickness
+    // Thickness: 6 == auto (depends on resolution)
+    const int thickness = (automap_thick == 6) ? (vid_resolution >> 1) : automap_thick;
 
-    // Precalculate drawing boundaries to reduce per-pixel checks.
-    int minx = x - thickness; if (minx < 0)    minx = 0;
-    int maxx = x + thickness; if (maxx >= f_w) maxx = f_w - 1;
-    int miny = y - thickness; if (miny < 0)    miny = 0;
-    int maxy = y + thickness; if (maxy >= f_h) maxy = f_h - 1;
+    // Clamp bbox once
+    const int fwm1 = f_w - 1, fhm1 = f_h - 1;
+    int minx = x - thickness; if (minx < 0)   minx = 0;
+    int maxx = x + thickness; if (maxx > fwm1) maxx = fwm1;
+    int miny = y - thickness; if (miny < 0)   miny = 0;
+    int maxy = y + thickness; if (maxy > fhm1) maxy = fhm1;
 
-    // Calculate the squared thickness for distance checks.
     const int thick_sq = thickness * thickness;
 
-    // Use a macro to handle smooth or regular drawing.
-    #define PUT_PIXEL(nx, ny, c) do {         \
-        if (smooth) PUTDOT_RAW(nx, ny, c);    \
-        else        PUTDOT(nx, ny, c);        \
-    } while (0)
+    // Cache fb pointer and width
+    pixel_t *restrict fbuf = fb;
+    const int fw = f_w;
 
-    // Iterate over the bounding box and draw pixels within the circle.
-    for (int nx = minx; nx <= maxx; nx++)
+    if (smooth)
     {
-        const int dx = nx - x;
-        for (int ny = miny; ny <= maxy; ny++)
+        // Truecolor/"raw color" path
+        for (int nx = minx; nx <= maxx; ++nx)
         {
-            const int dy = ny - y;
-            const int dist2 = dx * dx + dy * dy;
+            const int dx  = nx - x;
+            const int dx2 = dx * dx;
 
-            // Draw only if the pixel lies within the desired radius.
-            if (dist2 <= thick_sq)
-                PUT_PIXEL(nx, ny, color);
+            const int flipx = flipscreenwidth[nx];
+            pixel_t *pix = fbuf + miny * fw + flipx;
+
+            for (int ny = miny; ny <= maxy; ++ny, pix += fw)
+            {
+                const int dy = ny - y;
+                if (dx2 + dy * dy > thick_sq) continue;
+                *pix = color;
+            }
+        }
+    }
+    else
+    {
+        // Paletted path: map index > pixel once
+        const pixel_t fg = palette_pointer[(int)color];
+
+        for (int nx = minx; nx <= maxx; ++nx)
+        {
+            const int dx  = nx - x;
+            const int dx2 = dx * dx;
+
+            const int flipx = flipscreenwidth[nx];
+            pixel_t *pix = fbuf + miny * fw + flipx;
+
+            for (int ny = miny; ny <= maxy; ++ny, pix += fw)
+            {
+                const int dy = ny - y;
+                if (dx2 + dy * dy > thick_sq) continue;
+                *pix = fg;
+            }
         }
     }
     // Clean up the macro definition.
@@ -1217,10 +1305,10 @@ static void AM_drawFline_Vanilla (fline_t *fl, int color)
 {
     int d;
     int x = fl->a.x, y = fl->a.y;
-    int dx = fl->b.x - fl->a.x, dy = fl->b.y - fl->a.y;
-    int sx = dx < 0 ? -1 : 1, sy = dy < 0 ? -1 : 1;
+    const int dx = fl->b.x - fl->a.x, dy = fl->b.y - fl->a.y;
+    const int sx = dx < 0 ? -1 : 1, sy = dy < 0 ? -1 : 1;
     // [PN] Calculate abs(dx) and abs(dy) in one step
-    int ax = sx * dx * 2, ay = sy * dy * 2;
+    const int ax = sx * dx * 2, ay = sy * dy * 2;
 
 
     // [PN] Debug check to exit if out of bounds
@@ -1825,6 +1913,56 @@ static void AM_drawThings (void)
 }
 
 // -----------------------------------------------------------------------------
+// AM_drawSpectator
+// [JN] Draws player as wtite triangle while in spectator mode.
+// [PN] Optimized by consolidating conditions and minimizing redundant checks.
+// -----------------------------------------------------------------------------
+
+static void AM_drawSpectator (void)
+{
+    int       i;
+    mpoint_t  pt;
+    mobj_t   *t;
+    angle_t   actualangle;
+
+    for (i = 0 ; i < numsectors ; i++)
+    {
+        for (t = sectors[i].thinglist; t; t = t->snext)
+        {
+            // [JN] Interpolate things if possible.
+            if (vid_uncapped_fps && realleveltime > oldleveltime)
+            {
+                pt.x = LerpFixed(t->oldx, t->x) >> FRACTOMAPBITS;
+                pt.y = LerpFixed(t->oldy, t->y) >> FRACTOMAPBITS;
+                actualangle = LerpAngle(t->oldangle, t->angle);
+            }
+            else
+            {
+                pt.x = t->x >> FRACTOMAPBITS;
+                pt.y = t->y >> FRACTOMAPBITS;
+                actualangle = t->angle;
+            }
+
+            // [JN] Keep things static in Spectator + rotate mode.
+            if (crl_spectating && automap_rotate)
+            {
+                actualangle = t->angle - mapangle - viewangle + ANG90;
+            }
+
+            AM_transformPoint(&pt);
+
+            // [crispy] do not draw an extra triangle for the player
+            if (t == plr->mo)
+            {
+                AM_drawLineCharacter(thintriangle_guy, arrlen(thintriangle_guy),
+                                     t->radius >> FRACTOMAPBITS, actualangle,
+                                     arrow_color, pt.x, pt.y);
+            }
+        }
+    }
+}
+
+// -----------------------------------------------------------------------------
 // AM_drawMarks
 // Draw the marked locations on the automap.
 // [PN] Simplified boundary checks, eliminated redundant variables, and
@@ -1947,10 +2085,16 @@ void AM_Drawer (void)
     }
 
     // Change X and Y location.
-    // [JN] Moved from AM_Ticker for paning interpolation.
+    // [JN] Moved from AM_Ticker for panning interpolation.
     if (m_paninc.x || m_paninc.y)
     {
         AM_changeWindowLoc();
+    }
+
+    // [PN] Moves the map window by using the mouse.
+    if (mouse_pan_x != 0 || mouse_pan_y != 0)
+    {
+        AM_MousePanning();
     }
 
     // [crispy/Woof!] required for AM_transformPoint()
@@ -1988,6 +2132,12 @@ void AM_Drawer (void)
     if (iddt_cheating == 2)
     {
         AM_drawThings();
+    }
+
+    // [JN] CRL - draw pulsing triangle for player in Spectator mode.
+    if (crl_spectating)
+    {
+        AM_drawSpectator();
     }
 
     // [JN] Do not draw in following mode.

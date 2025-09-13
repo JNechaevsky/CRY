@@ -19,7 +19,7 @@
 #include "d_event.h"
 
 
-extern boolean F_Responder (event_t *ev);
+extern boolean F_Responder (const event_t *ev);
 extern void F_Ticker (void);
 extern void F_Drawer (void);
 extern void F_StartFinale (void);

@@ -70,6 +70,7 @@ extern int widget_coords;
 extern int widget_render;
 extern int widget_kis;
 extern int widget_kis_format;
+extern int widget_kis_items;
 extern int widget_time;
 extern int widget_totaltime;
 extern int widget_levelname;
@@ -88,6 +89,7 @@ extern int automap_secrets;
 extern int automap_rotate;
 extern int automap_overlay;
 extern int automap_shading;
+extern int automap_mouse_pan;
 
 // Gameplay features
 extern int vis_brightmaps;
