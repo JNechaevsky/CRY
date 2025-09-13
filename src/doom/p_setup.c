@@ -327,7 +327,6 @@ static angle_t anglediff(angle_t a, angle_t b)
 void P_SegLengths (boolean contrast_only)
 {
     const int count = numsegs;
-    const int rightangle = abs(finesine[(ANG60/2) >> ANGLETOFINESHIFT]);
 
     seg_t *const segArray = segs;
 

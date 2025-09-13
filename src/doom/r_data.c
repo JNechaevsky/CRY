@@ -1077,8 +1077,6 @@ void R_InitColormaps (void)
 
 static void R_InitHSVColors (void)
 {
-    const long long int starttime = I_GetTimeUS();
-    
     byte *restrict playpal = W_CacheLumpName("PLAYPAL", PU_STATIC);
     const boolean kg = (W_CheckMultipleLumps("sttnum0") < 2);
 
@@ -1108,8 +1106,6 @@ static void R_InitHSVColors (void)
         lump = W_CheckNumForName("CRBLUE");
     if (lump >= 0)
         cr[CR_RED2BLUE] = W_CacheLumpNum(lump, PU_STATIC);
-    
-    printf("\n:: done in %lld us.\n", I_GetTimeUS() - starttime);
 }
 
 // -----------------------------------------------------------------------------
