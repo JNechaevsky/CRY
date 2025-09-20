@@ -311,13 +311,8 @@ static void P_LoadSegs (int lump)
 
 static angle_t anglediff(angle_t a, angle_t b)
 {
-	if (b > a)
-		return anglediff(b, a);
-
-	if (a - b < ANG180)
-		return a - b;
-	else // [crispy] wrap around
-		return b - a;
+    const angle_t d = a - b; // unsigned wrap-around: modular subtraction
+    return (d > ANG180) ? (angle_t)(0-d) : d; // if > 180°, take the shorter arc
 }
 
 // -----------------------------------------------------------------------------
@@ -345,7 +340,7 @@ void P_SegLengths (boolean contrast_only)
             viewx = s->v1->r_x;
             viewy = s->v1->r_y;
             const angle_t newAngle = R_PointToAngleCrispy(s->v2->r_x, s->v2->r_y);
-            s->r_angle = (anglediff(newAngle, s->angle) > ANG60/2) ? s->angle : newAngle;
+            s->r_angle = (anglediff(newAngle, s->angle) > ANG30) ? s->angle : newAngle;
         }
     }
 }
