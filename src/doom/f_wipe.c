@@ -101,7 +101,6 @@ static void wipe_initMelt (void)
 
     // setup initial column positions
     // (y<0 => not ready to scroll yet)
-    y = (int *) malloc(SCREENWIDTH*sizeof(int));
     y[0] = -(ID_RealRandom()%16);
 
     for (int i = 1 ; i < SCREENWIDTH ; i++)
