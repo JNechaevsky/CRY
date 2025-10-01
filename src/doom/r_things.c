@@ -261,7 +261,7 @@ static void R_InitSpriteDefs (const char **namelist)
                     break;
 
                 case 1:
-                    // Expect full 8 rotations — ensure they're all present
+                    // Expect full 8 rotations - ensure they're all present
                     for (rotation = 0; rotation < 8; rotation++)
                     {
                         if (sprtemp[frame].lump[rotation] == -1)

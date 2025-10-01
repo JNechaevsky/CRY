@@ -26,7 +26,7 @@
 #include "p_local.h"
 
 
-const char *sprnames[NUMSPRITES] = {
+const char *sprnames[] = {
 "TROO","SHTG","PUNG","PISG","PISF","SHTF","CHGG","CHGF","MISG","MISF",
 "SAWG","PLSG","PLSF","BFGG","BFGF","BLUD","PUFF","BAL1","BAL2","BAL7",
 "PLSS","PLSE","MISL","BFS1","BFE1","BFE2","TFOG","IFOG","PLAY","POSS",
@@ -36,7 +36,7 @@ const char *sprnames[NUMSPRITES] = {
 "BROK","CELL","CELP","SHEL","SBOX","BPAK","BFUG","MGUN","CSAW","LAUN",
 "PLAS","SHOT","COLU","SMT2","POL2","POL5","POL4","POL1","GOR4","GOR5",
 "SMIT","COL2","COL4","CAND","CBRA","TRE1","ELEC","FSKU","SMBT","SMGT",
-"SMRT"
+"SMRT",NULL
 };
 
 
