@@ -782,12 +782,6 @@ void P_HitSlideLine (line_t* ld)
 {
     int			side;
 
-    angle_t		lineangle;
-    angle_t		moveangle;
-    angle_t		deltaangle;
-    
-    fixed_t		movelen;
-    fixed_t		newlen;
 	
 	
     if (ld->slopetype == ST_HORIZONTAL)
@@ -804,26 +798,44 @@ void P_HitSlideLine (line_t* ld)
 	
     side = P_PointOnLineSide (slidemo->x, slidemo->y, ld);
 	
-    lineangle = R_PointToAngle2 (0,0, ld->dx, ld->dy);
-
-    if (side == 1)
-	lineangle += ANG180;
-
-    moveangle = R_PointToAngle2 (0,0, tmxmove, tmymove);
-    deltaangle = moveangle-lineangle;
-
-    if (deltaangle > ANG180)
-	deltaangle += ANG180;
-    //	I_Error ("SlideLine: ang>ANG180");
-
-    lineangle >>= ANGLETOFINESHIFT;
-    deltaangle >>= ANGLETOFINESHIFT;
-	
-    movelen = P_AproxDistance (tmxmove, tmymove);
-    newlen = FixedMul (movelen, finecosine[deltaangle]);
-
-    tmxmove = FixedMul (newlen, finecosine[lineangle]);	
-    tmymove = FixedMul (newlen, finesine[lineangle]);	
+    // [PN/JN] Uses fixed-point vector projection onto linedef direction
+    // instead of angle/LUT projection to avoid diagonal quantization jitter.
+    int64_t linedx = (int64_t) ld->dx;
+    int64_t linedy = (int64_t) ld->dy;
+ 
+    // [PN] Keep the old behavior of orienting the blocking line towards the player.
+    if (side == 1) 
+    {
+        linedx = -linedx;
+        linedy = -linedy;
+    }
+ 
+    const int64_t movex = (int64_t) tmxmove;
+    const int64_t movey = (int64_t) tmymove;
+    const int64_t dot = movex * linedx + movey * linedy;
+    const int64_t lensq = linedx * linedx + linedy * linedy;
+ 
+    if (lensq <= 0)
+    {
+        tmxmove = 0;
+        tmymove = 0;
+        return;
+    }
+ 
+    // [PN] Project movement vector onto linedef direction in fixed-point. 
+    const int64_t proj = (dot << FRACBITS) / lensq; 
+    tmxmove = (fixed_t) ((proj * linedx) >> FRACBITS); 
+    tmymove = (fixed_t) ((proj * linedy) >> FRACBITS); 
+ 
+    // [PN] Guard against tiny fixed-point overshoots that can increase speed. 
+    const fixed_t oldlen = P_AproxDistance ((fixed_t) movex, (fixed_t) movey); 
+    const fixed_t newlen = P_AproxDistance (tmxmove, tmymove); 
+ 
+    if (newlen > oldlen && newlen > 0) 
+    { 
+        tmxmove = FixedMul (tmxmove, FixedDiv (oldlen, newlen)); 
+        tmymove = FixedMul (tmymove, FixedDiv (oldlen, newlen)); 
+    } 
 }
 
 
