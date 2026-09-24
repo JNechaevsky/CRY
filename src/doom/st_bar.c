@@ -1386,7 +1386,7 @@ void ST_Init (void)
     }
 
 	// Allocate status bar background.
-	st_backing_screen = (pixel_t *) Z_Malloc(MAXWIDTH * (ST_HEIGHT * MAXHIRES)
+	st_backing_screen = (pixel_t *) Z_Malloc(MAXWIDTH * MAXHEIGHT
 					* sizeof(*st_backing_screen), PU_STATIC, 0);
 }
 

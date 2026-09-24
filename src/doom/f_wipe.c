@@ -123,54 +123,46 @@ static void wipe_initMelt (void)
 
 static boolean wipe_doMelt (int ticks)
 {
-    int j;
     int dy;
-    const int width = SCREENWIDTH/2;
+    const int width = SCREENWIDTH / 2;
+    const int sh    = SCREENHEIGHT;
 
-    boolean	done = true;
+    boolean done = true;
 
     while (ticks--)
     {
-        for (int i = 0 ; i < width ; i++)
+        for (int i = 0; i < width; i++)
         {
-            if (y[i]<0)
+            if (y[i] < 0)
             {
                 y[i]++; done = false;
             }
-            else
-            if (y[i] < SCREENHEIGHT)
+            else if (y[i] < SCREENHEIGHT)
             {
-                dy = (y[i] < 16) ? y[i]+1 : (8 * vid_resolution);
-
-                if (y[i]+dy >= SCREENHEIGHT)
-                {
+                dy = (y[i] < 16) ? y[i] + 1 : (8 * vid_resolution);
+                if (y[i] + dy >= SCREENHEIGHT)
                     dy = SCREENHEIGHT - y[i];
-                }
 
-                // [PN] Row-major: copy the falling part from end-screen column (i)
-                // source starts at row y[i], destination at the same row
-                const dpixel_t *s1 = &((dpixel_t *)wipe_scr_end)[ y[i] * width + i ];
-                dpixel_t       *d1 = &((dpixel_t *)wipe_scr    )[ y[i] * width + i ];
+                const int yold = y[i];
+                const int ynew = yold + dy;
 
-                for (j = dy ; j ; --j)
+                // falling part from the end screen, and the area below the
+                // falling edge from the start screen, for both physical columns.
+                for (int c = 2 * i; c < 2 * i + 2 && c < SCREENWIDTH; c++)
                 {
-                    *d1 = *s1;
-                    d1 += width;  // next row
-                    s1 += width;  // next row
+                    pixel_t       *scr    = wipe_scr       + (size_t)c * sh;
+                    const pixel_t *colend = wipe_scr_end   + (size_t)c * sh;
+                    const pixel_t *colsta = wipe_scr_start + (size_t)c * sh;
+
+                    // rows [yold, yold+dy) <- end screen
+                    memcpy(scr + yold, colend + yold,
+                           (size_t)dy * sizeof(pixel_t));
+                    // rows [ynew, SCREENHEIGHT) <- start screen top
+                    memcpy(scr + ynew, colsta,
+                           (size_t)(SCREENHEIGHT - ynew) * sizeof(pixel_t));
                 }
 
-                y[i] += dy;
-                // [PN] Row-major: fill the area above with start-screen column (i)
-                const dpixel_t *s2 = &((dpixel_t *)wipe_scr_start)[i]; // row 0
-                dpixel_t       *d2 = &((dpixel_t *)wipe_scr      )[y[i] * width + i ];
-
-                for (j = SCREENHEIGHT - y[i]; j; --j)
-                {
-                    *d2 = *s2;
-                    d2 += width;  // next row
-                    s2 += width;  // next row
-                }
-
+                y[i] = ynew;
                 done = false;
             }
         }
@@ -252,7 +244,7 @@ static void wipe_initFizzle (void)
 
                     if (sx < SCREENWIDTH && sy < SCREENHEIGHT)
                     {
-                        y[sy * SCREENWIDTH + sx] = burn_value;
+                        y[sx * SCREENHEIGHT + sy] = burn_value;
                     }
                 }
             }

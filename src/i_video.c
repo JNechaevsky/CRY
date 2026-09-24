@@ -76,6 +76,12 @@ static const char *window_title = "";
 // load the RGBA buffer to and that we render into another texture (4) which
 // is upscaled by an integer factor UPSCALE using "nearest" scaling and which
 // in turn is finally rendered to screen using "linear" scaling.
+//
+// [PN] Transposed backbuffer: the game buffer holds pixel (x,y) at
+// x*SCREENHEIGHT + y (row pitch SCREENHEIGHT), so wall columns write
+// sequentially. argbbuffer and the streaming texture are created with swapped
+// dimensions; presentation un-rotates by 90 degrees with a vertical flip.
+// Window/logical coordinates stay in normal screen orientation.
 
 SDL_Surface *argbbuffer = NULL;
 static SDL_Texture *texture = NULL;
@@ -885,6 +891,36 @@ static void CreateUpscaledTexture(boolean force)
 //      range of [0.0, 1.0).  Used for interpolation.
 fixed_t fractionaltic;
 
+// [PN] Render the transposed streaming texture into a W×H destination space,
+// un-rotating it to normal orientation (verified pixel-exact on software and
+// direct3d11 backends).
+static void PresentTransposed (SDL_Texture *tex, int W, int H)
+{
+    SDL_Rect d;
+
+    d.w = H;
+    d.h = W;
+    d.x = (W - H) / 2;
+    d.y = (H - W) / 2;
+
+    SDL_RenderCopyEx(renderer, tex, NULL, &d, 90.0, NULL, SDL_FLIP_VERTICAL);
+}
+
+// [PN] Present to the window: use the logical size when set, otherwise the
+// full renderer output (free-resize mode, vid_aspect_ratio_correct == 0).
+static void PresentTransposedToWindow (SDL_Texture *tex)
+{
+    int W = 0, H = 0;
+
+    SDL_RenderGetLogicalSize(renderer, &W, &H);
+    if (W <= 0 || H <= 0)
+    {
+        SDL_GetRendererOutputSize(renderer, &W, &H);
+    }
+
+    PresentTransposed(tex, W, H);
+}
+
 //
 // I_FinishUpdate
 //
@@ -964,11 +1000,14 @@ void I_FinishUpdate (void)
 
     if (vid_smooth_scaling && !vid_force_software_renderer)
     {
-    // Render this intermediate texture into the upscaled texture
-    // using "nearest" integer scaling.
+    // [PN] Rotate the transposed texture into the upscaled target (which
+    // stays in normal orientation; targets ignore the logical size).
 
+    int tw = SCREENWIDTH, th = SCREENHEIGHT;
+
+    SDL_QueryTexture(texture_upscaled, NULL, NULL, &tw, &th);
     SDL_SetRenderTarget(renderer, texture_upscaled);
-    SDL_RenderCopy(renderer, texture, NULL, NULL);
+    PresentTransposed(texture, tw, th);
 
     // Finally, render this upscaled texture to screen using linear scaling.
 
@@ -978,7 +1017,8 @@ void I_FinishUpdate (void)
     else
     {
 	SDL_SetRenderTarget(renderer, NULL);
-	SDL_RenderCopy(renderer, texture, NULL, NULL);
+	// [PN] Un-transpose on presentation into the window's render space.
+	PresentTransposedToWindow(texture);
     }
 
     if (curpane)
@@ -1514,7 +1554,7 @@ static void SetVideoMode(void)
     if (argbbuffer == NULL)
     {
         argbbuffer = SDL_CreateRGBSurfaceWithFormat(
-                     0, SCREENWIDTH, SCREENHEIGHT, 32, SDL_PIXELFORMAT_ARGB8888);
+                     0, SCREENHEIGHT, SCREENWIDTH, 32, SDL_PIXELFORMAT_ARGB8888);
 
         // [PN] Use the helper function to create textures for all palettes
         palette_01 = CreatePaletteTexture(255, 240, 240, SDL_BLENDMODE_MOD);   // Red palettes
@@ -1555,10 +1595,12 @@ static void SetVideoMode(void)
     // The SDL_TEXTUREACCESS_STREAMING flag means that this texture's content
     // is going to change frequently.
 
+    // [PN] Transposed: w=SCREENHEIGHT, h=SCREENWIDTH (see I_FinishUpdate).
+
     texture = SDL_CreateTexture(renderer,
                                 SDL_PIXELFORMAT_ARGB8888,
                                 SDL_TEXTUREACCESS_STREAMING,
-                                SCREENWIDTH, SCREENHEIGHT);
+                                SCREENHEIGHT, SCREENWIDTH);
 
     // [JN] Workaround for SDL 2.0.14+ alt-tab bug
 #if defined(_WIN32)
@@ -1764,7 +1806,7 @@ void I_ReInitGraphics (int reinit)
 
 		SDL_FreeSurface(argbbuffer);
 		argbbuffer = SDL_CreateRGBSurfaceWithFormat(0,
-				                    SCREENWIDTH, SCREENHEIGHT, 32,
+				                    SCREENHEIGHT, SCREENWIDTH, 32,
 				                    SDL_PIXELFORMAT_ARGB8888);
 
 		// [crispy] re-set the framebuffer pointer
@@ -1810,7 +1852,7 @@ void I_ReInitGraphics (int reinit)
 		texture = SDL_CreateTexture(renderer,
 		                            SDL_PIXELFORMAT_ARGB8888,
 		                            SDL_TEXTUREACCESS_STREAMING,
-		                            SCREENWIDTH, SCREENHEIGHT);
+		                            SCREENHEIGHT, SCREENWIDTH);
 
 		// [crispy] force its re-creation
 		CreateUpscaledTexture(true);
@@ -1897,7 +1939,10 @@ void I_RenderReadPixels (byte **data, int *w, int *h)
     // already contains the scene that we actually want to capture.
     if (post_rendering_hook)
     {
-        SDL_RenderCopy(renderer, vid_smooth_scaling ? texture_upscaled : texture, NULL, NULL);
+        if (vid_smooth_scaling && !vid_force_software_renderer)
+            SDL_RenderCopy(renderer, texture_upscaled, NULL, NULL);
+        else
+            PresentTransposedToWindow(texture);
         SDL_RenderPresent(renderer);
     }
 

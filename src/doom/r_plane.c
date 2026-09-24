@@ -472,7 +472,7 @@ void R_DrawPlanes (void)
                                 *dest = dc_colormap[dc_brightmap[source2]][source2];
                             }
 
-                            dest += SCREENWIDTH;
+                            dest++;
                             frac += fracstep;
                         } while (count--);
                     }
@@ -498,8 +498,8 @@ void R_DrawPlanes (void)
                                 *dest1 = *dest2 = dc_colormap[dc_brightmap[source2]][source2];
                             }
 
-                            dest1 += SCREENWIDTH;
-                            dest2 += SCREENWIDTH;
+                            dest1++;
+                            dest2++;
                             frac += fracstep;
                         } while (count--);
                     }

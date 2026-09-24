@@ -1092,7 +1092,12 @@ void AM_Ticker (void)
 
 static void AM_clearFB (void)
 {
-    memset(I_VideoBuffer, 0, f_w*f_h*sizeof(*I_VideoBuffer));
+    pixel_t *dest = I_VideoBuffer;
+
+    for (int x = 0; x < f_w; x++, dest += SCREENHEIGHT)
+    {
+        memset(dest, 0, (size_t)f_h * sizeof(*I_VideoBuffer));
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -1102,16 +1107,17 @@ static void AM_clearFB (void)
 
 static void AM_shadeBackground (void)
 {
-    pixel_t *dest = I_VideoBuffer;
     const int shade = automap_shading;
-    const int scr = (dp_screen_size > 10)
-                  ? SCREENAREA
-                  : SCREENWIDTH * (SCREENHEIGHT - ST_HEIGHT * vid_resolution);
+    const int hgt = (dp_screen_size > 10)
+                  ? SCREENHEIGHT
+                  : SCREENHEIGHT - ST_HEIGHT * vid_resolution;
 
-    for (int i = 0; i < scr; i++)
+    for (int cx = 0; cx < SCREENWIDTH; cx++)
     {
-        *dest = I_BlendDark_32(*dest, I_ShadeFactor[shade]);
-        ++dest;
+        pixel_t *dest = I_VideoBuffer + (size_t)cx * SCREENHEIGHT;
+
+        for (int i = 0; i < hgt; i++, dest++)
+            *dest = I_BlendDark_32(*dest, I_ShadeFactor[shade]);
     }
 }
 
@@ -1207,7 +1213,7 @@ static boolean AM_clipMline (mline_t *ml, fline_t *fl)
 #undef DOOUTCODE
 
 
-#define PUTDOT_RAW(xx,yy,cc) fb[(yy) * f_w + flipscreenwidth[(xx)]] = (cc)
+#define PUTDOT_RAW(xx,yy,cc) fb[flipscreenwidth[(xx)] * SCREENHEIGHT + (yy)] = (cc)
 #define PUTDOT(xx,yy,cc) PUTDOT_RAW(xx,yy,palette_pointer[(cc)])
 
 // -----------------------------------------------------------------------------
@@ -1248,7 +1254,7 @@ static inline void PUTDOT_THICK (int x, int y, pixel_t color)
 
     // Cache fb pointer and width
     pixel_t *restrict fbuf = fb;
-    const int fw = f_w;
+    const int fw = SCREENHEIGHT;
 
     if (smooth)
     {
@@ -1259,9 +1265,9 @@ static inline void PUTDOT_THICK (int x, int y, pixel_t color)
             const int dx2 = dx * dx;
 
             const int flipx = flipscreenwidth[nx];
-            pixel_t *pix = fbuf + miny * fw + flipx;
+            pixel_t *pix = fbuf + flipx * fw + miny;
 
-            for (int ny = miny; ny <= maxy; ++ny, pix += fw)
+            for (int ny = miny; ny <= maxy; ++ny, pix++)
             {
                 const int dy = ny - y;
                 if (dx2 + dy * dy > thick_sq) continue;
@@ -1280,9 +1286,9 @@ static inline void PUTDOT_THICK (int x, int y, pixel_t color)
             const int dx2 = dx * dx;
 
             const int flipx = flipscreenwidth[nx];
-            pixel_t *pix = fbuf + miny * fw + flipx;
+            pixel_t *pix = fbuf + flipx * fw + miny;
 
-            for (int ny = miny; ny <= maxy; ++ny, pix += fw)
+            for (int ny = miny; ny <= maxy; ++ny, pix++)
             {
                 const int dy = ny - y;
                 if (dx2 + dy * dy > thick_sq) continue;

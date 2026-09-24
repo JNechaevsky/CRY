@@ -40,9 +40,11 @@ void V_PProc_SupersampledSmoothing (boolean st_background_on, int st_height)
     if (!argbbuffer || argbbuffer->format->BytesPerPixel != 4)
         return;
 
-    const int w = argbbuffer->w;
-    // [JN] Exclude status bar area from smoothing if active.
-    const int h = argbbuffer->h - (st_background_on ? st_height : 0);
+    // [JN] Exclude status bar area from smoothing if active: the bar spans
+    // screen rows, which are surface columns here.
+    const int stride = argbbuffer->w;
+    const int w = stride - (st_background_on ? st_height : 0);
+    const int h = argbbuffer->h;
     Uint32 *restrict pixels = (Uint32*)argbbuffer->pixels;
     const int block = post_supersample + 1;
 
@@ -58,7 +60,7 @@ void V_PProc_SupersampledSmoothing (boolean st_background_on, int st_height)
             {
                 for (int x = bx; x < bx + block && x < w; ++x)
                 {
-                    const Uint32 c = pixels[y * w + x];
+                    const Uint32 c = pixels[y * stride + x];
                     r += (c >> 16) & 0xFF;
                     g += (c >> 8) & 0xFF;
                     b += c & 0xFF;
@@ -76,7 +78,7 @@ void V_PProc_SupersampledSmoothing (boolean st_background_on, int st_height)
             // [PN] Apply the averaged color back to all pixels in the block
             for (int y = by; y < by + block && y < h; ++y)
                 for (int x = bx; x < bx + block && x < w; ++x)
-                    pixels[y * w + x] = avg;
+                    pixels[y * stride + x] = avg;
         }
     }
 }
@@ -435,16 +437,14 @@ static void V_PProc_AnalogRGBDrift (void)
     // [PN] Loop through each row of pixels
     for (int y = 0; y < height; ++y)
     {
-        pixel_t *restrict const dst = src + y * width;
-        const pixel_t *restrict const row = chromabuf + y * width;
-
         // [PN] Process each pixel in the row
         for (int x = 0; x < width; ++x)
         {
+            const size_t idx  = (size_t)x * height + y;
             // [PN] Fetch original pixel and shifted red/blue samples
-            const pixel_t orig = row[x];
-            const pixel_t rsrc = row[x_src_r[x]]; // Shifted red
-            const pixel_t bsrc = row[x_src_b[x]]; // Shifted blue
+            const pixel_t orig = chromabuf[idx];
+            const pixel_t rsrc = chromabuf[(size_t)x_src_r[x] * height + y]; // Shifted red
+            const pixel_t bsrc = chromabuf[(size_t)x_src_b[x] * height + y]; // Shifted blue
 
             // [PN] Extract RGB components and apply the shift
             const int r = (rsrc >> 16) & 0xFF;
@@ -452,7 +452,7 @@ static void V_PProc_AnalogRGBDrift (void)
             const int b = bsrc & 0xFF;
 
             // [PN] Compose the final pixel with altered red/blue and original green
-            dst[x] = 0xFF000000 | (r << 16) | (g << 8) | b;
+            src[idx] = 0xFF000000 | (r << 16) | (g << 8) | b;
         }
     }
 }
@@ -473,10 +473,9 @@ static void V_PProc_VHSLineDistortion (void)
     if (!argbbuffer || argbbuffer->format->BytesPerPixel != 4)
         return;
 
-    // [PN] Dimensions and row stride
-    const int width  = argbbuffer->w;
-    const int height = argbbuffer->h;
-    const int stride = width;
+    const int width  = SCREENWIDTH;  // screen x range
+    const int height = SCREENHEIGHT; // screen y range
+    const int pitch  = SCREENHEIGHT; // stride between screen columns
 
     // [PN] Framebuffer pointer; restrict allows better compiler optimization
     Uint32 *restrict pixels = (Uint32 *restrict)argbbuffer->pixels;
@@ -498,27 +497,25 @@ static void V_PProc_VHSLineDistortion (void)
     // [PN] Apply line distortion per row within the selected block
     for (int y = y_start; y < y_start + block_height; ++y)
     {
-        Uint32 *restrict row = pixels + y * stride;
-
         if (shift_val > 0)
         {
             // [PN] Right shift — copy pixels rightward
             for (int x = width - 1; x >= abs_shift; --x)
-                row[x] = row[x - abs_shift];
+                pixels[x * pitch + y] = pixels[(x - abs_shift) * pitch + y];
 
             // [PN] Fill left edge with black
             for (int x = 0; x < abs_shift; ++x)
-                row[x] = black_pixel;
+                pixels[x * pitch + y] = black_pixel;
         }
         else
         {
             // [PN] Left shift — copy pixels leftward
             for (int x = abs_shift; x < width; ++x)
-                row[x - abs_shift] = row[x];
+                pixels[(x - abs_shift) * pitch + y] = pixels[x * pitch + y];
 
             // [PN] Fill right edge with black
             for (int x = width - abs_shift; x < width; ++x)
-                row[x] = black_pixel;
+                pixels[x * pitch + y] = black_pixel;
         }
     }
 }
@@ -948,23 +945,23 @@ static void V_PProc_DepthOfFieldBlur (void)
         break;
     }
 
-    // [PN] Border blur (3x3) for left/right edges only
-    for (int y = 1; y < height - 1; ++y)
+    for (int fx = 1; fx < width - 1; ++fx)
     {
-        const int dy  = y - cy;
-        const int dy2 = dy * dy;
-        Uint32 *restrict dst = pixels + y * stride;
-        for (int x = 0; x < width; x += (width - 1))
+        for (int fy = 0; fy < height; fy += height - 1)
         {
-            const int dx = x - cx;
+            const int dy  = fy - cy;
+            const int dy2 = dy * dy;
+            const int dx  = fx - cx;
             if (dx * dx + dy2 < threshSq) continue;
             int r_sum = 0, g_sum = 0, b_sum = 0, count = 0;
             for (int ky = -1; ky <= 1; ++ky)
             {
-                const Uint32 *restrict row = pixels + (y + ky) * stride;
+                int yy = fy + ky;
+                if ((unsigned)yy >= (unsigned)height) continue;
+                const Uint32 *restrict row = pixels + (size_t)yy * stride;
                 for (int kx = -1; kx <= 1; ++kx)
                 {
-                    int xx = x + kx;
+                    int xx = fx + kx;
                     if ((unsigned)xx >= (unsigned)width) continue;
                     Uint32 c = row[xx];
                     r_sum += (c >> 16) & 0xFF;
@@ -973,7 +970,9 @@ static void V_PProc_DepthOfFieldBlur (void)
                     ++count;
                 }
             }
-            if (count) dst[x] = (0xFFu << 24) | ((r_sum / count) << 16) | ((g_sum / count) << 8) | (b_sum / count);
+            if (count)
+                pixels[(size_t)fy * stride + fx] =
+                    (0xFFu << 24) | ((r_sum / count) << 16) | ((g_sum / count) << 8) | (b_sum / count);
         }
     }
 }
