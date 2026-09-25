@@ -748,8 +748,8 @@ static void R_ProjectSprite (mobj_t* thing)
     if (!vis_brightmaps)
     {
         // [JN] Colorize sprite drawing.
-        vis->colormap[0] = R_SpriteSectorColormap(colormaps);
-        vis->colormap[1] = R_SpriteSectorColormap(colormaps);
+        vis->colormap[0] = R_SpriteSectorColormap(invulcolormap ? invulmaps : colormaps);
+        vis->colormap[1] = R_SpriteSectorColormap(invulcolormap ? invulmaps : colormaps);
     }
     else
     {
@@ -808,7 +808,8 @@ void R_AddSprites (sector_t *sec)
     const int lightnum = BETWEEN(0, LIGHTLEVELS - 1, (sec->lightlevel >> LIGHTSEGSHIFT)
                        + (extralight * LIGHTBRIGHT));
     // [JN] Colorize sprite drawing.
-    spritelights = scalelight[lightnum];
+    spritelights = invulcolormap ? scalelight_INVULN[lightnum] :
+                                   scalelight[lightnum];
     spritecolorbank = sec->lightbank;
 
     // Handle all things in sector.
@@ -957,7 +958,8 @@ static void R_DrawPlayerSprites (void)
     // [crispy] smooth diminishing lighting
     const int lightnum = BETWEEN(0, LIGHTLEVELS - 1, (viewplayer->mo->subsector->sector->lightlevel >> LIGHTSEGSHIFT)
                        + (extralight * LIGHTBRIGHT));
-    spritelights = scalelight[lightnum];
+    spritelights = invulcolormap ? scalelight_INVULN[lightnum] :
+                                   scalelight[lightnum];
     spritecolorbank = viewplayer->mo->subsector->sector->lightbank;
 
     // clip to screen bounds

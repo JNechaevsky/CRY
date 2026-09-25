@@ -217,7 +217,8 @@ void R_RenderMaskedSegRange (drawseg_t *ds, int x1, int x2)
 
     // [JN] Colorize masked or 2-sided textures drawing,
     // though they are not appearing on vanilla Jaguar levels.
-    walllights = scalelight[BETWEEN(0, LIGHTLEVELS-1, lightnum)];
+    walllights = invulcolormap ? scalelight_INVULN[BETWEEN(0, LIGHTLEVELS-1, lightnum)] :
+                                 scalelight[BETWEEN(0, LIGHTLEVELS-1, lightnum)];
 
     maskedtexturecol = ds->maskedtexturecol;
     rw_scalestep = ds->scalestep;
@@ -867,7 +868,8 @@ void R_StoreWallRange (int start, int stop)
                                + (extralight * LIGHTBRIGHT)
                                + curline->fakecontrast;
 
-            walllights = scalelight[BETWEEN(0, LIGHTLEVELS - 1, lightnum)];
+            walllights = invulcolormap ? scalelight_INVULN[BETWEEN(0, LIGHTLEVELS - 1, lightnum)] :
+                                         scalelight[BETWEEN(0, LIGHTLEVELS - 1, lightnum)];
         }
     }
 

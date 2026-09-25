@@ -559,7 +559,7 @@ void R_DrawPlanes (void)
             // [PN] Ensure 'light' is within the range [0, LIGHTLEVELS - 1] inclusively.
             const int light = BETWEEN(0, LIGHTLEVELS-1, (pl->lightlevel >> LIGHTSEGSHIFT) + (extralight * LIGHTBRIGHT));
             planecolorbank = pl->colorbank;
-            planezlight = zlight[light];
+            planezlight = invulcolormap ? zlight_INVULN[light] : zlight[light];
             pl->top[pl->minx-1] = pl->top[stop] = USHRT_MAX;
 
             for (int x = pl->minx ; x <= stop ; x++)
