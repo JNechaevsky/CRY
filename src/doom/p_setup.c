@@ -31,7 +31,7 @@
 #include "i_timer.h"
 #include "w_wad.h"
 #include "p_local.h"
-#include "r_collit.h"
+#include "r_collight.h"
 #include "s_sound.h"
 #include "doomstat.h"
 #include "d_englsh.h"
@@ -381,45 +381,6 @@ static void P_LoadSubsectors (int lump)
 }
 
 // -----------------------------------------------------------------------------
-// PrepareSectorColors
-// [PN] Prepares an array of colors for sectors in the current map. 
-// This function populates a global array, `color_for_sector`, 
-// where each element corresponds to a sector's color based on 
-// the `sectorcolor` table for the given map. If no color is defined 
-// for a sector, it is initialized to 0 (default value).
-//
-// @param gamemap      The current map number.
-// @param colors       Pointer to the sectorcolor_t array defining colors.
-// @param numsectors   Number of sectors in the map.
-// -----------------------------------------------------------------------------
-
-static unsigned int *color_for_sector = NULL;
-
-static void P_PrepareSectorColors(int gamemap, const sectorcolor_t *colors, int numsectors)
-{
-    // [PN] Allocate memory for sector colors (numsectors elements)
-    color_for_sector = Z_Malloc(sizeof(unsigned) * numsectors, PU_STATIC, 0);
-    
-    // [PN] Initialize the array with zeros (default values)
-    memset(color_for_sector, 0, sizeof(unsigned) * numsectors);
-
-    // [PN] Traverse the sectorcolor array until the end marker is found
-    for (int j = 0; colors[j].map != -1; j++)
-    {
-        // [PN] Check if the map matches, the sector index is valid, 
-        // and the color value is non-zero
-        if (colors[j].map == gamemap
-        &&  colors[j].sector >= 0
-        &&  colors[j].sector < numsectors
-        &&  colors[j].color != 0)
-        {
-            // [PN] Assign the color to the corresponding sector
-            color_for_sector[colors[j].sector] = colors[j].color;
-        }
-    }
-}
-
-// -----------------------------------------------------------------------------
 // P_LoadSectors
 // -----------------------------------------------------------------------------
 
@@ -443,12 +404,6 @@ static void P_LoadSectors (int lump)
     const byte *const data = W_CacheLumpNum(lump, PU_STATIC);
     if (!data || count == 0)
         I_Error("P_LoadSectors: No sectors in map! (lump %d)", lump);
-
-    // [PN] Prepare the color mapping for sectors in the current map.
-    // This initializes the global array `color_for_sector` with
-    // the color values defined in the `sectorcolor` table.
-    P_PrepareSectorColors(gamemap, sectorcolor, numsectors);
-
     const mapsector_t *restrict src = (const mapsector_t *)data;
 
     // Copy fields
@@ -474,14 +429,7 @@ static void P_LoadSectors (int lump)
         dst[i].oldgametic          = -1;
         // [PN] Initialize Z-axis sound origin with the middle of the sector height
         dst[i].soundorg.z          = (dst[i].floorheight + dst[i].ceilingheight) >> 1;
-
-        // [JN] Inject color tables into the sectors of IWAD levels.
-        if (canmodify)
-        dst[i].color = color_for_sector[i];
     }
-
-    // [PN] Free allocated memory of sector colors array.
-    Z_Free(color_for_sector);
 
     // Release the cached lump
     W_ReleaseLumpNum(lump);
@@ -1159,6 +1107,7 @@ void P_SetupLevel (int episode, int map)
     // Prepare memory and thinkers
     S_Start();
     Z_FreeTags(PU_LEVEL, PU_PURGELEVEL - 1);
+    R_ColLight_ResetLevel(); // [PN] Reset per-level colored-lighting LUT state.
     P_InitThinkers();
 
     // Determine lump name
@@ -1170,9 +1119,6 @@ void P_SetupLevel (int episode, int map)
     // Adaptaken from DOOM Retro, thanks Brad Harding!
     canmodify = W_CheckMultipleLumps(lumpname) == 1;
 
-    // [JN] Set per-level sector colors table.
-    P_SetSectorColorTable(map);
-
     // Reset timers
     leveltime = realleveltime = oldleveltime = 0;
 
@@ -1183,6 +1129,7 @@ void P_SetupLevel (int episode, int map)
     crispy_validblockmap = P_LoadBlockMap(lumpnum + ML_BLOCKMAP); // [crispy] (re-)create BLOCKMAP if necessary
     P_LoadVertexes(lumpnum + ML_VERTEXES);
     P_LoadSectors(lumpnum + ML_SECTORS);
+    R_ColLight_LoadMapLUT(lumpname); // [PN] Assign sector color-light banks for this map.
     P_LoadSideDefs(lumpnum + ML_SIDEDEFS);
     P_LoadLineDefs(lumpnum + ML_LINEDEFS);
     // [crispy] (re-)create BLOCKMAP if necessary

@@ -50,7 +50,7 @@
 #include "v_trans.h"
 #include "am_map.h"
 #include "st_bar.h"
-#include "r_collit.h"
+#include "r_collight.h"
 
 #include "id_vars.h"
 #include "id_func.h"
@@ -3204,16 +3204,6 @@ static void M_ID_Brightmaps (int choice)
 static void M_ID_ColoredLightingHook (void)
 {
     vis_colored_lighting ^= 1;
-    
-    if (!vis_colored_lighting)
-    {
-        R_FreeColoredLights();
-    }
-    else
-    {
-        R_InitColoredLightTables();
-    }
-    R_ExecuteSetViewSize();
 }
 
 static void M_ID_ColoredLighting (int choice)
@@ -3639,10 +3629,6 @@ static void M_ID_JaguarSkies (int choice)
 
     // Reset Jaguar sky textures.
     G_InitSkyTextures();
-    // Redefine color table for colored lighting.
-    P_SetSectorColorTable(24);
-    // Refill colored lighting values.
-    P_ReloadSectorColorTable(24);
 }
 
 static void M_ScrollGameplay (int choice)
@@ -3757,7 +3743,7 @@ static void M_ID_ApplyResetHook (void)
     vis_brightmaps = 0;
     vis_translucency = 0;
     vis_improved_fuzz = 0;
-    vis_colored_lighting = 0; R_FreeColoredLights();
+    vis_colored_lighting = 0;
     vis_colored_blood = 0;
     vis_swirling_liquids = 0; P_InitPicAnims();
     vis_animated_sky = 0; skysmoothdelta = 0;

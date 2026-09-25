@@ -140,6 +140,9 @@ typedef	struct
 
     // [crispy] revealed secrets
     short	oldspecial;
+
+    // [PN] Per-sector colored-lighting bank index (0 = neutral/base lighting).
+    unsigned short lightbank;
 } sector_t;
 
 //
@@ -421,7 +424,7 @@ typedef struct visplane_s
     fixed_t height;
     int     picnum;
     int     lightlevel;
-    int     color; // [JN] Colored lighting
+    unsigned short colorbank; // [PN] Colored-lighting bank id for this visplane.
     int     minx;
     int     maxx;
 
@@ -729,10 +732,10 @@ extern boolean original_colormap;
 // [JN] Even smoother, use full 0...256 brightness range.
 #define LIGHTLEVELS     256     // 32
 #define LIGHTSEGSHIFT   0       // 3
-#define LIGHTBRIGHT     15      // 2
-#define MAXLIGHTSCALE   376     // 48
+#define LIGHTBRIGHT     16      // 2
+#define MAXLIGHTSCALE   384     // 48
 #define LIGHTSCALESHIFT 9       // 12
-#define MAXLIGHTZ       2048    // 1024
+#define MAXLIGHTZ       8192    // 1024
 #define LIGHTZSHIFT     16      // 17
 
 extern lighttable_t***	scalelight;
@@ -776,7 +779,7 @@ extern fixed_t distscale[MAXWIDTH];
 extern fixed_t swirlCoord_x;
 extern fixed_t swirlCoord_y;
 
-extern visplane_t *R_FindPlane (fixed_t height, int picnum, int lightlevel, int color);
+extern visplane_t *R_FindPlane (fixed_t height, int picnum, int lightlevel, int colorbank);
 extern visplane_t *R_CheckPlane (visplane_t *pl, int start, int stop);
 extern visplane_t *R_DupPlane (const visplane_t *pl, int start, int stop);
 

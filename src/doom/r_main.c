@@ -30,7 +30,7 @@
 #include "p_local.h"
 #include "v_video.h"
 #include "w_wad.h"
-#include "r_collit.h"
+#include "r_collight.h"
 #include "st_bar.h"
 #include "v_postproc.h"
 
@@ -567,9 +567,6 @@ void R_InitLightTables (void)
 
     // [PN] Free after zlight[][] is built
     free(scale_table);
-
-    // [JN] Initialize and generate colored scalelights and zlights. 
-    R_InitColoredLightTables();
 }
 
 //
@@ -785,9 +782,6 @@ void R_ExecuteSetViewSize (void)
 
     // [PN] Free after scalelight[][] is built
     free(scale_table);
-
-    // [JN] (Re-)generate colored scalelight levels.
-    R_GenerateColoredSClights(viewwidth_nonwide);
 
     // [crispy] lookup table for horizontal screen coordinates
     for (i = 0, j = SCREENWIDTH - 1; i < SCREENWIDTH; i++, j--)

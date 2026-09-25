@@ -27,7 +27,7 @@
 #include "w_wad.h"
 #include "doomstat.h"
 #include "p_local.h"
-#include "r_collit.h"
+#include "r_collight.h"
 #include "r_local.h"
 #include "m_misc.h"
 
@@ -54,8 +54,8 @@ visplane_t *floorplane, *ceilingplane;
 // [JN] killough -- hash function for visplanes
 // Empirically verified to be fairly uniform:
 
-#define visplane_hash(picnum, lightlevel, height) \
-    ((unsigned)((picnum) * 3 + (lightlevel) + (height) * 7) & (MAXVISPLANES - 1))
+#define visplane_hash(picnum, lightlevel, height, colorbank) \
+    ((unsigned)((picnum) * 3 + (lightlevel) + (height) * 7 + (colorbank) * 11) & (MAXVISPLANES - 1))
 
 // [JN] killough 8/1/98: set static number of openings to be large enough
 // (a static limit is okay in this case and avoids difficulties in r_segs.c)
@@ -85,6 +85,7 @@ int			spanstop[MAXHEIGHT];
 //
 static lighttable_t**		planezlight;
 static fixed_t			planeheight;
+static int				planecolorbank;
 
 fixed_t*			yslope;
 fixed_t			yslopes[LOOKDIRS][MAXHEIGHT];
@@ -190,7 +191,11 @@ R_MapPlane
 	if (index >= MAXLIGHTZ )
 	    index = MAXLIGHTZ-1;
 
-	ds_colormap[0] = planezlight[index];
+    // [PN] Fast path keeps vanilla pointer when visplane uses neutral bank 0.
+    const lighttable_t *const base = planezlight[index];
+    ds_colormap[0] = planecolorbank
+                   ? R_ColLight_Apply(planecolorbank, base)
+                   : (lighttable_t *)base;
 	ds_colormap[1] = invulcolormap ? invulmaps : colormaps;
 	
     ds_y = y;
@@ -225,6 +230,7 @@ void R_ClearPlanes (void)
 
     // texture calculation
     memset(cachedheight, 0, sizeof(cachedheight));
+    planecolorbank = 0; // [PN] Default to neutral bank until a plane selects one.
 }
 
 // -----------------------------------------------------------------------------
@@ -260,7 +266,7 @@ R_FindPlane
 ( fixed_t	height,
   int		picnum,
   int		lightlevel,
-  int		color)
+  int		colorbank)
 {
     visplane_t *check;
     unsigned int hash;
@@ -268,6 +274,7 @@ R_FindPlane
     if (picnum == skyflatnum || picnum & PL_SKYFLAT)  // killough 10/98
     {
         lightlevel = 0;   // killough 7/19/98: most skies map together
+        colorbank = 0;    // [PN] Sky is always fullbright and not sector-tinted.
 
         // haleyjd 05/06/08: but not all. If height > viewpoint.z, set height to 1
         // instead of 0, to keep ceilings mapping with ceilings, and floors mapping
@@ -283,11 +290,11 @@ R_FindPlane
     }
 
     // New visplane algorithm uses hash table -- killough
-    hash = visplane_hash(picnum, lightlevel, height);
+    hash = visplane_hash(picnum, lightlevel, height, colorbank);
 
     for (check = visplanes[hash]; check; check = check->next)
         if (height == check->height && picnum == check->picnum 
-        && lightlevel == check->lightlevel && color == check->color)
+        && lightlevel == check->lightlevel && colorbank == check->colorbank)
             return check;
 
     check = new_visplane(hash);
@@ -295,7 +302,7 @@ R_FindPlane
     check->height = height;
     check->picnum = picnum;
     check->lightlevel = lightlevel;
-    check->color = color;
+    check->colorbank = (unsigned short)colorbank;
     check->minx = SCREENWIDTH;
     check->maxx = -1;
 
@@ -310,12 +317,12 @@ R_FindPlane
 
 visplane_t *R_DupPlane(const visplane_t *pl, int start, int stop)
 {
-    visplane_t  *new_pl = new_visplane(visplane_hash(pl->picnum, pl->lightlevel, pl->height));
+    visplane_t  *new_pl = new_visplane(visplane_hash(pl->picnum, pl->lightlevel, pl->height, pl->colorbank));
 
     new_pl->height = pl->height;
     new_pl->picnum = pl->picnum;
     new_pl->lightlevel = pl->lightlevel;
-    new_pl->color = pl->color;
+    new_pl->colorbank = pl->colorbank;
     new_pl->minx = start;
     new_pl->maxx = stop;
 
@@ -544,8 +551,8 @@ void R_DrawPlanes (void)
             planeheight = abs(pl->height-viewz);
             // [PN] Ensure 'light' is within the range [0, LIGHTLEVELS - 1] inclusively.
             const int light = BETWEEN(0, LIGHTLEVELS-1, (pl->lightlevel >> LIGHTSEGSHIFT) + (extralight * LIGHTBRIGHT));
-            // [JN] Colorize visplanes drawing.
-            planezlight = R_ColoredVisplanesColorize(light, pl->color);
+            planecolorbank = pl->colorbank;
+            planezlight = zlight[light];
             pl->top[pl->minx-1] = pl->top[stop] = USHRT_MAX;
 
             for (int x = pl->minx ; x <= stop ; x++)

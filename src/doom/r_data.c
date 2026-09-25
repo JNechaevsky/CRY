@@ -23,7 +23,7 @@
 #include "w_wad.h"
 #include "m_misc.h"
 #include "p_local.h"
-#include "r_collit.h"
+#include "r_collight.h"
 #include "doomstat.h"
 #include "v_trans.h"
 #include "v_video.h"
@@ -976,7 +976,6 @@ void R_InitColormaps (void)
 	{
 		colormaps = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
 		invulmaps = (lighttable_t*) Z_Malloc((NUMCOLORMAPS + 1) * 256 * sizeof(lighttable_t), PU_STATIC, 0);
-		R_AllocateColoredColormaps();
 	}
 
     // [PN] Precompute gamma'ed base RGB for both palettes (once per index)
@@ -1019,10 +1018,6 @@ void R_InitColormaps (void)
             const int B = (int)(base_gamma_render[k][2] * k0 + kB);
     
             row_col[i] = 0xff000000 | ((byte)R << 16) | ((byte)G << 8) | (byte)B;
-    
-            // [PN] Colored colormaps generator still expects a linear index.
-            // Use computed absolute index instead of j-counter.
-            R_GenerateColoredColormaps(k, (float)scale, c * 256 + i);
     
             // [PN] Invulnerability colormap (invul palette)
             const int Ri = (int)(base_gamma_invul[k][0] * k0 + kB);
@@ -1068,6 +1063,9 @@ void R_InitColormaps (void)
 	W_ReleaseLumpName("CRYPAL");
 	W_ReleaseLumpName("PLAYINVL");
 	W_ReleaseLumpName("CRYINVL");
+
+	// [PN] Base colormaps[] changed: rebuild colored sector-light LUT banks.
+	R_ColLight_RebuildBanks();
 }
 
 // -----------------------------------------------------------------------------

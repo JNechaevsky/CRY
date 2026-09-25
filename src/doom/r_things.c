@@ -29,7 +29,7 @@
 #include "p_local.h"
 #include "r_local.h"
 #include "doomstat.h"
-#include "r_collit.h"
+#include "r_collight.h"
 #include "v_postproc.h"
 #include "v_trans.h" // [crispy] colored blood sprites
 #include "v_video.h" // [JN] translucency tables
@@ -76,6 +76,7 @@ fixed_t pspritescale;
 fixed_t pspriteiscale;
 
 static lighttable_t **spritelights;
+static int spritecolorbank;
 
 // constant arrays used for psprite clipping and initializing clipping
 int negonearray[MAXWIDTH];        // [JN] 32-bit integer math
@@ -87,6 +88,17 @@ int          numsprites;
 static spriteframe_t  sprtemp[29];
 static int            maxframe;
 static const char    *spritename;
+
+// -----------------------------------------------------------------------------
+// R_SpriteSectorColormap
+// [PN] Fast path for sectors without colored lighting (bank 0).
+// -----------------------------------------------------------------------------
+
+static inline lighttable_t *R_SpriteSectorColormap(const lighttable_t *base)
+{
+    return spritecolorbank ? R_ColLight_Apply(spritecolorbank, base)
+                           : (lighttable_t *)base;
+}
 
 
 // -----------------------------------------------------------------------------
@@ -736,23 +748,23 @@ static void R_ProjectSprite (mobj_t* thing)
     if (!vis_brightmaps)
     {
         // [JN] Colorize sprite drawing.
-        vis->colormap[0] = vis->colormap[1]
-                         = R_ColoredSprColorize(thing->subsector->sector->color);
+        vis->colormap[0] = R_SpriteSectorColormap(colormaps);
+        vis->colormap[1] = R_SpriteSectorColormap(colormaps);
     }
     else
     {
         if (thing->sprite == SPR_CAND   // Candestick
         ||  thing->sprite == SPR_CBRA)  // Candelabra
         {
-            vis->colormap[0] = spritelights[index];
+            vis->colormap[0] = R_SpriteSectorColormap(spritelights[index]);
             vis->colormap[1] = invulcolormap ? &invulmaps[(thing->bmap_flick<<BMAPANIMSHIFT)*256] :
                                                &colormaps[(thing->bmap_flick<<BMAPANIMSHIFT)*256];
         }
         else
         {
-            vis->colormap[0] = spritelights[index];
             // [JN] Colorize brightmapped sprite drawing.
-            vis->colormap[1] = R_ColoredSprColorize(thing->subsector->sector->color);
+            vis->colormap[0] = R_SpriteSectorColormap(spritelights[index]);
+            vis->colormap[1] = R_SpriteSectorColormap(colormaps);
         }
     }	
     }
@@ -796,7 +808,8 @@ void R_AddSprites (sector_t *sec)
     const int lightnum = BETWEEN(0, LIGHTLEVELS - 1, (sec->lightlevel >> LIGHTSEGSHIFT)
                        + (extralight * LIGHTBRIGHT));
     // [JN] Colorize sprite drawing.
-	spritelights = R_ColoredSegsColorize(lightnum, sec->color);
+    spritelights = scalelight[lightnum];
+    spritecolorbank = sec->lightbank;
 
     // Handle all things in sector.
     for (mobj_t *thing = sec->thinglist ; thing ; thing = thing->snext)
@@ -809,6 +822,7 @@ void R_AddSprites (sector_t *sec)
 
 static void R_DrawPSprite (pspdef_t* psp)
 {
+    const state_t *const state = psp->state;
     fixed_t		tx;
     int			x1;
     int			x2;
@@ -908,34 +922,25 @@ static void R_DrawPSprite (pspdef_t* psp)
     {
 	vis->colormap[0] = vis->colormap[1] = invulcolormap;
     }
-    else if (psp->state->frame & FF_FULLBRIGHT)
+    else if (state->frame & FF_FULLBRIGHT)
     {
-	// full bright
-    // [JN] Colorize STbar sprite drawing.
-    if (vis_colored_lighting)
+        // full bright
+        vis->colormap[0] = colormaps;
+        vis->colormap[1] = colormaps;
+    }
+    else
     {
-	    player_t *player = &players[displayplayer];
+        // local light
+        vis->colormap[0] = R_SpriteSectorColormap(spritelights[MAXLIGHTSCALE - 1]);
+        vis->colormap[1] = colormaps;
+    }
 
-	    vis->colormap[0] = R_ColoredSprColorize(player->mo->subsector->sector->color);
-	    vis->colormap[1] = colormaps;
-    }
-    else
-    {
-	vis->colormap[0] = vis->colormap[1] = colormaps;
-    }
-    }
-    else
-    {
-	// local light
-	vis->colormap[0] = spritelights[MAXLIGHTSCALE-1];
-	vis->colormap[1] = colormaps;
-    }
-    vis->brightmap = R_BrightmapForState(psp->state - states);
-	
+    vis->brightmap = R_BrightmapForState(state - states);
+
     // [crispy] free look
     vis->texturemid += FixedMul(((centery - viewheight / 2) << FRACBITS), pspriteiscale) >> detailshift;
 
-    R_DrawVisSprite (vis);
+    R_DrawVisSprite(vis);
 }
 
 // -----------------------------------------------------------------------------
@@ -952,10 +957,9 @@ static void R_DrawPlayerSprites (void)
     // [crispy] smooth diminishing lighting
     const int lightnum = BETWEEN(0, LIGHTLEVELS - 1, (viewplayer->mo->subsector->sector->lightlevel >> LIGHTSEGSHIFT)
                        + (extralight * LIGHTBRIGHT));
+    spritelights = scalelight[lightnum];
+    spritecolorbank = viewplayer->mo->subsector->sector->lightbank;
 
-    // [JN] Colorize STbar sprite drawing.
-    spritelights = R_ColoredSegsColorize(lightnum, viewplayer->mo->subsector->sector->color);
-    
     // clip to screen bounds
     mfloorclip = screenheightarray;
     mceilingclip = negonearray;
