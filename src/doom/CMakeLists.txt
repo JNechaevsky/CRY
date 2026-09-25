@@ -12,6 +12,7 @@ add_library(doom STATIC
             f_wipe.c        f_wipe.h
             g_game.c        g_game.h
             info.c          info.h
+            jagcry.c        jagcry.h
             id_func.c       id_func.h
             m_menu.c        m_menu.h
             p_ceilng.c

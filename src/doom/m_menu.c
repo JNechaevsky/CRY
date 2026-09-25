@@ -1420,7 +1420,7 @@ static menuitem_t ID_Menu_Display[]=
     { M_SLDR, "GAMMA-CORRECTION",        M_ID_Gamma,             'g' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
-    { M_MUL2, "EMULATE CRY PALETTE",     M_ID_CRYPalette,        'e' },
+    { M_MUL2, "CRY COLOR SPACE",         M_ID_CRYPalette,        'c' },
     { M_MUL1, "FIELD OF VIEW",           M_ID_FOV,               'f' },
     { M_MUL1, "MENU BACKGROUND SHADING", M_ID_MenuShading,       'm' },
     { M_MUL1, "EXTRA LEVEL BRIGHTNESS",  M_ID_LevelBrightness,   'e' },
@@ -1460,7 +1460,7 @@ static void M_Draw_ID_Display (void)
                         NULL, cr[CR_MENU_BRIGHT5],
                             LINE_ALPHA(0));
 
-    // Emulate CRY palette
+    // CRY Color Space
     sprintf(str, dp_cry_palette ? "ON" : "OFF");
     M_WriteTextGlow(M_ItemRightAlign(str), 45, str,
                         dp_cry_palette ? cr[CR_GREEN] : cr[CR_DARKRED],

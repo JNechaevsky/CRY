@@ -27,6 +27,7 @@
 #include "doomstat.h"
 #include "v_trans.h"
 #include "v_video.h"
+#include "jagcry.h"   // [PN] Jaguar CRY color space
 
 #include "id_vars.h"
 
@@ -958,19 +959,111 @@ static const byte colormap[256] = {
     240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255
 };
 
+// [JN] Original Jaguar Doom CRYPAL, palette set 0 of 14.
+const uint16_t CRYPAL_Jaguar[256] =
+{
+    0,51487,55319,30795,30975,30747,30739,30731,30727,43831,44075,48415,53015,47183,47175,51263,
+    38655,38647,42995,42731,42727,42719,46811,46803,46795,46535,46527,46523,46515,50599,50599,50339,
+    50331,54423,54415,54155,54147,54143,53879,57971,57963,57703,57695,57691,57683,61519,61511,61507,
+    34815,34815,39167,38911,38911,43263,43007,43007,47359,47351,47087,47079,47071,51415,51407,51147,
+    51391,51379,51371,51363,51355,51343,51335,51327,51319,51307,51295,51539,51531,51519,51763,51755,
+    30959,30951,30943,30939,30931,30923,30919,30911,30903,30899,30891,30887,30879,30871,30867,30859,
+    30851,30847,30839,30831,30827,30819,30811,30807,30799,30791,30787,30779,30775,30767,30759,30755,
+    36095,36079,36063,36047,36031,36015,35999,35987,35971,35955,35939,35923,35907,40243,35875,40215,
+    39103,39095,39087,39079,39071,43163,43155,43147,43139,43131,43127,43119,43111,43103,43095,47187,
+    43167,43151,43139,47479,47463,47451,47183,51523,39295,39283,39275,35171,43607,39487,39479,39487,
+    48127,52199,56279,56003,60079,59547,63367,63091,30975,34815,38911,42751,46591,50431,54271,58111,
+    61695,61679,61667,61655,61643,61631,61619,61607,61595,61579,61567,61555,61543,61531,61519,61507,
+    30719,26623,22527,18175,17919,13567,9215,4607,255,227,203,179,155,131,107,83,
+    30975,34815,39167,43263,47359,51455,55295,59391,59379,63467,59103,63447,63179,63171,63159,63151,
+    30975,35071,39423,48127,52479,56831,61183,65535,63143,62879,62867,62599,47183,51267,51255,55087,
+    83,71,59,47,35,23,11,0,55551,56575,29951,28927,28879,32927,32879,42663
+};
+
+// [PN] Inverse of CRY_BuildRGBTable(). CRY's Y is luminance itself (the Y
+// of the YUV family), so id's offline converter pins the intensity to the
+// source's luma and only searches the 16x16 chroma cell. Letting Y float
+// (plain RGB least-squares) brightens dark browns and pulls them blue-ish
+// (pink); preserving luma exactly keeps the Jaguar's darker, yellower
+// shadow character.
+static uint16_t CRY_EncodeRGB(int r, int g, int b)
+{
+    // ITU-R BT.601 luma in 0..255 (weights scaled by 256).
+    const int luma = (77 * r + 150 * g + 29 * b + 128) >> 8;
+
+    int best_c = 0, best_r = 0, best_y = 0;
+    int64_t best_err = LONG_MAX;
+
+    for (int cy = 0; cy < 16; cy++)
+        for (int rd = 0; rd < 16; rd++)
+        {
+            const int vr = cryred  [cy][rd];
+            const int vg = crygreen[cy][rd];
+            const int vb = cryblue [cy][rd];
+            // Decoded luma of this cell at intensity y: (lv * y) >> 16.
+            const int lv = 77 * vr + 150 * vg + 29 * vb;
+            int y0;
+
+            if (lv <= 0)
+            continue;
+
+            // Solve (lv * y) >> 16 == luma for y.
+            y0 = (int)((((int64_t)luma << 16) + lv / 2) / lv);
+            if (y0 < 0)
+                y0 = 0;
+            if (y0 > 255)
+                y0 = 255;
+
+            for (int dy = -1; dy <= 1; dy++)
+            {
+                int y = y0 + dy;
+                int64_t dr, dg, db, err;
+
+                if (y < 0)
+                    y = 0;
+                if (y > 255)
+                    y = 255;
+
+                dr = r - ((vr * y) >> 8);
+                dg = g - ((vg * y) >> 8);
+                db = b - ((vb * y) >> 8);
+                err = dr * dr + dg * dg + db * db;
+
+                if (err < best_err)
+                {
+                    best_err = err;
+                    best_c = cy;
+                    best_r = rd;
+                    best_y = y;
+
+                    if (err == 0)
+                    goto done;
+                }
+            }
+        }
+
+    done:
+    return (uint16_t)((best_c << CRY_CSHIFT) | (best_r << CRY_RSHIFT) | best_y);
+}
+
 void R_InitColormaps (void)
 {
 	int i, j = 0;
 	byte r, g, b;
 
 	byte *const playpal = W_CacheLumpName("PLAYPAL", PU_STATIC);
-	byte *const crypal = W_CacheLumpName("CRYPAL", PU_STATIC);
 	byte *const invulpal = W_CacheLumpName("PLAYINVL", PU_STATIC);
-	byte *const invulcry = W_CacheLumpName("CRYINVL", PU_STATIC);
-	// [JN] Which palette to use for in-game rendering, CRYPAL or PLAYPAL?
-	byte *const render_pointer = dp_cry_palette ? crypal : playpal;
-	// [JN] Which palette to use for invulnerability palette, CRYINVL or PLAYINVL?
-	byte *const invul_pointer = dp_cry_palette ? invulcry : invulpal;
+
+	// [PN] Jaguar CRY color space emulation.
+	// In CRYPAL mode the render base palette is the original
+	// Jaguar CRYPAL set 0 from the ROM, embedded in CRYPAL_Jaguar[] above.
+	// The invulnerability base is PLAYINVL projected through the CRY encoder.
+	static boolean cry_table_built = false;
+	if (!cry_table_built)
+	{
+		CRY_BuildRGBTable();
+		cry_table_built = true;
+	}
 
 	if (!colormaps)
 	{
@@ -984,18 +1077,47 @@ void R_InitColormaps (void)
     
     byte base_gamma_render[256][3];
     byte base_gamma_invul [256][3];
+
+    // [PN] Native CRY encodings of the base palettes (CRYPAL mode only):
+    // lighting later scales the Y component in CRY space, exactly like
+    // Calico's renderer (chroma cells stay fixed while dimming).
+    uint16_t crybase_render[256];
+    uint16_t crybase_invul [256];
     
     for (int p = 0; p < 256; ++p)
     {
-        // [PN] Render palette (CRYPAL or PLAYPAL)
-        base_gamma_render[p][0] = gtab[render_pointer[3 * p + 0]];
-        base_gamma_render[p][1] = gtab[render_pointer[3 * p + 1]];
-        base_gamma_render[p][2] = gtab[render_pointer[3 * p + 2]];
-    
-        // [PN] Invulnerability palette (CRYINVL or PLAYINVL)
-        base_gamma_invul[p][0]  = gtab[invul_pointer [3 * p + 0]];
-        base_gamma_invul[p][1]  = gtab[invul_pointer [3 * p + 1]];
-        base_gamma_invul[p][2]  = gtab[invul_pointer [3 * p + 2]];
+        if (!dp_cry_palette)
+        {
+            base_gamma_render[p][0] = gtab[playpal[3 * p + 0]];
+            base_gamma_render[p][1] = gtab[playpal[3 * p + 1]];
+            base_gamma_render[p][2] = gtab[playpal[3 * p + 2]];
+
+            base_gamma_invul[p][0] = gtab[invulpal[3 * p + 0]];
+            base_gamma_invul[p][1] = gtab[invulpal[3 * p + 1]];
+            base_gamma_invul[p][2] = gtab[invulpal[3 * p + 2]];
+            continue;
+        }
+
+        // [PN] Base CRY value: authentic ROM palette for the render base.
+        // The invul base is our own cyan palette, so it is projected with
+        // the free encoder instead of snapping to id's 256-color gamut.
+        crybase_render[p] = CRYPAL_Jaguar[p];
+        crybase_invul[p] = CRY_EncodeRGB(invulpal[3 * p + 0],
+                                         invulpal[3 * p + 1],
+                                         invulpal[3 * p + 2]);
+
+        // [JN] Apply gamma tables after CRY decoding so gamma
+        // correction works the same way as with the PLAYPAL palette.
+        const uint32_t rgb  = CRYToRGB[crybase_render[p]];
+        const uint32_t rgbi = CRYToRGB[crybase_invul[p]];
+
+        base_gamma_render[p][0] = gtab[(rgb >> 16) & 0xff];
+        base_gamma_render[p][1] = gtab[(rgb >> 8) & 0xff];
+        base_gamma_render[p][2] = gtab[rgb & 0xff];
+
+        base_gamma_invul[p][0] = gtab[(rgbi >> 16) & 0xff];
+        base_gamma_invul[p][1] = gtab[(rgbi >> 8) & 0xff];
+        base_gamma_invul[p][2] = gtab[rgbi & 0xff];
     }
     
     // [PN] Build colormaps with simple gamma-space fade to black
@@ -1012,6 +1134,34 @@ void R_InitColormaps (void)
         {
             const byte k = colormap[i]; // mapping index (identity in your table)
     
+            if (dp_cry_palette)
+            {
+                // [PN] Calico's lighting model: the colormap is a signed
+                // luminance offset added to the CRY Y channel (max about
+                // -64), not a fade to black — dark areas keep their color,
+                // which is the Jaguar's "lifted, cold" shadow look.
+                const int yoff = (255 * c) / (NUMCOLORMAPS * 4);
+
+                const uint16_t cb = crybase_render[k];
+                const uint16_t ci = crybase_invul[k];
+
+                int y  = (int)(cb & CRY_YMASK) - yoff;
+                int yi = (int)(ci & CRY_YMASK) - yoff;
+                if (y  < 0) y  = 0;
+                if (yi < 0) yi = 0;
+
+                const uint32_t dec  = CRYToRGB[(cb & CRY_COLORMASK) | y];
+                const uint32_t deci = CRYToRGB[(ci & CRY_COLORMASK) | yi];
+
+                row_col[i] = 0xff000000 | (gtab[(dec >> 16) & 0xff] << 16)
+                                        | (gtab[(dec >> 8) & 0xff] << 8)
+                                        |  gtab[dec & 0xff];
+                row_inv[i] = 0xff000000 | (gtab[(deci >> 16) & 0xff] << 16)
+                                        | (gtab[(deci >> 8) & 0xff] << 8)
+                                        |  gtab[deci & 0xff];
+                continue;
+            }
+
             // [PN] Normal colormap (render palette)
             const int R = (int)(base_gamma_render[k][0] * k0 + kB);
             const int G = (int)(base_gamma_render[k][1] * k0 + kB);
@@ -1047,22 +1197,20 @@ void R_InitColormaps (void)
 		cry_color = (pixel_t*) Z_Malloc(256 * sizeof(pixel_t), PU_STATIC, 0);
 	}
 
-	for (i = 256, j = 0; i < 512; i++)
+	// [PN] Patch-drawing palette: in CRYPAL mode identical
+	// to the projected render base above.
+	for (i = 0, j = 0; i < 256; i++)
 	{
-		r = gammatable[vid_gamma][crypal[3 * i + 0]];
-		g = gammatable[vid_gamma][crypal[3 * i + 1]];
-		b = gammatable[vid_gamma][crypal[3 * i + 2]];
-
-		cry_color[j++] = 0xff000000 | (r << 16) | (g << 8) | b;
+		cry_color[i] = 0xff000000 | (base_gamma_render[i][0] << 16)
+		                          | (base_gamma_render[i][1] << 8)
+		                          |  base_gamma_render[i][2];
 	}
 
 	// [JN] Which palette to use for patch drawing, CRYPAL or PLAYPAL?
 	palette_pointer = dp_cry_palette ? cry_color : pal_color;
 
 	W_ReleaseLumpName("PLAYPAL");
-	W_ReleaseLumpName("CRYPAL");
 	W_ReleaseLumpName("PLAYINVL");
-	W_ReleaseLumpName("CRYINVL");
 
 	// [PN] Base colormaps[] changed: rebuild colored sector-light LUT banks.
 	R_ColLight_RebuildBanks();
