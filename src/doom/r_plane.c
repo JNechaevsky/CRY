@@ -450,13 +450,20 @@ void R_DrawPlanes (void)
                     }
 
                     // [crispy] Optionally draw skies horizontally linear.
-                    angle = ((viewangle + (vis_linear_sky ? 
+                    angle = ((viewangle + (vis_linear_sky == 1 ? 
                               linearskyangle[x] : xtoviewangle[x])) ^ gp_flip_levels) >> ANGLETOSKYSHIFT;
-                    angle2 = ((viewangle + skysmoothdelta + (vis_linear_sky ? 
+                    angle2 = ((viewangle + skysmoothdelta + (vis_linear_sky == 1 ? 
                                linearskyangle[x] : xtoviewangle[x])) ^ gp_flip_levels) >> ANGLETOSKYSHIFT;
                     dc_source = R_GetColumn(texturetranslation[skytexture2], angle);
                     dc_source2 = R_GetColumn(texturetranslation[skytexture], angle2);
-                    fracstep = FRACUNIT / vid_resolution;
+
+                    // [PN] Cylindrical sky projection.
+                    const int base_fracstep = FRACUNIT / vid_resolution;
+
+                    fracstep = (vis_linear_sky == 2)
+                             ? FixedMul(base_fracstep, abs(finecosine[xtoviewangle[x] >> ANGLETOFINESHIFT]))
+                             : base_fracstep;
+
                     frac = SKYTEXTUREMIDSHIFTED * FRACUNIT + (dc_yl - centery) * fracstep;
 
                     // [JN] HIGH detail mode.
