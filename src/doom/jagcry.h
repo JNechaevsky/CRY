@@ -52,9 +52,9 @@ extern uint32_t CRYToRGB[0x10000];
 
 void CRY_BuildRGBTable(void);
 
-const uint8_t cryred[16][16];
-const uint8_t crygreen[16][16];
-const uint8_t cryblue[16][16];
+extern const uint8_t cryred[16][16];
+extern const uint8_t crygreen[16][16];
+extern const uint8_t cryblue[16][16];
 
 #ifdef __cplusplus
 }
