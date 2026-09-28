@@ -21,6 +21,11 @@ on:
 permissions:
   contents: write
   actions: write
+  security-events: write
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+    cancel-in-progress: ${{ github.head_ref != '' }}
 
 env:
   VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/vcpkg_cache,readwrite"
@@ -28,7 +33,7 @@ env:
 jobs:
   windows_64bit:
     name: Windows (64-bit)
-    runs-on: windows-latest
+    runs-on: windows-2025-vs2026
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
@@ -92,7 +97,7 @@ jobs:
 
   windows_32bit:
     name: Windows (32-bit)
-    runs-on: windows-latest
+    runs-on: windows-2025-vs2026
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
@@ -173,11 +178,23 @@ jobs:
           mkdir -p appdir/usr/share/icons/hicolor/128x128/apps
           cp data/doom.png appdir/usr/share/icons/hicolor/128x128/apps/cry.png
 
-      - name: Add executable to AppDir
+      - name: Add executable and bundled IWAD to AppDir
         run: |
           mkdir -p appdir/usr/bin
           cp build_linux/src/cry appdir/usr/bin/
-          cp iwad/cry.wad .
+          # Bundle the IWAD inside the AppImage; the custom AppRun below
+          # points DOOMWADDIR into the mounted image, which CRY's standard
+          # IWAD search (d_iwad.c) honors.
+          mkdir -p appdir/usr/share/games/doom
+          cp iwad/cry.wad appdir/usr/share/games/doom/
+          cat > appdir/AppRun <<'EOF'
+          #!/usr/bin/env bash
+          HERE="$(dirname "$(readlink -f "${0}")")"
+          export LD_LIBRARY_PATH="${HERE}/usr/lib:${HERE}/usr/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH}"
+          export DOOMWADDIR="${HERE}/usr/share/games/doom"
+          exec "${HERE}/usr/bin/cry" "$@"
+          EOF
+          chmod +x appdir/AppRun
 
       - name: Package as AppImage
         run: |
@@ -196,8 +213,107 @@ jobs:
           path: |
             **/*.AppImage
             **/*.AppImage.zsync
-            cry.wad
           retention-days: 3
+
+  codeql:
+    name: Analyze (CodeQL)
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      
+    steps:
+      - uses: actions/checkout@v7
+      
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install fluidsynth libfluidsynth-dev libsamplerate0-dev libsdl2-dev libsdl2-mixer-dev ninja-build
+      
+      - name: Configure CMake
+        run: cmake -S . -B debug -G Ninja -DCMAKE_BUILD_TYPE=Debug
+      
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4.38.0
+        with:
+          languages: c-cpp
+          build-mode: manual
+          dependency-caching: false
+      
+      - name: Build the project (CodeQL will trace it)
+        run: |
+          cmake --build debug --parallel
+        env:
+          CC: clang
+          CXX: clang++
+      
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4.38.0
+        with:
+          category: "/language:c-cpp"
+
+  cppcheck:
+    name: Analyze (Cppcheck)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install cppcheck
+
+      - uses: actions/checkout@v7
+
+      - name: Run cppcheck
+        env:
+          ANALYZE: true
+        run: |
+          cppcheck --error-exitcode=1 -j2 -UTESTING -D__GNUC__ -Iopl -Isrc -Isrc/setup opl pcsound src textscreen
+
+  cpp-linter:
+    name: Analyze (Cpp-linter)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install fluidsynth libfluidsynth-dev libsamplerate0-dev libsdl2-dev libsdl2-mixer-dev ninja-build
+      - name: Run cmake to generate compilation database
+        run: cmake -S . -B . -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=1
+      - uses: cpp-linter/cpp-linter-action@v2
+        id: linter
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          style: ''      # Disable clang-format
+          lines-changed-only: true
+          files-changed-only: true
+          tidy-checks: >-
+            boost-*
+            ,bugprone-*
+            ,performance-*
+            ,readability-*
+            ,portability-*
+            ,modernize-*
+            ,clang-analyzer-*
+            ,cppcoreguidelines-*
+            ,-cppcoreguidelines-avoid-magic-numbers
+            ,-cppcoreguidelines-init-variables
+            ,-readability-identifier-length
+            ,-readability-isolate-declaration
+            ,-readability-magic-numbers
+
+      - name: Fail if linting issues found
+        if: steps.linter.outputs.checks-failed > 0
+        run: |
+          echo "Some files failed the linting checks! Fail fast disabled until false positive issue is fixed"
+          # exit 1
+
+      - name: Verify that 'extern' is not used in .c files
+        run: |
+          # Find all .c files (excluding lib/miniz) and grep for 'extern'
+          EXTERN=$(find . -name "*.c" -not -path "./lib/miniz/*" -exec grep -H -e 'extern[^A-Za-z0-9_]' {} \;)
+          if [ -n "$EXTERN" ]; then
+            echo "❌ 'extern' found in .c files (should only be in .h files):"
+            echo "$EXTERN"
+            # exit 1
+          else
+            echo "✅ No 'extern' declarations found in .c files"
+          fi
 
   release_nightly:
     name: Create Nightly Release
@@ -244,14 +360,13 @@ jobs:
             ./artifacts/cry-win32.zip
             ./artifacts/linux64/*.AppImage
             ./artifacts/linux64/*.AppImage.zsync
-            ./artifacts/linux64/cry.wad
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   cleanup_actions:
     name: Cleanup Actions
     runs-on: ubuntu-latest
-    needs: [windows_64bit, windows_32bit, linux_64bit]
+    needs: [windows_64bit, windows_32bit, linux_64bit, codeql]
     if: always() && github.event_name != 'pull_request'
     steps:
       - name: Keep only latest workflow runs
@@ -272,4 +387,23 @@ jobs:
           | while read -r run_id; do
               echo "Deleting workflow run ${run_id}"
               gh api -X DELETE /repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}
+            done
+
+      - name: Prune old CodeQL trap caches
+        env:
+          GH_TOKEN: ${{ github.token }}
+          KEEP_CODEQL_CACHES: 4
+        run: |
+          gh api --paginate \
+            "/repos/${GITHUB_REPOSITORY}/actions/caches?key=codeql-trap" \
+            --jq "(.actions_caches // [])[]
+              | select(.key | startswith(\"codeql-trap\"))
+              | [.created_at, .id]
+              | @tsv" \
+              | sort -r \
+              | tail -n +$((KEEP_CODEQL_CACHES + 1)) \
+              | cut -f2 \
+              | while read -r cache_id; do
+              echo "Deleting CodeQL trap cache ${cache_id}"
+              gh api -X DELETE "/repos/${GITHUB_REPOSITORY}/actions/caches/${cache_id}"
             done
