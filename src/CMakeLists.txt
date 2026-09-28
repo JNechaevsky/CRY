@@ -29,6 +29,7 @@ set(GAME_SOURCE_FILES
     i_sdlmusic.c
     i_sdlsound.c
     i_sound.c           i_sound.h
+    i_jagmusic.c        i_jagmusic.h
     i_timer.c           i_timer.h
     i_truecolor.c       i_truecolor.h
     i_video.c           i_video.h

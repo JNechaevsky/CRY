@@ -25,6 +25,7 @@
 #include "doomtype.h"
 
 #include "i_sound.h"
+#include "i_jagmusic.h"
 #include "i_video.h"
 #include "m_argv.h"
 #include "m_config.h"
@@ -380,6 +381,10 @@ void I_ShutdownMusic(void)
 
 void I_SetMusicVolume(int volume)
 {
+    // [PN] The Jaguar synth mixes via post-mix and scales the master
+    // volume itself, so it must be broadcast unconditionally.
+    music_jag_module.SetMusicVolume(volume);
+
     if (music_module != NULL)
     {
         music_module->SetMusicVolume(volume);
@@ -427,6 +432,16 @@ boolean IsMus(byte *mem, int len)
 
 void *I_RegisterSong(void *data, int len)
 {
+    // [PN] Jaguar native music: sample-sequencer stream, neither MUS nor
+    // MIDI; route to the software synth when the instrument bank is in
+    // the WAD and the stream validates.
+    if (I_JagMusic_Init() && !IsMid(data, len) && !IsMus(data, len)
+        && I_JagMusic_IsNative(data, len))
+    {
+        active_music_module = &music_jag_module;
+        return active_music_module->RegisterSong(data, len);
+    }
+
     if (!IsMid(data, len) && !IsMus(data, len))
     {
 #ifndef DISABLE_SDL2MIXER
