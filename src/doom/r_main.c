@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -13,17 +14,12 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// DESCRIPTION:
-//	Rendering main loop and setup functions,
-//	 utility functions (BSP, geometry, trigonometry).
-//	See tables.c, too.
-//
 
 
 #include <stdlib.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
-#include "doomstat.h" // [AM] leveltime, paused, menuactive
+#include "doomstat.h"
 #include "m_bbox.h"
 #include "d_main.h"
 #include "m_menu.h"
@@ -39,67 +35,68 @@
 
 
 // Fineangles in the SCREENWIDTH wide window.
-#define FIELDOFVIEW		2048	
+#define FIELDOFVIEW 2048
 
 
 
 // increment every time a check is made
-int			validcount = 1;		
+int validcount = 1;
 
+lighttable_t *invulcolormap;
 
-lighttable_t*		invulcolormap;
+int     centerx;
+int     centery;
+fixed_t centerxfrac;
+fixed_t centeryfrac;
+fixed_t projection;
 
+fixed_t viewx;
+fixed_t viewy;
+fixed_t viewz;
 
-int			centerx;
-int			centery;
+angle_t     viewangle;
+localview_t localview; // [crispy]
 
-fixed_t			centerxfrac;
-fixed_t			centeryfrac;
-fixed_t			projection;
+fixed_t viewcos;
+fixed_t viewsin;
 
-fixed_t			viewx;
-fixed_t			viewy;
-fixed_t			viewz;
-
-angle_t			viewangle;
-localview_t		localview; // [crispy]
-
-fixed_t			viewcos;
-fixed_t			viewsin;
-
-player_t*		viewplayer;
+player_t *viewplayer;
 
 // 0 = high, 1 = low
-int			detailshift;	
+int detailshift;
 
 //
 // precalculated math tables
 //
-angle_t			clipangle;
+angle_t clipangle;
 
 // The viewangletox[viewangle + FINEANGLES/4] lookup
 // maps the visible view angles to screen X coordinates,
 // flattening the arc to a flat projection plane.
 // There will be many angles mapped to the same X. 
-int			viewangletox[FINEANGLES/2];
+int viewangletox[FINEANGLES/2];
 
 // The xtoviewangleangle[] table maps a screen pixel
 // to the lowest viewangle that maps back to x ranges
 // from clipangle to -clipangle.
-angle_t			xtoviewangle[MAXWIDTH+1];
+angle_t xtoviewangle[MAXWIDTH+1];
 
 // [crispy] calculate the linear sky angle component here
-angle_t			linearskyangle[MAXWIDTH+1];
+angle_t linearskyangle[MAXWIDTH+1];
+
+// [crispy] lookup table for horizontal screen coordinates
+int  flipscreenwidth[MAXWIDTH];
+int *flipviewwidth;
 
 // [crispy] parameterized for smooth diminishing lighting
-lighttable_t***		scalelight = NULL;
-lighttable_t**		scalelightfixed = NULL;
-lighttable_t***		zlight = NULL;
-lighttable_t***		scalelight_INVULN = NULL;
-lighttable_t***		zlight_INVULN = NULL;
+lighttable_t ***scalelight = NULL;
+lighttable_t  **scalelightfixed = NULL;
+lighttable_t ***zlight = NULL;
+lighttable_t ***scalelight_INVULN = NULL;
+lighttable_t ***zlight_INVULN = NULL;
 
 // bumped light from gun blasts
-int			extralight;			
+int extralight;
 
 // [JN] FOV from DOOM Retro, Woof! and Nugget Doom
 static fixed_t fovscale;	
@@ -116,6 +113,7 @@ void (*transcolfunc) (void);
 void (*tlcolfunc) (void);
 void (*tladdcolfunc) (void);
 void (*transtlfuzzcolfunc) (void);
+void (*shadowcolfunc) (void);
 void (*spanfunc) (void);
 
 
@@ -127,7 +125,7 @@ void (*spanfunc) (void);
 // [JN] killough 5/2/98: reformatted
 // -----------------------------------------------------------------------------
 
-int R_PointOnSide (fixed_t x, fixed_t y, const node_t *node)
+int R_PointOnSide (fixed_t x, fixed_t y, const node_t *const node)
 {
     if (!node->dx)
     {
@@ -148,7 +146,7 @@ int R_PointOnSide (fixed_t x, fixed_t y, const node_t *node)
         return (node->dy ^ x) < 0;  // (left is negative)
     }
 
-    return FixedMul(y, node->dx>>FRACBITS) >= FixedMul(node->dy>>FRACBITS, x);		
+    return FixedMul(y, node->dx>>FRACBITS) >= FixedMul(node->dy>>FRACBITS, x);
 }
 
 // -----------------------------------------------------------------------------
@@ -156,7 +154,7 @@ int R_PointOnSide (fixed_t x, fixed_t y, const node_t *node)
 // [PN] killough 5/2/98: reformatted
 // -----------------------------------------------------------------------------
 
-int R_PointOnSegSide (fixed_t x, fixed_t y, const seg_t *line)
+int R_PointOnSegSide (fixed_t x, fixed_t y, const seg_t *const line)
 {
     const fixed_t lx = line->v1->x;
     const fixed_t ly = line->v1->y;
@@ -182,8 +180,7 @@ int R_PointOnSegSide (fixed_t x, fixed_t y, const seg_t *line)
             return FixedMul(y, ldx>>FRACBITS) >= FixedMul(ldy>>FRACBITS, x);
 }
 
-
-//
+// -----------------------------------------------------------------------------
 // R_PointToAngle
 // To get a global angle from cartesian coordinates,
 //  the coordinates are flipped until they are in
@@ -191,21 +188,15 @@ int R_PointOnSegSide (fixed_t x, fixed_t y, const seg_t *line)
 //  the y (<=x) is scaled and divided by x to get a
 //  tangent (slope) value which is looked up in the
 //  tantoangle[] table.
-
 //
-
-
-
-
 // [crispy] turned into a general R_PointToAngle() flavor
 // called with either slope_div = SlopeDivCrispy() from R_PointToAngleCrispy()
 // or slope_div = SlopeDiv() else
 // [PN] Reformatted for readability and reduced nesting
-angle_t
-R_PointToAngleSlope
-( fixed_t	x,
-  fixed_t	y,
-  int (*slope_div) (unsigned int num, unsigned int den))
+// -----------------------------------------------------------------------------
+
+static angle_t R_PointToAngleSlope (fixed_t x, fixed_t y,
+                                    int(*slope_div)(unsigned int num, unsigned int den))
 {
     // [PN] Shift to local player coordinates
     x -= viewx;
@@ -251,45 +242,33 @@ R_PointToAngleSlope
     }
 }
 
-angle_t
-R_PointToAngle
-( fixed_t	x,
-  fixed_t	y )
+angle_t R_PointToAngle (fixed_t x, fixed_t y)
 {
     return R_PointToAngleSlope (x, y, SlopeDiv);
 }
 
 // [crispy] overflow-safe R_PointToAngle() flavor
 // called only from R_CheckBBox(), R_AddLine() and P_SegLengths()
-angle_t
-R_PointToAngleCrispy
-( fixed_t	x,
-  fixed_t	y )
+angle_t R_PointToAngleCrispy (fixed_t x, fixed_t y)
 {
     // [crispy] fix overflows for very long distances
     const int64_t y_viewy = (int64_t)y - viewy;
     const int64_t x_viewx = (int64_t)x - viewx;
 
     // [crispy] the worst that could happen is e.g. INT_MIN-INT_MAX = 2*INT_MIN
-    if (x_viewx < INT_MIN || x_viewx > INT_MAX ||
-        y_viewy < INT_MIN || y_viewy > INT_MAX)
+    if (x_viewx < INT_MIN || x_viewx > INT_MAX
+    ||  y_viewy < INT_MIN || y_viewy > INT_MAX)
     {
-	// [crispy] preserving the angle by halfing the distance in both directions
-	x = x_viewx / 2 + viewx;
-	y = y_viewy / 2 + viewy;
+        // [crispy] preserving the angle by halfing the distance in both directions
+        x = x_viewx / 2 + viewx;
+        y = y_viewy / 2 + viewy;
     }
 
-    return R_PointToAngleSlope (x, y, SlopeDivCrispy);
+    return R_PointToAngleSlope(x, y, SlopeDivCrispy);
 }
 
-
-angle_t
-R_PointToAngle2
-( fixed_t	x1,
-  fixed_t	y1,
-  fixed_t	x2,
-  fixed_t	y2 )
-{	
+angle_t R_PointToAngle2 (fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2)
+{
     viewx = x1;
     viewy = y1;
     
@@ -297,75 +276,9 @@ R_PointToAngle2
     return R_PointToAngleSlope (x2, y2, SlopeDiv);
 }
 
-
-// [crispy] WiggleFix: move R_ScaleFromGlobalAngle function to r_segs.c,
-// above R_StoreWallRange
-#if 0
-//
-// R_ScaleFromGlobalAngle
-// Returns the texture mapping scale
-//  for the current line (horizontal span)
-//  at the given angle.
-// rw_distance must be calculated first.
-//
-fixed_t R_ScaleFromGlobalAngle (angle_t visangle)
-{
-    fixed_t		scale;
-    angle_t		anglea;
-    angle_t		angleb;
-    int			sinea;
-    int			sineb;
-    fixed_t		num;
-    int			den;
-
-    // UNUSED
-#if 0
-{
-    fixed_t		dist;
-    fixed_t		z;
-    fixed_t		sinv;
-    fixed_t		cosv;
-	
-    sinv = finesine[(visangle-rw_normalangle)>>ANGLETOFINESHIFT];	
-    dist = FixedDiv (rw_distance, sinv);
-    cosv = finecosine[(viewangle-visangle)>>ANGLETOFINESHIFT];
-    z = abs(FixedMul (dist, cosv));
-    scale = FixedDiv(projection, z);
-    return scale;
-}
-#endif
-
-    anglea = ANG90 + (visangle-viewangle);
-    angleb = ANG90 + (visangle-rw_normalangle);
-
-    // both sines are allways positive
-    sinea = finesine[anglea>>ANGLETOFINESHIFT];	
-    sineb = finesine[angleb>>ANGLETOFINESHIFT];
-    num = FixedMul(projection,sineb)<<detailshift;
-    den = FixedMul(rw_distance,sinea);
-
-    if (den > num>>FRACBITS)
-    {
-	scale = FixedDiv (num, den);
-
-	if (scale > 64*FRACUNIT)
-	    scale = 64*FRACUNIT;
-	else if (scale < 256)
-	    scale = 256;
-    }
-    else
-	scale = 64*FRACUNIT;
-	
-    return scale;
-}
-#endif
-
-
-
 // [crispy] in widescreen mode, make sure the same number of horizontal
 // pixels shows the same part of the game scene as in regular rendering mode
-static int scaledviewwidth_nonwide;
-int viewwidth_nonwide;  // [JN] Externalized for colored lighting.
+static int scaledviewwidth_nonwide, viewwidth_nonwide;
 static fixed_t centerxfrac_nonwide;
 
 //
@@ -395,11 +308,8 @@ static void CalcMaxProjectSlope (int fov)
 // while keeping identical behavior.
 // -----------------------------------------------------------------------------
 
-void R_InitTextureMapping (void)
+static void R_InitTextureMapping (void)
 {
-    // Calc focallength 
-    const fixed_t focallength = FixedDiv(centerxfrac, fovscale);
-    
     // Calculate FOV
     angle_t fov;
     if (vid_fov == 90 && centerxfrac == centerxfrac_nonwide)
@@ -417,6 +327,8 @@ void R_InitTextureMapping (void)
     const int max_x = viewwidth + 1;
     const int min_x = -1;
     const fixed_t centerxfrac_adj = centerxfrac + FRACUNIT - 1;
+    // [PN] Set focallength (projection is calculated in R_ExecuteSetViewSize)
+    const fixed_t focallength = projection;
     
     for (int i = 0; i < FINEANGLES/2; i++)
     {
@@ -472,40 +384,33 @@ void R_InitTextureMapping (void)
     CalcMaxProjectSlope(fov);
 }
 
-
-
-//
+// -----------------------------------------------------------------------------
 // R_InitLightTables
 // Only inits the zlight table,
 //  because the scalelight table changes with view size.
-//
+// -----------------------------------------------------------------------------
 
 void R_InitLightTables (void)
 {
-    int		i;
-    int		j;
-    
+    int i;
+
     if (scalelight)
     {
-	for (i = 0; i < LIGHTLEVELS; i++)
-	{
-		free(scalelight[i]);
-	}
-	free(scalelight);
+        for (i = 0; i < LIGHTLEVELS; i++)
+            free(scalelight[i]);
+        free(scalelight);
     }
 
     if (scalelightfixed)
     {
-	free(scalelightfixed);
+        free(scalelightfixed);
     }
 
     if (zlight)
     {
-	for (i = 0; i < LIGHTLEVELS; i++)
-	{
-		free(zlight[i]);
-	}
-	free(zlight);
+        for (i = 0; i < LIGHTLEVELS; i++)
+            free(zlight[i]);
+        free(zlight);
     }
 
     if (scalelight_INVULN)
@@ -540,20 +445,19 @@ void R_InitLightTables (void)
             scale_table[j] = (FixedDiv(fracwidth, (j + 1) << LIGHTZSHIFT)) >> LIGHTSCALESHIFT;
     }
 
-    // Calculate the light levels to use
-    //  for each level / distance combination.
+    // Calculate the light levels to use for each level / distance combination.
     for (i = 0 ; i < LIGHTLEVELS ; i++)
     {
         scalelight[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight));
         zlight[i] = malloc(MAXLIGHTZ * sizeof(**zlight));
         scalelight_INVULN[i] = malloc(MAXLIGHTSCALE * sizeof(**scalelight_INVULN));
         zlight_INVULN[i] = malloc(MAXLIGHTZ * sizeof(**zlight_INVULN));
-        const int startmap = ((LIGHTLEVELS - LIGHTBRIGHT - i) << 1) * NUMCOLORMAPS / LIGHTLEVELS;
+        const int start_map = ((LIGHTLEVELS - LIGHTBRIGHT - i) << 1) * NUMCOLORMAPS / LIGHTLEVELS;
 
-        for (j = 0; j < MAXLIGHTZ; j++)
+        for (int j = 0; j < MAXLIGHTZ; j++)
         {
             const int scale = scale_table[j];
-            int level = startmap - (scale >> 1);
+            int level = start_map - (scale >> 1);
     
             if (level < 0)
                 level = 0;
@@ -582,77 +486,70 @@ int			skyscrollspeed; // Scrolling speed, depending on game episode.
 int			skycloudoffset; // Scrolling offset, depending of speed.
 int			skysmoothdelta; // Smooth scrolling offset for rendering.
 
-//
+// -----------------------------------------------------------------------------
 // R_SetViewSize
-// Do not really change anything here,
-//  because it might be in the middle of a refresh.
-// The change will take effect next refresh.
-//
-boolean		setsizeneeded;
-int		setblocks;
-int		setdetail;
+// Do not really change anything here, because it might be in the middle
+// of a refresh. The change will take effect next refresh.
+// -----------------------------------------------------------------------------
 
-// [crispy] lookup table for horizontal screen coordinates
-int		flipscreenwidth[MAXWIDTH];
-int		*flipviewwidth;
+boolean setsizeneeded;
+int     setblocks;
+int     setdetail;
 
-void
-R_SetViewSize
-( int		blocks,
-  int		detail )
+void R_SetViewSize (int blocks, int detail)
 {
     setsizeneeded = true;
     setblocks = blocks;
     setdetail = detail;
 }
 
-
-//
+// -----------------------------------------------------------------------------
 // R_ExecuteSetViewSize
-//
+// -----------------------------------------------------------------------------
+
 void R_ExecuteSetViewSize (void)
 {
-    fixed_t	cosadj;
-    int		i;
-    int		j;
-    double	WIDEFOVDELTA;  // [JN] FOV from DOOM Retro and Nugget Doom
+    int	    i;
+    int	    j;
+    fixed_t cosadj;
+    double  WIDEFOVDELTA;  // [JN] FOV from DOOM Retro and Nugget Doom
 
     setsizeneeded = false;
 
     if (setblocks >= 11) // [crispy] Crispy HUD
     {
-	scaledviewwidth_nonwide = NONWIDEWIDTH;
-	scaledviewwidth = SCREENWIDTH;
-	viewheight = SCREENHEIGHT;
+        scaledviewwidth_nonwide = NONWIDEWIDTH;
+        scaledviewwidth = SCREENWIDTH;
+        viewheight = SCREENHEIGHT;
     }
     // [crispy] hard-code to SCREENWIDTH and SCREENHEIGHT minus status bar height
     else if (setblocks == 10)
     {
-	scaledviewwidth_nonwide = NONWIDEWIDTH;
-	scaledviewwidth = SCREENWIDTH;
-	viewheight = SCREENHEIGHT-(ST_HEIGHT*vid_resolution);
+        scaledviewwidth_nonwide = NONWIDEWIDTH;
+        scaledviewwidth = SCREENWIDTH;
+        viewheight = SCREENHEIGHT-(ST_HEIGHT*vid_resolution);
     }
     else
     {
-	scaledviewwidth_nonwide = (setblocks*32)*vid_resolution;
-	viewheight = ((setblocks*168/10)&~7)*vid_resolution;
+        scaledviewwidth_nonwide = (setblocks * 32) * vid_resolution;
+        viewheight = ((setblocks * 168 / 10) & ~7) * vid_resolution;
 
-	// [crispy] regular viewwidth in non-widescreen mode
-	if (vid_widescreen)
-	{
-		const int widescreen_edge_aligner = 8 * vid_resolution;
+        // [crispy] regular viewwidth in non-widescreen mode
+        if (vid_widescreen)
+        {
+            const int widescreen_edge_aligner = 8 * vid_resolution;
 
-		scaledviewwidth = viewheight*SCREENWIDTH/(SCREENHEIGHT-(ST_HEIGHT*vid_resolution));
-		// [crispy] make sure scaledviewwidth is an integer multiple of the bezel patch width
-		scaledviewwidth = (scaledviewwidth / widescreen_edge_aligner) * widescreen_edge_aligner;
-		scaledviewwidth = MIN(scaledviewwidth, SCREENWIDTH);
-	}
-	else
-	{
-		scaledviewwidth = scaledviewwidth_nonwide;
-	}
+            scaledviewwidth = viewheight*SCREENWIDTH/(SCREENHEIGHT-(ST_HEIGHT*vid_resolution));
+            // [crispy] make sure scaledviewwidth is an integer multiple of the bezel patch width
+            scaledviewwidth = (scaledviewwidth / widescreen_edge_aligner) * widescreen_edge_aligner;
+            scaledviewwidth = MIN(scaledviewwidth, SCREENWIDTH);
+        }
+        else
+        {
+            scaledviewwidth = scaledviewwidth_nonwide;
+        }
     }
-    
+
     // [JN] Enforce LOW detail for 1x resolution to represent vanilla render.
     if (vid_resolution == 1)
     {
@@ -662,9 +559,9 @@ void R_ExecuteSetViewSize (void)
     {
         detailshift = setdetail;
     }
-    viewwidth = scaledviewwidth>>detailshift;
-    viewwidth_nonwide = scaledviewwidth_nonwide>>detailshift;
-	
+    viewwidth = scaledviewwidth >> detailshift;
+    viewwidth_nonwide = scaledviewwidth_nonwide >> detailshift;
+
     // [JN] FOV from DOOM Retro and Nugget Doom
     fovdiff = (float) 90 / vid_fov;
     if (vid_widescreen) 
@@ -678,52 +575,54 @@ void R_ExecuteSetViewSize (void)
         WIDEFOVDELTA = 0;
     }
 
-    centery = viewheight/2;
-    centerx = viewwidth/2;
-    centerxfrac = centerx<<FRACBITS;
-    centeryfrac = centery<<FRACBITS;
-    centerxfrac_nonwide = (viewwidth_nonwide/2)<<FRACBITS;
+    centery = viewheight / 2;
+    centerx = viewwidth / 2;
+    centerxfrac = centerx << FRACBITS;
+    centeryfrac = centery << FRACBITS;
+    centerxfrac_nonwide = (viewwidth_nonwide / 2) << FRACBITS;
     // [JN] FOV from DOOM Retro and Nugget Doom
     fovscale = finetangent[(int)(FINEANGLES / 4 + (vid_fov + WIDEFOVDELTA) * FINEANGLES / 360 / 2)];
     projection = FixedDiv(centerxfrac, fovscale);
 
     if (!detailshift)
     {
-	colfunc = basecolfunc = R_DrawColumn;
-	fuzzcolfunc = R_DrawFuzzColumn;
-	fuzztlcolfunc = R_DrawFuzzTLColumn;
-	fuzzbwcolfunc = R_DrawFuzzBWColumn;
-	transcolfunc = R_DrawTranslatedColumn;
-	tlcolfunc = R_DrawTLColumn;
-	tladdcolfunc = R_DrawTLAddColumn;
-	transtlfuzzcolfunc = R_DrawTransTLFuzzColumn;
-	spanfunc = R_DrawSpan;
+        colfunc = basecolfunc = R_DrawColumn;
+        fuzzcolfunc = R_DrawFuzzColumn;
+        fuzzbwcolfunc = R_DrawFuzzBWColumn;
+        transcolfunc = R_DrawTranslatedColumn;
+        tlcolfunc = R_DrawTLColumn;
+        tladdcolfunc = R_DrawTLAddColumn;
+        fuzztlcolfunc = R_DrawFuzzTLColumn;
+        transtlfuzzcolfunc = R_DrawTransTLFuzzColumn;
+        shadowcolfunc = R_DrawShadowColumn;
+        spanfunc = R_DrawSpan;
     }
     else
     {
-	colfunc = basecolfunc = R_DrawColumnLow;
-	fuzzcolfunc = R_DrawFuzzColumnLow;
-	fuzztlcolfunc = R_DrawFuzzTLColumnLow;
-	fuzzbwcolfunc = R_DrawFuzzBWColumnLow;
-	transcolfunc = R_DrawTranslatedColumnLow;
-	tlcolfunc = R_DrawTLColumnLow;
-	tladdcolfunc = R_DrawTLAddColumnLow;
-	transtlfuzzcolfunc = R_DrawTransTLFuzzColumnLow;
-	spanfunc = R_DrawSpanLow;
+        colfunc = basecolfunc = R_DrawColumnLow;
+        fuzzcolfunc = R_DrawFuzzColumnLow;
+        fuzzbwcolfunc = R_DrawFuzzBWColumnLow;
+        transcolfunc = R_DrawTranslatedColumnLow;
+        tlcolfunc = R_DrawTLColumnLow;
+        tladdcolfunc = R_DrawTLAddColumnLow;
+        fuzztlcolfunc = R_DrawFuzzTLColumnLow;
+        transtlfuzzcolfunc = R_DrawTransTLFuzzColumnLow;
+        shadowcolfunc = R_DrawShadowColumnLow;
+        spanfunc = R_DrawSpanLow;
     }
 
-    R_InitBuffer (scaledviewwidth, viewheight);
-	
-    R_InitTextureMapping ();
-    
+    R_InitBuffer(scaledviewwidth, viewheight);
+
+    R_InitTextureMapping();
+
     // psprite scales
-    pspritescale = FRACUNIT*viewwidth_nonwide/ORIGWIDTH;
-    pspriteiscale = FRACUNIT*ORIGWIDTH/viewwidth_nonwide;
-    
+    pspritescale = FRACUNIT * viewwidth_nonwide / ORIGWIDTH;
+    pspriteiscale = FRACUNIT * ORIGWIDTH / viewwidth_nonwide;
+
     // thing clipping
-    for (i=0 ; i<viewwidth ; i++)
-	screenheightarray[i] = viewheight;
-    
+    for (i = 0 ; i < viewwidth ; i++)
+        screenheightarray[i] = viewheight;
+
     // planes
     {
         // [crispy] re-generate lookup-table for yslope[] (free look)
@@ -745,13 +644,13 @@ void R_ExecuteSetViewSize (void)
         }
     }
     yslope = yslopes[LOOKDIRMIN];
-	
-    for (i=0 ; i<viewwidth ; i++)
+
+    for (i = 0 ; i < viewwidth ; i++)
     {
-	cosadj = abs(finecosine[xtoviewangle[i]>>ANGLETOFINESHIFT]);
-	distscale[i] = FixedDiv (FRACUNIT,cosadj);
+        cosadj = abs(finecosine[xtoviewangle[i] >> ANGLETOFINESHIFT]);
+        distscale[i] = FixedDiv(FRACUNIT, cosadj);
     }
-    
+
     // [PN] Precalculate lighting scale table before generating scalelight[][]
     int *scale_table = malloc(MAXLIGHTSCALE * sizeof(*scale_table));
     {
@@ -764,11 +663,11 @@ void R_ExecuteSetViewSize (void)
     //  for each level / scale combination.
     for (i = 0 ; i < LIGHTLEVELS ; i++)
     {
-        const int startmap = ((LIGHTLEVELS - LIGHTBRIGHT - i) << 1) * NUMCOLORMAPS / LIGHTLEVELS;
+        const int start_map = ((LIGHTLEVELS - LIGHTBRIGHT - i) << 1) * NUMCOLORMAPS / LIGHTLEVELS;
 
         for (j = 0 ; j < MAXLIGHTSCALE ; j++)
         {
-            int level = startmap - scale_table[j];
+            int level = start_map - scale_table[j];
 
             if (level < 0)
                 level = 0;
@@ -786,23 +685,21 @@ void R_ExecuteSetViewSize (void)
     // [crispy] lookup table for horizontal screen coordinates
     for (i = 0, j = SCREENWIDTH - 1; i < SCREENWIDTH; i++, j--)
     {
-	flipscreenwidth[i] = gp_flip_levels ? j : i;
+        flipscreenwidth[i] = gp_flip_levels ? j : i;
     }
 
     flipviewwidth = flipscreenwidth + (gp_flip_levels ? (SCREENWIDTH - scaledviewwidth) : 0);
-    
-    R_FillBackScreen();   // erase old menu stuff
 
-    st_fullupdate = true; // [JN] Redraw status bar background.
+    // Erase old menu stuff
+    R_FillBackScreen();
+
+    // [crispy] Redraw status bar, needed for widescreen HUD
+    st_fullupdate = true;
 }
 
-
-
-//
+// -----------------------------------------------------------------------------
 // R_Init
-//
-
-
+// -----------------------------------------------------------------------------
 
 void R_Init (void)
 {
@@ -819,32 +716,29 @@ void R_Init (void)
     printf ("]");
 }
 
-
-//
+// -----------------------------------------------------------------------------
 // R_PointInSubsector
-//
-subsector_t*
-R_PointInSubsector
-( fixed_t	x,
-  fixed_t	y )
+// -----------------------------------------------------------------------------
+
+subsector_t *R_PointInSubsector (fixed_t x, fixed_t y)
 {
-    node_t*	node;
-    int		side;
-    int		nodenum;
+    node_t *node;
+    int     side;
+    int     nodenum;
 
     // single subsector is a special case
-    if (!numnodes)				
-	return subsectors;
-		
+    if (!numnodes)
+        return subsectors;
+
     nodenum = numnodes-1;
 
     while (! (nodenum & NF_SUBSECTOR) )
     {
-	node = &nodes[nodenum];
-	side = R_PointOnSide (x, y, node);
-	nodenum = node->children[side];
+        node = &nodes[nodenum];
+        side = R_PointOnSide (x, y, node);
+        nodenum = node->children[side];
     }
-	
+
     return &subsectors[nodenum & ~NF_SUBSECTOR];
 }
 
@@ -861,23 +755,25 @@ static inline boolean CheckLocalView(const player_t *player)
   );
 }
 
-//
+// -----------------------------------------------------------------------------
 // R_SetupFrame
-//
-void R_SetupFrame (player_t* player)
-{		
-    int		tempCentery;
-    int		pitch;
+// -----------------------------------------------------------------------------
+
+static void R_SetupFrame (player_t *const player)
+{
+    int tempCentery;
+    int pitch; // [crispy]
+    int tableAngle;
 
     viewplayer = player;
-    
+
     if (crl_spectating)
     {
         fixed_t bx, by, bz;
         angle_t ba;
 
-    	// RestlessRodent -- Get camera position
-    	CRL_GetCameraPos(&bx, &by, &bz, &ba);
+        // RestlessRodent -- Get camera position
+        CRL_GetCameraPos(&bx, &by, &bz, &ba);
         
         if (vid_uncapped_fps)
         {
@@ -885,6 +781,7 @@ void R_SetupFrame (player_t* player)
             viewy = LerpFixed(CRL_camera_oldy, by);
             viewz = LerpFixed(CRL_camera_oldz, bz);
             viewangle = LerpAngle(CRL_camera_oldang, ba);
+            pitch = LerpFixed(CRL_camera_oldlookdir, CRL_camera_lookdir) / MLOOKUNIT;
         }
         else
         {
@@ -892,8 +789,8 @@ void R_SetupFrame (player_t* player)
             viewy = by;
             viewz = bz;
             viewangle = ba;
+            pitch = CRL_camera_lookdir / MLOOKUNIT;
         }
-        pitch = 0;
     }
     else
     {
@@ -933,26 +830,30 @@ void R_SetupFrame (player_t* player)
             viewy = player->mo->y;
             viewz = player->viewz;
             viewangle = player->mo->angle;
-
-            // [crispy] pitch is actual lookdir and weapon pitch
-            pitch = player->lookdir / MLOOKUNIT;
+            pitch = player->lookdir / MLOOKUNIT; // [crispy] pitch is actual lookdir and weapon pitch
         }
-	}
-    
+    }
+
+    tableAngle = viewangle >> ANGLETOFINESHIFT;
+
     extralight = player->extralight;
     extralight += dp_level_brightness;  // [JN] Level Brightness feature.
-    
+
     // RestlessRodent -- Just report it
     CRL_ReportPosition(viewx, viewy, viewz, viewangle);
+    // [PN] Keep spectator pitch history in sync with position history.
+    CRL_ReportLookdir(CRL_camera_lookdir);
     
     if (pitch > LOOKDIRMAX)
-	pitch = LOOKDIRMAX;
+        pitch = LOOKDIRMAX;
     else
     if (pitch < -LOOKDIRMIN)
-	pitch = -LOOKDIRMIN;
+        pitch = -LOOKDIRMIN;
 
-    // apply new yslope[] whenever "lookdir", "detailshift" or "screenblocks" change
-    tempCentery = viewheight/2 + (pitch * (1 * vid_resolution)) * (dp_screen_size < 11 ? dp_screen_size : 11) / 10;
+    // [crispy] apply new yslope[] whenever "lookdir", "detailshift" or
+    // "dp_screen_size" change
+    tempCentery = viewheight / 2 + (pitch * (1 * vid_resolution))
+                * (dp_screen_size < 11 ? dp_screen_size : 11) / 10;
     if (centery != tempCentery)
     {
         centery = tempCentery;
@@ -960,27 +861,32 @@ void R_SetupFrame (player_t* player)
         yslope = yslopes[LOOKDIRMIN + pitch];
     }
 
-    viewsin = finesine[viewangle>>ANGLETOFINESHIFT];
-    viewcos = finecosine[viewangle>>ANGLETOFINESHIFT];
-	
+    viewsin = finesine[tableAngle];
+    viewcos = finecosine[tableAngle];
+
     if (player->invulcolormap)
-	invulcolormap = invulmaps;
+    {
+        invulcolormap = invulmaps;
+    }
     else
-	invulcolormap = 0;
-		
+    {
+        invulcolormap = 0;
+    }
+
     validcount++;
 }
 
-//
+// -----------------------------------------------------------------------------
 // R_RenderView
-//
+// -----------------------------------------------------------------------------
+
 void R_RenderPlayerView (player_t *player)
 {
     // [JN] Reset render counters.
     memset(&IDRender, 0, sizeof(IDRender));
 
     // Start frame
-    R_SetupFrame (player);
+    R_SetupFrame(player);
 
     // [JN] Fill view buffer with black color to prevent
     // overbrighting from post-processing effects and 
@@ -992,30 +898,32 @@ void R_RenderPlayerView (player_t *player)
     }
 
     // Clear buffers.
-    R_ClearClipSegs ();
-    R_ClearDrawSegs ();
-    R_ClearPlanes ();
-    R_ClearSprites ();
+    R_ClearClipSegs();
+    R_ClearDrawSegs();
+    R_ClearPlanes();
+    R_ClearSprites();
+
     if (automapactive && !automap_overlay)
     {
-        R_RenderBSPNode (numnodes-1);
+        R_RenderBSPNode(numnodes - 1);
         return;
     }
 
     // [crispy] smooth texture scrolling
     if (!crl_freeze)
     {
-        R_InterpolateTextureOffsets();
+        R_InterpolateTextureOffsets(); // [crispy] Smooth texture scrolling
     }
 
     // The head node is the last node output.
-    R_RenderBSPNode (numnodes-1);
+    R_RenderBSPNode(numnodes - 1);
 
-    R_DrawPlanes ();
+    R_DrawPlanes();
 
     // [crispy] draw fuzz effect independent of rendering frame rate
     R_SetFuzzPosDraw();
-    R_DrawMasked ();
+
+    R_DrawMasked();
 
     // [JN] Apply post-processing effects.
     V_PProc_PlayerView();

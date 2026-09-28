@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -85,9 +86,6 @@ typedef	struct
     short   lightlevel;
     short   special;
     short   tag;
-
-    // [JN] Value that refers to custom sector's colormap table.
-    int     color;
 
     // 0 = untraversed, 1,2 = sndlines -1
     int     soundtraversed;
@@ -366,6 +364,10 @@ typedef struct vissprite_s
     int         mobjflags;
     // [crispy] color translation table for blood colored by monster class
     byte         *translation;
+
+    // [PN] Source mobj for per-column sprite lighting.
+    const mobj_t *thing;
+
     // [JN] Indicate if vissprite's frame is bright for choosing 
     // blending option of colfunc:
     // - tlcolfunc for overlay (unlit) blending.
@@ -573,9 +575,6 @@ extern void  R_InitColormaps (void);
 extern void  R_InitData (void);
 extern void  R_PrecacheLevel (void);
 
-extern int   *texturecompositesize;
-extern byte **texturecomposite;
-
 extern int    numflats;
 
 // -----------------------------------------------------------------------------
@@ -586,20 +585,12 @@ extern void R_DrawColumn (void);
 extern void R_DrawColumnLow (void);
 extern void R_DrawFuzzColumn (void);
 extern void R_DrawFuzzColumnLow (void);
-extern void R_DrawFuzzTLColumn (void);
-extern void R_DrawFuzzTLColumnLow (void);
 extern void R_DrawFuzzBWColumn (void);
 extern void R_DrawFuzzBWColumnLow (void);
 extern void R_DrawSpan (void);
 extern void R_DrawSpanLow (void);
-extern void R_DrawTLColumn (void);
-extern void R_DrawTLColumnLow (void);
-extern void R_DrawTLAddColumn (void);
-extern void R_DrawTLAddColumnLow (void);
 extern void R_DrawTranslatedColumn (void);
 extern void R_DrawTranslatedColumnLow (void);
-extern void R_DrawTransTLFuzzColumn (void);
-extern void R_DrawTransTLFuzzColumnLow (void);
 
 extern void R_DrawViewBorder (void);
 extern void R_FillBackScreen (void);
@@ -608,10 +599,10 @@ extern void R_InitTranslationTables (void);
 extern void R_SetFuzzPosDraw (void);
 extern void R_SetFuzzPosTic (void);
 
-extern byte *dc_source, *dc_source2;
-extern byte *ds_source;		
+extern const byte *dc_source, *dc_source2;
+extern const byte *ds_source;		
+extern const byte *dc_translation;
 extern byte *translationtables;
-extern byte *dc_translation;
 
 extern int dc_x;
 extern int dc_yl;
@@ -630,6 +621,9 @@ extern fixed_t ds_ystep;
 
 extern lighttable_t *dc_colormap[2];
 extern lighttable_t *ds_colormap[2];
+
+extern pixel_t *ylookup[MAXHEIGHT];
+extern int columnofs[MAXWIDTH];
 
 extern const byte *dc_brightmap;
 extern const byte *ds_brightmap;
@@ -696,6 +690,7 @@ extern void (*transcolfunc) (void);
 extern void (*tlcolfunc) (void);
 extern void (*tladdcolfunc) (void);
 extern void (*transtlfuzzcolfunc) (void);
+extern void (*shadowcolfunc) (void);
 extern void (*spanfunc) (void);
 
 // POV related.
@@ -709,7 +704,6 @@ extern int     centery;
 extern int     validcount;
 extern int     viewwindowx;
 extern int     viewwindowy;
-extern int     viewwidth_nonwide;
 
 // [JN] FOV from DOOM Retro, Woof! and Nugget Doom
 extern  float fovdiff;
@@ -779,15 +773,15 @@ extern fixed_t distscale[MAXWIDTH];
 extern fixed_t swirlCoord_x;
 extern fixed_t swirlCoord_y;
 
-extern visplane_t *R_FindPlane (fixed_t height, int picnum, int lightlevel, int colorbank);
-extern visplane_t *R_CheckPlane (visplane_t *pl, int start, int stop);
-extern visplane_t *R_DupPlane (const visplane_t *pl, int start, int stop);
+extern visplane_t *const R_FindPlane (fixed_t height, int picnum, int lightlevel, int colorbank);
+extern visplane_t *const R_CheckPlane (visplane_t *const pl, int start, int stop);
+extern visplane_t *const R_DupPlane (const visplane_t *const pl, int start, int stop);
 
 // -----------------------------------------------------------------------------
 // R_SEGS
 // -----------------------------------------------------------------------------
 
-extern void R_RenderMaskedSegRange (drawseg_t *ds, int x1, int x2);
+extern void R_RenderMaskedSegRange (const drawseg_t *const ds, int x1, int x2);
 extern void R_StoreWallRange (int start, int stop);
 
 extern lighttable_t **walllights;
@@ -828,11 +822,11 @@ extern byte *R_WarpingFlat3 (int flatnum);
 // -----------------------------------------------------------------------------
 
 extern void R_AddPSprites (void);
-extern void R_AddSprites (sector_t *sec);
+extern void R_AddSprites (const sector_t *const sec);
+extern void R_NearbySprites (void);
 extern void R_ClearSprites (void);
-extern void R_ClipVisSprite (vissprite_t *vis, int xl, int xh);
 extern void R_DrawMasked (void);
-extern void R_DrawMaskedColumn (column_t *column);
+extern void R_DrawMaskedColumn (const column_t *const column);
 extern void R_DrawSprites (void);
 extern void R_InitSprites (const char **namelist);
 
@@ -850,8 +844,19 @@ extern int64_t sprtopscreen;
 extern fixed_t pspritescale;
 extern fixed_t pspriteiscale;
 
-// [crispy] interpolate weapon bobbing
-extern boolean pspr_interp;
+// -----------------------------------------------------------------------------
+// R_TLCNSY
+// -----------------------------------------------------------------------------
 
-extern pixel_t *ylookup[MAXHEIGHT];
-extern int      columnofs[MAXWIDTH]; 
+extern void R_DrawTLColumn (void);
+extern void R_DrawTLColumnLow (void);
+extern void R_DrawTLAddColumn (void);
+extern void R_DrawTLAddColumnLow (void);
+extern void R_DrawFuzzTLColumn (void);
+extern void R_DrawFuzzTLColumnLow (void);
+extern void R_DrawFuzzTLTransColumn (void);
+extern void R_DrawFuzzTLTransColumnLow (void);
+extern void R_DrawShadowColumn (void);
+extern void R_DrawShadowColumnLow (void);
+extern void R_DrawTransTLFuzzColumn (void);
+extern void R_DrawTransTLFuzzColumnLow (void);

@@ -215,10 +215,7 @@ void S_Shutdown(void)
 
 static void S_StopChannel(int cnum)
 {
-    int i;
-    channel_t *c;
-
-    c = &channels[cnum];
+    channel_t *const c = &channels[cnum];
 
     if (c->sfxinfo)
     {
@@ -231,7 +228,7 @@ static void S_StopChannel(int cnum)
 
         // check to see if other channels are playing the sound
 
-        for (i=0; i<snd_channels; i++)
+        for (int i=0; i<snd_channels; i++)
         {
             if (cnum != i && c->sfxinfo == channels[i].sfxinfo)
             {
@@ -244,6 +241,22 @@ static void S_StopChannel(int cnum)
         c->sfxinfo->usefulness--;
         c->sfxinfo = NULL;
         c->origin = NULL;
+    }
+}
+
+// -----------------------------------------------------------------------------
+// S_StopAllSound
+//  [JN] Stop/clear all sounds in all the available SFX channels.
+// -----------------------------------------------------------------------------
+
+void S_StopAllSound(void)
+{
+    for (int i = 0 ; i < snd_channels ; i++)
+    {
+        if (channels[i].sfxinfo)
+        {
+            S_StopChannel(i);
+        }
     }
 }
 
@@ -284,7 +297,7 @@ void S_Start(void)
     S_ChangeMusic(mnum, true);
 }
 
-void S_StopSound(mobj_t *origin)
+void S_StopSound(const mobj_t *origin)
 {
     int cnum;
 
@@ -396,11 +409,13 @@ static int S_GetChannel(mobj_t *origin, sfxinfo_t *sfxinfo)
 
 static int64_t S_ApproxDistanceZ (int64_t dx, int64_t dy, int64_t dz)
 {
+	int64_t dxy;
+
 	dx = llabs(dx);
 	dy = llabs(dy);
 	dz = llabs(dz);
 
-	int64_t dxy = (dy > dx) ? dy + (dx >> 1) : dx + (dy >> 1);
+	dxy = (dy > dx) ? dy + (dx >> 1) : dx + (dy >> 1);
 
 	return (dz > dxy) ? dz + (dxy >> 1) : dxy + (dz >> 1);
 }
@@ -412,7 +427,7 @@ static int64_t S_ApproxDistanceZ (int64_t dx, int64_t dy, int64_t dz)
 // Otherwise, modifies parameters and returns 1.
 //
 
-static int S_AdjustSoundParams(mobj_t *listener, mobj_t *source,
+static int S_AdjustSoundParams(mobj_t *const listener, mobj_t *const source,
                                int *vol, int *sep)
 {
     int64_t        approx_dist;
@@ -421,11 +436,31 @@ static int S_AdjustSoundParams(mobj_t *listener, mobj_t *source,
     int64_t        adz; // [JN] Z-axis sfx distance
     angle_t        angle;
 
+    int64_t        listener_x;
+    int64_t        listener_y;
+    int64_t        listener_z;
+    angle_t        listener_ang;
+
+    if (!crl_spectating)
+    {
+        listener_x   = listener->x;
+        listener_y   = listener->y;
+        listener_z   = listener->z;
+        listener_ang = listener->angle;
+    }
+    else
+    {
+        listener_x   = CRL_camera_x;
+        listener_y   = CRL_camera_y;
+        listener_z   = CRL_camera_z;
+        listener_ang = CRL_camera_ang;
+    }
+
     // calculate the distance to sound origin
     //  and clip it if necessary
-    adx = llabs((int64_t)listener->x - (int64_t)source->x);
-    ady = llabs((int64_t)listener->y - (int64_t)source->y);
-    adz = llabs((int64_t)listener->z - (int64_t)source->z);
+    adx = llabs(listener_x - (int64_t)source->x);
+    ady = llabs(listener_y - (int64_t)source->y);
+    adz = llabs(listener_z - (int64_t)source->z);
 
     // [JN] Always use XYZ sound attenuation.
     approx_dist = S_ApproxDistanceZ(adx, ady, adz);
@@ -436,18 +471,18 @@ static int S_AdjustSoundParams(mobj_t *listener, mobj_t *source,
     }
 
     // angle of source to listener
-    angle = R_PointToAngle2(listener->x,
-                            listener->y,
+    angle = R_PointToAngle2(listener_x,
+                            listener_y,
                             source->x,
                             source->y);
 
-    if (angle > listener->angle)
+    if (angle > listener_ang)
     {
-        angle = angle - listener->angle;
+        angle = angle - listener_ang;
     }
     else
     {
-        angle = angle + (0xffffffff - listener->angle);
+        angle = angle + (0xffffffff - listener_ang);
     }
 
     angle >>= ANGLETOFINESHIFT;
@@ -463,9 +498,9 @@ static int S_AdjustSoundParams(mobj_t *listener, mobj_t *source,
     else
     {
         // distance effect
-        *vol = (snd_SfxVolume 
+        *vol = (snd_SfxVolume
                 * ((S_CLIPPING_DIST - approx_dist)>>FRACBITS))
-                / S_ATTENUATOR;
+            / S_ATTENUATOR;
     }
 
     return (*vol > 0);
@@ -473,21 +508,11 @@ static int S_AdjustSoundParams(mobj_t *listener, mobj_t *source,
 
 void S_StartSound(void *origin_p, int sfx_id)
 {
-    sfxinfo_t *sfx;
-    mobj_t *origin;
-    int rc;
-    int sep;
-    int pitch;
-    int cnum;
-    int volume;
-
+    // [JN] Do not play sound while demo-warp.
     if (!snd_SfxVolume)
     {
         return;
     }
-
-    origin = (mobj_t *) origin_p;
-    volume = snd_SfxVolume;
 
     // check for bogus sound #
     if (sfx_id < 1 || sfx_id > NUMSFX)
@@ -495,10 +520,13 @@ void S_StartSound(void *origin_p, int sfx_id)
         I_Error("Bad sfx #: %d", sfx_id);
     }
 
-    sfx = &S_sfx[sfx_id];
-
     // Initialize sound parameters
-    pitch = NORM_PITCH;
+    mobj_t *const origin = (mobj_t *) origin_p;
+    sfxinfo_t *const sfx = &S_sfx[sfx_id];
+    int volume = snd_SfxVolume;
+    int pitch = NORM_PITCH;
+    int sep = NORM_SEP;
+
     if (sfx->link)
     {
         volume += sfx->volume;
@@ -515,30 +543,28 @@ void S_StartSound(void *origin_p, int sfx_id)
         }
     }
 
+    // [PN] Cache player pointers to avoid multiple global array lookups.
+    mobj_t *const listener = players[displayplayer].mo;
+    mobj_t *const listener_so = players[displayplayer].so;
 
     // Check to see if it is audible,
     //  and if not, modify the params
-    if (origin && origin != players[displayplayer].mo && origin != players[displayplayer].so) // [crispy] weapon sound source
+    // [PN] In spectating mode we DO NOT treat displayplayer sounds as local:
+    // everything should be positioned in world at the real player's coords.
+    if (origin)
     {
-        rc = S_AdjustSoundParams(players[displayplayer].mo,
-                                 origin,
-                                 &volume,
-                                 &sep);
+        const boolean force_local = (!crl_spectating)
+            && (origin == listener || origin == listener_so); // [crispy] weapon sound source
 
-        if (origin->x == players[displayplayer].mo->x
-         && origin->y == players[displayplayer].mo->y)
+        if (!force_local)
         {
-            sep = NORM_SEP;
-        }
+            const int rc = S_AdjustSoundParams(listener, origin, &volume, &sep);
 
-        if (!rc)
-        {
-            return;
+            if (!rc)
+            {
+                return;
+            }
         }
-    }
-    else
-    {
-        sep = NORM_SEP;
     }
 
     // [JN] Jaguar: optionally emulate real Jaguar hardware lower pitch.
@@ -548,7 +574,7 @@ void S_StartSound(void *origin_p, int sfx_id)
     S_StopSound(origin);
 
     // try to find a channel
-    cnum = S_GetChannel(origin, sfx);
+    const int cnum = S_GetChannel(origin, sfx);
 
     if (cnum < 0)
     {
@@ -567,7 +593,7 @@ void S_StartSound(void *origin_p, int sfx_id)
     }
 
     channels[cnum].pitch = pitch;
-    channels[cnum].handle = I_StartSound(sfx, cnum, volume, sep, channels[cnum].pitch);
+    channels[cnum].handle = I_StartSound(sfx, cnum, volume, sep, pitch);
 }
 
 void S_StartSoundOnce (void *origin_p, int sfx_id)
@@ -619,8 +645,8 @@ void S_UpdateSounds(mobj_t *listener)
     int                cnum;
     int                volume;
     int                sep;
-    sfxinfo_t*        sfx;
-    channel_t*        c;
+    const sfxinfo_t   *sfx;
+    const channel_t   *c;
 
     I_UpdateSound();
 
@@ -653,20 +679,24 @@ void S_UpdateSounds(mobj_t *listener)
 
                 // check non-local sounds for distance clipping
                 //  or modify their params
-                if (c->origin && listener != c->origin && c->origin != players[displayplayer].so) // [crispy] weapon sound source
+                // [PN] In spectating mode the displayplayer's own sounds are NOT local.
+                if (c->origin)
                 {
-                    audible = S_AdjustSoundParams(listener,
-                                                  c->origin,
-                                                  &volume,
-                                                  &sep);
+                    boolean treat_local = (!crl_spectating)
+                        && ((listener == c->origin) || (c->origin == players[displayplayer].so)); // [crispy] weapon sound source
 
-                    if (!audible)
+                    if (!treat_local)
                     {
-                        S_StopChannel(cnum);
-                    }
-                    else
-                    {
-                        I_UpdateSoundParams(c->handle, volume, sep);
+                        audible = S_AdjustSoundParams(listener, c->origin, &volume, &sep);
+
+                        if (!audible)
+                        {
+                            S_StopChannel(cnum);
+                        }
+                        else
+                        {
+                            I_UpdateSoundParams(c->handle, volume, sep);
+                        }
                     }
                 }
             }

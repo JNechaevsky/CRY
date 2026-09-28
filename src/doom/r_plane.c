@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -12,11 +13,6 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
-// DESCRIPTION:
-//	Here is a core component: drawing the floors and ceilings,
-//	 while maintaining a per column clipping list only.
-//	Moreover, the sky areas have to be determined.
 //
 
 
@@ -44,7 +40,7 @@
 // Lee Killough
 // -----------------------------------------------------------------------------
 
-#define MAXVISPLANES	128                  // must be a power of 2
+#define MAXVISPLANES 128                     // must be a power of 2
 
 static visplane_t *visplanes[MAXVISPLANES];  // [JN] killough
 static visplane_t *freetail;                 // [JN] killough
@@ -64,37 +60,31 @@ size_t  maxopenings;
 int    *openings;     // [JN] 32-bit integer math
 int    *lastopening;  // [JN] 32-bit integer math
 
-
 //
 // Clip values are the solid pixel bounding the range.
 //  floorclip starts out SCREENHEIGHT
 //  ceilingclip starts out -1
 //
-int  floorclip[MAXWIDTH];    // [JN] 32-bit integer math
-int  ceilingclip[MAXWIDTH];  // [JN] 32-bit integer math
+
+int floorclip[MAXWIDTH];    // [JN] 32-bit integer math
+int ceilingclip[MAXWIDTH];  // [JN] 32-bit integer math
 
 //
-// spanstart holds the start of a plane span
-// initialized to 0 at start
+// Texture mapping
 //
-int			spanstart[MAXHEIGHT];
-int			spanstop[MAXHEIGHT];
 
-//
-// texture mapping
-//
-static lighttable_t**		planezlight;
-static fixed_t			planeheight;
-static int				planecolorbank;
+static lighttable_t **planezlight;
+static fixed_t        planeheight;
+static int            planecolorbank;
 
-fixed_t*			yslope;
-fixed_t			yslopes[LOOKDIRS][MAXHEIGHT];
-fixed_t			distscale[MAXWIDTH];
+fixed_t *yslope;
+fixed_t  yslopes[LOOKDIRS][MAXHEIGHT];
+fixed_t  distscale[MAXWIDTH];
 
-fixed_t			cachedheight[MAXHEIGHT];
-fixed_t			cacheddistance[MAXHEIGHT];
-fixed_t			cachedxstep[MAXHEIGHT];
-fixed_t			cachedystep[MAXHEIGHT];
+static fixed_t cachedheight[MAXHEIGHT];
+static fixed_t cacheddistance[MAXHEIGHT];
+static fixed_t cachedxstep[MAXHEIGHT];
+static fixed_t cachedystep[MAXHEIGHT];
 
 // [JN] Flowing effect for swirling liquids.
 // Render-only coords:
@@ -114,37 +104,21 @@ void R_InitPlanes (void)
 }
 
 
-//
+// -----------------------------------------------------------------------------
 // R_MapPlane
 //
-// Uses global vars:
-//  planeheight
-//  ds_source
-//  viewx
-//  viewy
-//
+// Uses global vars: planeheight, viewx, viewy
 // BASIC PRIMITIVE
-//
-static void
-R_MapPlane
-( int		y,
-  int		x1,
-  int		x2)
+// -----------------------------------------------------------------------------
+
+static void R_MapPlane (int y, int x1, int x2)
 {
-// [crispy] see below
-//  angle_t	angle;
-    fixed_t	distance;
-//  fixed_t	length;
-//  unsigned	index;
-    int dx, dy;
-	
+    fixed_t distance;
+
 #ifdef RANGECHECK
-    if (x2 < x1
-     || x1 < 0
-     || x2 >= viewwidth
-     || y > viewheight)
+    if (x2 < x1 || x1 < 0 || x2 >= viewwidth || y > viewheight)
     {
-	I_Error ("R_MapPlane: %i, %i at %i",x1,x2,y);
+        I_Error("R_MapPlane: %i, %i at %i",x1,x2,y);
     }
 #endif
 
@@ -157,27 +131,27 @@ R_MapPlane
 
     if (centery == y)
     {
-	return;
+        return;
     }
 
-    dy = abs((centery - y) << FRACBITS) + (FRACUNIT >> 1);
+    const int dy = abs((centery - y) << FRACBITS) + (FRACUNIT >> 1);
 
     if (planeheight != cachedheight[y])
     {
-	cachedheight[y] = planeheight;
-	distance = cacheddistance[y] = FixedMul (planeheight, yslope[y]);
-	// [FG] avoid right-shifting in FixedMul() followed by left-shifting in FixedDiv()
-	ds_xstep = cachedxstep[y] = (fixed_t)((int64_t)viewsin * planeheight / dy) << detailshift;
-	ds_ystep = cachedystep[y] = (fixed_t)((int64_t)viewcos * planeheight / dy) << detailshift;
+        cachedheight[y] = planeheight;
+        distance = cacheddistance[y] = FixedMul(planeheight, yslope[y]);
+        // [FG] avoid right-shifting in FixedMul() followed by left-shifting in FixedDiv()
+        ds_xstep = cachedxstep[y] = (fixed_t)((int64_t)viewsin * planeheight / dy) << detailshift;
+        ds_ystep = cachedystep[y] = (fixed_t)((int64_t)viewcos * planeheight / dy) << detailshift;
     }
     else
     {
-	distance = cacheddistance[y];
-	ds_xstep = cachedxstep[y];
-	ds_ystep = cachedystep[y];
+        distance = cacheddistance[y];
+        ds_xstep = cachedxstep[y];
+        ds_ystep = cachedystep[y];
     }
 
-    dx = x1 - centerx;
+    const int dx = x1 - centerx;
 
     ds_xfrac = viewx + FixedMul(viewcos, distance) + dx * ds_xstep;
     ds_yfrac = -viewy - FixedMul(viewsin, distance) + dx * ds_ystep;
@@ -186,9 +160,9 @@ R_MapPlane
     ds_xfrac += swirlFlow_x;
     ds_yfrac += swirlFlow_y;
 
-	unsigned int index = distance >> LIGHTZSHIFT;
-	
-	if (index >= MAXLIGHTZ )
+    unsigned int index = distance >> LIGHTZSHIFT;
+
+    if (index >= MAXLIGHTZ )
 	    index = MAXLIGHTZ-1;
 
     // [PN] Fast path keeps vanilla pointer when visplane uses neutral bank 0.
@@ -197,20 +171,20 @@ R_MapPlane
                    ? R_ColLight_Apply(planecolorbank, base)
                    : (lighttable_t *)base;
 	ds_colormap[1] = invulcolormap ? invulmaps : colormaps;
-	
+
     ds_y = y;
     ds_x1 = x1;
     ds_x2 = x2;
 
-    // high or low detail
-    spanfunc ();	
+    // High or low detail
+    spanfunc();
 }
 
-
-//
+// -----------------------------------------------------------------------------
 // R_ClearPlanes
 // At begining of frame.
-//
+// -----------------------------------------------------------------------------
+
 void R_ClearPlanes (void)
 {
     int i;
@@ -222,9 +196,20 @@ void R_ClearPlanes (void)
         ceilingclip[i] = -1;
     }
 
-    for (i = 0; i < MAXVISPLANES; i++)  // [JN] new code -- killough
-        for (*freehead = visplanes[i], visplanes[i] = NULL ; *freehead ; )
-            freehead = &(*freehead)->next;
+    // [PN] Optimize loop by avoiding unnecessary assignments and checks.
+    // Only process non-null visplanes and simplify inner loop performance.
+    for (i = 0; i < MAXVISPLANES; i++)
+    {
+        if (visplanes[i] != NULL)
+        {
+            *freehead = visplanes[i];
+            visplanes[i] = NULL;
+            while (*freehead)
+            {
+                freehead = &(*freehead)->next;
+            }
+        }
+    }
 
     lastopening = openings;
 
@@ -238,7 +223,7 @@ void R_ClearPlanes (void)
 // New function, by Lee Killough
 // -----------------------------------------------------------------------------
 
-static visplane_t *new_visplane (unsigned const int hash)
+static visplane_t *const new_visplane (unsigned const int hash)
 {
     visplane_t *check = freetail;
 
@@ -257,21 +242,17 @@ static visplane_t *new_visplane (unsigned const int hash)
     return check;
 }
 
-
-//
+// -----------------------------------------------------------------------------
 // R_FindPlane
-//
-visplane_t*
-R_FindPlane
-( fixed_t	height,
-  int		picnum,
-  int		lightlevel,
-  int		colorbank)
+// -----------------------------------------------------------------------------
+
+visplane_t *const R_FindPlane (fixed_t height, int picnum, int lightlevel, int colorbank)
 {
     visplane_t *check;
     unsigned int hash;
 
-    if (picnum == skyflatnum || picnum & PL_SKYFLAT)  // killough 10/98
+    // [crispy] add support for MBF sky transfers
+    if (picnum == skyflatnum || picnum & PL_SKYFLAT)
     {
         lightlevel = 0;   // killough 7/19/98: most skies map together
         colorbank = 0;    // [PN] Sky is always fullbright and not sector-tinted.
@@ -315,9 +296,9 @@ R_FindPlane
 // R_DupPlane
 // -----------------------------------------------------------------------------
 
-visplane_t *R_DupPlane(const visplane_t *pl, int start, int stop)
+visplane_t *const R_DupPlane(const visplane_t *const pl, int start, int stop)
 {
-    visplane_t  *new_pl = new_visplane(visplane_hash(pl->picnum, pl->lightlevel, pl->height, pl->colorbank));
+    visplane_t *new_pl = new_visplane(visplane_hash(pl->picnum, pl->lightlevel, pl->height, pl->colorbank));
 
     new_pl->height = pl->height;
     new_pl->picnum = pl->picnum;
@@ -335,11 +316,7 @@ visplane_t *R_DupPlane(const visplane_t *pl, int start, int stop)
 // R_CheckPlane
 // -----------------------------------------------------------------------------
 
-visplane_t*
-R_CheckPlane
-( visplane_t*	pl,
-  int		start,
-  int		stop)
+visplane_t *const R_CheckPlane (visplane_t *const pl, int start, int stop)
 {
     int intrl, intrh, unionl, unionh, x;
 
@@ -375,18 +352,21 @@ R_CheckPlane
     }
 }
 
-
-//
+// -----------------------------------------------------------------------------
 // R_MakeSpans
-//
+// -----------------------------------------------------------------------------
+
 static void
 R_MakeSpans
-( unsigned int		x,   // [JN] 32-bit integer math
-  unsigned int		t1,  // [JN] 32-bit integer math
-  unsigned int		b1,  // [JN] 32-bit integer math
-  unsigned int		t2,  // [JN] 32-bit integer math
-  unsigned int		b2)  // [JN] 32-bit integer math
+( unsigned int x,   // [JN] 32-bit integer math
+  unsigned int t1,  // [JN] 32-bit integer math
+  unsigned int b1,  // [JN] 32-bit integer math
+  unsigned int t2,  // [JN] 32-bit integer math
+  unsigned int b2)  // [JN] 32-bit integer math
 {
+    // spanstart holds the start of a plane span
+    static int spanstart[MAXHEIGHT];
+
     for ( ; t1 < t2 && t1 <= b1 ; t1++)
     {
         R_MapPlane(t1, spanstart[t1], x-1);
@@ -405,12 +385,10 @@ R_MakeSpans
     }
 }
 
-
-
-//
+// -----------------------------------------------------------------------------
 // R_DrawPlanes
 // At the end of each frame.
-//
+// -----------------------------------------------------------------------------
 
 #define SKYTEXTUREMIDSHIFTED 200
 

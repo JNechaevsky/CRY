@@ -56,29 +56,14 @@ static pixel_t *dest_screen = NULL;
 // [crispy] resolution-agnostic patch drawing
 static fixed_t dx, dxi, dy, dyi;
 
-
-// -----------------------------------------------------------------------------
-// V_MarkRect
-// -----------------------------------------------------------------------------
-
-void V_MarkRect(int x, int y, int width, int height) 
-{
-    static int dirtybox[4];
-
-    // If we are temporarily using an alternate screen, do not
-    // affect the update box.
-
-    if (dest_screen == I_VideoBuffer)
-    {
-        M_AddToBox (dirtybox, x, y);
-        M_AddToBox (dirtybox, x + width-1, y + height-1);
-    }
-}
+// [PN] Clean screenshot schedule flag.
+boolean cleanshot_pending  = false;
 
 // -----------------------------------------------------------------------------
 // V_CopyRect
-// [PN] Transposed layout: a rectangle is a y-contiguous run per column,
-// columns pitched by SCREENHEIGHT. All buffers share this layout.
+// [PN] Transposed layout: a rectangle is a run of y-contiguous pixels
+// (stride 1) per column, columns spaced SCREENHEIGHT apart. All buffers
+// passed here are full-screen-sized and share the transposed layout.
 // -----------------------------------------------------------------------------
 
 void V_CopyRect(int srcx, int srcy, pixel_t *source,
@@ -108,12 +93,11 @@ void V_CopyRect(int srcx, int srcy, pixel_t *source,
     if (width <= 0 || height <= 0)
         return;
 
-    V_MarkRect(destx, desty, width, height);
-
     const size_t col_bytes = (size_t)height * sizeof(pixel_t);
 
-    // Same-buffer copy: overlapping x ranges need a safe traversal
-    // direction; y overlap within one column handled with memmove.
+    // Same-buffer copy: columns never alias each other in the transposed
+    // layout, but overlapping x ranges need a safe traversal direction;
+    // y overlap within one column is handled with memmove.
     const boolean same_buffer = (source == dst0);
     const boolean y_overlap   = same_buffer
                              && desty < srcy + height && srcy < desty + height;
@@ -123,15 +107,15 @@ void V_CopyRect(int srcx, int srcy, pixel_t *source,
     for (int n = 0; n < width; ++n)
     {
         const int i = back_cols ? width - 1 - n : n;
-        pixel_t *src  = source + (srcx  + i) * sh + srcy;
-        pixel_t *dest = dst0   + (destx + i) * sh + desty;
+        pixel_t *const src  = source + (srcx  + i) * sh + srcy;
+        pixel_t *const dest = dst0   + (destx + i) * sh + desty;
 
         if (y_overlap)
             memmove(dest, src, col_bytes);
         else
             memcpy (dest, src, col_bytes);
     }
-} 
+}
 
 // -----------------------------------------------------------------------------
 // V_DrawPatch
@@ -168,9 +152,6 @@ void V_DrawPatch(int x, int y, patch_t *patch)
     y -= SHORT(patch->topoffset);
     x -= SHORT(patch->leftoffset);
     x += ws_delta; // horizontal widescreen offset
-
-    // Mark dirty rectangle (original semantics).
-    V_MarkRect(x, y, SHORT(patch->width), SHORT(patch->height));
 
     // Left clipping in fixed-point column space.
     col = 0;
@@ -337,9 +318,6 @@ void V_DrawShadowedPatchOptional(int x, int y, patch_t *patch)
     y -= SHORT(patch->topoffset);
     x -= SHORT(patch->leftoffset);
     x += ws_delta; // horizontal widescreen offset
-
-    // Mark dirty rectangle (original semantics).
-    V_MarkRect(x, y, SHORT(patch->width), SHORT(patch->height));
 
     // Left clipping in fixed-point column space.
     col = 0;
@@ -558,9 +536,6 @@ void V_DrawPatchFlipped(int x, int y, patch_t *patch)
     x -= SHORT(patch->leftoffset);
     x += ws_delta; // horizontal widescreen offset
 
-    // Mark dirty rectangle (original semantics).
-    V_MarkRect(x, y, SHORT(patch->width), SHORT(patch->height));
-
     // Left clipping in fixed-point column space.
     col = 0;
     if (x < 0)
@@ -671,8 +646,6 @@ void V_DrawPatchFinale (int x, int y, patch_t *patch)
 	y -= SHORT(patch->topoffset);
 	x -= SHORT(patch->leftoffset);
 	x += (WIDESCREENDELTA/2);
-
-	V_MarkRect(x, y, SHORT(patch->width), SHORT(patch->height));
 
 	w = SHORT(patch->width);
 
@@ -841,8 +814,6 @@ void V_DrawBlock(int x, int y, int width, int height, pixel_t *src)
     if (width <= 0 || height <= 0 || src == NULL)
         return;
 
-    V_MarkRect(x, y, width, height);
-
     // [PN] Transposed: src and dst share the screen layout (column pitch
     // SCREENHEIGHT). dest[0] corresponds to block origin (x, y*vres).
     const int y0 = y * vres;
@@ -964,8 +935,6 @@ void V_DrawFilledBox(int x, int y, int w, int h, int c)
 
     if (w <= 0 || h <= 0)
         return;
-
-    V_MarkRect(x, y, w, h);
 
     pixel_t *restrict col0 = screen + x * sh + y;
     const pixel_t color = (pixel_t)c;

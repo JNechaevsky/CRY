@@ -41,6 +41,7 @@ extern int key_use;
 
 // Advanced movement
 
+extern int always_run;
 extern int key_autorun;
 extern int key_mouse_look; // [crispy]
 extern int key_novert;

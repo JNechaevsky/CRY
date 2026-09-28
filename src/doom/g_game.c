@@ -165,6 +165,19 @@ static int      turnheld;		// for accelerative turning
  
 static boolean  mousearray[MAX_MOUSE_BUTTONS + 1];
 static boolean *mousebuttons = &mousearray[1];  // allow [-1]
+// [PN] Latch array for impulse mouse buttons (e.g. mouse wheel).
+// When a button press/release arrives within a single tic, the state
+// would otherwise be lost before G_BuildTiccmd reads it. This latch
+// guarantees the press is visible for at least one ticcmd.
+static boolean mousebutton_latch_array[MAX_MOUSE_BUTTONS + 1];
+static boolean *mousebutton_latch = &mousebutton_latch_array[1]; // allow [-1]
+/*
+static inline boolean mouse_buttons(int btn1, int btn2)
+{
+    return (mousebuttons[btn1] || mousebutton_latch[btn1] ||
+            mousebuttons[btn2] || mousebutton_latch[btn2]);
+}
+*/
 
 // mouse values are used once 
 int             mousex;
@@ -280,11 +293,11 @@ boolean speedkeydown (void)
 }
 
 // [crispy] for carrying rounding error
-static int CarryError(double value, const double *prevcarry, double *carry)
+static int CarryError(double value, const double *prev_carry, double *cur_carry)
 {
-    const double desired = value + *prevcarry;
+    const double desired = value + *prev_carry;
     const int actual = lround(desired);
-    *carry = desired - actual;
+    *cur_carry = desired - actual;
 
     return actual;
 }
@@ -314,20 +327,20 @@ static int CarryMouseSide(double side)
     return actual;
 }
 
-static double CalcMouseAngle(int mousex)
+static double CalcMouseAngle(int mouse_x)
 {
     if (!mouseSensitivity)
         return 0.0;
 
-    return (I_AccelerateMouse(mousex) * (mouseSensitivity + 5) * 8 / 10);
+    return (I_AccelerateMouse(mouse_x) * (mouseSensitivity + 5) * 8 / 10);
 }
 
-static double CalcMouseVert(int mousey)
+static double CalcMouseVert(int mouse_y)
 {
     if (!mouse_sensitivity_y)
         return 0.0;
 
-    return (I_AccelerateMouseY(mousey) * (mouse_sensitivity_y + 5) * 2 / 10);
+    return (I_AccelerateMouseY(mouse_y) * (mouse_sensitivity_y + 5) * 2 / 10);
 }
 
 //
@@ -348,18 +361,23 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
     int		forward;
     int		side;
     ticcmd_t spect;
+    int spect_angle = 0; // [PN] Spectator camera-only, do not copy to cmd
+
+    // [crispy] For fast polling.
+    G_PrepTiccmd();
 
     if (!crl_spectating)
     {
-        // [crispy] For fast polling.
-        G_PrepTiccmd();
         memcpy(cmd, &basecmd, sizeof(*cmd));
         memset(&basecmd, 0, sizeof(ticcmd_t));
     }
     else
     {
-        // [JN] CRL - can't interpolate spectator.
+        // [PN] spect_angle is used for the spectator camera only.
+        // Do not copy it into cmd to avoid rotating the actual player
+        // or desynchronizing demo/network state.
         memset(cmd, 0, sizeof(ticcmd_t));
+        spect_angle = basecmd.angleturn;
         // [JN] CRL - reset basecmd.angleturn for exact
         // position of jumping to the camera position.
         basecmd.angleturn = 0;
@@ -368,6 +386,11 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
 	// needed for net games
     cmd->consistancy = consistancy[consoleplayer][maketic%BACKUPTICS]; 
  	
+	// [JN] Deny all player control events while active menu 
+	// in multiplayer to eliminate movement and camera rotation.
+ 	if (/*netgame &&*/ menuactive)
+ 	return;
+
  	// RestlessRodent -- If spectating then the player loses all input
  	memmove(&spect, cmd, sizeof(spect));
  	// [JN] Allow saving and pausing while spectating.
@@ -377,13 +400,9 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
     strafe = gamekeydown[key_strafe] || mousebuttons[mousebstrafe] 
 	|| joybuttons[joybstrafe]; 
 
-    // fraggle: support the old "joyb_speed = 31" hack which
-    // allowed an autorun effect
-
     // [crispy] when "always run" is active,
     // pressing the "run" key will result in walking
-    speed = (key_speed >= NUMKEYS
-         || joybspeed >= MAX_JOY_BUTTONS);
+    speed = always_run;
     speed ^= speedkeydown();
     crl_camzspeed = speed;
  
@@ -414,20 +433,9 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
     // [crispy] toggle "always run"
     if (gamekeydown[key_autorun])
     {
-        static int joybspeed_old = 2;
-
-        if (joybspeed >= MAX_JOY_BUTTONS)
-        {
-            joybspeed = joybspeed_old;
-        }
-        else
-        {
-            joybspeed_old = joybspeed;
-            joybspeed = MAX_JOY_BUTTONS;
-        }
-
-        CT_SetMessage(&players[consoleplayer], joybspeed >= MAX_JOY_BUTTONS ?
-                       ID_AUTORUN_ON : ID_AUTORUN_OFF, false, NULL);
+        always_run ^= 1;
+        CT_SetMessage(&players[consoleplayer], always_run ?
+                      ID_AUTORUN_ON : ID_AUTORUN_OFF, false, NULL);
 
         S_StartSound(NULL, sfx_swtchn);
 
@@ -441,6 +449,8 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
         if (!mouse_look)
         {
             cmd->lookdir = players[consoleplayer].lookdir = 0;
+            // [PN] Reset spectator lookdir as well.
+            CRL_ReportLookdir(0);
         }
         CT_SetMessage(&players[consoleplayer], mouse_look ?
                        ID_MLOOK_ON : ID_MLOOK_OFF, false, NULL);
@@ -681,7 +691,7 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
     }
 
     // [crispy] mouse look
-    if (mouse_look)
+    if (mouse_look && !crl_spectating)
     {
         const double vert = CalcMouseVert(mousey);
         cmd->lookdir += mouse_y_invert ? CarryPitch(-vert) : CarryPitch(vert);
@@ -696,10 +706,7 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
 	side += mousex*2;
     else 
     {
-        if (!crl_spectating)
         cmd->angleturn += CarryMouseSide(mousex);
-        else
-        angle -= mousex*0x8;
     }
 
     mousex_angleturn = cmd->angleturn;
@@ -723,7 +730,7 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
         else
         {
         const short old_angleturn = cmd->angleturn;
-        cmd->angleturn = CarryAngle(localview.rawangle + angle);
+        cmd->angleturn = spect_angle = CarryAngle(localview.rawangle + angle);
         localview.ticangleturn = gp_flip_levels ?
             (old_angleturn - cmd->angleturn) :
             (cmd->angleturn - old_angleturn);
@@ -749,12 +756,17 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
     localview.rawangle = 0.0;
     prevcarry = carry;
     
+    // [PN] Clear the mouse button latch array after the ticcmd has been built.
+    // This ensures that impulse buttons (e.g. mouse wheel) that were pressed
+    // and released within a single tic are not carried over to the next tic.
+    memset(mousebutton_latch_array, 0, sizeof(mousebutton_latch_array));
+
     // special buttons
     if (sendpause) 
     { 
 	sendpause = false; 
-
-	if (gameaction != ga_loadgame)
+	// [crispy] ignore un-pausing in menus during demo recording
+	if (!(menuactive /*&& demorecording*/ && paused) && gameaction != ga_loadgame)
 	{
 	cmd->buttons = BT_SPECIAL | BTS_PAUSE; 
 	}
@@ -771,11 +783,14 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
 	mousex_angleturn = -mousex_angleturn;
 	cmd->angleturn = -cmd->angleturn;
 	cmd->sidemove = -cmd->sidemove;
+	if (crl_spectating)
+		spect_angle = -spect_angle;
     }
 
-    // If spectating, send the movement commands instead
+    
+    // RestlessRodent -- If spectating, send the movement commands instead
     if (crl_spectating && !menuactive)
-    	CRL_ImpulseCamera(cmd->forwardmove, cmd->sidemove, cmd->angleturn); 
+    	CRL_ImpulseCamera(cmd->forwardmove, cmd->sidemove, spect_angle); 
 } 
  
 // -----------------------------------------------------------------------------
@@ -812,15 +827,7 @@ void G_InitSkyTextures (void)
 //
 void G_DoLoadLevel (void) 
 { 
-    int i;
-
-	// [JN] Properly remove paused state and resume music playing.
-	// Fixes a bug when pausing intermission screen causes locking up sound.
-	if (paused)
-	{
-		paused = false;
-		S_ResumeSound ();
-	}
+    int             i; 
 
     // Set the sky map.
     // First thing, we have a dummy sky texture name,
@@ -873,6 +880,7 @@ void G_DoLoadLevel (void)
     memset(&basecmd, 0, sizeof(basecmd)); // [crispy]
     sendpause = sendsave = paused = false;
     memset(mousearray, 0, sizeof(mousearray));
+    memset(mousebutton_latch_array, 0, sizeof(mousebutton_latch_array));
     memset(joyarray, 0, sizeof(joyarray));
 
     if (testcontrols)
@@ -921,6 +929,12 @@ static void SetMouseButtons(unsigned int buttons_mask)
 
         if (!mousebuttons[i] && button_on)
         {
+            // [PN] Latch the button press so it is visible for at least
+            // one ticcmd, even if the button is released before G_BuildTiccmd
+            // is called. This fixes mouse wheel actions assigned to fire,
+            // strafe, use, etc.
+            mousebutton_latch[i] = true;
+
             // [JN] CRL - move spectator camera up/down.
             if (crl_spectating && !menuactive)
             {
@@ -944,13 +958,6 @@ static void SetMouseButtons(unsigned int buttons_mask)
                 if (i == mousebnextweapon)
                 {
                     next_weapon = 1;
-                }
-                else
-                if (i == mousebuse)
-                {
-                    // [PN] Mouse wheel "use" workaround: some mouse buttons (e.g. wheel click)
-                    // generate only a single tick event. We simulate a short BT_USE press here.
-                    basecmd.buttons |= BT_USE;
                 }
             }
         }
@@ -1157,11 +1164,14 @@ void G_PrepTiccmd (void)
         mousex = 0;
     }
 
-    if (mousey && mouse_look && !crl_spectating)
+    if (!menuactive && mousey && mouse_look)
     {
         const double vert = CalcMouseVert(mousey);
-        basecmd.lookdir += mouse_y_invert ?
-                            CarryPitch(-vert): CarryPitch(vert);
+        const int delta = mouse_y_invert ? CarryPitch(-vert) : CarryPitch(vert);
+        // [PN] Spectator mouse look
+        if (!crl_spectating)
+            basecmd.lookdir += delta;
+        CRL_LimitLookdir(delta);
         mousey = 0;
     }
 }
@@ -1376,7 +1386,7 @@ void G_InitPlayer (int player)
 // G_PlayerFinishLevel
 // Can when a player completes a level.
 //
-void G_PlayerFinishLevel (int player) 
+static void G_PlayerFinishLevel (int player) 
 { 
     player_t*	p; 
 	 

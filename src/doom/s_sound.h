@@ -51,11 +51,11 @@ void S_Start(void);
 //  using <sound_id> from sounds.h
 //
 
-void S_StartSound(void *origin, int sound_id);
-void S_StartSoundOnce(void *origin, int sound_id);
+void S_StartSound(void *origin_p, int sfx_id);
+void S_StartSoundOnce(void *origin_p, int sfx_id);
 
 // Stop sound for thing at <origin>
-void S_StopSound(mobj_t *origin);
+void S_StopSound(const mobj_t *origin);
 void S_UnlinkSound(mobj_t *origin);
 
 
@@ -84,6 +84,7 @@ void S_SetMusicVolume(int volume);
 void S_SetSfxVolume(int volume);
 
 extern void S_ChangeSFXSystem (void);
+extern void S_StopAllSound (void);
 extern void S_UpdateStereoSeparation (void);
 extern void S_MuteUnmuteSound (boolean mute);
 

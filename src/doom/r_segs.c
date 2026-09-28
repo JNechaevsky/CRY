@@ -200,7 +200,7 @@ void R_FixWiggle (sector_t *sector)
 // R_RenderMaskedSegRange
 // -----------------------------------------------------------------------------
 
-void R_RenderMaskedSegRange (drawseg_t *ds, int x1, int x2)
+void R_RenderMaskedSegRange (const drawseg_t *const ds, int x1, int x2)
 {
     // Calculate light table.
     // Use different light tables

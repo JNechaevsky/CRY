@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -13,14 +14,8 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// DESCRIPTION:
-//	BSP traversal, handling of LineSegs for rendering.
-//
 
-
-#include <stdlib.h>
 #include "m_bbox.h"
-#include "m_misc.h"
 #include "i_system.h"
 #include "doomstat.h"
 #include "p_local.h"
@@ -104,12 +99,12 @@ static void R_ClipWallSegment (int first, const int last, const boolean solid)
 // R_RecalcLineFlags
 // -----------------------------------------------------------------------------
 
-static void R_RecalcLineFlags (line_t *linedef)
+static void R_RecalcLineFlags (line_t *line_def)
 {
-    linedef->r_validcount = gametic;
+    line_def->r_validcount = gametic;
 
     // First decide if the line is closed, normal, or invisible */
-    if (!(linedef->flags & ML_TWOSIDED)
+    if (!(line_def->flags & ML_TWOSIDED)
     || backsector->interpceilingheight <= frontsector->interpfloorheight
     || backsector->interpfloorheight >= frontsector->interpceilingheight
     ||
@@ -126,7 +121,7 @@ static void R_RecalcLineFlags (line_t *linedef)
     // properly render skies (consider door "open" if both ceilings are sky):
     && (backsector->ceilingpic !=skyflatnum || frontsector->ceilingpic!=skyflatnum)))
     {
-        linedef->r_flags = RF_CLOSED;
+        line_def->r_flags = RF_CLOSED;
     }
     else
     {
@@ -143,12 +138,12 @@ static void R_RecalcLineFlags (line_t *linedef)
         || backsector->lightlevel != frontsector->lightlevel
         || backsector->lightbank != frontsector->lightbank)
         {
-            linedef->r_flags = 0;
+            line_def->r_flags = 0;
             return;
         }
         else
         {
-            linedef->r_flags = RF_IGNORE;
+            line_def->r_flags = RF_IGNORE;
         }
     }
 
@@ -159,7 +154,7 @@ static void R_RecalcLineFlags (line_t *linedef)
     }
 
     // Now decide on texture tiling
-    if (linedef->flags & ML_TWOSIDED)
+    if (line_def->flags & ML_TWOSIDED)
     {
         int c;
 
@@ -167,14 +162,14 @@ static void R_RecalcLineFlags (line_t *linedef)
         if ((c = frontsector->interpceilingheight - backsector->interpceilingheight) > 0
         && (textureheight[texturetranslation[curline->sidedef->toptexture]] > c))
         {
-            linedef->r_flags |= RF_TOP_TILE;
+            line_def->r_flags |= RF_TOP_TILE;
         }
 
         // Does bottom texture need tiling
         if ((c = frontsector->interpfloorheight - backsector->interpfloorheight) > 0
         && (textureheight[texturetranslation[curline->sidedef->bottomtexture]] > c))
         {
-            linedef->r_flags |= RF_BOT_TILE;
+            line_def->r_flags |= RF_BOT_TILE;
         }
     }
     else
@@ -185,7 +180,7 @@ static void R_RecalcLineFlags (line_t *linedef)
         if ((c = frontsector->interpceilingheight - frontsector->interpfloorheight) > 0
         && (textureheight[texturetranslation[curline->sidedef->midtexture]] > c))
         {
-            linedef->r_flags |= RF_MID_TILE;
+            line_def->r_flags |= RF_MID_TILE;
         }
     }
 }
@@ -200,14 +195,14 @@ void R_ClearClipSegs (void)
 }
 
 // -----------------------------------------------------------------------------
-// R_MaybeInterpolateSector
+// R_CheckInterpolateSector
 // [AM] Interpolate the passed sector, if prudent.
 // -----------------------------------------------------------------------------
 
-static void R_MaybeInterpolateSector(sector_t* sector)
+static void R_CheckInterpolateSector (sector_t *sector)
 {
     if (vid_uncapped_fps &&
-        // Only if we moved the sector last tic.
+        // Only if we moved the sector last tic ...
         sector->oldgametic == gametic - 1 &&
         // ... and it has a thinker associated with it.
         sector->specialdata)
@@ -321,7 +316,7 @@ static void R_AddLine (seg_t *line)
         // [AM] Interpolate sector movement before
         //      running clipping tests.  Frontsector
         //      should already be interpolated.
-        R_MaybeInterpolateSector(backsector);
+        R_CheckInterpolateSector(backsector);
     }
     else
     {
@@ -378,6 +373,16 @@ static boolean R_CheckBBox (const fixed_t *bspcoord)
     int        boxpos;
     const int *check;
 
+    // [PN] Expand bounding boxes by MAXRADIUS to keep wide sprites from
+    // disappearing when their centers are just behind a solid wall.
+    fixed_t expanded[4];
+    expanded[BOXLEFT]   = bspcoord[BOXLEFT]   - MAXRADIUS;
+    expanded[BOXRIGHT]  = bspcoord[BOXRIGHT]  + MAXRADIUS;
+    expanded[BOXTOP]    = bspcoord[BOXTOP]    + MAXRADIUS;
+    expanded[BOXBOTTOM] = bspcoord[BOXBOTTOM] - MAXRADIUS;
+    // [PN] Use expanded bbox without touching the original code below.
+    #define bspcoord expanded
+
     // Find the corners of the box that define the edges from current viewpoint.
     boxpos = (viewx <= bspcoord[BOXLEFT] ? 0 : viewx < bspcoord[BOXRIGHT ] ? 1 : 2) +
              (viewy >= bspcoord[BOXTOP ] ? 0 : viewy > bspcoord[BOXBOTTOM] ? 4 : 8);
@@ -391,6 +396,9 @@ static boolean R_CheckBBox (const fixed_t *bspcoord)
 
     angle1 = R_PointToAngleCrispy (bspcoord[check[0]], bspcoord[check[1]]) - viewangle;
     angle2 = R_PointToAngleCrispy (bspcoord[check[2]], bspcoord[check[3]]) - viewangle;
+
+    // [PN] Restore original bspcoord symbol outside this block.
+    #undef bspcoord
 
     // [JN] cph - replaced old code, which was unclear and badly commented
     // Much more efficient code now
@@ -450,7 +458,7 @@ static void R_Subsector (int num)
     int   count = sub->numlines;
 
 #ifdef RANGECHECK
-    if (num>=numsubsectors)
+    if (num >= numsubsectors)
 	I_Error ("R_Subsector: ss %i with numss = %i", num, numsubsectors);
 #endif
 
@@ -458,13 +466,13 @@ static void R_Subsector (int num)
 
     // [AM] Interpolate sector movement.  Usually only needed
     //      when you're standing inside the sector.
-    R_MaybeInterpolateSector(frontsector);
+    R_CheckInterpolateSector(frontsector);
 
     floorplane = frontsector->interpfloorheight < viewz ?
                  R_FindPlane (frontsector->interpfloorheight,
-                              // [crispy] add support for MBF sky tranfers
-				              frontsector->floorpic == skyflatnum &&
-				              frontsector->sky & PL_SKYFLAT ? frontsector->sky :
+                              // [crispy] add support for MBF sky transfers
+                              frontsector->floorpic == skyflatnum &&
+                              frontsector->sky & PL_SKYFLAT ? frontsector->sky :
                               frontsector->floorpic,
                               frontsector->lightlevel,
                               frontsector->lightbank) : NULL;
@@ -472,9 +480,9 @@ static void R_Subsector (int num)
     ceilingplane = frontsector->interpceilingheight > viewz ||
                    frontsector->ceilingpic == skyflatnum ?
                    R_FindPlane (frontsector->interpceilingheight,
-                                // [crispy] add support for MBF sky tranfers
-				                frontsector->ceilingpic == skyflatnum &&
-				                frontsector->sky & PL_SKYFLAT ? frontsector->sky :
+                                // [crispy] add support for MBF sky transfers
+                                frontsector->ceilingpic == skyflatnum &&
+                                frontsector->sky & PL_SKYFLAT ? frontsector->sky :
                                 frontsector->ceilingpic,
                                 frontsector->lightlevel,
                                 frontsector->lightbank) : NULL;

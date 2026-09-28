@@ -79,9 +79,11 @@ static const char *window_title = "";
 //
 // [PN] Transposed backbuffer: the game buffer holds pixel (x,y) at
 // x*SCREENHEIGHT + y (row pitch SCREENHEIGHT), so wall columns write
-// sequentially. argbbuffer and the streaming texture are created with swapped
-// dimensions; presentation un-rotates by 90 degrees with a vertical flip.
-// Window/logical coordinates stay in normal screen orientation.
+// sequentially. The argbbuffer surface and the streaming texture are
+// therefore created with swapped dimensions; presentation un-rotates by
+// 90 degrees with a vertical flip (verified pixel-exact on software and
+// direct3d11 backends). All window/logical coordinates stay in normal
+// screen orientation.
 
 SDL_Surface *argbbuffer = NULL;
 static SDL_Texture *texture = NULL;
@@ -129,6 +131,7 @@ static boolean nomouse = false;
 int usemouse = 1;
 
 // [JN/PN] Mouse coordinates for menu control.
+
 // Used by in-game menu
 int menu_mouse_x, menu_mouse_y;
 // Used by SDL cursor for position saving and resoring
@@ -142,12 +145,11 @@ char *vid_video_driver = "";
 // [JN] Allow to choose render driver to use.
 // https://wiki.libsdl.org/SDL2/SDL_HINT_RENDER_DRIVER
 
-#ifdef _WIN32
-// On Windows, set Direct3D 11 by default for better performance.
+#ifdef _WIN64
+// On 64-bit Windows, use Direct3D 11 by default for better performance.
+// On 32-bit Windows, keep the default (Direct3D 9), and on other systems
+// let the OS choose scaler for better compatibility.
 char *vid_screen_scaler_api = "direct3d11";
-#else
-// On other OSes let SDL decide what is better for compatibility.
-char *vid_screen_scaler_api = "";
 #endif
 
 // [JN] Window X and Y position to save and restore.
@@ -331,8 +333,6 @@ void I_ShutdownGraphics(void)
     }
 }
 
-
-
 // Adjust vid_window_width / vid_window_height variables to be an an aspect
 // ratio consistent with the vid_aspect_ratio_correct variable.
 static void AdjustWindowSize(void)
@@ -371,7 +371,7 @@ static void AdjustWindowSize(void)
     }
 }
 
-static void HandleWindowEvent(SDL_WindowEvent *event)
+static void HandleWindowEvent(const SDL_WindowEvent *event)
 {
     int i;
     int flags = 0;
@@ -477,7 +477,7 @@ static int HandleWindowResize (void* data, SDL_Event *event)
     return 0;
 }
 
-static boolean ToggleFullScreenKeyShortcut(SDL_Keysym *sym)
+static boolean ToggleFullScreenKeyShortcut(const SDL_Keysym *sym)
 {
     Uint16 flags = (KMOD_LALT | KMOD_RALT);
 #if defined(__MACOSX__)
@@ -536,60 +536,71 @@ void I_UpdateExclusiveFullScreen(void)
 
 // -----------------------------------------------------------------------------
 // I_WindowToGameCursorPosition
-//
-//  [PN] Converts raw window pixel coordinates (as returned by SDL events or
-//  SDL_GetMouseState) into "game-space" coordinates (SCREENWIDTH x SCREENHEIGHT).
-//
-//  This is used only when vid_aspect_ratio_correct == 0 (free-resize mode).
-//  In this mode the game framebuffer is stretched arbitrarily to the window,
-//  so the mapping is a simple proportional scale: [0..win_w) -> [0..SCREENWIDTH),
-//  [0..win_h) -> [0..SCREENHEIGHT).
+//  [PN] Converts window-space cursor coordinates (obtained from SDL_GetMouseState)
+//  into normalized in-game coordinates (SCREENWIDTH x SCREENHEIGHT), taking
+//  into account the actual renderer output size and any letterboxing or
+//  pillarboxing caused by aspect ratio correction.
 // -----------------------------------------------------------------------------
 
 static void I_WindowToGameCursorPosition(int win_x, int win_y, int *game_x, int *game_y)
 {
-    int w, h;
-    SDL_GetWindowSize(screen, &w, &h);
-    if (w <= 0 || h <= 0)
+    int out_w, out_h;
+    SDL_GetRendererOutputSize(renderer, &out_w, &out_h);
+
+    SDL_Rect dst = {0, 0, out_w, out_h};
+
+    // Apply letterboxing/pillarboxing if aspect ratio correction is active
+    if (vid_aspect_ratio_correct)
     {
-        *game_x = 0;
-        *game_y = 0;
-        return;
+        if (out_w * actualheight > out_h * SCREENWIDTH)
+        {
+            int tempw = out_w;
+            dst.w = out_h * SCREENWIDTH / actualheight;
+            dst.x = (tempw - dst.w) / 2;
+        }
+        else if (out_h * SCREENWIDTH > out_w * actualheight)
+        {
+            int temph = out_h;
+            dst.h = out_w * actualheight / SCREENWIDTH;
+            dst.y = (temph - dst.h) / 2;
+        }
     }
 
-    int gx = win_x * SCREENWIDTH / w;
-    int gy = win_y * SCREENHEIGHT / h;
+    // Clamp cursor to the visible render area
+    if (win_x < dst.x) win_x = dst.x;
+    if (win_x >= dst.x + dst.w) win_x = dst.x + dst.w - 1;
+    if (win_y < dst.y) win_y = dst.y;
+    if (win_y >= dst.y + dst.h) win_y = dst.y + dst.h - 1;
 
-    if (gx < 0) gx = 0;
-    if (gx >= SCREENWIDTH)  gx = SCREENWIDTH  - 1;
-    if (gy < 0) gy = 0;
-    if (gy >= SCREENHEIGHT) gy = SCREENHEIGHT - 1;
+    const int relx = win_x - dst.x;
+    const int rely = win_y - dst.y;
 
-    *game_x = gx;
-    *game_y = gy;
+    // Convert to game-space coordinates
+    *game_x = relx * SCREENWIDTH  / dst.w;
+    *game_y = rely * SCREENHEIGHT / dst.h;
 }
 
 // [JN] Reinitialize mouse cursor position on changing rendering resoluton
 void I_ReInitCursorPosition (void)
 {
     int wx, wy;
+
+    // [PN] Drop stale motion events generated during renderer/window reinit.
+    // They may still be in the queue with old coordinate space and can cause
+    // a one-frame menu cursor jump to a different item.
+    SDL_PumpEvents();
+    SDL_FlushEvent(SDL_MOUSEMOTION);
+
     SDL_GetMouseState(&wx, &wy);
 
-    if (vid_aspect_ratio_correct == 0)
-    {
-        I_WindowToGameCursorPosition(wx, wy, &menu_mouse_x, &menu_mouse_y);
-    }
-    else
-    {
-        const float div_factor = (vid_aspect_ratio_correct == 1) ? 1.2f : 1.0f;
-        menu_mouse_x = wx;
-        menu_mouse_y = (int)(wy / div_factor);
-    }
+    menu_mouse_x_sdl = wx;
+    menu_mouse_y_sdl = wy;
 
-    SDL_GetMouseState(&menu_mouse_x_sdl, &menu_mouse_y_sdl);
+    // [PN] Also clear accumulated relative deltas to avoid a stray ev_mouse tick.
+    SDL_GetRelativeMouseState(NULL, NULL);
 }
 
-void I_GetEvent(void)
+static void I_GetEvent(void)
 {
     SDL_Event sdlevent;
 
@@ -614,6 +625,7 @@ void I_GetEvent(void)
             case SDL_MOUSEMOTION:
                 if (menu_mouse_allow && window_focused)
                 {
+                    // [PN] Get mouse coordinates for menu control
                     if (vid_aspect_ratio_correct == 0)
                     {
                         // [PN] Free resize: map window coords → game coords
@@ -728,7 +740,7 @@ static void UpdateGrab(void)
 
         // [JN] Restore cursor position.
         SDL_WarpMouseInWindow(screen, menu_mouse_x_sdl, menu_mouse_y_sdl);
-
+        
         SDL_GetRelativeMouseState(NULL, NULL);
     }
 
@@ -891,9 +903,9 @@ static void CreateUpscaledTexture(boolean force)
 //      range of [0.0, 1.0).  Used for interpolation.
 fixed_t fractionaltic;
 
-// [PN] Render the transposed streaming texture into a W×H destination space,
-// un-rotating it to normal orientation (verified pixel-exact on software and
-// direct3d11 backends).
+// [PN] Render the transposed streaming texture into a W×H destination space
+// (window logical size or a target texture), un-rotating it to normal
+// orientation. Semantics verified against SDL software and direct3d11.
 static void PresentTransposed (SDL_Texture *tex, int W, int H)
 {
     SDL_Rect d;
@@ -904,21 +916,6 @@ static void PresentTransposed (SDL_Texture *tex, int W, int H)
     d.y = (H - W) / 2;
 
     SDL_RenderCopyEx(renderer, tex, NULL, &d, 90.0, NULL, SDL_FLIP_VERTICAL);
-}
-
-// [PN] Present to the window: use the logical size when set, otherwise the
-// full renderer output (free-resize mode, vid_aspect_ratio_correct == 0).
-static void PresentTransposedToWindow (SDL_Texture *tex)
-{
-    int W = 0, H = 0;
-
-    SDL_RenderGetLogicalSize(renderer, &W, &H);
-    if (W <= 0 || H <= 0)
-    {
-        SDL_GetRendererOutputSize(renderer, &W, &H);
-    }
-
-    PresentTransposed(tex, W, H);
 }
 
 //
@@ -971,7 +968,7 @@ void I_FinishUpdate (void)
 #endif
 
 	// [crispy] [AM] Real FPS counter
-    if (vid_showfps)
+	if (vid_showfps)
 	{
 		static int lastmili;
 		static int fpscount;
@@ -981,8 +978,8 @@ void I_FinishUpdate (void)
 		const uint32_t i = SDL_GetTicks();
 		const int mili = i - lastmili;
 
-		// Update FPS counter every second
-		if (mili >= 1000)
+		// Update FPS counter every 1/4th of second
+		if (mili >= 250)
 		{
 			id_fps_value = (fpscount * 1000) / mili;
 			fpscount = 0;
@@ -994,14 +991,23 @@ void I_FinishUpdate (void)
 
     SDL_UpdateTexture(texture, NULL, argbbuffer->pixels, argbbuffer->pitch);
 
+    // [PN] Clean screenshot: upload only, present nothing. The screen freezes
+    // on the last normal frame while I_RenderReadPixels grabs the uploaded
+    // texture off-screen below.
+    if (cleanshot_pending)
+    {
+        return;
+    }
+
     // Make sure the pillarboxes are kept clear each frame.
 
     SDL_RenderClear(renderer);
 
     if (vid_smooth_scaling && !vid_force_software_renderer)
     {
-    // [PN] Rotate the transposed texture into the upscaled target (which
-    // stays in normal orientation; targets ignore the logical size).
+    // [PN] Rotate the transposed texture into the upscaled target, which
+    // stays in normal orientation; its pixel dimensions are the destination
+    // space here (targets ignore the logical size).
 
     int tw = SCREENWIDTH, th = SCREENHEIGHT;
 
@@ -1017,8 +1023,8 @@ void I_FinishUpdate (void)
     else
     {
 	SDL_SetRenderTarget(renderer, NULL);
-	// [PN] Un-transpose on presentation into the window's render space.
-	PresentTransposedToWindow(texture);
+	// [PN] Un-transpose on presentation into the logical window space.
+	PresentTransposed(texture, SCREENWIDTH, actualheight);
     }
 
     if (curpane)
@@ -1075,6 +1081,7 @@ void I_ReadScreen (pixel_t* scr)
 //
 // I_SetPalette
 //
+
 void I_SetPalette (int palette)
 {
     switch (palette)
@@ -1327,7 +1334,7 @@ void I_GraphicsCheckCommandLine(void)
 
 void I_CheckIsScreensaver(void)
 {
-    char *env;
+    const char *env;
 
     env = getenv("XSCREENSAVER_WINDOW");
 
@@ -1348,7 +1355,7 @@ static void SetSDLVideoDriver(void)
 
         env_string = M_StringJoin("SDL_VIDEODRIVER=", vid_video_driver, NULL);
         putenv(env_string);
-        free(env_string);
+        // env_string deliberately not freed; see putenv manpage
     }
 }
 
@@ -1397,8 +1404,10 @@ static void SetVideoMode(void)
     // retina displays, especially when using small window sizes.
     window_flags |= SDL_WINDOW_ALLOW_HIGHDPI;
 
+#ifdef _WIN64
     // [JN] Choose render driver to use.
     SDL_SetHint(SDL_HINT_RENDER_DRIVER, vid_screen_scaler_api);
+#endif
 
     // [JN] Ensure 'mode.w/h' is initialized before use.
     if (SDL_GetCurrentDisplayMode(vid_video_display, &mode) != 0)
@@ -1424,12 +1433,9 @@ static void SetVideoMode(void)
             h = mode.h;
             window_flags |= SDL_WINDOW_FULLSCREEN;
         }
-    }
 
-    // in vid_fullscreen mode, the window "position" still matters, because
-    // we use it to control which display we run vid_fullscreen on.
-    if (vid_fullscreen)
-    {
+        // in vid_fullscreen mode, the window "position" still matters, because
+        // we use it to control which display we run vid_fullscreen on.
         CenterWindow(&x, &y, w, h);
     }
 
@@ -1542,6 +1548,7 @@ static void SetVideoMode(void)
     SDL_RenderClear(renderer);
     SDL_RenderPresent(renderer);
 
+
     // Format of argbbuffer must match the screen pixel format because we
     // import the surface data into the texture.
 
@@ -1594,7 +1601,6 @@ static void SetVideoMode(void)
     // Create the intermediate texture that the RGBA surface gets loaded into.
     // The SDL_TEXTUREACCESS_STREAMING flag means that this texture's content
     // is going to change frequently.
-
     // [PN] Transposed: w=SCREENHEIGHT, h=SCREENWIDTH (see I_FinishUpdate).
 
     texture = SDL_CreateTexture(renderer,
@@ -1614,6 +1620,7 @@ static void SetVideoMode(void)
     // [JN] Set the initial position of the mouse cursor.
     {
         int screen_w, screen_h;
+
         SDL_GetWindowSize(screen, &screen_w, &screen_h);
         menu_mouse_x_sdl = (int)(screen_w / 1.3);
         menu_mouse_y_sdl = (int)(screen_h / 1.3);
@@ -1685,7 +1692,7 @@ void I_GetScreenDimensions (void)
 		SCREENWIDTH = MIN(SCREENWIDTH, MAXWIDTH);
 	}
 
-    SCREENAREA = SCREENWIDTH * SCREENHEIGHT;
+	SCREENAREA = SCREENWIDTH * SCREENHEIGHT;
 	WIDESCREENDELTA = ((SCREENWIDTH - NONWIDEWIDTH) / vid_resolution) / 2;
 }
 
@@ -1702,7 +1709,7 @@ void I_ToggleVsync (void)
 void I_InitGraphics(void)
 {
     SDL_Event dummy;
-    char *env;
+    const char *env;
 
     // Pass through the XSCREENSAVER_WINDOW environment variable to 
     // SDL_WINDOWID, to embed the SDL window into the Xscreensaver
@@ -1718,7 +1725,8 @@ void I_InitGraphics(void)
         sscanf(env, "0x%x", &winid);
         M_snprintf(winenv, sizeof(winenv), "SDL_WINDOWID=%u", winid);
 
-        putenv(winenv);
+        putenv(M_StringDuplicate(winenv));
+		// putenv parameter deliberately duplicated; see putenv manpage
     }
 
     SetSDLVideoDriver();
@@ -1742,6 +1750,7 @@ void I_InitGraphics(void)
     // [crispy] run-time variable high-resolution rendering
     I_GetScreenDimensions();
 
+
     // [crispy] (re-)initialize resolution-agnostic patch drawing
     V_Init();
 
@@ -1758,6 +1767,7 @@ void I_InitGraphics(void)
     // on configuration.
     AdjustWindowSize();
     SetVideoMode();
+
 
     // SDL2-TODO UpdateFocus();
     UpdateGrab();
@@ -1778,7 +1788,6 @@ void I_InitGraphics(void)
     // finally rendered into our window or full screen in I_FinishUpdate().
 
     I_VideoBuffer = argbbuffer->pixels;
-
     V_RestoreBuffer();
 
     // Clear the screen to black.
@@ -1801,17 +1810,15 @@ void I_ReInitGraphics (int reinit)
 	{
 		I_GetScreenDimensions();
 
+
 		// [crispy] re-initialize resolution-agnostic patch drawing
 		V_Init();
 
 		SDL_FreeSurface(argbbuffer);
-		argbbuffer = SDL_CreateRGBSurfaceWithFormat(0,
-				                    SCREENHEIGHT, SCREENWIDTH, 32,
-				                    SDL_PIXELFORMAT_ARGB8888);
+		argbbuffer = SDL_CreateRGBSurfaceWithFormat(
+			0, SCREENHEIGHT, SCREENWIDTH, 32, SDL_PIXELFORMAT_ARGB8888);
 
-		// [crispy] re-set the framebuffer pointer
 		I_VideoBuffer = argbbuffer->pixels;
-
 		V_RestoreBuffer();
 
 		// [crispy] it will get re-created below with the new resolution
@@ -1929,26 +1936,63 @@ void I_RenderReadPixels (byte **data, int *w, int *h)
     format = SDL_AllocFormat(png_format);
     temp = rect.w * format->BytesPerPixel; // [crispy] pitch
 
-    // [crispy] As far as I understand the issue, SDL_RenderPresent()
-    // may return early, i.e. before it has actually finished rendering the
-    // current texture to screen -- from where we want to capture it.
-    // However, it does never return before it has finished rendering the
-    // *previous* texture.
-    // Thus, we add a second call to SDL_RenderPresent() here to make sure
-    // that it has at least finished rendering the previous texture, which
-    // already contains the scene that we actually want to capture.
-    if (post_rendering_hook)
-    {
-        if (vid_smooth_scaling && !vid_force_software_renderer)
-            SDL_RenderCopy(renderer, texture_upscaled, NULL, NULL);
-        else
-            PresentTransposedToWindow(texture);
-        SDL_RenderPresent(renderer);
-    }
-
     // [crispy] allocate memory for screenshot image
-    pixels = malloc(rect.h * temp);
-    SDL_RenderReadPixels(renderer, &rect, format->format, pixels, temp);
+    pixels = malloc((size_t)rect.h * temp);
+
+    // [PN] Clean screenshot: the screen is frozen on the last normal frame and the
+    // clean frame only lives in the streaming texture, so render it into a private
+    // off-screen target and read back from there, never touching the back buffer.
+    if (cleanshot_pending)
+    {
+        static SDL_Texture *shot;
+        static int shot_w, shot_h;
+
+        if (shot == NULL || shot_w != rect.w || shot_h != rect.h)
+        {
+            if (shot != NULL)
+            {
+                SDL_DestroyTexture(shot);
+            }
+            shot = SDL_CreateTexture(renderer,
+                                     SDL_PIXELFORMAT_ARGB8888,
+                                     SDL_TEXTUREACCESS_TARGET,
+                                     rect.w, rect.h);
+            shot_w = rect.w;
+            shot_h = rect.h;
+        }
+
+        SDL_SetRenderTarget(renderer, shot);
+        SDL_RenderClear(renderer);
+        // [PN] The streaming texture holds a transposed image; un-rotate it
+        // into the screen-oriented shot target.
+        PresentTransposed(texture, rect.w, rect.h);
+        SDL_RenderFlush(renderer);
+
+        rect.x = rect.y = 0;
+        SDL_RenderReadPixels(renderer, &rect, format->format, pixels, temp);
+        SDL_SetRenderTarget(renderer, NULL);
+    }
+    else
+    {
+        // [crispy] As far as I understand the issue, SDL_RenderPresent()
+        // may return early, i.e. before it has actually finished rendering the
+        // current texture to screen -- from where we want to capture it.
+        // However, it does never return before it has finished rendering the
+        // *previous* texture.
+        // Thus, we add a second call to SDL_RenderPresent() here to make sure
+        // that it has at least finished rendering the previous texture, which
+        // already contains the scene that we actually want to capture.
+        if (post_rendering_hook)
+        {
+            if (vid_smooth_scaling && !vid_force_software_renderer)
+                SDL_RenderCopy(renderer, texture_upscaled, NULL, NULL);
+            else
+                PresentTransposed(texture, SCREENWIDTH, actualheight);
+            SDL_RenderPresent(renderer);
+        }
+
+        SDL_RenderReadPixels(renderer, &rect, format->format, pixels, temp);
+    }
 
     *data = pixels;
     *w = rect.w;
@@ -1976,17 +2020,11 @@ void I_BindVideoVariables(void)
     M_BindIntVariable("vid_window_width",              &vid_window_width);
     M_BindIntVariable("vid_window_height",             &vid_window_height);
     M_BindStringVariable("vid_video_driver",           &vid_video_driver);
+#ifdef _WIN64
     M_BindStringVariable("vid_screen_scaler_api",      &vid_screen_scaler_api);
+#endif
     M_BindIntVariable("vid_window_position_x",         &vid_window_position_x);
     M_BindIntVariable("vid_window_position_y",         &vid_window_position_y);
     M_BindIntVariable("mouse_enable",                  &usemouse);
     M_BindIntVariable("mouse_grab",                    &mouse_grab);
 }
-
-// [PN] Original human-readable mapping function from Crispy Doom
-/*
-pixel_t I_MapRGB (const uint8_t r, const uint8_t g, const uint8_t b)
-{
-	return SDL_MapRGB(argbbuffer->format, r, g, b);
-}
-*/

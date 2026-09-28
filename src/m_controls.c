@@ -53,6 +53,7 @@ int key_use  = ' ';
 
 // Advanced movement
 
+int always_run     = 1;
 int key_autorun    = KEY_CAPSLOCK; // [crispy]
 int key_mouse_look = 0;            // [crispy]
 int key_novert     = 0;
@@ -203,6 +204,7 @@ void M_BindControls (void)
 
     // Advanced movement
 
+    M_BindIntVariable("always_run",          &always_run);
     M_BindIntVariable("key_autorun",         &key_autorun); // [crispy]
     M_BindIntVariable("key_mouse_look",      &key_mouse_look);
     M_BindIntVariable("key_novert",          &key_novert);

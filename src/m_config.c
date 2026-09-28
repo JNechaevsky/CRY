@@ -155,7 +155,9 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_INT(vid_startup_delay),
     CONFIG_VARIABLE_INT(vid_resize_delay),
     CONFIG_VARIABLE_STRING(vid_video_driver),
+#ifdef _WIN64
     CONFIG_VARIABLE_STRING(vid_screen_scaler_api),
+#endif
     CONFIG_VARIABLE_INT(vid_fullscreen),
     CONFIG_VARIABLE_INT(vid_fullscreen_exclusive),
     CONFIG_VARIABLE_INT(vid_window_position_x),
@@ -285,6 +287,7 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_KEY(key_use),
 
     // Advanced movement
+    CONFIG_VARIABLE_INT(always_run),
     CONFIG_VARIABLE_KEY(key_autorun),
     CONFIG_VARIABLE_KEY(key_mouse_look),
     CONFIG_VARIABLE_KEY(key_novert),
@@ -477,6 +480,8 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_COMMENT("Gameplay Features"),
     CONFIG_VARIABLE_INT(vis_brightmaps),
     CONFIG_VARIABLE_INT(vis_translucency),
+    CONFIG_VARIABLE_INT(vis_sprite_light),
+    CONFIG_VARIABLE_INT(vis_sprite_shadows),
     CONFIG_VARIABLE_INT(vis_improved_fuzz),
     CONFIG_VARIABLE_INT(vis_colored_lighting),
     CONFIG_VARIABLE_INT(vis_smooth_light),

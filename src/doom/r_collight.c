@@ -687,7 +687,7 @@ static boolean CL_ParseBlockHeaderLine(char *line, const char *map_name,
     }
 
     int index = 0;
-    char *mission_token = NULL;
+    //char *mission_token = NULL;
     char *wad_token = NULL;
     enum
     {
@@ -698,7 +698,7 @@ static boolean CL_ParseBlockHeaderLine(char *line, const char *map_name,
 
     if (CL_IsMissionToken(tokens[index]))
     {
-        mission_token = tokens[index++];
+        //mission_token = tokens[index++];
 
         if (index >= token_count)
         {

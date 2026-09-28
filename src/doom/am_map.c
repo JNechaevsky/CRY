@@ -203,10 +203,19 @@ int followplayer = 1; // specifies whether to follow the player around
 // [PN] Accumulated automap pan delta from mouse movement
 static int mouse_pan_x = 0;
 static int mouse_pan_y = 0;
+// [PN] Keep sub-pixel remainder to avoid frame-rate dependent jitter.
+static int64_t m_paninc_frac_x = 0;
+static int64_t m_paninc_frac_y = 0;
+static int64_t mouse_pan_frac_x = 0;
+static int64_t mouse_pan_frac_y = 0;
+// [PN] Sub-pixel accumulators (1/32 px), so slow motion isn't truncated away.
+static int64_t mouse_pan_sub_x = 0;
+static int64_t mouse_pan_sub_y = 0;
 
 static boolean stopped = true;
 
 // [crispy] Antialiased lines from Heretic with more colors
+// [PN] Wu weights now alpha-blend the base line color (I_BlendOver_32).
 #define NUMSHADES 8
 #define NUMSHADES_BITS 3 // log2(NUMSHADES)
 static pixel_t color_shades[NUMSHADES * 256];
@@ -459,9 +468,15 @@ static void AM_MousePanning (void)
 
     prev_frac = fractionaltic;
 
-    // Interpolated movement step
-    int64_t step_x = FixedMul(mouse_pan_x, delta);
-    int64_t step_y = FixedMul(mouse_pan_y, delta);
+    // Interpolated movement step with remainder carry, so very small frame
+    // deltas at high FPS don't collapse to zero and cause jitter.
+    int64_t step_x_acc = (int64_t) mouse_pan_x * delta + mouse_pan_frac_x;
+    int64_t step_y_acc = (int64_t) mouse_pan_y * delta + mouse_pan_frac_y;
+    int64_t step_x = step_x_acc / FRACUNIT;
+    int64_t step_y = step_y_acc / FRACUNIT;
+
+    mouse_pan_frac_x = step_x_acc - step_x * FRACUNIT;
+    mouse_pan_frac_y = step_y_acc - step_y * FRACUNIT;
 
     // Save original unrotated values
     const int64_t original_x = step_x;
@@ -469,6 +484,26 @@ static void AM_MousePanning (void)
 
     if (!(step_x | step_y))
         return;
+
+    // [PN] In flipped-level mode the screen x axis is mirrored: invert the
+    // horizontal screen-space movement first, then rotate.
+    if (gp_flip_levels)
+        step_x = -step_x;
+
+    // [PN] Convert the screen-space step into map axes in rotate mode.
+    // Rotating at full fixed precision and rounding to nearest: rotating
+    // the tiny raw per-event deltas collapsed direction onto world axes
+    // (the diagonal drift).
+    if (automap_rotate)
+    {
+        int64_t fx = step_x << FRACBITS;
+        int64_t fy = step_y << FRACBITS;
+
+        AM_rotate(&fx, &fy, 0 - mapangle);
+
+        step_x = (fx + FRACUNIT / 2) >> FRACBITS;
+        step_y = (fy + FRACUNIT / 2) >> FRACBITS;
+    }
 
     const int32_t center_x = m_x + (m_w >> 1) + FTOM(step_x);
     const int32_t center_y = m_y + (m_h >> 1) + FTOM(step_y);
@@ -488,6 +523,12 @@ static void AM_MousePanning (void)
     mouse_pan_x -= original_x;
     mouse_pan_y -= original_y;
 
+    // Drop residual sub-pixel carry once axis movement is fully consumed.
+    if (mouse_pan_x == 0)
+        mouse_pan_frac_x = 0;
+    if (mouse_pan_y == 0)
+        mouse_pan_frac_y = 0;
+
     // Update extents
     m_x2 = m_x + m_w;
     m_y2 = m_y + m_h;
@@ -502,9 +543,13 @@ void AM_initVariables (void)
     automapactive = true;
 
     m_paninc.x = m_paninc.y = 0;
+    m_paninc_frac_x = m_paninc_frac_y = 0;
     ftom_zoommul = FRACUNIT;
     mtof_zoommul = FRACUNIT;
     mousewheelzoom = false; // [crispy]
+    mouse_pan_x = mouse_pan_y = 0;
+    mouse_pan_sub_x = mouse_pan_sub_y = 0; // [PN]
+    mouse_pan_frac_x = mouse_pan_frac_y = 0;
 
     m_w = FTOM(f_w);
     m_h = FTOM(f_h);
@@ -734,28 +779,21 @@ boolean AM_Responder (const event_t *ev)
         else // [PN] Move the map window by using the mouse
         if (!followplayer && automap_mouse_pan && (ev->data2 || ev->data3))
         {
-            int dx = ev->data2;
-            int dy = ev->data3;
+            // [PN] Accumulate raw screen-space movement with a sub-pixel
+            // carry: slow, smooth motion used to floor to 0 through the
+            // per-event >> 5. Flip inversion and rotate-mode conversion
+            // happen at consumption, in AM_MousePanning().
+            mouse_pan_sub_x += (int64_t) ev->data2 * vid_resolution * mouseSensitivity;
+            mouse_pan_sub_y += (int64_t) ev->data3 * vid_resolution * mouse_sensitivity_y;
 
-            // Invert horizontal movement if the level is flipped
-            if (gp_flip_levels)
-                dx = -dx;
+            const int pan_x = (int) (mouse_pan_sub_x >> 5);
+            const int pan_y = (int) (mouse_pan_sub_y >> 5);
 
-            // Rotate pan direction if automap is in rotate mode
-            if (automap_rotate)
-            {
-                int64_t incx = dx;
-                int64_t incy = dy;
-                AM_rotate(&incx, &incy, 0 - mapangle);
-                dx = (int)incx;
-                dy = (int)incy;
-            }
+            mouse_pan_sub_x -= (int64_t) pan_x << 5;
+            mouse_pan_sub_y -= (int64_t) pan_y << 5;
 
-            // Accumulate mouse movement into pan buffer,
-            // scaled by resolution and sensitivity.
-            // The >> 5 keeps movement smooth across wide FPS ranges and DPI setups.
-            mouse_pan_x += (dx * vid_resolution * mouseSensitivity) >> 5;
-            mouse_pan_y += (dy * vid_resolution * mouse_sensitivity_y) >> 5;
+            mouse_pan_x += pan_x;
+            mouse_pan_y += pan_y;
 
             rc = true;
         }
@@ -1213,6 +1251,10 @@ static boolean AM_clipMline (mline_t *ml, fline_t *fl)
 #undef DOOUTCODE
 
 
+	// [JN] TODO:
+	const int drawing_minimap = 0;
+	const int automap_mini_thick = 0;
+
 #define PUTDOT_RAW(xx,yy,cc) fb[flipscreenwidth[(xx)] * SCREENHEIGHT + (yy)] = (cc)
 #define PUTDOT(xx,yy,cc) PUTDOT_RAW(xx,yy,palette_pointer[(cc)])
 
@@ -1228,12 +1270,14 @@ static boolean AM_clipMline (mline_t *ml, fline_t *fl)
 
 static inline void PUTDOT_THICK (int x, int y, pixel_t color)
 {
+    const int thick_setting = drawing_minimap ? automap_mini_thick : automap_thick;
+
     // Cache the global setting for smooth rendering locally to avoid
     // repeated access during the loop iterations.
     const int smooth = automap_smooth;
 
     // Thin point fast path
-    if (!automap_thick)
+    if (!thick_setting)
     {
         if (smooth) PUTDOT_RAW(x, y, color);
         else        PUTDOT(x, y, color);
@@ -1241,7 +1285,7 @@ static inline void PUTDOT_THICK (int x, int y, pixel_t color)
     }
 
     // Thickness: 6 == auto (depends on resolution)
-    const int thickness = (automap_thick == 6) ? (vid_resolution >> 1) : automap_thick;
+    const int thickness = (thick_setting == 6) ? (vid_resolution >> 1) : thick_setting;
 
     // Clamp bbox once
     const int fwm1 = f_w - 1, fhm1 = f_h - 1;
@@ -1252,9 +1296,11 @@ static inline void PUTDOT_THICK (int x, int y, pixel_t color)
 
     const int thick_sq = thickness * thickness;
 
-    // Cache fb pointer and width
+    // Cache fb pointer and real screen stride
     pixel_t *restrict fbuf = fb;
-    const int fw = SCREENHEIGHT;
+    const int stride = SCREENHEIGHT;
+    const int fx = f_x;
+    const int fy = f_y;
 
     if (smooth)
     {
@@ -1264,8 +1310,10 @@ static inline void PUTDOT_THICK (int x, int y, pixel_t color)
             const int dx  = nx - x;
             const int dx2 = dx * dx;
 
-            const int flipx = flipscreenwidth[nx];
-            pixel_t *pix = fbuf + flipx * fw + miny;
+            const int flipx = drawing_minimap
+                            ? (gp_flip_levels ? (fx + (f_w - 1 - nx)) : (fx + nx))
+                            : flipscreenwidth[fx + nx];
+            pixel_t *pix = fbuf + flipx * stride + (fy + miny);
 
             for (int ny = miny; ny <= maxy; ++ny, pix++)
             {
@@ -1285,8 +1333,10 @@ static inline void PUTDOT_THICK (int x, int y, pixel_t color)
             const int dx  = nx - x;
             const int dx2 = dx * dx;
 
-            const int flipx = flipscreenwidth[nx];
-            pixel_t *pix = fbuf + flipx * fw + miny;
+            const int flipx = drawing_minimap
+                            ? (gp_flip_levels ? (fx + (f_w - 1 - nx)) : (fx + nx))
+                            : flipscreenwidth[fx + nx];
+            pixel_t *pix = fbuf + flipx * stride + (fy + miny);
 
             for (int ny = miny; ny <= maxy; ++ny, pix++)
             {
@@ -1296,8 +1346,103 @@ static inline void PUTDOT_THICK (int x, int y, pixel_t color)
             }
         }
     }
-    // Clean up the macro definition.
-    #undef PUT_PIXEL
+}
+
+// -----------------------------------------------------------------------------
+// PUTDOT_THICK_BLEND
+// [PN] Draws a thick automap point like PUTDOT_THICK, but alpha-blends
+// the base line color over background (used by smooth/Wu lines).
+// -----------------------------------------------------------------------------
+
+static inline void PUTDOT_THICK_BLEND (int x, int y, pixel_t fg, unsigned char alpha)
+{
+    const int thick_setting = drawing_minimap ? automap_mini_thick : automap_thick;
+
+    if (alpha == 0)
+    {
+        return;
+    }
+
+    // Thin point fast path
+    if (!thick_setting)
+    {
+        if ((unsigned int) x >= (unsigned int) f_w
+        ||  (unsigned int) y >= (unsigned int) f_h)
+        {
+            return;
+        }
+
+        pixel_t *const pix = &fb[(drawing_minimap
+            ? (gp_flip_levels ? (f_x + (f_w - 1 - x)) : (x + f_x))
+            : flipscreenwidth[x + f_x]) * SCREENHEIGHT + (y + f_y)];
+        if (alpha == 255)
+        {
+            *pix = fg;
+        }
+        else
+        {
+            *pix = I_BlendOver_32(*pix, fg, alpha);
+        }
+        return;
+    }
+
+    // Thickness: 6 == auto (depends on resolution)
+    const int thickness = (thick_setting == 6) ? (vid_resolution >> 1) : thick_setting;
+
+    // Clamp bbox once
+    const int fwm1 = f_w - 1, fhm1 = f_h - 1;
+    int minx = x - thickness; if (minx < 0)    minx = 0;
+    int maxx = x + thickness; if (maxx > fwm1) maxx = fwm1;
+    int miny = y - thickness; if (miny < 0)    miny = 0;
+    int maxy = y + thickness; if (maxy > fhm1) maxy = fhm1;
+
+    const int thick_sq = thickness * thickness;
+
+    pixel_t *restrict fbuf = fb;
+    const int stride = SCREENHEIGHT;
+    const int fx = f_x;
+    const int fy = f_y;
+
+    if (alpha == 255)
+    {
+        for (int nx = minx; nx <= maxx; ++nx)
+        {
+            const int dx  = nx - x;
+            const int dx2 = dx * dx;
+
+            const int flipx = drawing_minimap
+                            ? (gp_flip_levels ? (fx + (f_w - 1 - nx)) : (fx + nx))
+                            : flipscreenwidth[fx + nx];
+            pixel_t *pix = fbuf + flipx * stride + (fy + miny);
+
+            for (int ny = miny; ny <= maxy; ++ny, pix++)
+            {
+                const int dy = ny - y;
+                if (dx2 + dy * dy > thick_sq) continue;
+                *pix = fg;
+            }
+        }
+    }
+    else
+    {
+        for (int nx = minx; nx <= maxx; ++nx)
+        {
+            const int dx  = nx - x;
+            const int dx2 = dx * dx;
+
+            const int flipx = drawing_minimap
+                            ? (gp_flip_levels ? (fx + (f_w - 1 - nx)) : (fx + nx))
+                            : flipscreenwidth[fx + nx];
+            pixel_t *pix = fbuf + flipx * stride + (fy + miny);
+
+            for (int ny = miny; ny <= maxy; ++ny, pix++)
+            {
+                const int dy = ny - y;
+                if (dx2 + dy * dy > thick_sq) continue;
+                *pix = I_BlendOver_32(*pix, fg, alpha);
+            }
+        }
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -1360,7 +1505,10 @@ static void AM_drawFline_Vanilla (fline_t *fl, int color)
 static void AM_drawFline_Smooth(fline_t* fl, int color)
 {
     int X0 = fl->a.x, Y0 = fl->a.y, X1 = fl->b.x, Y1 = fl->b.y;
-    const pixel_t* BaseColor = &color_shades[color * NUMSHADES];
+    const pixel_t BaseColor = palette_pointer[(unsigned char) color];
+    static const unsigned char aa_alpha[NUMSHADES] = {
+        255, 240, 224, 208, 192, 176, 160, 144
+    };
     unsigned short ErrorAcc = 0, ErrorAdj;
     unsigned short Weighting, WeightingComplementMask = NUMSHADES - 1;
     // [PN] Declared IntensityShift with other variables
@@ -1374,7 +1522,7 @@ static void AM_drawFline_Smooth(fline_t* fl, int color)
     }
 
     /* Draw the initial pixel */
-    PUTDOT_THICK(X0, Y0, BaseColor[0]);
+    PUTDOT_THICK_BLEND(X0, Y0, BaseColor, 255);
 
     DeltaX = X1 - X0;
     DeltaY = Y1 - Y0;
@@ -1387,7 +1535,7 @@ static void AM_drawFline_Smooth(fline_t* fl, int color)
         while (DeltaX--)
         {
             X0 += XDir;
-            PUTDOT_THICK(X0, Y0, BaseColor[0]);
+            PUTDOT_THICK_BLEND(X0, Y0, BaseColor, 255);
         }
         return;
     }
@@ -1398,7 +1546,7 @@ static void AM_drawFline_Smooth(fline_t* fl, int color)
         while (DeltaY--)
         {
             Y0++;
-            PUTDOT_THICK(X0, Y0, BaseColor[0]);
+            PUTDOT_THICK_BLEND(X0, Y0, BaseColor, 255);
         }
         return;
     }
@@ -1410,7 +1558,7 @@ static void AM_drawFline_Smooth(fline_t* fl, int color)
         {
             X0 += XDir;
             Y0++;
-            PUTDOT_THICK(X0, Y0, BaseColor[0]);
+            PUTDOT_THICK_BLEND(X0, Y0, BaseColor, 255);
         }
         return;
     }
@@ -1432,8 +1580,8 @@ static void AM_drawFline_Smooth(fline_t* fl, int color)
             }
             Y0++;
             Weighting = ErrorAcc >> IntensityShift;
-            PUTDOT_THICK(X0, Y0, BaseColor[Weighting]);
-            PUTDOT_THICK(X0 + XDir, Y0, BaseColor[Weighting ^ WeightingComplementMask]);
+            PUTDOT_THICK_BLEND(X0, Y0, BaseColor, aa_alpha[Weighting]);
+            PUTDOT_THICK_BLEND(X0 + XDir, Y0, BaseColor, aa_alpha[Weighting ^ WeightingComplementMask]);
         }
     }
     /* X-major line */
@@ -1454,13 +1602,13 @@ static void AM_drawFline_Smooth(fline_t* fl, int color)
             }
             X0 += XDir;
             Weighting = ErrorAcc >> IntensityShift;
-            PUTDOT_THICK(X0, Y0, BaseColor[Weighting]);
-            PUTDOT_THICK(X0, Y0 + 1, BaseColor[Weighting ^ WeightingComplementMask]);
+            PUTDOT_THICK_BLEND(X0, Y0, BaseColor, aa_alpha[Weighting]);
+            PUTDOT_THICK_BLEND(X0, Y0 + 1, BaseColor, aa_alpha[Weighting ^ WeightingComplementMask]);
         }
     }
 
     /* Draw the final pixel */
-    PUTDOT_THICK(X1, Y1, BaseColor[0]);
+    PUTDOT_THICK_BLEND(X1, Y1, BaseColor, 255);
 }
 
 // -----------------------------------------------------------------------------
@@ -1474,6 +1622,15 @@ static void AM_drawMline (mline_t *ml, int color)
 
     if (AM_clipMline(ml, &fl))
     {
+        // [PN] Draw routine expects local viewport coordinates.
+        if (f_x || f_y)
+        {
+            fl.a.x -= f_x;
+            fl.a.y -= f_y;
+            fl.b.x -= f_x;
+            fl.b.y -= f_y;
+        }
+
         // draws it on frame buffer using fb coords
         AM_drawFline(&fl, color);
     }
@@ -2159,6 +2316,4 @@ void AM_Drawer (void)
     {
         AM_LevelNameDrawer();
     }
-
-    V_MarkRect(f_x, f_y, f_w, f_h);
 }

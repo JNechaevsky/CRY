@@ -640,6 +640,8 @@ static void M_ID_Automap_Pan (int choice);
 static void M_Draw_ID_Gameplay_1 (void);
 static void M_ID_Brightmaps (int choice);
 static void M_ID_Translucency (int choice);
+static void M_ID_SpriteLighting (int choice);
+static void M_ID_SpriteShadows (int choice);
 static void M_ID_ImprovedFuzz (int choice);
 static void M_ID_ColoredLighting (int choice);
 static void M_ID_ColoredBlood (int choice);
@@ -1121,7 +1123,16 @@ static void M_ID_RenderingResHook (void)
 
 static void M_ID_RenderingRes (int choice)
 {
+    const int old_resolution = vid_resolution;
     vid_resolution = M_INT_Slider(vid_resolution, 1, MAXHIRES, choice, false);
+
+    // [PN] Keep menu hover position stable across resolution multiplier changes.
+    if (old_resolution != vid_resolution)
+    {
+        menu_mouse_x = menu_mouse_x * vid_resolution / old_resolution;
+        menu_mouse_y = menu_mouse_y * vid_resolution / old_resolution;
+    }
+
     post_rendering_hook = M_ID_RenderingResHook;
 }
 
@@ -3069,6 +3080,8 @@ static menuitem_t ID_Menu_Gameplay_1[]=
 {
     { M_MUL1, "BRIGHTMAPS",                  M_ID_Brightmaps,        'b' },
     { M_MUL2, "TRANSLUCENCY",                M_ID_Translucency,      't' },
+    { M_MUL1, "SPRITE LIGHTING",             M_ID_SpriteLighting,    's' },
+    { M_MUL1, "SPRITE SHADOWS",              M_ID_SpriteShadows,     's' },
     { M_MUL1, "FUZZ EFFECT",                 M_ID_ImprovedFuzz,      'f' },
     { M_MUL1, "COLORED LIGHTING",            M_ID_ColoredLighting,   'c' },
     { M_MUL1, "COLORED BLOOD AND CORPSES",   M_ID_ColoredBlood,      'c' },
@@ -3079,8 +3092,6 @@ static menuitem_t ID_Menu_Gameplay_1[]=
     { M_SKIP, "", 0, '\0' },
     { M_MUL2, "SHAPE",                       M_ID_Crosshair,         's' },
     { M_MUL2, "INDICATION",                  M_ID_CrosshairColor,    'i' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
     { M_MUL2, "", /* < SCROLL PAGES >*/      M_ScrollGameplay,       's' },
 };
 
@@ -3117,59 +3128,73 @@ static void M_Draw_ID_Gameplay_1 (void)
                             vis_translucency ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
                                 LINE_ALPHA(1));
 
+    // Sprite lighting
+    sprintf(str, vis_sprite_light ? "PER-COLUMN" : "ORIGINAL");
+    M_WriteTextGlow(M_ItemRightAlign(str), 36, str,
+                        vis_sprite_light ? cr[CR_GREEN] : cr[CR_DARKRED],
+                            vis_sprite_light ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
+                                LINE_ALPHA(2));
+
+    // Sprite shadows
+    sprintf(str, vis_sprite_shadows ? "ON" : "OFF");
+    M_WriteTextGlow(M_ItemRightAlign(str), 45, str,
+                        vis_sprite_shadows ? cr[CR_GREEN] : cr[CR_DARKRED],
+                            vis_sprite_shadows ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
+                                LINE_ALPHA(3));
+
     // Fuzz effect
     sprintf(str, vis_improved_fuzz == 1 ? "FUZZ" :
                  vis_improved_fuzz == 2 ? "TRANSLUCENT" :
                  vis_improved_fuzz == 3 ? "GRAYSCALE" : "OFF");
-    M_WriteTextGlow(M_ItemRightAlign(str), 36, str,
+    M_WriteTextGlow(M_ItemRightAlign(str), 54, str,
                         vis_improved_fuzz ? cr[CR_GREEN] : cr[CR_DARKRED],
                             vis_improved_fuzz ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
-                                LINE_ALPHA(2));
+                                LINE_ALPHA(4));
 
     // Colored lighting
     sprintf(str, vis_colored_lighting ? "ON" : "OFF");
-    M_WriteTextGlow(M_ItemRightAlign(str), 45, str,
+    M_WriteTextGlow(M_ItemRightAlign(str), 63, str,
                         vis_colored_lighting ? cr[CR_GREEN] : cr[CR_DARKRED],
                             vis_colored_lighting ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
-                                LINE_ALPHA(3));
+                                LINE_ALPHA(5));
 
     // Colored blood and corpses
     sprintf(str, vis_colored_blood ? "ON" : "OFF");
-    M_WriteTextGlow(M_ItemRightAlign(str), 54, str,
+    M_WriteTextGlow(M_ItemRightAlign(str), 72, str,
                         vis_colored_blood ? cr[CR_GREEN] : cr[CR_DARKRED],
                             vis_colored_blood ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
-                                LINE_ALPHA(4));
+                                LINE_ALPHA(6));
 
     // Liquids animation
     sprintf(str, vis_swirling_liquids ? "IMPROVED" : "ORIGINAL");
-    M_WriteTextGlow(M_ItemRightAlign(str), 63, str,
+    M_WriteTextGlow(M_ItemRightAlign(str), 81, str,
                         vis_swirling_liquids ? cr[CR_GREEN] : cr[CR_DARKRED],
                             vis_swirling_liquids ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
-                                LINE_ALPHA(5));
+                                LINE_ALPHA(7));
 
     // Sky animation
     sprintf(str, vis_animated_sky ? "ON" : "OFF");
-    M_WriteTextGlow(M_ItemRightAlign(str), 72, str,
+    M_WriteTextGlow(M_ItemRightAlign(str), 90, str,
                         vis_animated_sky ? cr[CR_GREEN] : cr[CR_DARKRED],
                             vis_animated_sky ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
-                                LINE_ALPHA(6));
+                                LINE_ALPHA(8));
 
     // Sky drawing mode
     sprintf(str, vis_linear_sky == 1 ? "LINEAR" :
                  vis_linear_sky == 2 ? "CYLINDRICAL" : "ORIGINAL");
-    M_WriteTextGlow(M_ItemRightAlign(str), 81, str,
+    M_WriteTextGlow(M_ItemRightAlign(str), 99, str,
                         vis_linear_sky ? cr[CR_GREEN] : cr[CR_DARKRED],
                             vis_linear_sky ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
-                                LINE_ALPHA(7));
+                                LINE_ALPHA(9));
 
     // Randomly mirrored corpses
     sprintf(str, vis_flip_corpses ? "ON" : "OFF");
-    M_WriteTextGlow(M_ItemRightAlign(str), 90, str,
+    M_WriteTextGlow(M_ItemRightAlign(str), 108, str,
                         vis_flip_corpses ? cr[CR_GREEN] : cr[CR_DARKRED],
                             vis_flip_corpses ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
-                                LINE_ALPHA(8));
+                                LINE_ALPHA(10));
 
-    M_WriteTextCentered(99, "CROSSHAIR", cr[CR_YELLOW]);
+    M_WriteTextCentered(117, "CROSSHAIR", cr[CR_YELLOW]);
 
     // Crosshair shape
     sprintf(str, xhair_draw == 1 ? "CROSS 1" :
@@ -3179,19 +3204,19 @@ static void M_Draw_ID_Gameplay_1 (void)
                  xhair_draw == 5 ? "ANGLE" :
                  xhair_draw == 6 ? "TRIANGLE" :
                  xhair_draw == 7 ? "DOT" : "OFF");
-    M_WriteTextGlow(M_ItemRightAlign(str), 108, str,
+    M_WriteTextGlow(M_ItemRightAlign(str), 126, str,
                         xhair_draw ? cr[CR_GREEN] : cr[CR_DARKRED],
                             xhair_draw ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
-                                LINE_ALPHA(10));
+                                LINE_ALPHA(12));
 
     // Crosshair indication
     sprintf(str, xhair_color == 1 ? "HEALTH" :
                  xhair_color == 2 ? "TARGET HIGHLIGHT" :
                  xhair_color == 3 ? "TARGET HIGHLIGHT+HEALTH" : "STATIC");
-    M_WriteTextGlow(M_ItemRightAlign(str), 117, str,
+    M_WriteTextGlow(M_ItemRightAlign(str), 135, str,
                         xhair_color ? cr[CR_GREEN] : cr[CR_DARKRED],
                             xhair_color ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
-                                LINE_ALPHA(11));
+                                LINE_ALPHA(13));
 
     // < Scroll pages >
     M_DrawScrollPages(ID_MENU_LEFTOFFSET_BIG, 144, 14, "1/3");
@@ -3215,6 +3240,16 @@ static void M_ID_ColoredLighting (int choice)
 static void M_ID_Translucency (int choice)
 {
     vis_translucency = M_INT_Slider(vis_translucency, 0, 2, choice, false);
+}
+
+static void M_ID_SpriteLighting (int choice)
+{
+    vis_sprite_light ^= 1;
+}
+
+static void M_ID_SpriteShadows (int choice)
+{
+    vis_sprite_shadows ^= 1;
 }
 
 static void M_ID_ImprovedFuzz (int choice)
@@ -3743,6 +3778,8 @@ static void M_ID_ApplyResetHook (void)
     // Visual
     vis_brightmaps = 0;
     vis_translucency = 0;
+    vis_sprite_light = 0;
+    vis_sprite_shadows = 0;
     vis_improved_fuzz = 0;
     vis_colored_lighting = 0;
     vis_colored_blood = 0;
@@ -5598,8 +5635,8 @@ boolean M_Responder (event_t* ev)
     else if (key == key_menu_back)
     {
         // Go back to previous menu
-
         currentMenu->lastOn = itemOn;
+
         if (currentMenu->prevMenu)
         {
             currentMenu = currentMenu->prevMenu;
@@ -5631,7 +5668,6 @@ boolean M_Responder (event_t* ev)
         if (currentMenu->menuitems[itemOn].routine
         &&  currentMenu->menuitems[itemOn].status > STS_SWTC)
         {
-            S_StartSound(NULL, sfx_stnmov);
             currentMenu->menuitems[itemOn].routine(0);
         }
         return true;
@@ -5649,7 +5685,6 @@ boolean M_Responder (event_t* ev)
         if (currentMenu->menuitems[itemOn].routine
         &&  currentMenu->menuitems[itemOn].status > STS_SWTC)
         {
-            S_StartSound(NULL, sfx_stnmov);
             currentMenu->menuitems[itemOn].routine(1);
         }
         return true;
@@ -5657,15 +5692,15 @@ boolean M_Responder (event_t* ev)
     else if (key == key_menu_forward && itemOn != -1)
     {
         // Activate menu item
-
         if (currentMenu->menuitems[itemOn].routine
         &&  currentMenu->menuitems[itemOn].status)
         {
             currentMenu->lastOn = itemOn;
+
             if (currentMenu->menuitems[itemOn].status == STS_MUL1
             ||  currentMenu->menuitems[itemOn].status == STS_MUL2)
             {
-                currentMenu->menuitems[itemOn].routine(1);      // right arrow
+                currentMenu->menuitems[itemOn].routine(1); // right arrow
                 S_StartSound(NULL, sfx_stnmov);
             }
             else
@@ -5676,9 +5711,9 @@ boolean M_Responder (event_t* ev)
         }
         return true;
     }
-    // [crispy] delete a savegame
     else if (key == key_menu_del)
     {
+        // [crispy] delete a savegame
         if (currentMenu == &LoadDef || currentMenu == &SaveDef)
         {
             if (LoadMenu[itemOn].status)
@@ -5709,44 +5744,34 @@ boolean M_Responder (event_t* ev)
             return true;
         }
     }
-    // [JN] Go to previous-left menu by pressing Page Up key.
     else if (key == KEY_PGUP)
     {
+        // [JN] Go to previous-left menu by pressing Page Up key.
         if (currentMenu->ScrollPG)
         {
             M_ScrollPages(false);
         }
     }
-    // [JN] Go to next-right menu by pressing Page Down key.
     else if (key == KEY_PGDN)
     {
+        // [JN] Go to next-right menu by pressing Page Down key.
         if (currentMenu->ScrollPG)
         {
             M_ScrollPages(true);
         }
     }
-
-    // Keyboard shortcut?
-    // Vanilla Doom has a weird behavior where it jumps to the scroll bars
-    // when the certain keys are pressed, so emulate this.
-
+    // Jump to menu item based on first letter:
     else if (ch != 0 || IsNullKey(key))
     {
-        for (i = itemOn + 1 ; i < currentMenu->numitems ; i++)
+        // [PN] Combined loops using a cyclic index to traverse the array twice,
+        // avoiding code duplication.
+        for (i = itemOn + 1; i < currentMenu->numitems + itemOn + 1; i++)
         {
-            if (currentMenu->menuitems[i].alphaKey == ch)
-            {
-                itemOn = i;
-                S_StartSound(NULL, sfx_pstop);
-                return true;
-            }
-        }
+            const int index = i % currentMenu->numitems;
 
-        for (i = 0 ; i <= itemOn ; i++)
-        {
-            if (currentMenu->menuitems[i].alphaKey == ch)
+            if (currentMenu->menuitems[index].alphaKey == ch)
             {
-                itemOn = i;
+                itemOn = index;
                 S_StartSound(NULL, sfx_pstop);
                 return true;
             }
@@ -5776,71 +5801,124 @@ void M_StartControlPanel (void)
     menu_mouse_allow = false;
 }
 
+// -----------------------------------------------------------------------------
+// M_ID_MenuMouseControl
+//  [PN/JN] Set menu cursor position under the mouse cursor.
+// -----------------------------------------------------------------------------
+
 static void M_ID_MenuMouseControl (void)
 {
-    if (!menu_mouse_allow || KbdIsBinding || MouseIsBinding)
+    // Skip if mouse control disabled or any binding is active
+    if (!menu_mouse_allow || KbdIsBinding || MouseIsBinding /*|| GamepadIsBinding*/)
+        return;
+
+    // Precompute scaled horizontal boundaries for the entire menu
+    const int left = (currentMenu->x + WIDESCREENDELTA) * vid_resolution;
+    const int right = (ORIGWIDTH + WIDESCREENDELTA - currentMenu->x) * vid_resolution;
+
+    // Determine line height based on font size
+    const int line_height = currentMenu->smallFont ? ID_MENU_LINEHEIGHT_SMALL : LINEHEIGHT;
+    const int slider_height = currentMenu->smallFont ? 3 : 2;
+    const int scaled_line_height = line_height * vid_resolution;
+    const int base_y = currentMenu->y * vid_resolution;
+
+    // Quick reject: mouse outside horizontal bounds or above menu
+    if (menu_mouse_x < left || menu_mouse_x > right || menu_mouse_y < base_y)
     {
-        // [JN] Skip hovering if the cursor is disabled/hidden or a binding is active.
+        itemOn = -1;
         return;
     }
-    else
+
+    // Approximate bottom boundary – if mouse is far below, reject early
+    const int max_bottom_estimate = base_y + currentMenu->numitems * scaled_line_height;
+    if (menu_mouse_y > max_bottom_estimate)
     {
-        // [JN] Which line height should be used?
-        const int line_height = currentMenu->smallFont ? ID_MENU_LINEHEIGHT_SMALL : LINEHEIGHT;
-
-        // [JN] Reset current menu item, it will be set in a cycle below.
         itemOn = -1;
+        return;
+    }
 
-        // [PN] Check if the cursor is hovering over a menu item
-        for (int i = 0; i < currentMenu->numitems; i++)
+    // Reset selection; will be set if cursor is over an item
+    itemOn = -1;
+
+    // Scan menu items from top to bottom
+    for (int i = 0; i < currentMenu->numitems; ++i)
+    {
+        // Skip items that cannot be selected (STS_SKIP = -1)
+        if (currentMenu->menuitems[i].status == -1)
+            continue;
+
+        // Sliders occupy three lines, normal items one line
+        const int mn_lines = (currentMenu->menuitems[i].status == STS_SLDR) ? slider_height : 1;
+        const int mn_top = base_y + i * scaled_line_height;
+        const int mn_bottom = mn_top + mn_lines * scaled_line_height;
+
+        // If mouse is above current item, further items are even lower - stop scan
+        if (menu_mouse_y < mn_top)
+            break;
+
+        // Check vertical overlap
+        if (menu_mouse_y <= mn_bottom)
         {
-            // [JN] Slider takes three lines.
-            const int line_item = currentMenu->menuitems[i].status == STS_SLDR ? 3 : 1;
-
-            if (menu_mouse_x >= (currentMenu->x + WIDESCREENDELTA) * vid_resolution
-            &&  menu_mouse_x <= (ORIGWIDTH + WIDESCREENDELTA - currentMenu->x) * vid_resolution
-            &&  menu_mouse_y >= (currentMenu->y + i * line_height) * vid_resolution
-            &&  menu_mouse_y <= (currentMenu->y + (i + line_item) * line_height) * vid_resolution
-            &&  currentMenu->menuitems[i].status != -1)
-            {
-                // [PN] Highlight the current menu item
-                itemOn = i;
-            }
+            itemOn = i;
+            break; // Found the topmost item under cursor (items don't overlap vertically)
         }
     }
 }
 
-static void M_ID_HandleSliderMouseControl (int x, int y, int width, void *value, boolean is_float, float min, float max)
+// -----------------------------------------------------------------------------
+// M_ID_HandleSliderMouseControl
+//  [PN/JN] Handle slider position setting under the mouse cursor.
+// -----------------------------------------------------------------------------
+
+inline static void M_ID_HandleSliderMouseControl (int x, int y, int width, void *value, boolean is_float, float min, float max)
 {
+    // Ignore if mouse clicks are not allowed (prevents multiple adjustments)
     if (!menu_mouse_allow_click)
         return;
 
-    // [JN/PN] Adjust slider boundaries
+    // Adjust slider boundaries to account for screen resolution and widescreen offset
     const int adj_x = (x + WIDESCREENDELTA) * vid_resolution;
     const int adj_y = y * vid_resolution;
     const int adj_width = width * vid_resolution;
     const int adj_height = LINEHEIGHT * vid_resolution;
 
-    // [PN] Check cursor position and item status
+    // Verify mouse is within slider boundaries and current item is actually a slider
+    const menuitem_t *const item = &currentMenu->menuitems[itemOn];
     if (menu_mouse_x < adj_x || menu_mouse_x > adj_x + adj_width
     ||  menu_mouse_y < adj_y || menu_mouse_y > adj_y + adj_height
-    ||  currentMenu->menuitems[itemOn].status != STS_SLDR)
+    ||  item->status != STS_SLDR)
         return;
 
-    // [PN] Calculate and update slider value
-    const float normalized = (float)(menu_mouse_x - adj_x + 5) / adj_width;
-    const float newValue = min + normalized * (max - min);
-    if (is_float)
-        *((float *)value) = newValue;
-    else
-        *((int *)value) = (int)newValue;
+    // Calculate normalized cursor position (0.0 to 1.0) within slider
+    // Adding +5 provides a small deadzone for better precision at edges
+    const float normalized = (float)(menu_mouse_x - adj_x + 5) / (float)adj_width;
+    const float range = max - min;
+    boolean value_changed = false;
 
-    // [JN/PN] Call related routine and reset mouse click allowance
-    currentMenu->menuitems[itemOn].routine(-1);
+    // Update the actual value based on cursor position and data type
+    if (is_float)
+    {
+        float *v = (float *)value;
+        const float old_value = *v;
+        *v = min + normalized * range;
+        value_changed = (old_value != *v);
+    }
+    else
+    {
+        int *v = (int *)value;
+        const int old_value = *v;
+        *v = (int)(min + normalized * range);
+        value_changed = (old_value != *v);
+    }
+
+    // Execute the item's routine to handle any side effects
+    // and prevent multiple clicks from processing in the same frame
+    item->routine(-1);
     menu_mouse_allow_click = false;
 
-    // Play sound
-    S_StartSound(NULL, sfx_stnmov);
+    // Provide audio feedback only if the value actually changed
+    if (value_changed)
+        S_StartSound(NULL, sfx_stnmov);
 }
 
 //
@@ -5962,9 +6040,6 @@ void M_Drawer (void)
     {
         V_DrawShadowedPatchOptional(116, 76, W_CacheLumpName("DEFAULTS", PU_CACHE));
     }
-
-    // [JN] Call the menu control routine for mouse input.
-    M_ID_MenuMouseControl();
 }
 
 
@@ -5999,10 +6074,18 @@ static void M_SetupNextMenu(menu_t *menudef)
 //
 void M_Ticker (void)
 {
+    if (menuactive == false)
+    {
+        return;
+    }
+    
+    // [JN] Call the menu control routine for mouse input.
+    M_ID_MenuMouseControl();
+    
     if (--skullAnimCounter <= 0)
     {
-	whichSkull ^= 1;
-	skullAnimCounter = 8;
+        whichSkull ^= 1;
+        skullAnimCounter = 8;
     }
 
     // [JN] Cursor glowing animation:

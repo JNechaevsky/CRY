@@ -117,6 +117,8 @@ int automap_mouse_pan = 0;
 // Visual
 int vis_brightmaps = 0;
 int vis_translucency = 0;
+int vis_sprite_light = 0;
+int vis_sprite_shadows = 0;
 int vis_improved_fuzz = 0;
 int vis_colored_lighting = 0;
 int vis_colored_blood = 0;
@@ -253,6 +255,8 @@ void ID_BindVariables (void)
     // Visual
     M_BindIntVariable("vis_brightmaps",                 &vis_brightmaps);
     M_BindIntVariable("vis_translucency",               &vis_translucency);
+    M_BindIntVariable("vis_sprite_light",               &vis_sprite_light);
+    M_BindIntVariable("vis_sprite_shadows",             &vis_sprite_shadows);
     M_BindIntVariable("vis_improved_fuzz",              &vis_improved_fuzz);
     M_BindIntVariable("vis_colored_lighting",           &vis_colored_lighting);
     M_BindIntVariable("vis_colored_blood",              &vis_colored_blood);
