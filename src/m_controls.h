@@ -24,68 +24,68 @@
 
 // Movement
 
-extern int key_up;
-extern int key_down;
-extern int key_right;
-extern int key_left;
-extern int key_strafeleft;
-extern int key_straferight;
-extern int key_speed;
-extern int key_strafe;
-extern int key_180turn;
+extern int key_up, key_up2;
+extern int key_down, key_down2;
+extern int key_right, key_right2;
+extern int key_left, key_left2;
+extern int key_strafeleft, key_strafeleft2;
+extern int key_straferight, key_straferight2;
+extern int key_speed, key_speed2;
+extern int key_strafe, key_strafe2;
+extern int key_180turn, key_180turn2;
 
 // Action
 
-extern int key_fire;
-extern int key_use;
+extern int key_fire, key_fire2;
+extern int key_use, key_use2;
 
 // Advanced movement
 
 extern int always_run;
-extern int key_autorun;
-extern int key_mouse_look; // [crispy]
-extern int key_novert;
+extern int key_autorun, key_autorun2;
+extern int key_mouse_look, key_mouse_look2; // [crispy]
+extern int key_novert, key_novert2;
 
 // Special keys
 
-extern int key_nextlevel;   // [crispy]
-extern int key_reloadlevel; // [crispy]
-extern int key_flip_levels; // [crispy]
-extern int key_widget_enable;
+extern int key_nextlevel, key_nextlevel2;         // [crispy]
+extern int key_reloadlevel, key_reloadlevel2;     // [crispy]
+extern int key_flip_levels, key_flip_levels2;     // [crispy]
+extern int key_widget_enable, key_widget_enable2;
 
 // RestlessRodent -- CRL (Special modes)
 
-extern int key_spectator;
-extern int key_freeze;
-extern int key_notarget;
-extern int key_buddha;
+extern int key_spectator, key_spectator2; // RestlessRodent -- CRL
+extern int key_freeze, key_freeze2;
+extern int key_notarget, key_notarget2;
+extern int key_buddha, key_buddha2;
 
 // Weapons
 
-extern int key_weapon1;
-extern int key_weapon2;
-extern int key_weapon3;
-extern int key_weapon4;
-extern int key_weapon5;
-extern int key_weapon6;
-extern int key_weapon7;
-extern int key_weapon8;
-extern int key_prevweapon;
-extern int key_nextweapon;
+extern int key_weapon1, key_weapon1_2;
+extern int key_weapon2, key_weapon2_2;
+extern int key_weapon3, key_weapon3_2;
+extern int key_weapon4, key_weapon4_2;
+extern int key_weapon5, key_weapon5_2;
+extern int key_weapon6, key_weapon6_2;
+extern int key_weapon7, key_weapon7_2;
+extern int key_weapon8, key_weapon8_2;
+extern int key_prevweapon, key_prevweapon2;
+extern int key_nextweapon, key_nextweapon2;
 
 // Automap
 
-extern int key_map_toggle;
-extern int key_map_zoomin;
-extern int key_map_zoomout;
-extern int key_map_maxzoom;
-extern int key_map_follow;
-extern int key_map_rotate;
-extern int key_map_overlay;
-extern int key_map_mousepan;
-extern int key_map_grid;
-extern int key_map_mark;
-extern int key_map_clearmark;
+extern int key_map_toggle, key_map_toggle2;
+extern int key_map_zoomin, key_map_zoomin2;
+extern int key_map_zoomout, key_map_zoomout2;
+extern int key_map_maxzoom, key_map_maxzoom2;
+extern int key_map_follow, key_map_follow2;
+extern int key_map_rotate, key_map_rotate2;
+extern int key_map_overlay, key_map_overlay2;
+extern int key_map_mousepan, key_map_mousepan2;
+extern int key_map_grid, key_map_grid2;
+extern int key_map_mark, key_map_mark2;
+extern int key_map_clearmark, key_map_clearmark2;
 extern int key_map_north;
 extern int key_map_south;
 extern int key_map_east;
@@ -93,24 +93,25 @@ extern int key_map_west;
 
 // Function keys
 
-extern int key_menu_help;
-extern int key_menu_save;
-extern int key_menu_load;
-extern int key_menu_volume;
-extern int key_menu_detail;
-extern int key_menu_qsave;
-extern int key_menu_endgame;
-extern int key_menu_messages;
-extern int key_menu_qload;
-extern int key_menu_quit;
-extern int key_menu_gamma;
-extern int key_menu_palette;
+extern int key_menu_help, key_menu_help2;
+extern int key_menu_save, key_menu_save2;
+extern int key_menu_load, key_menu_load2;
+extern int key_menu_volume, key_menu_volume2;
+extern int key_menu_detail, key_menu_detail2;
+extern int key_menu_qsave, key_menu_qsave2;
+extern int key_menu_endgame, key_menu_endgame2;
+extern int key_menu_messages, key_menu_messages2;
+extern int key_menu_qload, key_menu_qload2;
+extern int key_menu_quit, key_menu_quit2;
+extern int key_menu_gammad, key_menu_gammad2;
+extern int key_menu_gamma, key_menu_gamma2;
+extern int key_menu_palette, key_menu_palette2;
 
 // Shortcut keys
 
-extern int key_pause;
-extern int key_menu_screenshot;
-extern int key_message_refresh;
+extern int key_pause, key_pause2;
+extern int key_menu_screenshot, key_menu_screenshot2;
+extern int key_message_refresh, key_message_refresh2;
 
 // Special menu keys, not available for rebinding
 
@@ -131,16 +132,16 @@ extern int key_menu_del; // [crispy]
 // Mouse controls
 //
 
-extern int mousebfire;
-extern int mousebforward;
-extern int mousebspeed;
-extern int mousebstrafe;
-extern int mousebbackward;
-extern int mousebuse;
-extern int mousebstrafeleft;
-extern int mousebstraferight;
-extern int mousebprevweapon;
-extern int mousebnextweapon;
+extern int mousebfire, mousebfire2;
+extern int mousebforward, mousebforward2;
+extern int mousebbackward, mousebbackward2;
+extern int mousebuse, mousebuse2;
+extern int mousebspeed, mousebspeed2;
+extern int mousebstrafe, mousebstrafe2;
+extern int mousebstrafeleft, mousebstrafeleft2;
+extern int mousebstraferight, mousebstraferight2;
+extern int mousebprevweapon, mousebprevweapon2;
+extern int mousebnextweapon, mousebnextweapon2;
 
 // Control whether if a mouse button is double clicked,
 // it acts like "use" has been pressed.

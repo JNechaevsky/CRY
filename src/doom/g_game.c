@@ -123,15 +123,20 @@ fixed_t         forwardmove[2] = {0x19, 0x32};
 fixed_t         sidemove[2] = {0x18, 0x28}; 
 fixed_t         angleturn[3] = {640, 1280, 320};    // + slow turn 
 
-static int *weapon_keys[] = {
-    &key_weapon1,
-    &key_weapon2,
-    &key_weapon3,
-    &key_weapon4,
-    &key_weapon5,
-    &key_weapon6,
-    &key_weapon7,
-    &key_weapon8
+typedef struct {
+    int *primary;
+    int *secondary;
+} weapon_keys_pair_t;
+
+static weapon_keys_pair_t weapon_keys[] = {
+    { &key_weapon1, &key_weapon1_2 },
+    { &key_weapon2, &key_weapon2_2 },
+    { &key_weapon3, &key_weapon3_2 },
+    { &key_weapon4, &key_weapon4_2 },
+    { &key_weapon5, &key_weapon5_2 },
+    { &key_weapon6, &key_weapon6_2 },
+    { &key_weapon7, &key_weapon7_2 },
+    { &key_weapon8, &key_weapon8_2 }
 };
 
 // Set to -1 or +1 to switch to the previous or next weapon.
@@ -171,13 +176,11 @@ static boolean *mousebuttons = &mousearray[1];  // allow [-1]
 // guarantees the press is visible for at least one ticcmd.
 static boolean mousebutton_latch_array[MAX_MOUSE_BUTTONS + 1];
 static boolean *mousebutton_latch = &mousebutton_latch_array[1]; // allow [-1]
-/*
 static inline boolean mouse_buttons(int btn1, int btn2)
 {
     return (mousebuttons[btn1] || mousebutton_latch[btn1] ||
             mousebuttons[btn2] || mousebutton_latch[btn2]);
 }
-*/
 
 // mouse values are used once 
 int             mousex;
@@ -287,8 +290,9 @@ static int G_NextWeapon(int direction)
 // e.g. quick exit, clean screenshots, resurrection from savegames
 boolean speedkeydown (void)
 {
-    return (key_speed < NUMKEYS && gamekeydown[key_speed]) ||
-           (mousebspeed < MAX_MOUSE_BUTTONS && mousebuttons[mousebspeed]) ||
+    return (key_speed < NUMKEYS && gamekeydown[key_speed]) || (key_speed2 < NUMKEYS && gamekeydown[key_speed2]) ||
+           (mousebspeed < MAX_MOUSE_BUTTONS && mousebuttons[mousebspeed]) || (mousebspeed2 < MAX_MOUSE_BUTTONS && mousebuttons[mousebspeed2]) ||
+           (mousebspeed < MAX_MOUSE_BUTTONS && mousebutton_latch[mousebspeed]) || (mousebspeed2 < MAX_MOUSE_BUTTONS && mousebutton_latch[mousebspeed2]) ||
            (joybspeed < MAX_JOY_BUTTONS && joybuttons[joybspeed]);
 }
 
@@ -397,7 +401,8 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
  	if (crl_spectating && !sendsave && !sendpause)
  		cmd = &spect;
  	
-    strafe = gamekeydown[key_strafe] || mousebuttons[mousebstrafe] 
+    strafe = gamekeydown[key_strafe] || gamekeydown[key_strafe2]
+	|| mouse_buttons(mousebstrafe, mousebstrafe2)
 	|| joybuttons[joybstrafe]; 
 
     // [crispy] when "always run" is active,
@@ -412,8 +417,8 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
     // on the keyboard and joystick
     if (joyxmove < 0
 	|| joyxmove > 0  
-	|| gamekeydown[key_right]
-	|| gamekeydown[key_left]) 
+	|| gamekeydown[key_right] || gamekeydown[key_right2]
+	|| gamekeydown[key_left] || gamekeydown[key_left2]) 
 	turnheld += ticdup; 
     else 
 	turnheld = 0; 
@@ -424,14 +429,14 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
 	tspeed = speed;
     
     // [crispy] add quick 180° reverse
-    if (gamekeydown[key_180turn])
+    if (gamekeydown[key_180turn] || gamekeydown[key_180turn2])
     {
         angle += ANG180 >> FRACBITS;
-        gamekeydown[key_180turn] = false;
+        gamekeydown[key_180turn] = gamekeydown[key_180turn2] = false;
     }
 
     // [crispy] toggle "always run"
-    if (gamekeydown[key_autorun])
+    if (gamekeydown[key_autorun] || gamekeydown[key_autorun2])
     {
         always_run ^= 1;
         CT_SetMessage(&players[consoleplayer], always_run ?
@@ -439,11 +444,11 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
 
         S_StartSound(NULL, sfx_swtchn);
 
-        gamekeydown[key_autorun] = false;
+        gamekeydown[key_autorun] = gamekeydown[key_autorun2] = false;
     }
 
     // [JN] Toggle mouse look.
-    if (gamekeydown[key_mouse_look])
+    if (gamekeydown[key_mouse_look] || gamekeydown[key_mouse_look2])
     {
         mouse_look ^= 1;
         if (!mouse_look)
@@ -455,17 +460,17 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
         CT_SetMessage(&players[consoleplayer], mouse_look ?
                        ID_MLOOK_ON : ID_MLOOK_OFF, false, NULL);
         S_StartSound(NULL, sfx_swtchn);
-        gamekeydown[key_mouse_look] = false;
+        gamekeydown[key_mouse_look] = gamekeydown[key_mouse_look2] = false;
     }
 
     // [JN] Toggle vertical mouse movement.
-    if (gamekeydown[key_novert])
+    if (gamekeydown[key_novert] || gamekeydown[key_novert2])
     {
         mouse_novert ^= 1;
         CT_SetMessage(&players[consoleplayer], mouse_novert ?
                       ID_NOVERT_ON : ID_NOVERT_OFF, false, NULL);
         S_StartSound(NULL, sfx_swtchn);
-        gamekeydown[key_novert] = false;
+        gamekeydown[key_novert] = gamekeydown[key_novert2] = false;
     }
 
     // let movement keys cancel each other out
@@ -473,12 +478,12 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
     { 
         if (!cmd->angleturn)
         {
-            if (gamekeydown[key_right])
+            if (gamekeydown[key_right] || gamekeydown[key_right2])
             {
                 // fprintf(stderr, "strafe right\n");
                 side += sidemove[speed];
             }
-            if (gamekeydown[key_left])
+            if (gamekeydown[key_left] || gamekeydown[key_left2])
             {
                 //	fprintf(stderr, "strafe left\n");
                 side -= sidemove[speed];
@@ -501,9 +506,9 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
     } 
     else 
     { 
-	if (gamekeydown[key_right])
+	if (gamekeydown[key_right] || gamekeydown[key_right2])
 	    angle -= angleturn[tspeed];
-	if (gamekeydown[key_left])
+	if (gamekeydown[key_left] || gamekeydown[key_left2])
 	    angle += angleturn[tspeed];
         if (use_analog && joyxmove)
         {
@@ -522,12 +527,12 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
         }
     } 
  
-    if (gamekeydown[key_up]) 
+    if (gamekeydown[key_up] || gamekeydown[key_up2]) 
     {
 	// fprintf(stderr, "up\n");
 	forward += forwardmove[speed]; 
     }
-    if (gamekeydown[key_down]) 
+    if (gamekeydown[key_down] || gamekeydown[key_down2]) 
     {
 	// fprintf(stderr, "down\n");
 	forward -= forwardmove[speed]; 
@@ -548,16 +553,16 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
             forward -= forwardmove[speed];
     }
 
-    if (gamekeydown[key_strafeleft]
-     || joybuttons[joybstrafeleft]
-     || mousebuttons[mousebstrafeleft])
+    if (gamekeydown[key_strafeleft] || gamekeydown[key_strafeleft2]
+     || mouse_buttons(mousebstrafeleft, mousebstrafeleft2)
+     || joybuttons[joybstrafeleft])
     {
         side -= sidemove[speed];
     }
 
-    if (gamekeydown[key_straferight]
-     || joybuttons[joybstraferight]
-     || mousebuttons[mousebstraferight])
+    if (gamekeydown[key_straferight] || gamekeydown[key_straferight2]
+     || mouse_buttons(mousebstraferight, mousebstraferight2)
+     || joybuttons[joybstraferight])
     {
         side += sidemove[speed]; 
     }
@@ -579,13 +584,14 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
 
     // buttons
 
-    if (gamekeydown[key_fire] || mousebuttons[mousebfire] 
+    if (gamekeydown[key_fire] || gamekeydown[key_fire2]
+	|| mouse_buttons(mousebfire, mousebfire2)
 	|| joybuttons[joybfire]) 
 	cmd->buttons |= BT_ATTACK; 
  
-    if (gamekeydown[key_use]
+    if (gamekeydown[key_use] || gamekeydown[key_use2]
      || joybuttons[joybuse]
-     || mousebuttons[mousebuse])
+     || mouse_buttons(mousebuse, mousebuse2))
     { 
 	cmd->buttons |= BT_USE;
 	// clear double clicks if hit use button 
@@ -608,9 +614,10 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
 
         for (i=0; (size_t)i<arrlen(weapon_keys); ++i)
         {
-            int key = *weapon_keys[i];
+            const int key  = *weapon_keys[i].primary;
+            const int key2 = *weapon_keys[i].secondary;
 
-            if (gamekeydown[key])
+            if (gamekeydown[key] || gamekeydown[key2])
             {
                 cmd->buttons |= BT_CHANGE;
                 cmd->buttons |= i<<BT_WEAPONSHIFT;
@@ -621,50 +628,55 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
 
     next_weapon = 0;
 
-    if (gamekeydown[key_message_refresh])
+    if (gamekeydown[key_message_refresh] || gamekeydown[key_message_refresh2])
     {
         players[consoleplayer].messageTics = MESSAGETICS;
     }
 
     // mouse
-    if (mousebuttons[mousebforward]) 
+    if (mouse_buttons(mousebforward, mousebforward2))
     {
 	forward += forwardmove[speed];
     }
-    if (mousebuttons[mousebbackward])
+    if (mouse_buttons(mousebbackward, mousebbackward2))
     {
         forward -= forwardmove[speed];
     }
 
     if (mouse_dclick_use)
     {
-        // forward double click
-        if (mousebuttons[mousebforward] != dclickstate && dclicktime > 1 ) 
-        { 
-            dclickstate = mousebuttons[mousebforward]; 
-            if (dclickstate) 
-                dclicks++; 
-            if (dclicks == 2) 
-            { 
-                cmd->buttons |= BT_USE; 
-                dclicks = 0; 
-            } 
-            else 
-                dclicktime = 0; 
-        } 
-        else 
-        { 
-            dclicktime += ticdup; 
-            if (dclicktime > 20) 
-            { 
-                dclicks = 0; 
-                dclickstate = 0; 
-            } 
+        // forward double click (combined)
+        if ((mousebuttons[mousebforward] != dclickstate || mousebuttons[mousebforward2] != dclickstate) && dclicktime > 1)
+        {
+            if (mousebuttons[mousebforward] != dclickstate)
+                dclickstate = mousebuttons[mousebforward];
+            else
+                dclickstate = mousebuttons[mousebforward2];
+
+            if (dclickstate)
+                dclicks++;
+
+            if (dclicks == 2)
+            {
+                cmd->buttons |= BT_USE;
+                dclicks = 0;
+            }
+            else
+                dclicktime = 0;
+        }
+        else
+        {
+            dclicktime += ticdup;
+            if (dclicktime > 20)
+            {
+                dclicks = 0;
+                dclickstate = 0;
+            }
         }
         
         // strafe double click
         bstrafe =
-            mousebuttons[mousebstrafe] 
+            mouse_buttons(mousebstrafe, mousebstrafe2)
             || joybuttons[joybstrafe]; 
         if (bstrafe != dclickstate2 && dclicktime2 > 1 ) 
         { 
@@ -950,12 +962,12 @@ static void SetMouseButtons(unsigned int buttons_mask)
             }
             else
             {
-                if (i == mousebprevweapon)
+                if (i == mousebprevweapon || i == mousebprevweapon2)
                 {
                     next_weapon = -1;
                 }
                 else
-                if (i == mousebnextweapon)
+                if (i == mousebnextweapon || i == mousebnextweapon2)
                 {
                     next_weapon = 1;
                 }
@@ -1025,11 +1037,11 @@ boolean G_Responder (event_t* ev)
     // If the next/previous weapon keys are pressed, set the next_weapon
     // variable to change weapons when the next ticcmd is generated.
 
-    if (ev->type == ev_keydown && ev->data1 == key_prevweapon)
+    if (ev->type == ev_keydown && (ev->data1 == key_prevweapon || ev->data1 == key_prevweapon2))
     {
         next_weapon = -1;
     }
-    else if (ev->type == ev_keydown && ev->data1 == key_nextweapon)
+    else if (ev->type == ev_keydown && (ev->data1 == key_nextweapon || ev->data1 == key_nextweapon2))
     {
         next_weapon = 1;
     }
@@ -1037,7 +1049,7 @@ boolean G_Responder (event_t* ev)
     switch (ev->type) 
     { 
       case ev_keydown: 
-	if (ev->data1 == key_pause) 
+	if (ev->data1 == key_pause || ev->data1 == key_pause2) 
 	{ 
 	    sendpause = true; 
 	}
@@ -1047,7 +1059,7 @@ boolean G_Responder (event_t* ev)
         }
 
     // [JN] Flip level horizontally.
-    if (ev->data1 == key_flip_levels)
+    if (ev->data1 == key_flip_levels || ev->data1 == key_flip_levels2)
     {
         gp_flip_levels ^= 1;
         // Redraw game screen
@@ -1059,7 +1071,7 @@ boolean G_Responder (event_t* ev)
     }   
 
     // [JN] CRL - Toggle extended HUD.
-    if (ev->data1 == key_widget_enable)
+    if (ev->data1 == key_widget_enable || ev->data1 == key_widget_enable2)
     {
         widget_enable ^= 1;
         CT_SetMessage(&players[consoleplayer], widget_enable ?
@@ -1070,7 +1082,7 @@ boolean G_Responder (event_t* ev)
     }
 
     // [JN] CRL - Toggle spectator mode.
-    if (ev->data1 == key_spectator)
+    if (ev->data1 == key_spectator || ev->data1 == key_spectator2)
     {
         crl_spectating ^= 1;
         CT_SetMessage(&players[consoleplayer], crl_spectating ?
@@ -1078,7 +1090,7 @@ boolean G_Responder (event_t* ev)
     }        
 
     // [JN] CRL - Toggle freeze mode.
-    if (ev->data1 == key_freeze)
+    if (ev->data1 == key_freeze || ev->data1 == key_freeze2)
     {
         crl_freeze ^= 1;
         CT_SetMessage(&players[consoleplayer], crl_freeze ?
@@ -1086,7 +1098,7 @@ boolean G_Responder (event_t* ev)
     }    
 
     // [JN] CRL - Toggle notarget mode.
-    if (ev->data1 == key_notarget)
+    if (ev->data1 == key_notarget || ev->data1 == key_notarget2)
     {
         player_t *player = &players[consoleplayer];
 
@@ -1097,7 +1109,7 @@ boolean G_Responder (event_t* ev)
     }
 
     // [JN] Woof - Toggle Buddha mode.
-    if (ev->data1 == key_buddha)
+    if (ev->data1 == key_buddha || ev->data1 == key_buddha2)
     {
         player_t *player = &players[consoleplayer];
 
@@ -1152,8 +1164,8 @@ void G_FastResponder (void)
 // [crispy]
 void G_PrepTiccmd (void)
 {
-    const boolean strafe = gamekeydown[key_strafe] ||
-        mousebuttons[mousebstrafe] || joybuttons[joybstrafe];
+    const boolean strafe = gamekeydown[key_strafe] || gamekeydown[key_strafe2] ||
+        mouse_buttons(mousebstrafe, mousebstrafe2) || joybuttons[joybstrafe];
 
     if (mousex && !strafe)
     {
