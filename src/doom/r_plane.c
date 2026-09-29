@@ -16,16 +16,13 @@
 //
 
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "i_system.h"
 #include "z_zone.h"
 #include "w_wad.h"
 #include "doomstat.h"
-#include "p_local.h"
-#include "r_collight.h"
-#include "r_local.h"
 #include "m_misc.h"
+#include "r_local.h"
+#include "r_collight.h"
 
 #include "id_vars.h"
 #include "id_func.h"
@@ -94,14 +91,6 @@ static fixed_t swirlFlow_y;
 fixed_t swirlCoord_x;
 fixed_t swirlCoord_y;
 
-//
-// R_InitPlanes
-// Only at game startup.
-//
-void R_InitPlanes (void)
-{
-  // Doh!
-}
 
 
 // -----------------------------------------------------------------------------

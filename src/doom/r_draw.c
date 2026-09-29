@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -13,16 +14,9 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// DESCRIPTION:
-//	The actual span/column drawing functions.
-//	Here find the main potential for optimization,
-//	 e.g. inline assembly, different algorithms.
-//
-
 
 
 #include <stdlib.h>
-
 #include "doomdef.h"
 #include "i_system.h"
 #include "z_zone.h"
@@ -40,34 +34,23 @@
 #define SBARHEIGHT		(40 * vid_resolution)
 
 //
-// All drawing to the view buffer is accomplished in this file.
-// The other refresh files only know about ccordinates,
-//  not the architecture of the frame buffer.
-// Conveniently, the frame buffer is a linear one,
-//  and we need only the base address,
-//  and the total size == width*height*depth/8.,
+// All drawing to the view buffer is accomplished in this file.  The other refresh
+// files only know about cordinates, not the architecture of the frame buffer.
 //
 
-byte *viewimage; 
-int   viewwidth;
-int   scaledviewwidth;
-int   viewheight;
-int   viewwindowx;
-int   viewwindowy; 
-pixel_t *ylookup[MAXHEIGHT];
+int viewwidth;
+int scaledviewwidth;
+int viewheight;
+int viewwindowx;
+int viewwindowy;
+
 int      columnofs[MAXWIDTH]; 
+pixel_t *ylookup[MAXHEIGHT];
 
-// Color tables for different players,
-//  translate a limited part to another
-//  (color ramps used for  suit colors).
-//
-byte translations[3][256];	
- 
 // Backing buffer containing the bezel drawn around the screen and 
 // surrounding background.
 
 static pixel_t *background_buffer = NULL;
-
 
 //
 // R_DrawColumn
@@ -79,6 +62,7 @@ int dc_x;
 int dc_yl;
 int dc_yh;
 int dc_texheight; // [crispy] Tutti-Frutti fix
+
 fixed_t dc_iscale;
 fixed_t dc_texturemid;
 
@@ -86,7 +70,6 @@ fixed_t dc_texturemid;
 const byte *dc_source, *dc_source2;
 const byte *dc_translation;
 byte *translationtables;
-
 
 // -----------------------------------------------------------------------------
 // R_DrawColumn
@@ -134,8 +117,7 @@ void R_DrawColumn(void)
         for (int i = 0; i <= count; ++i)
         {
             const unsigned s = sourcebase[frac >> FRACBITS]; // Texture sample
-            *dest = brightmap[s] ? colormap1[s] : colormap0[s];
-            dest++;
+            *dest++ = brightmap[s] ? colormap1[s] : colormap0[s];
             frac += fracstep;
             if (frac >= heightshifted)
                 frac -= heightshifted; // Normalize frac inline
@@ -146,8 +128,7 @@ void R_DrawColumn(void)
         for (int i = 0; i <= count; ++i)
         {
             const unsigned s = sourcebase[(frac >> FRACBITS) & heightmask]; // Texture sample with mask
-            *dest = brightmap[s] ? colormap1[s] : colormap0[s];
-            dest++;
+            *dest++ = brightmap[s] ? colormap1[s] : colormap0[s];
             frac += fracstep;
         }
     }
@@ -194,10 +175,8 @@ void R_DrawColumnLow(void)
             const unsigned s = sourcebase[frac >> FRACBITS]; // Texture sample
             const unsigned index = brightmap[s] ? colormap1[s] : colormap0[s];
 
-            *dest = index;
-            *dest2 = index;
-            dest++;
-            dest2++;
+            *dest++ = index;
+            *dest2++ = index;
             frac += fracstep;
             if (frac >= heightshifted) frac -= heightshifted; // Avoid modulo
         }
@@ -209,14 +188,13 @@ void R_DrawColumnLow(void)
             const unsigned s = sourcebase[(frac >> FRACBITS) & heightmask]; // Texture sample with bitmask
             const unsigned index = brightmap[s] ? colormap1[s] : colormap0[s];
 
-            *dest = index;
-            *dest2 = index;
-            dest++;
-            dest2++;
+            *dest++ = index;
+            *dest2++ = index;
             frac += fracstep; // Increment frac directly
         }
     }
 }
+
 
 
 //
@@ -307,12 +285,12 @@ void R_DrawFuzzColumn(void)
         if (fuzzblockwidth <= 0) return;
 
         // Lines to align with vertical block grid
-        int lines = block - (dc_yl % block);
+        int grid_lines = block - (dc_yl % block);
         int remaining = count + 1;
 
         while (remaining > 0)
         {
-            int write_lines = lines;
+            int write_lines = grid_lines;
             if (write_lines > remaining) write_lines = remaining;
 
             // Sample source (one row up/down per fuzzoffset)
@@ -344,7 +322,7 @@ void R_DrawFuzzColumn(void)
                 local_fuzzpos = 0;
             }
 
-            lines = block;
+            grid_lines = block;
         }
 
         // Bottom cutoff: one extra strip
@@ -390,6 +368,7 @@ void R_DrawFuzzColumn(void)
 
     fuzzpos = local_fuzzpos;
 }
+
 
 // -----------------------------------------------------------------------------
 // R_DrawFuzzColumnLow
@@ -458,12 +437,12 @@ void R_DrawFuzzColumnLow(void)
         if (fuzzblockwidth <= 0) return;
 
         // Lines to align with vertical block grid
-        int lines = block - (dc_yl % block);
+        int grid_lines = block - (dc_yl % block);
         int remaining = count + 1;
 
         while (remaining > 0)
         {
-            int write_lines = lines;
+            int write_lines = grid_lines;
             if (write_lines > remaining) write_lines = remaining;
 
             // Sample source (one row up/down per fuzzoffset)
@@ -497,7 +476,7 @@ void R_DrawFuzzColumnLow(void)
                 local_fuzzpos = 0;
             }
 
-            lines = block;
+            grid_lines = block;
         }
 
         // Bottom cutoff: one extra strip at the anchor
@@ -553,13 +532,20 @@ void R_DrawFuzzColumnLow(void)
     fuzzpos = local_fuzzpos;
 }
 
+
 // -----------------------------------------------------------------------------
 // R_DrawFuzzBWColumn
-// [PN] Draw grayscale fuzz columnn. High detail.
+// Grayscale variant of the spectre fuzz (uses I_BlendDarkGrayscale), high detail.
+//
+// [PN] Adopted Woof!-style blocky rendering so grayscale fuzz scales with
+// vid_resolution (leader-column draws, block-wide fill, viewport clamp).
+// [PN] Micro-optimizations: hoisted constants (pitch, bounds), single top clamp
+// + in-bounds guard, compact fuzzpos wrap, fewer array index recalculations.
 // -----------------------------------------------------------------------------
 
 void R_DrawFuzzBWColumn(void)
 {
+    // Bottom-row cutoff (as in original)
     const boolean cutoff = (dc_yh == viewheight - 1); // [crispy]
     if (cutoff)
         dc_yh = viewheight - 2;
@@ -568,54 +554,132 @@ void R_DrawFuzzBWColumn(void)
     if (count < 0)
         return; // No pixels to draw
 
-    // Precompute destination pointer
-    pixel_t *restrict dest = ylookup[dc_yl] + columnofs[flipviewwidth[dc_x]];
+    // Base destination
+    pixel_t *restrict dest =
+        ylookup[dc_yl] + columnofs[flipviewwidth[dc_x]];
 
-    // Local pointers for improved memory access
+    // Hoisted constants / caches
     const int *restrict const fuzzoffsetbase = fuzzoffset;
     int local_fuzzpos = fuzzpos;
+
     const int sh = SCREENHEIGHT;
     const pixel_t *restrict const vbuf_start = I_VideoBuffer;
-    const pixel_t *restrict const vbuf_end = I_VideoBuffer + SCREENAREA;
+    const pixel_t *restrict const vbuf_end   = I_VideoBuffer + SCREENAREA;
+    const int fuzzwrap = FUZZTABLE;
+    const int fuzzalpha = 0xD3; // fuzz_alpha;
+    const int block = (vid_resolution > 1) ? vid_resolution : 1;
 
-    // Aggressive optimization: reduce overhead in loop
-    const int iterations = count + 1;
-    for (int i = 0; i < iterations; ++i)
+    // --- Blocky mode for hi-res: rectangles aligned to the block grid ---
+    if (block > 1)
     {
-        const int offset = fuzzoffsetbase[local_fuzzpos];
-        const pixel_t *restrict src = dest + offset;
+        // Draw only from the leading column of each block
+        if ((dc_x % block) != 0)
+            return;
 
-        // Safely inject horizontal randomness
-        src = (src < vbuf_start) ? dest + sh - 1 : src;
+        // Horizontal block width, clamped to the right edge of the viewport
+        const int x_in_view = flipviewwidth[dc_x];
+        int fuzzblockwidth = scaledviewwidth - x_in_view;
+        if (fuzzblockwidth > block) fuzzblockwidth = block;
+        if (fuzzblockwidth <= 0) return;
 
+        // Lines to align with vertical block grid
+        int grid_lines = block - (dc_yl % block);
+        int remaining = count + 1;
+
+        while (remaining > 0)
+        {
+            int write_lines = grid_lines;
+            if (write_lines > remaining) write_lines = remaining;
+
+            // Source sample (one row up/down per fuzzoffset)
+            const int off = fuzzoffsetbase[local_fuzzpos];
+            const pixel_t *restrict src = dest + off;
+
+            // Top clamp + in-bounds guard
+            if (src < vbuf_start) src = dest + sh - 1;
+            if (src < vbuf_end)
+            {
+                const pixel_t blended = I_BlendDarkGrayscale_32(*src, fuzzalpha);
+
+                // Fill rectangle: fuzzblockwidth columns × write_lines rows.
+                for (int j = 0; j < fuzzblockwidth; ++j)
+                {
+                    pixel_t *col = dest + (size_t)j * sh;
+                    for (int ly = 0; ly < write_lines; ++ly)
+                        col[ly] = blended;
+                }
+            }
+
+            // Advance vertically
+            remaining -= write_lines;
+            dest += write_lines;
+
+            // Update fuzz position (compact wrap)
+            if (++local_fuzzpos == fuzzwrap)
+                local_fuzzpos = 0;
+
+            grid_lines = block;
+        }
+
+        // Bottom cutoff: one extra horizontal strip
+        if (cutoff)
+        {
+            const int fuzz_off = (fuzzoffsetbase[local_fuzzpos] - FUZZOFF) / 2;
+            const pixel_t blended = I_BlendDarkGrayscale_32(dest[fuzz_off], fuzzalpha);
+            for (int j = 0; j < fuzzblockwidth; ++j)
+                dest[j * sh] = blended;
+        }
+
+        fuzzpos = local_fuzzpos;
+        return;
+    }
+
+    // --- Classic path for vid_resolution == 1 ---
+    int iterations = count + 1;
+    while (iterations--)
+    {
+        const int off = fuzzoffsetbase[local_fuzzpos];
+        const pixel_t *restrict src = dest + off;
+
+        // Top clamp + in-bounds guard
+        if (src < vbuf_start) src = dest + sh - 1;
         if (src < vbuf_end)
-            *dest = I_BlendDarkGrayscale_32(*src, 0xD3); // 211 (17% darkening)
+            *dest = I_BlendDarkGrayscale_32(*src, fuzzalpha);
 
-        // Update fuzz position aggressively
-        if (++local_fuzzpos == FUZZTABLE)
+        // Update fuzz position (compact wrap)
+        if (++local_fuzzpos == fuzzwrap)
             local_fuzzpos = 0;
 
         dest++;
     }
 
-    // Handle cutoff line
+    // Bottom cutoff
     if (cutoff)
     {
         const int fuzz_offset = (fuzzoffsetbase[local_fuzzpos] - FUZZOFF) / 2;
-        *dest = I_BlendDarkGrayscale_32(dest[fuzz_offset], 0xD3); // 211 (17% darkening)
+        *dest = I_BlendDarkGrayscale_32(dest[fuzz_offset], fuzzalpha);
     }
 
-    // Restore fuzz position
+    // Persist fuzz position
     fuzzpos = local_fuzzpos;
 }
 
+
+
 // -----------------------------------------------------------------------------
 // R_DrawFuzzBWColumnLow
-// [PN] Draw grayscale fuzz columnn. Low detail.
+// Grayscale fuzz in low detail (two physical columns per logical x).
+//
+// [PN] Adopted Woof!-style blocky rendering with odd-scale–safe anchoring:
+// leader if x%block==0 or (x+1)%block==0; draw from anchored column; clamp
+// block width; preserve cutoff strip.
+// [PN] Micro-optimizations: constants hoisted, reduced inner-loop branching,
+// compact fuzzpos wrap, and hot pointers kept in registers.
 // -----------------------------------------------------------------------------
 
 void R_DrawFuzzBWColumnLow(void)
 {
+    // Bottom-row cutoff (as in original)
     const boolean cutoff = (dc_yh == viewheight - 1); // [crispy]
     if (cutoff)
         dc_yh = viewheight - 2;
@@ -624,58 +688,141 @@ void R_DrawFuzzBWColumnLow(void)
     if (count < 0)
         return; // No pixels to draw
 
-    // Blocky mode: double the x coordinate
+    // Low-detail doubles X: two physical columns per logical x
     const int x = dc_x << 1;
 
-    // Destination pointer calculations
-    pixel_t *restrict dest = ylookup[dc_yl] + columnofs[flipviewwidth[x]];
+    // Dest pointers for classic path / bookkeeping
+    pixel_t *restrict dest  = ylookup[dc_yl] + columnofs[flipviewwidth[x]];
     pixel_t *restrict dest2 = ylookup[dc_yl] + columnofs[flipviewwidth[x + 1]];
 
-    // Local pointers for improved memory access
+    // Hoisted constants / caches
     const int *restrict const fuzzoffsetbase = fuzzoffset;
     int local_fuzzpos = fuzzpos;
+
     const int sh = SCREENHEIGHT;
     const pixel_t *restrict const vbuf_start = I_VideoBuffer;
-    const pixel_t *restrict const vbuf_end = I_VideoBuffer + SCREENAREA;
+    const pixel_t *restrict const vbuf_end   = I_VideoBuffer + SCREENAREA;
+    const int fuzzwrap = FUZZTABLE;
+    const int fuzzalpha = 0xD3; // fuzz_alpha;
+    const int block = (vid_resolution > 1) ? vid_resolution : 1;
 
-    // Loop for blending pixels with aggressive optimizations
-    const int iterations = count + 1;
-    for (int i = 0; i < iterations; ++i)
+    // --- Blocky mode for hi-res: rectangles aligned to the block grid ---
+    if (block > 1)
     {
-        const int offset = fuzzoffsetbase[local_fuzzpos];
-        const pixel_t *restrict src1 = dest + offset;
-        const pixel_t *restrict src2 = dest2 + offset;
+        // Pick the block anchor among the two physical columns (x or x+1)
+        int anchorShift = -1;
+        if ((x % block) == 0)
+            anchorShift = 0;
+        else if (((x + 1) % block) == 0)
+            anchorShift = 1;
 
-        // Safely inject horizontal randomness
-        src1 = (src1 < vbuf_start) ? dest + sh - 1 : src1;
-        src2 = (src2 < vbuf_start) ? dest2 + sh - 1 : src2;
+        if (anchorShift < 0)
+            return;
+
+        const int x_anchor = x + anchorShift;
+
+        // Draw pointer starts at the anchored column
+        pixel_t *restrict draw =
+            ylookup[dc_yl] + columnofs[flipviewwidth[x_anchor]];
+
+        // Horizontal block width, clamped to the right edge of the viewport
+        const int x_in_view = flipviewwidth[x_anchor];
+        int fuzzblockwidth = scaledviewwidth - x_in_view;
+        if (fuzzblockwidth > block) fuzzblockwidth = block;
+        if (fuzzblockwidth <= 0) return;
+
+        // Lines to align with the vertical block grid
+        int grid_lines = block - (dc_yl % block);
+        int remaining = count + 1;
+
+        while (remaining > 0)
+        {
+            int write_lines = grid_lines;
+            if (write_lines > remaining) write_lines = remaining;
+
+            // Source sample (one row up/down per fuzzoffset)
+            const int off = fuzzoffsetbase[local_fuzzpos];
+            const pixel_t *restrict src = draw + off;
+
+            // Top clamp + in-bounds guard
+            if (src < vbuf_start) src = draw + sh - 1;
+            if (src < vbuf_end)
+            {
+                const pixel_t blended = I_BlendDarkGrayscale_32(*src, fuzzalpha);
+
+                // Fill rectangle: fuzzblockwidth columns × write_lines rows.
+                for (int j = 0; j < fuzzblockwidth; ++j)
+                {
+                    pixel_t *col = draw + (size_t)j * sh;
+                    for (int ly = 0; ly < write_lines; ++ly)
+                        col[ly] = blended;
+                }
+            }
+
+            // Advance vertically; keep dest/dest2 in step for cutoff bookkeeping
+            remaining -= write_lines;
+            draw  += write_lines;
+            dest  += write_lines;
+            dest2 += write_lines;
+
+            // Update fuzz position (compact wrap)
+            if (++local_fuzzpos == fuzzwrap)
+                local_fuzzpos = 0;
+
+            grid_lines = block;
+        }
+
+        // Bottom cutoff: one extra strip at the anchor
+        if (cutoff)
+        {
+            const int fuzz_off = (fuzzoffsetbase[local_fuzzpos] - FUZZOFF) / 2;
+            const pixel_t blended = I_BlendDarkGrayscale_32(draw[fuzz_off], fuzzalpha);
+            for (int j = 0; j < fuzzblockwidth; ++j)
+                draw[j * sh] = blended;
+        }
+
+        // Persist fuzz position and exit
+        fuzzpos = local_fuzzpos;
+        return;
+    }
+
+    // --- Classic path for vid_resolution == 1 (two physical columns) ---
+    int iterations = count + 1;
+    while (iterations--)
+    {
+        const int off = fuzzoffsetbase[local_fuzzpos];
+
+        const pixel_t *restrict src1 = dest  + off;
+        const pixel_t *restrict src2 = dest2 + off;
+
+        // Top clamp + in-bounds guard
+        if (src1 < vbuf_start) src1 = dest  + sh - 1;
+        if (src2 < vbuf_start) src2 = dest2 + sh - 1;
 
         if (src1 < vbuf_end)
-            *dest = I_BlendDarkGrayscale_32(*src1, 0xD3); // 211 (17% darkening)
+            *dest = I_BlendDarkGrayscale_32(*src1, fuzzalpha);
         if (src2 < vbuf_end)
-            *dest2 = I_BlendDarkGrayscale_32(*src2, 0xD3); // 211 (17% darkening)
+            *dest2 = I_BlendDarkGrayscale_32(*src2, fuzzalpha);
 
-        // Update fuzz position efficiently
-        if (++local_fuzzpos == FUZZTABLE)
+        // Update fuzz position (compact wrap)
+        if (++local_fuzzpos == fuzzwrap)
             local_fuzzpos = 0;
 
         dest++;
         dest2++;
     }
 
-    // Handle cutoff line
+    // Bottom cutoff
     if (cutoff)
     {
         const int fuzz_offset = (fuzzoffsetbase[local_fuzzpos] - FUZZOFF) / 2;
-
-        *dest = I_BlendDarkGrayscale_32(dest[fuzz_offset], 0xD3); // 211 (17% darkening)
-        *dest2 = I_BlendDarkGrayscale_32(dest2[fuzz_offset], 0xD3); // 211 (17% darkening)
+        *dest  = I_BlendDarkGrayscale_32(dest [fuzz_offset], fuzzalpha);
+        *dest2 = I_BlendDarkGrayscale_32(dest2[fuzz_offset], fuzzalpha);
     }
 
     // Restore fuzz position
     fuzzpos = local_fuzzpos;
 }
-
 
 
 // -----------------------------------------------------------------------------
@@ -715,9 +862,8 @@ void R_DrawTranslatedColumn(void)
     {
         const unsigned s = sourcebase[frac >> FRACBITS];  // Texture sample
         const unsigned t = translation[s];               // Translation lookup
-        *dest = brightmap[s] ? colormap1[t] : colormap0[t]; // Conditionally blend using colormap
+        *dest++ = brightmap[s] ? colormap1[t] : colormap0[t];
 
-        dest++;
         frac += fracstep;    // Increment texture coordinate
     }
 }
@@ -754,17 +900,12 @@ void R_DrawTranslatedColumnLow(void)
         const unsigned t = translation[s];               // Translation lookup
         const pixel_t index = brightmap[s] ? colormap1[t] : colormap0[t]; // Conditional colormap lookup
 
-        *dest = index;
-        *dest2 = index;
+        *dest++  = index;
+        *dest2++ = index;
 
-        // Advance destination pointers and texture coordinate
-        dest++;
-        dest2++;
         frac += fracstep;
     }
 }
-
-
 
 //
 // R_InitTranslationTables
@@ -773,9 +914,11 @@ void R_DrawTranslatedColumnLow(void)
 // Assumes a given structure of the PLAYPAL.
 // Could be read from a lump instead.
 //
+
 void R_InitTranslationTables (void)
 {
-    translationtables = Z_Malloc (256*3, PU_STATIC, 0);
+    // Allocate translation tables
+    translationtables = Z_Malloc(256 * 3, PU_STATIC, 0);
 
     // translate just the 16 green colors
     for (int i=0 ; i<256 ; i++)
@@ -798,7 +941,6 @@ void R_InitTranslationTables (void)
     }
 }
 
-
 //
 // R_DrawSpan 
 // With DOOM style restrictions on view orientation,
@@ -812,21 +954,19 @@ void R_InitTranslationTables (void)
 //  and the inner loop has to step in texture space u and v.
 //
 
-int ds_y; 
-int ds_x1; 
+int ds_y;
+int ds_x1;
 int ds_x2;
 
-lighttable_t *ds_colormap[2];
-const byte   *ds_brightmap;
+lighttable_t *ds_colormap[2];   // [crispy] brightmaps
+const byte *ds_brightmap;       // [crispy] brightmaps
 
-fixed_t ds_xfrac; 
-fixed_t ds_yfrac; 
-fixed_t ds_xstep; 
+fixed_t ds_xfrac;
+fixed_t ds_yfrac;
+fixed_t ds_xstep;
 fixed_t ds_ystep;
 
-// start of a 64*64 tile image 
-const byte *ds_source;
-
+const byte *ds_source; // start of a 64*64 tile image
 
 // -----------------------------------------------------------------------------
 // R_DrawSpan
@@ -923,7 +1063,6 @@ void R_DrawSpan(void)
     ds_yfrac = yfrac;
 }
 
-
 // -----------------------------------------------------------------------------
 // R_DrawSpanLow
 // Draws a horizontal span of pixels in blocky mode (low resolution).
@@ -971,13 +1110,11 @@ void R_DrawSpanLow(void)
                 const unsigned ytemp = (yfrac >> 10) & 0x0FC0;
                 const unsigned xtemp = (xfrac >> 16) & 0x3F;
                 const int spot = xtemp | ytemp;
-
                 const byte source = sourcebase[spot];
                 const pixel_t pix = brightmap[source] ? colormap1[source] : colormap0[source];
                 dest[0] = pix;
                 dest[sh] = pix;
                 dest += 2 * sh;
-
                 xfrac += xstep;
                 yfrac += ystep;
             }
@@ -1033,17 +1170,19 @@ void R_DrawSpanLow(void)
 // R_InitBuffer 
 // Initializes the buffer for a given view width and height.
 // Handles border offsets and row/column calculations.
-// [PN] Simplified logic and improved readability for better understanding.
+// [PN] Transposed backbuffer: columnofs[x] is now the column base offset
+// (x * SCREENHEIGHT), ylookup[y] the in-column row offset, so
+// ylookup[yl] + columnofs[x] still addresses pixel (x, y).
 // -----------------------------------------------------------------------------
 
-void R_InitBuffer (int width, int height)
-{ 
+void R_InitBuffer(int width, int height)
+{
     int i;
 
     // [PN] Handle resize: calculate horizontal offset (viewwindowx).
     viewwindowx = (SCREENWIDTH - width) >> 1;
 
-    // [PN] Calculate column offsets (columnofs).
+    // [PN] Column base offsets in transposed memory.
     for (i = 0; i < width; i++) 
     {
         columnofs[i] = (viewwindowx + i) * SCREENHEIGHT;
@@ -1053,7 +1192,7 @@ void R_InitBuffer (int width, int height)
     // Simplified using ternary operator.
     viewwindowy = (width == SCREENWIDTH) ? 0 : (SCREENHEIGHT - SBARHEIGHT - height) >> 1;
 
-    // [PN] Precalculate row offsets (ylookup) for each row.
+    // [PN] Precalculate row pointers (offset within the transposed column).
     for (i = 0; i < height; i++) 
     {
         ylookup[i] = I_VideoBuffer + (i + viewwindowy);
@@ -1062,7 +1201,7 @@ void R_InitBuffer (int width, int height)
     // [PN] Free the background buffer if it exists.
     if (background_buffer != NULL)
     {
-        free(background_buffer);
+        Z_Free(background_buffer);
         background_buffer = NULL;
     }
 }
@@ -1075,8 +1214,8 @@ void R_InitBuffer (int width, int height)
 //      Pre-cache patches and precompute commonly used values to improve efficiency.
 // -----------------------------------------------------------------------------
 
-void R_FillBackScreen (void) 
-{ 
+void R_FillBackScreen (void)
+{
     // If we are running full screen, there is no need to do any of this,
     // and the background buffer can be freed if it was previously in use.
     if (scaledviewwidth == SCREENWIDTH)
@@ -1087,9 +1226,8 @@ void R_FillBackScreen (void)
     // Allocate the background buffer if necessary
     if (background_buffer == NULL)
     {
-        // [PN] Transposed: the bezel buffer needs full-screen column pitch.
         const int size = SCREENAREA;
-        background_buffer = malloc(size * sizeof(*background_buffer));
+        background_buffer = Z_Malloc(size * sizeof(*background_buffer), PU_STATIC, 0);
     }
 
     // [PN] Use background buffer for drawing
@@ -1111,8 +1249,8 @@ void R_FillBackScreen (void)
     patch_t *patch_br = W_CacheLumpName("brdr_br", PU_CACHE);
 
     // [PN] Precompute commonly used values
-    const int viewx = viewwindowx / vid_resolution;
-    const int viewy = viewwindowy / vid_resolution;
+    const int view_x = viewwindowx / vid_resolution;
+    const int view_y = viewwindowy / vid_resolution;
     const int scaledwidth = scaledviewwidth / vid_resolution;
     const int viewheight_res = viewheight / vid_resolution;
 
@@ -1122,26 +1260,27 @@ void R_FillBackScreen (void)
     // [PN] Draw top and bottom borders
     for (int x = 0; x < scaledwidth; x += 8)
     {
-        V_DrawPatch(viewx + x - WIDESCREENDELTA, viewy - 8, patch_top);
-        V_DrawPatch(viewx + x - WIDESCREENDELTA, viewy + viewheight_res, patch_bottom);
+        V_DrawPatch(view_x + x - WIDESCREENDELTA, view_y - 8, patch_top);
+        V_DrawPatch(view_x + x - WIDESCREENDELTA, view_y + viewheight_res, patch_bottom);
     }
 
     // [PN] Draw left and right borders
     for (int y = 0; y < viewheight_res; y += 8)
     {
-        V_DrawPatch(viewx - 8 - WIDESCREENDELTA, viewy + y, patch_left);
-        V_DrawPatch(viewx + scaledwidth - WIDESCREENDELTA, viewy + y, patch_right);
+        V_DrawPatch(view_x - 8 - WIDESCREENDELTA, view_y + y, patch_left);
+        V_DrawPatch(view_x + scaledwidth - WIDESCREENDELTA, view_y + y, patch_right);
     }
 
     // [PN] Draw corners
-    V_DrawPatch(viewx - 8 - WIDESCREENDELTA, viewy - 8, patch_tl);
-    V_DrawPatch(viewx + scaledwidth - WIDESCREENDELTA, viewy - 8, patch_tr);
-    V_DrawPatch(viewx - 8 - WIDESCREENDELTA, viewy + viewheight_res, patch_bl);
-    V_DrawPatch(viewx + scaledwidth - WIDESCREENDELTA, viewy + viewheight_res, patch_br);
+    V_DrawPatch(view_x - 8 - WIDESCREENDELTA, view_y - 8, patch_tl);
+    V_DrawPatch(view_x + scaledwidth - WIDESCREENDELTA, view_y - 8, patch_tr);
+    V_DrawPatch(view_x - 8 - WIDESCREENDELTA, view_y + viewheight_res, patch_bl);
+    V_DrawPatch(view_x + scaledwidth - WIDESCREENDELTA, view_y + viewheight_res, patch_br);
 
     // [PN] Restore the previous buffer
     V_RestoreBuffer();
 }
+
 
 // -----------------------------------------------------------------------------
 // Copy a screen buffer rectangle.
@@ -1152,15 +1291,16 @@ static void R_VideoErase (int x, int y, int w, int h)
 {
     const int sh = SCREENHEIGHT;
 
-    // [PN] Ensure the background buffer is valid before copying
-    if (background_buffer != NULL)
+    if (background_buffer == NULL)
     {
-        for (int i = 0; i < w; i++)
-        {
-            memcpy(I_VideoBuffer + (x + i) * sh + y,
-                   background_buffer + (x + i) * sh + y,
-                   (size_t)h * sizeof(*I_VideoBuffer));
-        }
+        return;
+    }
+
+    for (int i = 0; i < w; i++)
+    {
+        memcpy(I_VideoBuffer + (x + i) * sh + y,
+               background_buffer + (x + i) * sh + y,
+               (size_t)h * sizeof(*I_VideoBuffer));
     }
 }
 
@@ -1170,8 +1310,8 @@ static void R_VideoErase (int x, int y, int w, int h)
 // [PN] Transposed: erase the bezel as rectangles instead of linear runs.
 // -----------------------------------------------------------------------------
 
-void R_DrawViewBorder (void) 
-{ 
+void R_DrawViewBorder (void)
+{
     if (scaledviewwidth == SCREENWIDTH || background_buffer == NULL)
     {
         return;
@@ -1179,22 +1319,18 @@ void R_DrawViewBorder (void)
 
     const int top = ((SCREENHEIGHT - SBARHEIGHT) - viewheight) / 2;
     const int side = (SCREENWIDTH - scaledviewwidth) / 2;
-    const int band = SCREENHEIGHT - SBARHEIGHT; // bezel area above status bar
 
-    // Top and bottom full-width bands (clamped to the bezel area).
+    // Top and bottom full-width bands.
     if (top > 0)
     {
         R_VideoErase(0, 0, SCREENWIDTH, top);
-
-        if (band > top + viewheight)
-            R_VideoErase(0, top + viewheight, SCREENWIDTH,
-                         band - (top + viewheight));
+        R_VideoErase(0, top + viewheight, SCREENWIDTH, top + 1);
     }
 
     // Left and right borders along the view height.
     if (side > 0)
     {
-        R_VideoErase(0, top, side, viewheight);
-        R_VideoErase(SCREENWIDTH - side, top, side, viewheight);
+        R_VideoErase(0, top, side, viewheight + 1);
+        R_VideoErase(SCREENWIDTH - side, top, side, viewheight + 1);
     }
 }

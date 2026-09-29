@@ -28,6 +28,7 @@
 #include "s_sound.h"
 #include "v_video.h"
 #include "z_zone.h"
+#include "f_finale.h"
 
 #include "id_func.h"
 

@@ -197,6 +197,55 @@ void P_InitPicAnims (void)
     }
 }
 
+// -----------------------------------------------------------------------------
+// P_MarkAnimatedTextureFrames
+// [PN] If any frame of a wall-texture animation is present in hitlist,
+// mark the whole animation range so composites can be precached up-front.
+// -----------------------------------------------------------------------------
+
+void P_MarkAnimatedTextureFrames (byte *hitlist, int hitlist_size)
+{
+    if (hitlist == NULL || hitlist_size <= 0 || anims == NULL || lastanim == NULL)
+    {
+        return;
+    }
+
+    for (anim_t *anim = anims; anim < lastanim; ++anim)
+    {
+        if (!anim->istexture || anim->numpics <= 1)
+        {
+            continue;
+        }
+
+        const int base = anim->basepic;
+        const int end = base + anim->numpics;
+
+        if (base < 0 || base >= hitlist_size)
+        {
+            continue;
+        }
+
+        boolean any_present = false;
+
+        for (int i = base; i < end && i < hitlist_size; ++i)
+        {
+            if (hitlist[i])
+            {
+                any_present = true;
+                break;
+            }
+        }
+
+        if (any_present)
+        {
+            for (int i = base; i < end && i < hitlist_size; ++i)
+            {
+                hitlist[i] = 1;
+            }
+        }
+    }
+}
+
 /*
 ==============================================================================
 
@@ -489,7 +538,7 @@ or by timed thinkers
 void P_CrossSpecialLine (int linenum, int side, mobj_t *thing)
 {
 	line_t		*line;
-	int			ok;
+	int			cross_ok;
 
 	line = &lines[linenum];
 
@@ -498,7 +547,7 @@ void P_CrossSpecialLine (int linenum, int side, mobj_t *thing)
 	/* */
 	if (!thing->player)
 	{
-		ok = 0;
+		cross_ok = 0;
 		switch(line->special)
 		{
 			case 39:	/* TELEPORT TRIGGER */
@@ -506,10 +555,10 @@ void P_CrossSpecialLine (int linenum, int side, mobj_t *thing)
 			case 4:		/* RAISE DOOR */
 			case 10:	/* PLAT DOWN-WAIT-UP-STAY TRIGGER */
 			case 88:	/* PLAT DOWN-WAIT-UP-STAY RETRIGGER */
-				ok = 1;
+				cross_ok = 1;
 				break;
 		}
-		if (!ok)
+		if (!cross_ok)
 			return;
 	}
 	
@@ -737,21 +786,21 @@ void P_CrossSpecialLine (int linenum, int side, mobj_t *thing)
 
 void	P_ShootSpecialLine ( mobj_t *thing, line_t *line)
 {
-	int		ok;
+	int		shoot_ok;
 	
 	/* */
 	/*	Impacts that other things can activate */
 	/* */
 	if (!thing->player)
 	{
-		ok = 0;
+		shoot_ok = 0;
 		switch(line->special)
 		{
 			case 46:		/* OPEN DOOR IMPACT */
-				ok = 1;
+				shoot_ok = 1;
 				break;
 		}
-		if (!ok)
+		if (!shoot_ok)
 			return;
 	}
 

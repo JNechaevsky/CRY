@@ -147,7 +147,7 @@ static void saveg_write32(int value)
     saveg_write8((value >> 24) & 0xff);
 }
 
-int64_t saveg_read64(void)
+static int64_t saveg_read64(void)
 {
     int64_t result;
 
@@ -163,7 +163,7 @@ int64_t saveg_read64(void)
     return result;
 }
 
-void saveg_write64(int64_t value)
+static void saveg_write64(int64_t value)
 {
     saveg_write8(value & 0xff);
     saveg_write8((value >> 8) & 0xff);
@@ -2100,9 +2100,8 @@ void P_RestoreTargets (void)
 {
     mobj_t    *mo;
     thinker_t *th;
-    uint32_t   i;
 
-    for (th = thinkercap.next, i = 1 ; th != &thinkercap ; th = th->next, i++)
+    for (th = thinkercap.next ; th != &thinkercap ; th = th->next)
     {
         if (th->function.acp1 == (actionf_p1) P_MobjThinker)
         {

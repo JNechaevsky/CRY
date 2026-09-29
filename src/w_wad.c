@@ -204,10 +204,12 @@ wad_file_t *W_AddFile (const char *filename)
 //
 // W_NumLumps
 //
+/*
 int W_NumLumps (void)
 {
     return numlumps;
 }
+*/
 
 
 

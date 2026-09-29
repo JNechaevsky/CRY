@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -15,21 +16,18 @@
 //
 
 
-#include <stdio.h>
+#include <stdlib.h> // [crispy] calloc()
 
+#include "doomstat.h"
 #include "i_swap.h"
 #include "i_system.h"
-#include "z_zone.h"
-#include "w_wad.h"
 #include "m_misc.h"
 #include "p_local.h"
 #include "r_collight.h"
-#include "doomstat.h"
 #include "v_trans.h"
 #include "v_video.h"
+#include "z_zone.h"
 #include "jagcry.h"   // [PN] Jaguar CRY color space
-
-#include "id_vars.h"
 
 
 //
@@ -124,19 +122,18 @@ int numspritelumps;
 
 int numtextures;
 texture_t **textures;
-texture_t **textures_hashtable;
+static texture_t **textures_hashtable;
 
-
-int *texturewidthmask;
-int *texturewidth;             // [crispy] texture width for wrapping column getter function
-fixed_t *textureheight;        // [crispy] texture height for Tutti-Frutti fix
-int *texturecompositesize;
-short    **texturecolumnlump;
-unsigned **texturecolumnofs;   // [crispy] column offsets for composited translucent mid-textures on 2S walls
-unsigned **texturecolumnofs2;  // [crispy] column offsets for composited opaque textures
-byte **texturecomposite;       // [crispy] composited translucent mid-textures on 2S walls
-byte **texturecomposite2;      // [crispy] composited opaque textures
-const byte **texturebrightmap; // [crispy] brightmaps
+static int *texturewidthmask;
+static int *texturewidth;             // [crispy] texture width for wrapping column getter function
+fixed_t    *textureheight;            // [crispy] texture height for Tutti-Frutti fix
+static int *texturecompositesize;
+static short    **texturecolumnlump;
+static unsigned **texturecolumnofs;   // [crispy] column offsets for composited translucent mid-textures on 2S walls
+static unsigned **texturecolumnofs2;  // [crispy] column offsets for composited opaque textures
+static byte **texturecomposite;       // [crispy] composited translucent mid-textures on 2S walls
+static byte **texturecomposite2;      // [crispy] composited opaque textures
+const  byte **texturebrightmap;       // [crispy] brightmaps
 
 // for global animation
 int *flattranslation;
@@ -188,7 +185,7 @@ static void R_DrawColumnInCache
     byte           *restrict mark  = marks;
 
     // Hot locals, declared near use
-    int top = -1;
+    int cliptop = -1;
 
     // Single-pass, clamp with start/end to reduce branches
     while (col->topdelta != 0xff)
@@ -196,17 +193,17 @@ static void R_DrawColumnInCache
         const int topdelta = col->topdelta;
 
         // [crispy] support for DeePsea tall patches
-        if (topdelta <= top)
+        if (topdelta <= cliptop)
         {
-            top += topdelta;
+            cliptop += topdelta;
         }
         else
         {
-            top = topdelta;
+            cliptop = topdelta;
         }
 
         const int count = col->length;
-        const int start = originy + top;
+        const int start = originy + cliptop;
         const int end   = start + count;
 
         // Clip once; compute copy window [dst_start, dst_end)
@@ -242,8 +239,19 @@ static void R_GenerateComposite (int texnum)
     const int width  = texture->width;
     const int height = texture->height;
 
-    byte *const block = Z_Malloc(texturecompositesize[texnum], PU_STATIC, &texturecomposite[texnum]);
-    byte *const block2 = Z_Malloc((size_t)width * (size_t)height, PU_STATIC, &texturecomposite2[texnum]);
+    // [crispy] Allocate composite buffers as needed and keep them level-scoped.
+    byte *block = texturecomposite[texnum];
+    byte *block2 = texturecomposite2[texnum];
+
+    if (!block)
+    {
+        block = Z_Malloc(texturecompositesize[texnum], PU_LEVEL, &texturecomposite[texnum]);
+    }
+
+    if (!block2)
+    {
+        block2 = Z_Malloc((size_t)width * (size_t)height, PU_LEVEL, &texturecomposite2[texnum]);
+    }
 
     short    *restrict collump = texturecolumnlump[texnum];
     unsigned *restrict colofs  = texturecolumnofs [texnum];
@@ -268,8 +276,9 @@ static void R_GenerateComposite (int texnum)
         if (x2 > width)    x2 = width;
         if (x1 >= x2)      continue;
 
-        // Column offsets base, indexed by absolute x
-        const int *const cofs_base = realpatch->columnofs - x1;
+        // Column offsets must be indexed relative to the original patch origin.
+        // Using clipped x1 here breaks columns when patch originx is negative.
+        const int *const cofs_base = realpatch->columnofs - patch->originx;
         const byte *const rp_base  = (const byte *)realpatch;
 
         for (int x = x1; x < x2; ++x)
@@ -354,10 +363,6 @@ static void R_GenerateComposite (int texnum)
 
     free(source);
     free(marks);
-
-    // Purgable from zone memory now that caches are built
-    Z_ChangeTag(block,  PU_CACHE);
-    Z_ChangeTag(block2, PU_CACHE);
 }
 
 // -----------------------------------------------------------------------------
@@ -523,16 +528,15 @@ byte *R_GetColumn (int tex, int col)
 
 byte *R_GetColumnMod (int tex, int col)
 {
-    int ofs;
-
     while (col < 0)
         col += texturewidth[tex];
 
     col %= texturewidth[tex];
-    ofs = texturecolumnofs[tex][col];
 
     if (!texturecomposite[tex])
-        R_GenerateComposite (tex);
+        R_GenerateComposite(tex);
+
+    const int ofs = texturecolumnofs[tex][col];
 
     return texturecomposite[tex] + ofs;
 }
@@ -581,7 +585,7 @@ static void GenerateTextureHashTable(void)
 //  [crispy] partly rewritten to merge PNAMES and TEXTURE1/2 lumps.
 //------------------------------------------------------------------------------
 
-void R_InitTextures (void)
+static void R_InitTextures (void)
 {
     // Working pointers
     texture_t *texture;
@@ -801,11 +805,11 @@ void R_InitTextures (void)
 
         texture = textures[i] = Z_Malloc(sizeof(texture_t) + sizeof(texpatch_t) * (SHORT(mtexture->patchcount) - 1), PU_STATIC, 0);
 
+        memcpy(texture->name, mtexture->name, sizeof(texture->name));
+
         texture->width      = SHORT(mtexture->width);
         texture->height     = SHORT(mtexture->height);
         texture->patchcount = SHORT(mtexture->patchcount);
-
-        memcpy(texture->name, mtexture->name, sizeof(texture->name));
 
         const mappatch_t *mpatch = &mtexture->patches[0];
         patch = &texture->patches[0];
@@ -887,14 +891,14 @@ void R_InitTextures (void)
 // R_InitFlats
 // -----------------------------------------------------------------------------
 
-void R_InitFlats (void)
+static void R_InitFlats (void)
 {
-    firstflat = W_GetNumForName ("F_START") + 1;
-    lastflat = W_GetNumForName ("F_END") - 1;
-    numflats = lastflat - firstflat + 1;
+    firstflat = W_GetNumForName("F_START") + 1;
+    lastflat  = W_GetNumForName("F_END") - 1;
+    numflats  = lastflat - firstflat + 1;
 
     // Create translation table for global animation.
-    flattranslation = Z_Malloc ((numflats+1)*sizeof(*flattranslation), PU_STATIC, 0);
+    flattranslation = Z_Malloc((numflats+1) * sizeof(*flattranslation), PU_STATIC, 0);
 
     for (int i = 0; i < numflats; i++)
     {
@@ -902,7 +906,7 @@ void R_InitFlats (void)
     }
 
     // [PN] Generate hash table for flats.
-    W_HashNumForNameFromTo (firstflat, lastflat, numflats);
+    W_HashNumForNameFromTo(firstflat, lastflat, numflats);
 }
 
 // -----------------------------------------------------------------------------
@@ -912,22 +916,22 @@ void R_InitFlats (void)
 //  just for having the header info ready during rendering.
 // -----------------------------------------------------------------------------
 
-void R_InitSpriteLumps (void)
+static void R_InitSpriteLumps (void)
 {
-    firstspritelump = W_GetNumForName ("S_START") + 1;
-    lastspritelump = W_GetNumForName ("S_END") - 1;
+    firstspritelump = W_GetNumForName("S_START") + 1;
+    lastspritelump = W_GetNumForName("S_END") - 1;
 
     numspritelumps = lastspritelump - firstspritelump + 1;
-    spritewidth = Z_Malloc (numspritelumps * sizeof(*spritewidth), PU_STATIC, 0);
-    spriteoffset = Z_Malloc (numspritelumps * sizeof(*spriteoffset), PU_STATIC, 0);
-    spritetopoffset = Z_Malloc (numspritelumps * sizeof(*spritetopoffset), PU_STATIC, 0);
+    spritewidth = Z_Malloc(numspritelumps * sizeof(*spritewidth), PU_STATIC, 0);
+    spriteoffset = Z_Malloc(numspritelumps * sizeof(*spriteoffset), PU_STATIC, 0);
+    spritetopoffset = Z_Malloc(numspritelumps * sizeof(*spritetopoffset), PU_STATIC, 0);
 
     for (int i = 0; i < numspritelumps; i++)
     {
-        if (!(i&63))
-            printf (".");
+        if (!(i & 63))
+            printf(".");
 
-        patch_t *patch = W_CacheLumpNum (firstspritelump + i, PU_CACHE);
+        patch_t *patch = W_CacheLumpNum(firstspritelump + i, PU_CACHE);
         spritewidth[i] = SHORT(patch->width) << FRACBITS;
         spriteoffset[i] = SHORT(patch->leftoffset) << FRACBITS;
         spritetopoffset[i] = SHORT(patch->topoffset) << FRACBITS;
@@ -1130,7 +1134,7 @@ void R_InitColormaps (void)
         lighttable_t *const restrict row_col  = &colormaps [c * 256];
         lighttable_t *const restrict row_inv  = &invulmaps [c * 256];
     
-        for (int i = 0; i < 256; ++i)
+        for (i = 0; i < 256; ++i)
         {
             const byte k = colormap[i]; // mapping index (identity in your table)
     
@@ -1257,23 +1261,23 @@ static void R_InitHSVColors (void)
 // -----------------------------------------------------------------------------
 // R_InitData
 // Locates all the lumps that will be used by all views.
-// Must be called after W_Init.
 // -----------------------------------------------------------------------------
 
 void R_InitData (void)
 {
     R_InitFlats();
-    printf (".");
+    printf(".");
     R_InitTextures();
-    printf (".");
+    printf(".");
     R_InitSpriteLumps();
-    printf (".");
+    printf(".");
     R_InitColormaps();
-    printf (".");
+    printf(".");
     R_InitHSVColors();
-    printf (".");
+    printf(".");
+    // [JN] Initialize and compose translucency tables.
     I_InitTCTransMaps();
-    printf (".");
+    printf(".");
 }
 
 // -----------------------------------------------------------------------------
@@ -1281,9 +1285,9 @@ void R_InitData (void)
 //  Retrieval, get a flat number for a flat name.
 // -----------------------------------------------------------------------------
 
-int R_FlatNumForName(const char *name)
+int R_FlatNumForName (const char *name)
 {
-    const int i = W_CheckNumForNameFromTo (name, lastflat, firstflat);
+    const int i = W_CheckNumForNameFromTo(name, lastflat, firstflat);
 
     if (i == -1)
     {
@@ -1313,7 +1317,7 @@ int R_CheckTextureNumForName (const char *name)
     
     while (texture != NULL)
     {
-        if (!strncasecmp (texture->name, name, 8) )
+        if (!strncasecmp(texture->name, name, 8))
             return texture->index;
 
         texture = texture->next;
@@ -1327,16 +1331,15 @@ int R_CheckTextureNumForName (const char *name)
 //  Calls R_CheckTextureNumForName, aborts with error message.
 // -----------------------------------------------------------------------------
 
-int R_TextureNumForName(const char *name)
+int R_TextureNumForName (const char *name)
 {
+    const int i = R_CheckTextureNumForName(name);
 
-    const int i = R_CheckTextureNumForName (name);
-
-    if (i==-1)
+    if (i == -1)
     {
         // [crispy] make missing texture non-fatal
         // and fix absurd texture name in error message
-        fprintf (stderr, "R_TextureNumForName: %.8s not found\n", name);
+        fprintf(stderr, "R_TextureNumForName: %.8s not found\n", name);
         return 0;
     }
     return i;
@@ -1354,7 +1357,7 @@ int R_TextureNumForName(const char *name)
 
 #define MAX3(a,b,c) (((a)>(b))?((a)>(c)?(a):(c)):((b)>(c)?(b):(c)))
 
-void R_PrecacheLevel(void)
+void R_PrecacheLevel (void)
 {
     const size_t maxsize = MAX3(numtextures, numflats, numsprites);
     byte *restrict hitlist = (byte*)calloc(maxsize, 1);
@@ -1385,10 +1388,21 @@ void R_PrecacheLevel(void)
 
     hitlist[skytexture] = 1;
 
+    // [PN] If a level uses any frame of an animated wall texture,
+    // precache composites for all frames in that animation cycle.
+    P_MarkAnimatedTextureFrames(hitlist, numtextures);
+
     for (int i = 0; i < numtextures; ++i)
     {
         if (hitlist[i])
         {
+            // [crispy] Precache composite texture columns up-front.
+            // Guard to avoid regenerating already built composites.
+            if (!texturecomposite[i] || !texturecomposite2[i])
+            {
+                R_GenerateComposite(i);
+            }
+
             texture_t * const texture = textures[i];
             for (int j = 0; j < texture->patchcount; ++j)
             {

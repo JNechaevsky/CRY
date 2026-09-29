@@ -41,6 +41,11 @@ else()
                         "-Wformat-security"
                         "-Wno-ignored-qualifiers"
                         "-Wpedantic"
+                        "-Wshadow"
+                        "-Wundef"
+                        "-Wpointer-arith"
+                        "-Wstrict-prototypes"
+                        "-Wmissing-prototypes"
                         # "-Wextra"
                         )
 endif()
@@ -90,7 +95,7 @@ if(SampleRate_FOUND)
 endif()
 
 # Check for Miniz (replaces libpng).
-add_subdirectory("miniz")
+add_subdirectory("lib/miniz")
 
 find_package(m)
 
@@ -113,6 +118,6 @@ configure_file(cmake/config.h.cin config.h)
 
 configure_file(src/doom-res.rc.in src/doom-res.rc)
 
-foreach(SUBDIR opl src)
+foreach(SUBDIR lib/opl src)
     add_subdirectory("${SUBDIR}")
 endforeach()

@@ -1369,17 +1369,6 @@ void G_Ticker (void)
 // also see P_SpawnPlayer in P_Things
 //
 
-//
-// G_InitPlayer 
-// Called at the start.
-// Called by the game initialization functions.
-//
-void G_InitPlayer (int player) 
-{
-    // clear everything else to defaults
-    G_PlayerReborn (player); 
-}
- 
  
 
 //

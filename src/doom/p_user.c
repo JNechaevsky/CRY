@@ -68,7 +68,7 @@ P_Thrust
 // P_CalcHeight
 // Calculate the walking / running height adjustment
 //
-void P_CalcHeight (player_t* player) 
+static void P_CalcHeight (player_t *const player) 
 {
     int		angle;
     fixed_t	bob;
@@ -184,7 +184,7 @@ void P_CalcHeight (player_t* player)
 //
 // P_MovePlayer
 //
-void P_MovePlayer (player_t* player)
+static void P_MovePlayer (player_t *const player)
 {
     ticcmd_t*		cmd;
     int		look;
@@ -250,7 +250,7 @@ void P_MovePlayer (player_t* player)
 //
 #define ANG5   	(ANG90/18)
 
-void P_DeathThink (player_t* player)
+static void P_DeathThink (player_t *const player)
 {
     angle_t		angle;
     angle_t		delta;

@@ -687,7 +687,7 @@ static char   *M_NameBind (int itemSetOn, int key);
 static void    M_StartBind (int keynum);
 static void    M_CheckBind (int key);
 static void    M_DoBind (int keynum, int key);
-static void    M_ClearBind (int itemOn);
+static void    M_ClearBind (int item_On);
 static void    M_ResetBinds (void);
 static void    M_DrawBindKey (int itemNum, int yPos, int key);
 static void    M_DrawBindFooter (char *pagenum, boolean drawPages);
@@ -700,7 +700,7 @@ static char   *M_NameMouseBind (int itemSetOn, int btn);
 static void    M_StartMouseBind (int btn);
 static void    M_CheckMouseBind (int btn);
 static void    M_DoMouseBind (int btnnum, int btn);
-static void    M_ClearMouseBind (int itemOn);
+static void    M_ClearMouseBind (int item_On);
 static void    M_DrawBindButton (int itemNum, int yPos, int btn);
 static void    M_ResetMouseBinds (void);
 
@@ -6360,14 +6360,14 @@ static void M_DoBind (int keynum, int key)
 
 // -----------------------------------------------------------------------------
 // M_ClearBind
-//  [JN] Clear key bind on the line where cursor is placed (itemOn).
+//  [JN] Clear key bind on the line where cursor is placed (item_On).
 // -----------------------------------------------------------------------------
 
-static void M_ClearBind (int itemOn)
+static void M_ClearBind (int item_On)
 {
     for (size_t i = 0; i < sizeof(keybinds) / sizeof(keybinds[0]); i++)
     {
-        if (keybinds[i].menu == currentMenu && keybinds[i].item == itemOn)
+        if (keybinds[i].menu == currentMenu && keybinds[i].item == item_On)
         {
             *keybinds[i].slot = 0;
             return;
@@ -6542,15 +6542,15 @@ static void M_DoMouseBind (int btnnum, int btn)
 
 // -----------------------------------------------------------------------------
 // M_ClearMouseBind
-//  [JN] Clear mouse bind on the line where cursor is placed (itemOn).
+//  [JN] Clear mouse bind on the line where cursor is placed (item_On).
 // -----------------------------------------------------------------------------
 
 
-static void M_ClearMouseBind (int itemOn)
+static void M_ClearMouseBind (int item_On)
 {
     for (size_t i = 0; i < sizeof(mousebinds) / sizeof(mousebinds[0]); i++)
     {
-        if (mousebinds[i].item == itemOn)
+        if (mousebinds[i].item == item_On)
         {
             *mousebinds[i].slot = -1;
             return;

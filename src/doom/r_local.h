@@ -643,10 +643,10 @@ extern angle_t R_PointToAngle (fixed_t x, fixed_t y);
 extern angle_t R_PointToAngle2 (fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2);
 extern angle_t R_PointToAngleCrispy (fixed_t x, fixed_t y);
 extern fixed_t R_PointToDist (fixed_t x, fixed_t y);
-extern fixed_t R_ScaleFromGlobalAngle (angle_t visangle);
-extern int     R_PointOnSegSide (fixed_t x, fixed_t y, const seg_t *line);
-extern int     R_PointOnSide (fixed_t x, fixed_t y, const node_t *node);
+extern int     R_PointOnSegSide (fixed_t x, fixed_t y, const seg_t *const line);
+extern int     R_PointOnSide (fixed_t x, fixed_t y, const node_t *const node);
 extern subsector_t *R_PointInSubsector (fixed_t x, fixed_t y);
+extern void    R_AddPointToBox (int x, int y, fixed_t *box);
 
 inline static fixed_t LerpFixed(fixed_t oldvalue, fixed_t newvalue)
 {

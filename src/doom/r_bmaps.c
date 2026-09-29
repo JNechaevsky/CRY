@@ -238,11 +238,11 @@ const byte *R_BrightmapForTexName (const char *texname)
 
     for (i = 0; (size_t)i < arrlen(fullbright_walls); i++)
     {
-        const fullbright_t *fullbright = &fullbright_walls[i];
+        const fullbright_t *fullbright_tex = &fullbright_walls[i];
 
-        if (!strncasecmp(fullbright->texture, texname, 8))
+        if (!strncasecmp(fullbright_tex->texture, texname, 8))
         {
-            return fullbright->colormask;
+            return fullbright_tex->colormask;
         }
     }
 

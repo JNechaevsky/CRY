@@ -94,7 +94,7 @@ mobj_t *BlockingMobj;
 //
 // PIT_StompThing
 //
-boolean PIT_StompThing (mobj_t* thing)
+static boolean PIT_StompThing (mobj_t* thing)
 {
     fixed_t	blockdist;
 		
@@ -207,7 +207,7 @@ static void SpechitOverrun(line_t *ld);
 // PIT_CheckLine
 // Adjusts tmfloorz and tmceilingz as lines are contacted
 //
-boolean PIT_CheckLine (line_t* ld)
+static boolean PIT_CheckLine (line_t* ld)
 {
     if (tmbbox[BOXRIGHT] <= ld->bbox[BOXLEFT]
 	|| tmbbox[BOXLEFT] >= ld->bbox[BOXRIGHT]
@@ -301,7 +301,7 @@ static char *CRL_GetMobjName (mobjtype_t type)
 //
 // PIT_CheckThing
 //
-boolean PIT_CheckThing (mobj_t* thing)
+static boolean PIT_CheckThing (mobj_t* thing)
 {
     fixed_t		blockdist;
     boolean		solid;
@@ -724,7 +724,7 @@ void P_ApplyTorque (mobj_t *mo)
 // the z will be set to the lowest value
 // and false will be returned.
 //
-boolean P_ThingHeightClip (mobj_t* thing)
+static boolean P_ThingHeightClip (mobj_t* thing)
 {
     boolean		onfloor;
 	
@@ -778,7 +778,7 @@ fixed_t		tmymove;
 // Adjusts the xmove / ymove
 // so that the next move will slide along the wall.
 //
-void P_HitSlideLine (line_t* ld)
+static void P_HitSlideLine (line_t* ld)
 {
     int			side;
 
@@ -842,7 +842,7 @@ void P_HitSlideLine (line_t* ld)
 //
 // PTR_SlideTraverse
 //
-boolean PTR_SlideTraverse (intercept_t* in)
+static boolean PTR_SlideTraverse (intercept_t* in)
 {
     line_t*	li;
 	
@@ -1026,7 +1026,7 @@ fixed_t		aimslope;
 // PTR_AimTraverse
 // Sets linetaget and aimslope when a target is aimed at.
 //
-boolean
+static boolean
 PTR_AimTraverse (intercept_t* in)
 {
     line_t*		li;
@@ -1139,7 +1139,7 @@ PTR_AimTraverse (intercept_t* in)
 //
 // PTR_ShootTraverse
 //
-boolean PTR_ShootTraverse (intercept_t* in)
+static boolean PTR_ShootTraverse (intercept_t* in)
 {
     fixed_t		x;
     fixed_t		y;
@@ -1387,7 +1387,7 @@ P_LineAttack
 //
 mobj_t*		usething;
 
-boolean	PTR_UseTraverse (intercept_t* in)
+static boolean	PTR_UseTraverse (intercept_t* in)
 {
     int		side;
 	

@@ -473,9 +473,9 @@ extern boolean P_PathTraverse (fixed_t x1, fixed_t y1, fixed_t x2, fixed_t y2,
 extern fixed_t P_AproxDistance (fixed_t dx, fixed_t dy);
 extern fixed_t P_InterceptVector (divline_t* v2, divline_t* v1);
 extern int     P_BoxOnLineSide (fixed_t* tmbox, line_t* ld);
-extern int     P_PointOnDivlineSide (fixed_t x, fixed_t y, divline_t* line);
+extern int     P_PointOnDivlineSide (fixed_t x, fixed_t y, const divline_t *const line);
 extern int     P_PointOnLineSide (fixed_t x, fixed_t y, line_t* line);
-extern void    P_LineOpening (line_t* linedef);
+extern void    P_LineOpening (const line_t *const linedef);
 extern void    P_MakeDivline (line_t* li, divline_t* dl);
 extern void    P_SetThingPosition (mobj_t *thing);
 extern void    P_UnsetThingPosition (mobj_t *thing);
@@ -655,6 +655,9 @@ extern void P_SegLengths (boolean contrast_only);
 extern void P_SetupLevel (int episode, int map);
 extern void P_Init (void);
 
+extern sector_t *GetSectorAtNullAddress (void);
+extern fixed_t   GetOffset (const vertex_t *restrict v1, const vertex_t *restrict v2);
+
 extern byte     *rejectmatrix;  // for fast sight rejection
 extern int32_t  *blockmaplump;  // offsets in blockmap are from here
 extern int32_t  *blockmap;
@@ -691,6 +694,7 @@ extern int     P_FindMinSurroundingLight (sector_t *sector, int max);
 extern int     P_FindSectorFromLineTag (line_t *line, int start);
 extern void    P_CrossSpecialLine (int linenum, int side, mobj_t *thing);
 extern void    P_InitPicAnims (void);
+extern void    P_MarkAnimatedTextureFrames (byte *hitlist, int hitlist_size);
 extern void    P_PlayerInSpecialSector (player_t *player);
 extern void    P_ShootSpecialLine (mobj_t *thing, line_t *line);
 extern void    P_SpawnSpecials (void);

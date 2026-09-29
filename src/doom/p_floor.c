@@ -390,7 +390,7 @@ int EV_BuildStairs(line_t *line)
 	int		i;
 	int		newsecnum;
 	int		texture;
-	int		ok;
+	int		build_ok;
 	int		rtn;
 	sector_t	*sec, *tsec;
 	floormove_t	*floor;
@@ -428,7 +428,7 @@ int EV_BuildStairs(line_t *line)
 		/* */
 		do
 		{
-			ok = 0;
+			build_ok = 0;
 			for (i = 0;i < sec->linecount;i++)
 			{
 				if ( !((sec->lines[i])->flags & ML_TWOSIDED) )
@@ -457,10 +457,10 @@ int EV_BuildStairs(line_t *line)
 				floor->sector = sec;
 				floor->speed = FLOORSPEED/4;
 				floor->floordestheight = height;
-				ok = 1;
+				build_ok = 1;
 				break;
 			}
-		} while(ok);
+		} while(build_ok);
 	}
 	return rtn;
 }

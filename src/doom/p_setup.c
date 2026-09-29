@@ -206,7 +206,7 @@ sector_t *GetSectorAtNullAddress (void)
 // adapted from prboom-plus/src/p_setup.c:474-482
 // -----------------------------------------------------------------------------
 
-static fixed_t GetOffset (const vertex_t *restrict v1, const vertex_t *restrict v2)
+fixed_t GetOffset (const vertex_t *restrict v1, const vertex_t *restrict v2)
 {
     // Compute delta in map units
     const int32_t dx = (v1->x - v2->x) >> FRACBITS;
@@ -939,17 +939,17 @@ static void P_GroupLines (void)
         sec->soundorg.y = (bbox[BOXBOTTOM] + bbox[BOXTOP]) >> 1;
 
         // Compute blockbox clamped to map
-        const int top = (bbox[BOXTOP] - bmaporgy + MAXRADIUS) >> MAPBLOCKSHIFT;
-        sec->blockbox[BOXTOP] = (top >= bmapheight) ? bmapheight - 1 : top;
+        const int b_top = (bbox[BOXTOP] - bmaporgy + MAXRADIUS) >> MAPBLOCKSHIFT;
+        sec->blockbox[BOXTOP] = (b_top >= bmapheight) ? bmapheight - 1 : b_top;
 
-        const int bottom = (bbox[BOXBOTTOM] - bmaporgy - MAXRADIUS) >> MAPBLOCKSHIFT;
-        sec->blockbox[BOXBOTTOM] = (bottom < 0) ? 0 : bottom;
+        const int b_bottom = (bbox[BOXBOTTOM] - bmaporgy - MAXRADIUS) >> MAPBLOCKSHIFT;
+        sec->blockbox[BOXBOTTOM] = (b_bottom < 0) ? 0 : b_bottom;
 
-        const int right = (bbox[BOXRIGHT] - bmaporgx + MAXRADIUS) >> MAPBLOCKSHIFT;
-        sec->blockbox[BOXRIGHT] = (right >= bmapwidth) ? bmapwidth - 1 : right;
+        const int b_right = (bbox[BOXRIGHT] - bmaporgx + MAXRADIUS) >> MAPBLOCKSHIFT;
+        sec->blockbox[BOXRIGHT] = (b_right >= bmapwidth) ? bmapwidth - 1 : b_right;
 
-        const int left = (bbox[BOXLEFT] - bmaporgx - MAXRADIUS) >> MAPBLOCKSHIFT;
-        sec->blockbox[BOXLEFT] = (left < 0) ? 0 : left;
+        const int b_left = (bbox[BOXLEFT] - bmaporgx - MAXRADIUS) >> MAPBLOCKSHIFT;
+        sec->blockbox[BOXLEFT] = (b_left < 0) ? 0 : b_left;
     }
 }
 

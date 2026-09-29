@@ -185,7 +185,7 @@ static statenum_t P_LatestSafeState(statenum_t state)
 //
 // P_ExplodeMissile  
 //
-static void P_ExplodeMissileSafe (mobj_t* mo, boolean safe)
+static void P_ExplodeMissileSafe (mobj_t *const mo, boolean safe)
 {
     mo->momx = mo->momy = mo->momz = 0;
 
@@ -204,7 +204,7 @@ static void P_ExplodeMissileSafe (mobj_t* mo, boolean safe)
 	S_StartSound (mo, mo->info->deathsound);
 }
 
-void P_ExplodeMissile (mobj_t* mo)
+static void P_ExplodeMissile (mobj_t *const mo)
 {
     P_ExplodeMissileSafe(mo, false);
 }
@@ -215,7 +215,7 @@ void P_ExplodeMissile (mobj_t* mo)
 #define STOPSPEED		0x1000
 #define FRICTION		0xe800
 
-void P_XYMovement (mobj_t* mo) 
+static void P_XYMovement (mobj_t* mo) 
 { 	
     fixed_t 	ptryx;
     fixed_t	ptryy;
@@ -381,7 +381,7 @@ void P_XYMovement (mobj_t* mo)
 //
 // P_ZMovement
 //
-void P_ZMovement (mobj_t* mo)
+static void P_ZMovement (mobj_t *const mo)
 {
     fixed_t	dist;
     fixed_t	delta;
@@ -500,8 +500,8 @@ void P_ZMovement (mobj_t* mo)
 //
 // P_NightmareRespawn
 //
-void
-P_NightmareRespawn (mobj_t* mobj)
+static void
+P_NightmareRespawn (mobj_t *const mobj)
 {
     fixed_t		x;
     fixed_t		y;

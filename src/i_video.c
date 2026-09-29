@@ -1381,9 +1381,9 @@ void CenterWindow(int *x, int *y, int w, int h)
 static SDL_Texture *CreatePaletteTexture (uint8_t r, uint8_t g, uint8_t b, SDL_BlendMode blendMode)
 {
     SDL_FillRect(argbbuffer, NULL, I_MapRGB(r, g, b));
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, argbbuffer);
-    SDL_SetTextureBlendMode(texture, blendMode);
-    return texture;
+    SDL_Texture *pal_texture = SDL_CreateTextureFromSurface(renderer, argbbuffer);
+    SDL_SetTextureBlendMode(pal_texture, blendMode);
+    return pal_texture;
 }
 
 static void SetVideoMode(void)

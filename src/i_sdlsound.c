@@ -669,7 +669,7 @@ static boolean ExpandSoundData_SDL(sfxinfo_t *sfxinfo,
     else
     {
         Sint16 *expanded = (Sint16 *) chunk->abuf;
-        int expanded_length;
+        int expanded__length;
         int expand_ratio;
         int i;
 
@@ -681,10 +681,10 @@ static boolean ExpandSoundData_SDL(sfxinfo_t *sfxinfo,
 
         // number of samples in the converted sound
 
-        expanded_length = ((uint64_t) samplecount * mixer_freq) / samplerate;
-        expand_ratio = (samplecount << 8) / expanded_length;
+        expanded__length = ((uint64_t) samplecount * mixer_freq) / samplerate;
+        expand_ratio = (samplecount << 8) / expanded__length;
 
-        for (i=0; i<expanded_length; ++i)
+        for (i=0; i<expanded__length; ++i)
         {
             Sint16 sample;
             int src;
@@ -729,7 +729,7 @@ static boolean ExpandSoundData_SDL(sfxinfo_t *sfxinfo,
 
             // Both channels are processed in parallel, hence [i-2]:
 
-            for (i=2; i<expanded_length * 2; ++i)
+            for (i=2; i<expanded__length * 2; ++i)
             {
                 expanded[i] = (Sint16) (alpha * expanded[i]
                                       + (1 - alpha) * expanded[i-2]);

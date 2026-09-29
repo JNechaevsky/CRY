@@ -373,7 +373,7 @@ static void D_Display (void)
 // Add configuration file variable bindings.
 //
 
-void D_BindVariables(void)
+static void D_BindVariables(void)
 {
     I_BindInputVariables();
     I_BindVideoVariables();
@@ -400,7 +400,7 @@ void D_BindVariables(void)
 // Called to determine whether to grab the mouse pointer
 //
 
-boolean D_GrabMouseCallback(void)
+static boolean D_GrabMouseCallback(void)
 {
     // [JN] CRL - always grab mouse in spectator mode.
     // It's supposed to be controlled by hand, even while pause.

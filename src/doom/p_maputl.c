@@ -153,7 +153,7 @@ P_BoxOnLineSide
 ==================
 */
 
-int P_PointOnDivlineSide (fixed_t x, fixed_t y, divline_t *line)
+int P_PointOnDivlineSide (fixed_t x, fixed_t y, const divline_t *const line)
 {
 	fixed_t	dx,dy;
 	fixed_t	left, right;
@@ -253,18 +253,18 @@ fixed_t opentop, openbottom, openrange;
 fixed_t	lowfloor;
 
 
-void P_LineOpening (line_t* linedef)
+void P_LineOpening (const line_t *const line_def)
 {
 	sector_t	*front, *back;
 	
-	if (linedef->sidenum[1] == NO_INDEX) // [crispy] extended nodes
+	if (line_def->sidenum[1] == NO_INDEX) // [crispy] extended nodes
 	{	/* single sided line */
 		openrange = 0;
 		return;
 	}
 	 
-	front = linedef->frontsector;
-	back = linedef->backsector;
+	front = line_def->frontsector;
+	back = line_def->backsector;
 	
 	if (front->ceilingheight < back->ceilingheight)
 		opentop = front->ceilingheight;
@@ -774,7 +774,7 @@ static boolean PIT_AddThingIntercepts (mobj_t* thing)
 // Returns true if the traverser function returns true
 // for all lines.
 // 
-boolean
+static boolean
 P_TraverseIntercepts
 ( traverser_t	func,
   fixed_t	maxfrac )

@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -73,7 +74,7 @@ static void MapFile(win32_wad_file_t *wad, const char *filename)
     }
 }
 
-unsigned int GetFileLength(HANDLE handle)
+static unsigned int GetFileLength(HANDLE handle)
 {
     DWORD result;
 
@@ -163,8 +164,8 @@ static void W_Win32_CloseFile(wad_file_t *wad)
 // Read data from the specified position in the file into the 
 // provided buffer.  Returns the number of bytes read.
 
-size_t W_Win32_Read(wad_file_t *wad, unsigned int offset,
-                   void *buffer, size_t buffer_len)
+static size_t W_Win32_Read(wad_file_t *wad, unsigned int offset,
+                           void *buffer, size_t buffer_len)
 {
     win32_wad_file_t *win32_wad;
     DWORD bytes_read;

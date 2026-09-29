@@ -16,19 +16,12 @@
 //
 
 
-#include <stdlib.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "doomstat.h"
-#include "m_bbox.h"
-#include "d_main.h"
-#include "m_menu.h"
 #include "p_local.h"
 #include "v_video.h"
-#include "w_wad.h"
-#include "r_collight.h"
 #include "st_bar.h"
-#include "v_postproc.h"
 
 #include "id_vars.h"
 #include "id_func.h"
@@ -703,16 +696,15 @@ void R_ExecuteSetViewSize (void)
 
 void R_Init (void)
 {
-    R_InitData ();
-    printf (".");
+    R_InitData();
+    printf(".");
     // viewwidth / viewheight / dp_detail_level are set by the defaults
-    R_SetViewSize (dp_screen_size, dp_detail_level);
-    R_InitPlanes ();
-    printf (".");
-    R_InitLightTables ();
-    printf (".");
-    R_InitTranslationTables ();
-    printf (".");
+    R_SetViewSize(dp_screen_size, dp_detail_level);
+    printf(".");
+    R_InitLightTables();
+    printf(".");
+    R_InitTranslationTables();
+    printf(".");
     printf ("]");
 }
 

@@ -55,7 +55,7 @@ Most monsters are spawned unaware of all players, but some can be made preaware
 
 mobj_t*		soundtarget;
 
-void
+static void
 P_RecursiveSound
 ( sector_t*	sec,
   int		soundblocks )
@@ -201,7 +201,7 @@ boolean P_CheckMeleeRange (mobj_t *actor)
 ================
 */
 
-boolean P_CheckMissileRange (mobj_t *actor)
+static boolean P_CheckMissileRange (mobj_t *actor)
 {
 	fixed_t		dist;
 	
@@ -246,11 +246,11 @@ boolean P_CheckMissileRange (mobj_t *actor)
 ================
 */
 
-fixed_t	xspeed[8] = {FRACUNIT,47000,0,-47000,-FRACUNIT,-47000,0,47000};
-fixed_t yspeed[8] = {0,47000,FRACUNIT,47000,0,-47000,-FRACUNIT,-47000};
+static const fixed_t	xspeed[8] = {FRACUNIT,47000,0,-47000,-FRACUNIT,-47000,0,47000};
+static const fixed_t yspeed[8] = {0,47000,FRACUNIT,47000,0,-47000,-FRACUNIT,-47000};
 
 
-boolean P_Move (mobj_t *actor)
+static boolean P_Move (mobj_t *actor)
 {
 	fixed_t	tryx, tryy;
 	line_t		*ld;
@@ -351,7 +351,7 @@ boolean P_Move (mobj_t *actor)
 ==================================
 */
 
-boolean P_TryWalk (mobj_t *actor)
+static boolean P_TryWalk (mobj_t *actor)
 {	
 	if (!P_Move (actor))
 		return false;
@@ -370,13 +370,13 @@ boolean P_TryWalk (mobj_t *actor)
 ================
 */
 
-dirtype_t opposite[] =
+static const dirtype_t opposite[] =
 {DI_WEST, DI_SOUTHWEST, DI_SOUTH, DI_SOUTHEAST, DI_EAST, DI_NORTHEAST,
 DI_NORTH, DI_NORTHWEST, DI_NODIR};
 
-dirtype_t diags[] = {DI_NORTHWEST,DI_NORTHEAST,DI_SOUTHWEST,DI_SOUTHEAST};
+static const dirtype_t diags[] = {DI_NORTHWEST,DI_NORTHEAST,DI_SOUTHWEST,DI_SOUTHEAST};
 
-void P_NewChaseDir (mobj_t *actor)
+static void P_NewChaseDir (mobj_t *actor)
 {
 	fixed_t		deltax,deltay;
 	dirtype_t	d[3];
@@ -494,7 +494,7 @@ void P_NewChaseDir (mobj_t *actor)
 ================
 */
 
-boolean P_LookForPlayers (mobj_t *actor, boolean allaround)
+static boolean P_LookForPlayers (mobj_t *actor, boolean allaround)
 {
 	angle_t		an;
 	fixed_t		dist;

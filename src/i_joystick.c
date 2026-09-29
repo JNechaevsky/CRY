@@ -94,7 +94,7 @@ static int joystick_physical_buttons[NUM_VIRTUAL_BUTTONS] = {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 };
 
-void I_ShutdownGamepad(void)
+static void I_ShutdownGamepad(void)
 {
     if (gamepad != NULL)
     {
@@ -173,7 +173,7 @@ static int DeviceIndexGamepad(void)
     return index;
 }
 
-void I_InitGamepad(void)
+static void I_InitGamepad(void)
 {
     SDL_JoystickGUID guid;
     int index;
@@ -315,7 +315,7 @@ static int GetAxisStateGamepad(int axis, int invert, int dead_zone)
     return result;
 }
 
-void I_UpdateGamepad(void)
+static void I_UpdateGamepad(void)
 {
     if (gamepad != NULL)
     {

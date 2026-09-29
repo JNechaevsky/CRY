@@ -874,7 +874,7 @@ static void ST_updateFaceWidget (void)
 // ST_doPaletteStuff
 // -----------------------------------------------------------------------------
 
-void ST_doPaletteStuff (void)
+static void ST_doPaletteStuff (void)
 {
     int red = plyr->damagecount;
     int yel = plyr->bonuscount;

@@ -21,20 +21,15 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "doomdef.h"
+#include "doomstat.h"
 #include "i_swap.h"
 #include "i_system.h"
-#include "w_wad.h"
-#include "p_local.h"
 #include "r_local.h"
-#include "doomstat.h"
 #include "r_collight.h"
-#include "v_postproc.h"
 #include "v_trans.h" // [crispy] colored blood sprites
 #include "z_zone.h"
 #include "v_video.h" // [JN] translucency tables
 
-#include "id_vars.h"
 #include "id_func.h"
 
 

@@ -172,7 +172,7 @@ weaponinfo_t	weaponinfo[NUMWEAPONS] =
 ================
 */
 
-void P_BringUpWeapon (player_t *player)
+static void P_BringUpWeapon (player_t *const player)
 {
 	statenum_t	newstate;
 	
@@ -203,7 +203,7 @@ void P_BringUpWeapon (player_t *player)
 ================
 */
 
-boolean P_CheckAmmo (player_t *player)
+static boolean P_CheckAmmo (player_t *const player)
 {
 	ammotype_t	ammo;
 	int			count;
@@ -252,7 +252,7 @@ boolean P_CheckAmmo (player_t *player)
 ================
 */
 
-void P_FireWeapon (player_t *player)
+static void P_FireWeapon (player_t *player)
 {
 	statenum_t	newstate;
 	
@@ -639,7 +639,7 @@ void A_FirePlasma (mobj_t *mobj, player_t *player, pspdef_t *psp)
 fixed_t		bulletslope;
 
 
-void P_BulletSlope (mobj_t*	mo)
+static void P_BulletSlope (mobj_t*	mo)
 {
     angle_t	an;
     
@@ -681,7 +681,7 @@ void P_BulletSlope (mobj_t*	mo)
 ===============
 */
 
-void P_GunShot (mobj_t *mo, boolean accurate)
+static void P_GunShot (mobj_t *mo, boolean accurate)
 {
 	angle_t		angle;
 	int			damage;
@@ -751,10 +751,11 @@ void A_FireShotgun (mobj_t *mobj, player_t *player, pspdef_t *psp)
 ================== 
 */ 
  
-void A_CockSgun (player_t *player, pspdef_t *psp) 
-{
-/*	S_StartSound (player->mo, sfx_sgcock); */
-}
+// [JN] CRY - unused, comes from Jaguar Doom source.
+// void A_CockSgun (player_t *player, pspdef_t *psp) 
+// {
+// /*	S_StartSound (player->mo, sfx_sgcock); */
+// }
 
 /* 
 ================== 
