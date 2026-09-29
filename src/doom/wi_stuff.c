@@ -19,7 +19,7 @@
 #include "doomstat.h"
 #include "g_game.h"
 #include "i_swap.h"
-#include "m_menu.h"
+#include "mn_menu.h"
 #include "p_local.h"
 #include "s_sound.h"
 #include "v_trans.h"

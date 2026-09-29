@@ -33,7 +33,7 @@
 #include "d_main.h"
 #include "g_game.h"
 #include "p_local.h"
-#include "m_menu.h"
+#include "mn_menu.h"
 #include "s_sound.h"
 #include "v_video.h"
 #include "doomstat.h"

@@ -23,7 +23,7 @@
 #include "g_game.h"
 #include "i_system.h"
 #include "m_controls.h"
-#include "m_menu.h"
+#include "mn_menu.h"
 #include "m_misc.h"
 #include "p_local.h"
 #include "st_bar.h"

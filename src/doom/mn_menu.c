@@ -45,7 +45,7 @@
 #include "s_sound.h"
 #include "doomstat.h"
 #include "sounds.h"
-#include "m_menu.h"
+#include "mn_menu.h"
 #include "p_local.h"
 #include "ct_chat.h"
 #include "v_trans.h"
@@ -732,7 +732,6 @@ static void    M_DrawBindFooter (char *pagenum, boolean drawPages);
 static boolean MouseIsBinding;
 static int     btnToBind;
 
-static char   *M_NameMouseBind (int itemSetOn, int btn);
 static void    M_StartMouseBind (int btn);
 static void    M_CheckMouseBind (int btn);
 static void    M_DoMouseBind (int btnnum, int btn);

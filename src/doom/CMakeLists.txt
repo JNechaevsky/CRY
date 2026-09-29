@@ -14,7 +14,7 @@ add_library(doom STATIC
             info.c          info.h
             jagcry.c        jagcry.h
             id_func.c       id_func.h
-            m_menu.c        m_menu.h
+            mn_menu.c       mn_menu.h
             p_ceilng.c
             p_doors.c
             p_enemy.c

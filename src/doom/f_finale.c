@@ -22,7 +22,7 @@
 #include "d_englsh.h"
 #include "doomstat.h"
 #include "i_swap.h"
-#include "m_menu.h"
+#include "mn_menu.h"
 #include "m_misc.h"
 #include "r_local.h"
 #include "s_sound.h"
