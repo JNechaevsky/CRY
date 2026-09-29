@@ -94,28 +94,13 @@ static SDL_Texture *texture_upscaled = NULL;
 
 static SDL_Texture *curpane = NULL;
 // Red palette
-static SDL_Texture *palette_01 = NULL;
-static SDL_Texture *palette_02 = NULL;
-static SDL_Texture *palette_03 = NULL;
-static SDL_Texture *palette_04 = NULL;
-static SDL_Texture *palette_05 = NULL;
-static SDL_Texture *palette_06 = NULL;
-static SDL_Texture *palette_07 = NULL;
-static SDL_Texture *palette_08 = NULL;
-static SDL_Texture *palette_09 = NULL;
-static SDL_Texture *palette_10 = NULL;
-static SDL_Texture *palette_11 = NULL;
-static SDL_Texture *palette_12 = NULL;
-static SDL_Texture *palette_13 = NULL;
-static SDL_Texture *palette_14 = NULL;
-static SDL_Texture *palette_15 = NULL;
-static SDL_Texture *palette_16 = NULL;
-// Yellow palette
-static SDL_Texture *palette_17 = NULL; int yel_pane_alpha;
-// Green palette
-static SDL_Texture *palette_18 = NULL;
-// Yellow + green (bonus+rad)
-static SDL_Texture *palette_19 = NULL;
+static SDL_Texture *palette_red = NULL; int red_pane_alpha = 255;
+// Yellow (bonus) palette
+static SDL_Texture *palette_yellow = NULL; int yel_pane_alpha;
+// Green (radiation suit) palette
+static SDL_Texture *palette_green = NULL;
+// Yellow + green (bonus + radiation suit)
+static SDL_Texture *palette_bonusrad = NULL;
 
 static int pane_alpha;
 
@@ -1112,34 +1097,38 @@ void I_SetPalette (int palette)
 {
     switch (palette)
     {
-		case 0:		curpane = NULL;			break;
-		// Red palette
-		case 1:		curpane = palette_01;	break;
-		case 2:		curpane = palette_02;	break;
-		case 3:		curpane = palette_03;	break;
-		case 4:		curpane = palette_04;	break;
-		case 5:		curpane = palette_05;	break;
-		case 6:		curpane = palette_06;	break;
-		case 7:		curpane = palette_07;	break;
-		case 8:		curpane = palette_08;	break;
-		case 9:		curpane = palette_09;	break;
-		case 10:	curpane = palette_10;	break;
-		case 11:	curpane = palette_11;	break;
-		case 12:	curpane = palette_12;	break;
-		case 13:	curpane = palette_13;	break;
-		case 14:	curpane = palette_14;	break;
-		case 15:	curpane = palette_15;	break;
-		case 16:	curpane = palette_16;	break;
-		// Yellow palette
-		case 17:	curpane = palette_17;	pane_alpha = yel_pane_alpha;	break;
-		// Green palette
-		case 18:	curpane = palette_18;	pane_alpha = 140;   break;
-		// Yellow + green (bonus+rad)
-		case 19:	curpane = palette_19;	break;
+        case 0:
+            curpane = NULL;
+            break;
 
-		default:
-			I_Error("Unknown palette: %d!\n", palette);
-			break;
+        // Red damage palette
+        // [PN] SDL_BLENDMODE_MOD ignores alpha values,
+        // so blend via SDL_SetTextureColorMod instead.
+        case 1:
+            curpane = palette_red;
+            SDL_SetTextureColorMod(palette_red, 255, (Uint8)red_pane_alpha, (Uint8)red_pane_alpha);
+            break;
+
+        // Yellow (bonus) palette
+        case 2:
+            curpane = palette_yellow;
+            pane_alpha = yel_pane_alpha;
+            break;
+
+        // Green (radiation suit) palette
+        case 3:
+            curpane = palette_green;
+            pane_alpha = 140;
+            break;
+
+        // Yellow + green (bonus + radiation suit)
+        case 4:
+            curpane = palette_bonusrad;
+            break;
+
+        default:
+            I_Error("Unknown palette: %d!\n", palette);
+            break;
     }
 }
 
@@ -1590,25 +1579,10 @@ static void SetVideoMode(void)
                      0, SCREENHEIGHT, SCREENWIDTH, 32, SDL_PIXELFORMAT_ARGB8888);
 
         // [PN] Use the helper function to create textures for all palettes
-        palette_01 = CreatePaletteTexture(255, 240, 240, SDL_BLENDMODE_MOD);   // Red palettes
-        palette_02 = CreatePaletteTexture(255, 225, 225, SDL_BLENDMODE_MOD);
-        palette_03 = CreatePaletteTexture(255, 210, 210, SDL_BLENDMODE_MOD);
-        palette_04 = CreatePaletteTexture(255, 195, 195, SDL_BLENDMODE_MOD);
-        palette_05 = CreatePaletteTexture(255, 180, 180, SDL_BLENDMODE_MOD);
-        palette_06 = CreatePaletteTexture(255, 165, 165, SDL_BLENDMODE_MOD);
-        palette_07 = CreatePaletteTexture(255, 150, 150, SDL_BLENDMODE_MOD);
-        palette_08 = CreatePaletteTexture(255, 135, 135, SDL_BLENDMODE_MOD);
-        palette_09 = CreatePaletteTexture(255, 120, 120, SDL_BLENDMODE_MOD);
-        palette_10 = CreatePaletteTexture(255, 105, 105, SDL_BLENDMODE_MOD);
-        palette_11 = CreatePaletteTexture(255,  90,  90, SDL_BLENDMODE_MOD);
-        palette_12 = CreatePaletteTexture(255,  75,  75, SDL_BLENDMODE_MOD);
-        palette_13 = CreatePaletteTexture(255,  60,  60, SDL_BLENDMODE_MOD);
-        palette_14 = CreatePaletteTexture(255,  45,  45, SDL_BLENDMODE_MOD);
-        palette_15 = CreatePaletteTexture(255,  30,  30, SDL_BLENDMODE_MOD);
-        palette_16 = CreatePaletteTexture(255,  15,  15, SDL_BLENDMODE_MOD);
-        palette_17 = CreatePaletteTexture(255, 164,   0, SDL_BLENDMODE_BLEND); // Yellow palette
-        palette_18 = CreatePaletteTexture( 64, 255,   0, SDL_BLENDMODE_MUL);   // Green palette
-        palette_19 = CreatePaletteTexture(191, 255,   0, SDL_BLENDMODE_MUL);   // Yellow + Green palette
+        palette_red      = CreatePaletteTexture(255, 255, 255, SDL_BLENDMODE_MOD);
+        palette_yellow   = CreatePaletteTexture(255, 164,   0, SDL_BLENDMODE_BLEND);
+        palette_green    = CreatePaletteTexture( 64, 255,   0, SDL_BLENDMODE_MUL);
+        palette_bonusrad = CreatePaletteTexture(191, 255,   0, SDL_BLENDMODE_MUL);
 
         SDL_FillRect(argbbuffer, NULL, 0);
     }

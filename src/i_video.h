@@ -145,6 +145,7 @@ extern boolean screenvisible;
 extern int vanilla_keyboard_mapping;
 extern boolean screensaver_mode;
 extern pixel_t *I_VideoBuffer;
+extern int red_pane_alpha;
 extern int yel_pane_alpha;
 
 extern int screen_width;

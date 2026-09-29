@@ -48,16 +48,15 @@
 #include "id_func.h"
 
 
-// Palette indices.
-// For damage/bonus red-/gold-shifts
-#define STARTREDPALS		1
-#define NUMREDPALS			16
+// Palette indices (see I_SetPalette in i_video.c).
+// Damage, red shift.
+#define REDPAL              1
 // Bonus items, gold shift.
-#define BONUSPAL			17
+#define BONUSPAL            2
 // Radiation suit, green shift.
-#define RADIATIONPAL		18
+#define RADIATIONPAL        3
 // [JN] Bonus+radiation palette, mixed gold and green shift.
-#define RADIATIONBONUSPAL	19
+#define RADIATIONBONUSPAL   4
 
 
 // Number of status faces.
@@ -895,14 +894,12 @@ static void ST_doPaletteStuff (void)
 
     if (red)
     {
-        palette = red;
-
-        if (palette >= NUMREDPALS)
-        {
-            palette = NUMREDPALS-1;
-        }
-
-        palette += STARTREDPALS;
+        // [PN] Continuous fade, mirroring the yellow bonus palette below:
+        // damagecount decays by 1 per tic, so alpha climbs by REDADD each tic.
+        // REDADD=16 saturates at damagecount >= 15, i.e. the old hold-and-
+        // quick-fade timing, but now without the 16-texture staircase.
+        palette = REDPAL;
+        red_pane_alpha = 255 - MIN(red * REDADD, 240);
     }
     else if (yel)
     {
@@ -920,7 +917,7 @@ static void ST_doPaletteStuff (void)
         palette = RADIATIONPAL;
     }
 
-    if (palette != st_palette || yel)
+    if (palette != st_palette || red || yel)
     {
         st_palette = palette;
 		I_SetPalette (palette);
