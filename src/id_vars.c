@@ -16,14 +16,8 @@
 //
 
 
-#include "m_config.h"  // [JN] M_BindIntVariable
-
 #include "id_vars.h"
-
-
-// Game modes
-int crl_spectating = 0;  // RestlessRodent -- CRL
-int crl_freeze = 0;
+#include "m_config.h"  // [JN] M_Bind*Variable
 
 
 // -----------------------------------------------------------------------------
@@ -160,6 +154,17 @@ int emu_jaguar_skies = 1;
 
 // Compatibility-breaking
 int compat_vertical_aiming = 0;
+//
+// Game modes
+//
+
+int crl_spectating = 0;  // RestlessRodent -- CRL
+int crl_freeze = 0;
+int game_speed = 100;
+int rewind_enable = 1;
+int rewind_interval = 1;
+int rewind_depth = 60;
+int rewind_timeout = 10;
 
 
 // -----------------------------------------------------------------------------
@@ -297,4 +302,11 @@ void ID_BindVariables (void)
     M_BindIntVariable("emu_jaguar_skies",               &emu_jaguar_skies);
     
     M_BindIntVariable("compat_vertical_aiming",         &compat_vertical_aiming);
+
+    // Game modes
+    M_BindIntVariable("game_speed",                     &game_speed);
+    M_BindIntVariable("rewind_enable",                  &rewind_enable);
+    M_BindIntVariable("rewind_interval",                &rewind_interval);
+    M_BindIntVariable("rewind_depth",                   &rewind_depth);
+    M_BindIntVariable("rewind_timeout",                 &rewind_timeout);
 }

@@ -58,10 +58,6 @@ extern int msg_show;
 extern int msg_alignment;
 extern int msg_local_time;
 
-// Game modes
-extern int crl_spectating;
-extern int crl_freeze;
-
 // Widgets
 extern int widget_enable;
 extern int widget_location;
@@ -131,6 +127,15 @@ extern int emu_jaguar_skies;
 
 // Compatibility-breaking
 extern int compat_vertical_aiming;
+// Game modes
+extern int crl_spectating;
+extern int crl_freeze;
+extern int game_speed;
+extern int rewind_enable;
+extern int rewind_interval;
+extern int rewind_depth;
+extern int rewind_timeout;
+
 
 // Mouse look
 extern int mouse_look;

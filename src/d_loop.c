@@ -111,19 +111,11 @@ static boolean local_playeringame[NET_MAXPLAYERS];
 
 static int GetAdjustedTime(void)
 {
-    int time_ms;
+    int offset_tics;
 
-    time_ms = I_GetTimeMS();
+    offset_tics = ((offsetms / FRACUNIT) * TICRATE) / 1000;
 
-    if (new_sync)
-    {
-	// Use the adjustments from net_client.c only if we are
-	// using the new sync mode.
-
-        time_ms += (offsetms / FRACUNIT);
-    }
-
-    return (time_ms * TICRATE) / 1000;
+    return I_GetTime() + (new_sync ? offset_tics : 0);
 }
 
 static boolean BuildNewTic(void)

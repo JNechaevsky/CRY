@@ -54,12 +54,16 @@ extern int key_reloadlevel, key_reloadlevel2;     // [crispy]
 extern int key_flip_levels, key_flip_levels2;     // [crispy]
 extern int key_widget_enable, key_widget_enable2;
 
-// RestlessRodent -- CRL (Special modes)
+// Special modes
 
 extern int key_spectator, key_spectator2; // RestlessRodent -- CRL
 extern int key_freeze, key_freeze2;
 extern int key_notarget, key_notarget2;
 extern int key_buddha, key_buddha2;
+extern int key_speed_up, key_speed_up2;       // [PN]
+extern int key_speed_down, key_speed_down2;   // [PN]
+extern int key_speed_reset, key_speed_reset2; // [PN]
+extern int key_rewind, key_rewind2;           // [PN]
 
 // Weapons
 

@@ -73,6 +73,10 @@ int key_spectator   = 0; int key_spectator2   = 0;
 int key_freeze      = 0; int key_freeze2      = 0;
 int key_notarget    = 0; int key_notarget2    = 0;
 int key_buddha      = 0; int key_buddha2      = 0;
+int key_speed_up    = 0; int key_speed_up2    = 0; // [PN]
+int key_speed_down  = 0; int key_speed_down2  = 0; // [PN]
+int key_speed_reset = 0; int key_speed_reset2 = 0; // [PN]
+int key_rewind      = 0; int key_rewind2      = 0; // [PN]
 
 // Weapons
 
@@ -227,6 +231,10 @@ void M_BindControls (void)
     M_BindIntVariableKeybind("key_freeze",      &key_freeze,      "key_freeze2",      &key_freeze2);
     M_BindIntVariableKeybind("key_notarget",    &key_notarget,    "key_notarget2",    &key_notarget2);
     M_BindIntVariableKeybind("key_buddha",      &key_buddha,      "key_buddha2",      &key_buddha2);
+    M_BindIntVariableKeybind("key_speed_up",    &key_speed_up,    "key_speed_up2",    &key_speed_up2);   // [PN]
+    M_BindIntVariableKeybind("key_speed_down",  &key_speed_down,  "key_speed_down2",  &key_speed_down2); // [PN]
+    M_BindIntVariableKeybind("key_speed_reset", &key_speed_reset, "key_speed_reset2", &key_speed_reset2);// [PN]
+    M_BindIntVariableKeybind("key_rewind",      &key_rewind,      "key_rewind2",      &key_rewind2);     // [PN]
 
     // Weapons
 
