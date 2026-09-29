@@ -454,12 +454,10 @@ static menu_t SaveDef =
 // [JN] Custom ID menu
 // =============================================================================
 
-#define ID_MENU_TOPOFFSET         (27)
-#define ID_MENU_TOPOFFSET_SML     (18)
+#define ID_MENU_TOPOFFSET         (18)
 #define ID_MENU_LEFTOFFSET        (48)
 #define ID_MENU_LEFTOFFSET_SML    (90)
 #define ID_MENU_LEFTOFFSET_BIG    (32)
-#define ID_MENU_LEFTOFFSET_LEVEL  (74)
 
 #define ID_MENU_LINEHEIGHT_SMALL  (9)
 #define ID_MENU_CURSOR_OFFSET     (10)
@@ -548,6 +546,7 @@ static void M_Draw_ID_Keybinds_2 (void);
 static void M_Bind_AlwaysRun (int choice);
 static void M_Bind_MouseLook (int choice);
 static void M_Bind_NoVert (int choice);
+static void M_Bind_PrevLevel (int choice);
 static void M_Bind_RestartLevel (int choice);
 static void M_Bind_NextLevel (int choice);
 static void M_Bind_FlipLevels (int choice);
@@ -1049,7 +1048,7 @@ static menu_t ID_Def_Video_1 =
     &ID_Def_Main,
     ID_Menu_Video_1,
     M_Draw_ID_Video_1,
-    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET_SML,
+    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET,
     0,
     true, false, true,
 };
@@ -1350,7 +1349,7 @@ static menu_t ID_Def_Video_2 =
     &ID_Def_Main,
     ID_Menu_Video_2,
     M_Draw_ID_Video_2,
-    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET_SML,
+    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET,
     0,
     true, false, true,
 };
@@ -1519,7 +1518,7 @@ static menu_t ID_Def_Display =
     &ID_Def_Main,
     ID_Menu_Display,
     M_Draw_ID_Display,
-    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET_SML,
+    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET,
     0,
     true, false, false,
 };
@@ -1691,7 +1690,7 @@ static menu_t ID_Def_Sound =
     &ID_Def_Main,
     ID_Menu_Sound,
     M_Draw_ID_Sound,
-    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET_SML,
+    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET,
     0,
     true, false, false,
 };
@@ -1916,7 +1915,7 @@ static menu_t ID_Def_Controls =
     &ID_Def_Main,
     ID_Menu_Controls,
     M_Draw_ID_Controls,
-    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET_SML,
+    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET,
     0,
     true, false, false,
 };
@@ -2081,7 +2080,7 @@ static menu_t ID_Def_Keybinds_1 =
     &ID_Def_Controls,
     ID_Menu_Keybinds_1,
     M_Draw_ID_Keybinds_1,
-    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET_SML,
+    ID_MENU_LEFTOFFSET_BIG, ID_MENU_TOPOFFSET,
     0,
     true, true, true,
 };
@@ -2178,6 +2177,7 @@ static menuitem_t ID_Menu_Keybinds_2[]=
     { M_SWTC, "MOUSE LOOK",              M_Bind_MouseLook,      'm' },
     { M_SWTC, "VERTICAL MOUSE MOVEMENT", M_Bind_NoVert,         'v' },
     { M_SKIP, "", 0, '\0'},
+    { M_SWTC, "GO TO PREVIOUS LEVEL",    M_Bind_PrevLevel,      'g' },
     { M_SWTC, "RESTART LEVEL",           M_Bind_RestartLevel,   'r' },
     { M_SWTC, "GO TO NEXT LEVEL",        M_Bind_NextLevel,      'g' },
     { M_SWTC, "FLIP LEVEL HORIZONTALLY", M_Bind_FlipLevels,     'f' },
@@ -2198,7 +2198,7 @@ static menu_t ID_Def_Keybinds_2 =
     &ID_Def_Controls,
     ID_Menu_Keybinds_2,
     M_Draw_ID_Keybinds_2,
-    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET_SML,
+    ID_MENU_LEFTOFFSET_BIG, ID_MENU_TOPOFFSET,
     0,
     true, true, true,
 };
@@ -2218,44 +2218,49 @@ static void M_Bind_NoVert (int choice)
     M_StartBind(202);  // key_novert
 }
 
+static void M_Bind_PrevLevel (int choice)
+{
+    M_StartBind(203);  // key_prevlevel
+}
+
 static void M_Bind_RestartLevel (int choice)
 {
-    M_StartBind(203);  // key_reloadlevel
+    M_StartBind(204);  // key_reloadlevel
 }
 
 static void M_Bind_NextLevel (int choice)
 {
-    M_StartBind(204);  // key_nextlevel
+    M_StartBind(205);  // key_nextlevel
 }
 
 static void M_Bind_FlipLevels (int choice)
 {
-    M_StartBind(205);  // key_flip_levels
+    M_StartBind(206);  // key_flip_levels
 }
 
 static void M_Bind_ExtendedHUD (int choice)
 {
-    M_StartBind(206);  // key_widget_enable
+    M_StartBind(207);  // key_widget_enable
 }
 
 static void M_Bind_SpectatorMode (int choice)
 {
-    M_StartBind(207);  // key_spectator
+    M_StartBind(208);  // key_spectator
 }
 
 static void M_Bind_FreezeMode (int choice)
 {
-    M_StartBind(208);  // key_freeze
+    M_StartBind(209);  // key_freeze
 }
 
 static void M_Bind_NotargetMode (int choice)
 {
-    M_StartBind(209);  // key_notarget
+    M_StartBind(210);  // key_notarget
 }
 
 static void M_Bind_BuddhaMode (int choice)
 {
-    M_StartBind(210);  // key_buddha
+    M_StartBind(211);  // key_buddha
 }
 
 static void M_Draw_ID_Keybinds_2 (void)
@@ -2271,19 +2276,21 @@ static void M_Draw_ID_Keybinds_2 (void)
     M_DrawBindKey(1, 27, key_mouse_look, key_mouse_look2);
     M_DrawBindKey(2, 36, key_novert, key_novert2);
 
+
     M_WriteTextCentered(45, "SPECIAL KEYS", cr[CR_YELLOW]);
 
-    M_DrawBindKey(4, 54, key_reloadlevel, key_reloadlevel2);
-    M_DrawBindKey(5, 63, key_nextlevel, key_nextlevel2);
-    M_DrawBindKey(6, 72, key_flip_levels, key_flip_levels2);
-    M_DrawBindKey(7, 81, key_widget_enable, key_widget_enable2);
+    M_DrawBindKey(4, 54, key_prevlevel, key_prevlevel2);
+    M_DrawBindKey(5, 63, key_reloadlevel, key_reloadlevel2);
+    M_DrawBindKey(6, 72, key_nextlevel, key_nextlevel2);
+    M_DrawBindKey(7, 81, key_flip_levels, key_flip_levels2);
+    M_DrawBindKey(8, 90, key_widget_enable, key_widget_enable2);
 
-    M_WriteTextCentered(90, "SPECIAL MODES", cr[CR_YELLOW]);
+    M_WriteTextCentered(99, "SPECIAL MODES", cr[CR_YELLOW]);
 
-    M_DrawBindKey(9, 99, key_spectator, key_spectator2);
-    M_DrawBindKey(10, 108, key_freeze, key_freeze2);
-    M_DrawBindKey(11, 117, key_notarget, key_notarget2);
-    M_DrawBindKey(12, 126, key_buddha, key_buddha2);
+    M_DrawBindKey(10, 108, key_spectator, key_spectator2);
+    M_DrawBindKey(11, 117, key_freeze, key_freeze2);
+    M_DrawBindKey(12, 126, key_notarget, key_notarget2);
+    M_DrawBindKey(13, 135, key_buddha, key_buddha2);
 
     M_DrawBindFooter("2", true);
 }
@@ -2318,7 +2325,7 @@ static menu_t ID_Def_Keybinds_3 =
     &ID_Def_Controls,
     ID_Menu_Keybinds_3,
     M_Draw_ID_Keybinds_3,
-    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET_SML,
+    ID_MENU_LEFTOFFSET_BIG, ID_MENU_TOPOFFSET,
     0,
     true, true, true,
 };
@@ -2421,7 +2428,7 @@ static menu_t ID_Def_Keybinds_4 =
     &ID_Def_Controls,
     ID_Menu_Keybinds_4,
     M_Draw_ID_Keybinds_4,
-    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET_SML,
+    ID_MENU_LEFTOFFSET_BIG, ID_MENU_TOPOFFSET,
     0,
     true, true, true,
 };
@@ -2535,7 +2542,7 @@ static menu_t ID_Def_Keybinds_5 =
     &ID_Def_Controls,
     ID_Menu_Keybinds_5,
     M_Draw_ID_Keybinds_5,
-    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET_SML,
+    ID_MENU_LEFTOFFSET_BIG, ID_MENU_TOPOFFSET,
     0,
     true, true, true,
 };
@@ -2643,7 +2650,7 @@ static menu_t ID_Def_Keybinds_6 =
     &ID_Def_Controls,
     ID_Menu_Keybinds_6,
     M_Draw_ID_Keybinds_6,
-    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET_SML,
+    ID_MENU_LEFTOFFSET_BIG, ID_MENU_TOPOFFSET,
     0,
     true, true, true,
 };
@@ -2727,7 +2734,7 @@ static menu_t ID_Def_MouseBinds =
     &ID_Def_Controls,
     ID_Menu_MouseBinds,
     M_Draw_ID_MouseBinds,
-    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET_SML,
+    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET,
     0,
     true, false, false,
 };
@@ -2859,7 +2866,7 @@ static menu_t ID_Def_GamepadBinds =
     &ID_Def_Controls,
     ID_Menu_GamepadBinds,
     M_Draw_ID_GamepadBinds,
-    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET_SML,
+    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET,
     0,
     true, false, true,
 };
@@ -3024,7 +3031,7 @@ static menu_t ID_Def_GamepadSettings_1 =
     &ID_Def_Controls,
     ID_Menu_GamepadSettings_1,
     M_Draw_ID_GamepadSettings_1,
-    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET_SML,
+    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET,
     0,
     true, false, true,
 };
@@ -3047,7 +3054,7 @@ static menu_t ID_Def_GamepadSettings_2 =
     &ID_Def_Controls,
     ID_Menu_GamepadSettings_2,
     M_Draw_ID_GamepadSettings_2,
-    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET_SML,
+    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET,
     0,
     true, false, true,
 };
@@ -3198,7 +3205,7 @@ static menu_t ID_Def_Widgets =
     &ID_Def_Main,
     ID_Menu_Widgets,
     M_Draw_ID_Widgets,
-    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET_SML,
+    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET,
     0,
     true, false, false,
 };
@@ -3379,7 +3386,7 @@ static menu_t ID_Def_Automap =
     &ID_Def_Main,
     ID_Menu_Automap,
     M_Draw_ID_Automap,
-    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET_SML,
+    ID_MENU_LEFTOFFSET, ID_MENU_TOPOFFSET,
     0,
     true, false, false,
 };
@@ -3530,7 +3537,7 @@ static menu_t ID_Def_Gameplay_1 =
     &ID_Def_Main,
     ID_Menu_Gameplay_1,
     M_Draw_ID_Gameplay_1,
-    ID_MENU_LEFTOFFSET_BIG, ID_MENU_TOPOFFSET_SML,
+    ID_MENU_LEFTOFFSET_BIG, ID_MENU_TOPOFFSET,
     0,
     true, false, true,
 };
@@ -3758,7 +3765,7 @@ static menu_t ID_Def_Gameplay_2 =
     &ID_Def_Main,
     ID_Menu_Gameplay_2,
     M_Draw_ID_Gameplay_2,
-    ID_MENU_LEFTOFFSET_BIG, ID_MENU_TOPOFFSET_SML,
+    ID_MENU_LEFTOFFSET_BIG, ID_MENU_TOPOFFSET,
     0,
     true, false, true,
 };
@@ -3919,7 +3926,7 @@ static menu_t ID_Def_Gameplay_3 =
     &ID_Def_Main,
     ID_Menu_Gameplay_3,
     M_Draw_ID_Gameplay_3,
-    ID_MENU_LEFTOFFSET_BIG, ID_MENU_TOPOFFSET_SML,
+    ID_MENU_LEFTOFFSET_BIG, ID_MENU_TOPOFFSET,
     0,
     true, false, true,
 };
@@ -5403,14 +5410,46 @@ static int G_ReloadLevel (void)
     return result;
 }
 
-static int G_GotoNextLevel (void)
-{
-    byte jaguar_next[] = {
+// -----------------------------------------------------------------------------
+// G_GotoPrevLevel
+// [PN] One forward table drives both directions: "prev" is found by
+// inverting jaguar_next (the map whose "next" is the current one), so the
+// two directions can never disagree. Jaguar's 24 maps run 1..24 and wrap
+// 24 -> 1, hence prev of 1 is 24.
+// -----------------------------------------------------------------------------
+
+static const byte jaguar_next[] = {
      2,  3,  4,  5,  6,  7,  8,  9, 10,
     11, 12, 13, 14, 15, 16, 17, 18, 19,
-    20, 21, 22, 23, 24, 1,
-    };
+    20, 21, 22, 23, 24,  1,
+};
 
+static int G_GotoPrevLevel (void)
+{
+    int changed = false;
+
+    if (gamestate == GS_LEVEL || gamestate == GS_INTERMISSION)
+    {
+        int prev = gamemap;
+
+        for (int i = 0; i < (int)sizeof(jaguar_next); ++i)
+        {
+            if (jaguar_next[i] == gamemap)
+            {
+                prev = i + 1;
+                break;
+            }
+        }
+
+        G_DeferedInitNew(gameskill, gameepisode, prev);
+        changed = true;
+    }
+
+    return changed;
+}
+
+static int G_GotoNextLevel (void)
+{
     int changed = false;
 
     if (gamestate == GS_LEVEL || gamestate == GS_INTERMISSION)
@@ -6014,6 +6053,12 @@ boolean M_Responder (event_t* ev)
         {
             S_StartSound(NULL, sfx_swtchn);
             M_QuitDOOM(0);
+            return true;
+        }
+        // [PN] Go to previous level.
+        else if (key != 0 && (key == key_prevlevel || key == key_prevlevel2))
+        {
+            if (G_GotoPrevLevel())
             return true;
         }
         // [crispy] those two can be considered as shortcuts for the IDCLEV cheat
@@ -6909,14 +6954,15 @@ static const KeyBindEntry_t keybinds[] =
     KEYBIND_ENTRY(200, &ID_Def_Keybinds_2, 0,  key_autorun,       key_autorun2,       KEY_CAPSLOCK, 0, KBS_GLOBAL),
     KEYBIND_ENTRY(201, &ID_Def_Keybinds_2, 1,  key_mouse_look,    key_mouse_look2,    0,            0, KBS_GLOBAL),
     KEYBIND_ENTRY(202, &ID_Def_Keybinds_2, 2,  key_novert,        key_novert2,        0,            0, KBS_GLOBAL),
-    KEYBIND_ENTRY(203, &ID_Def_Keybinds_2, 4,  key_reloadlevel,   key_reloadlevel2,   0,            0, KBS_GLOBAL),
-    KEYBIND_ENTRY(204, &ID_Def_Keybinds_2, 5,  key_nextlevel,     key_nextlevel2,     0,            0, KBS_GLOBAL),
-    KEYBIND_ENTRY(205, &ID_Def_Keybinds_2, 6,  key_flip_levels,   key_flip_levels2,   0,            0, KBS_GLOBAL),
-    KEYBIND_ENTRY(206, &ID_Def_Keybinds_2, 7,  key_widget_enable, key_widget_enable2, 0,            0, KBS_GLOBAL),
-    KEYBIND_ENTRY(207, &ID_Def_Keybinds_2, 9,  key_spectator,     key_spectator2,     0,            0, KBS_GLOBAL),
-    KEYBIND_ENTRY(208, &ID_Def_Keybinds_2, 10, key_freeze,        key_freeze2,        0,            0, KBS_GLOBAL),
-    KEYBIND_ENTRY(209, &ID_Def_Keybinds_2, 11, key_notarget,      key_notarget2,      0,            0, KBS_GLOBAL),
-    KEYBIND_ENTRY(210, &ID_Def_Keybinds_2, 12, key_buddha,        key_buddha2,        0,            0, KBS_GLOBAL),
+    KEYBIND_ENTRY(203, &ID_Def_Keybinds_2, 4,  key_prevlevel,     key_prevlevel2,     0,            0, KBS_GLOBAL),
+    KEYBIND_ENTRY(204, &ID_Def_Keybinds_2, 5,  key_reloadlevel,   key_reloadlevel2,   0,            0, KBS_GLOBAL),
+    KEYBIND_ENTRY(205, &ID_Def_Keybinds_2, 6,  key_nextlevel,     key_nextlevel2,     0,            0, KBS_GLOBAL),
+    KEYBIND_ENTRY(206, &ID_Def_Keybinds_2, 7,  key_flip_levels,   key_flip_levels2,   0,            0, KBS_GLOBAL),
+    KEYBIND_ENTRY(207, &ID_Def_Keybinds_2, 8,  key_widget_enable, key_widget_enable2, 0,            0, KBS_GLOBAL),
+    KEYBIND_ENTRY(208, &ID_Def_Keybinds_2, 10, key_spectator,     key_spectator2,     0,            0, KBS_GLOBAL),
+    KEYBIND_ENTRY(209, &ID_Def_Keybinds_2, 11, key_freeze,        key_freeze2,        0,            0, KBS_GLOBAL),
+    KEYBIND_ENTRY(210, &ID_Def_Keybinds_2, 12, key_notarget,      key_notarget2,      0,            0, KBS_GLOBAL),
+    KEYBIND_ENTRY(211, &ID_Def_Keybinds_2, 13, key_buddha,        key_buddha2,        0,            0, KBS_GLOBAL),
 
     // Page 3
     KEYBIND_ENTRY(300, &ID_Def_Keybinds_3, 0, key_weapon1,     key_weapon1_2,    '1', 0, KBS_GLOBAL),

@@ -302,6 +302,7 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_KEYBIND(key_novert, key_novert2),
     
     // Special keys
+    CONFIG_VARIABLE_KEYBIND(key_prevlevel, key_prevlevel2),
     CONFIG_VARIABLE_KEYBIND(key_reloadlevel, key_reloadlevel2),
     CONFIG_VARIABLE_KEYBIND(key_nextlevel, key_nextlevel2),
     CONFIG_VARIABLE_KEYBIND(key_flip_levels, key_flip_levels2),

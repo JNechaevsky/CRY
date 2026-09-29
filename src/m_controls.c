@@ -61,6 +61,7 @@ int key_novert     = 0;            int key_novert2     = 0;
 
 // Special keys
 
+int key_prevlevel     = 0; int key_prevlevel2     = 0; // [PN]
 int key_reloadlevel   = 0; int key_reloadlevel2   = 0; // [crispy]
 int key_nextlevel     = 0; int key_nextlevel2     = 0; // [crispy]
 int key_flip_levels   = 0; int key_flip_levels2   = 0; // [crispy]
@@ -214,6 +215,7 @@ void M_BindControls (void)
 
     // Special keys
 
+    M_BindIntVariableKeybind("key_prevlevel",     &key_prevlevel,     "key_prevlevel2",     &key_prevlevel2);   // [PN]
     M_BindIntVariableKeybind("key_reloadlevel",   &key_reloadlevel,   "key_reloadlevel2",   &key_reloadlevel2); // [crispy]
     M_BindIntVariableKeybind("key_nextlevel",     &key_nextlevel,     "key_nextlevel2",     &key_nextlevel2);   // [crispy]
     M_BindIntVariableKeybind("key_flip_levels",   &key_flip_levels,   "key_flip_levels2",   &key_flip_levels2); // [crispy]
