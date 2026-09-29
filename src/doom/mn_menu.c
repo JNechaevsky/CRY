@@ -19,6 +19,7 @@
 //
 
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <time.h>
@@ -51,7 +52,6 @@
 #include "v_trans.h"
 #include "am_map.h"
 #include "st_bar.h"
-#include "r_collight.h"
 
 #include "id_vars.h"
 #include "id_func.h"
@@ -135,12 +135,32 @@ static boolean joypadSave = false; // was the save action initiated by joypad?
 // old save description before edit
 static char saveOldString[SAVESTRINGSIZE];  
 
-// [FG] support up to 8 pages of savegames
-// int savepage = 0;
-// static const int savepage_max = 7;
+// [FG] support up to 16 pages of savegames
+int savepage = 0;
+static const int savepage_max = 15;
 
 static char savegamestrings[10][SAVESTRINGSIZE];
+static byte savegamepreviews[10][V_SAVEPREVIEW_SIZE];
+static boolean savegamepreview_present[10];
+
+typedef struct
+{
+    byte skill;
+    byte episode;
+    byte map;
+    int leveltime;
+    boolean present;
+} savegame_meta_t;
+
+static savegame_meta_t savegame_meta[10];
+
+const char *const DefSkillName[5] = { "TYTD", "HNTR", "HMP", "UV" , "NM" };
+
 static char endstring[160];
+
+// [PN] Save/Load preview area (original 320x200 coordinate space).
+#define SAVE_PREVIEW_X 234
+#define SAVE_PREVIEW_Y 26
 
 
 //
@@ -246,6 +266,8 @@ static void M_DrawNewGame(void);
 static void M_DrawSound(void);
 static void M_DrawLoad(void);
 static void M_DrawSave(void);
+static void M_DrawSavePreview(void);
+static void M_DrawSavePreviewBorder(int x, int y, int w, int h);
 
 static void M_DrawSaveLoadBorder(int x,int y);
 static void M_SetupNextMenu(menu_t *menudef);
@@ -254,8 +276,8 @@ static int  M_StringHeight(const char *string);
 static void M_StartMessage(const char *string, void (*routine)(int), boolean input);
 static void M_ClearMenus (void);
 
-static void M_ID_MenuMouseControl (void);
-static void M_ID_HandleSliderMouseControl (int x, int y, int width, void *value, boolean is_float, float min, float max);
+inline static void M_ID_MenuMouseControl (void);
+inline static void M_ID_HandleSliderMouseControl (int x, int y, int width, void *value, boolean is_float, float min, float max);
 
 // =============================================================================
 // DOOM MENU
@@ -418,9 +440,9 @@ static menu_t LoadDef =
     &MainDef,
     LoadMenu,
     M_DrawLoad,
-    67,28,
+    39,27,
     0,
-    false, false, false,
+    false, true, true,
 };
 
 //
@@ -445,9 +467,9 @@ static menu_t SaveDef =
     &MainDef,
     SaveMenu,
     M_DrawSave,
-    67,28,
+    39,27,
     0,
-    false, false, false,
+    false, true, true,
 };
 
 // =============================================================================
@@ -812,7 +834,6 @@ static void M_ScrollPages (boolean direction)
     currentMenu->lastOn = itemOn;
 
     // Save/Load menu:
-    /*
     if (currentMenu == &LoadDef || currentMenu == &SaveDef)
     {
         if (direction)
@@ -835,7 +856,6 @@ static void M_ScrollPages (boolean direction)
         M_ReadSaveStrings();
         return;
     }
-    */
 
     // Video options:
          if (currentMenu == &ID_Def_Video_1) nextMenu = &ID_Def_Video_2;
@@ -3934,8 +3954,6 @@ static menu_t ID_Def_Gameplay_3 =
 static void M_Draw_ID_Gameplay_3 (void)
 {
     char str[32];
-    const char *const DefSkillName[5] = { "IAW", "NTR", "HMP", "UV", "NM" };
-
     Gameplay_Cur = 2;
 
     M_WriteTextCentered(9, "GAMEPLAY", cr[CR_YELLOW]);
@@ -4320,11 +4338,83 @@ static void M_Choose_ID_Reset (int choice)
 
 // =============================================================================
 
+// [PN] Read basic map/skill/time metadata from Doom save header.
+static boolean M_ReadSaveMeta(FILE *handle, byte *skill, byte *episode,
+                              byte *map, int *save_leveltime)
+{
+    if (handle == NULL || skill == NULL || episode == NULL
+     || map == NULL || save_leveltime == NULL)
+    {
+        return false;
+    }
+
+    if (fseek(handle, SAVESTRINGSIZE + VERSIONSIZE, SEEK_SET) != 0)
+    {
+        return false;
+    }
+
+    const int s = fgetc(handle);
+    const int e = fgetc(handle);
+    const int m = fgetc(handle);
+    const int idmus = fgetc(handle);
+
+    if (s == EOF || e == EOF || m == EOF || idmus == EOF)
+    {
+        return false;
+    }
+
+    if (fseek(handle, MAXPLAYERS, SEEK_CUR) != 0)
+    {
+        return false;
+    }
+
+    const int a = fgetc(handle);
+    const int b = fgetc(handle);
+    const int c = fgetc(handle);
+
+    if (a == EOF || b == EOF || c == EOF)
+    {
+        return false;
+    }
+
+    *skill = (byte)s;
+    *episode = (byte)e;
+    *map = (byte)m;
+    *save_leveltime = (a << 16) | (b << 8) | c;
+
+    return true;
+}
+
+// [PN] Format map identifier from save metadata.
+static void M_FormatSaveMap(char *buf, size_t buflen, byte episode, byte map)
+{
+    M_snprintf(buf, buflen, "MAP%02d", map);
+}
+
+// [PN] Format level time from tics as MM:SS or H:MM:SS.
+static void M_FormatSaveTime(char *buf, size_t buflen, int tics)
+{
+    int total_seconds = (tics >= 0) ? (tics / TICRATE) : 0;
+    const int hours = total_seconds / 3600;
+    const int minutes = (total_seconds % 3600) / 60;
+    const int seconds = total_seconds % 60;
+
+    if (hours > 0)
+    {
+        M_snprintf(buf, buflen, "%d:%02d:%02d", hours, minutes, seconds);
+    }
+    else
+    {
+        M_snprintf(buf, buflen, "%d:%02d", minutes, seconds);
+    }
+}
+
 
 //
 // M_ReadSaveStrings
 //  read the strings from the savegame files
 //
+
 static void M_ReadSaveStrings(void)
 {
     FILE   *handle;
@@ -4341,19 +4431,100 @@ static void M_ReadSaveStrings(void)
         {
             M_StringCopy(savegamestrings[i], EMPTYSTRING, SAVESTRINGSIZE);
             LoadMenu[i].status = 0;
+            savegamepreview_present[i] = false;
+            savegame_meta[i].present = false;
             continue;
         }
+
         retval = fread(&savegamestrings[i], 1, SAVESTRINGSIZE, handle);
-	fclose(handle);
         LoadMenu[i].status = retval == SAVESTRINGSIZE;
+
+        if (LoadMenu[i].status)
+        {
+            byte skill, episode, map;
+            int slot_leveltime;
+
+            savegame_meta[i].present = M_ReadSaveMeta(handle, &skill, &episode,
+                                                      &map, &slot_leveltime);
+            if (savegame_meta[i].present)
+            {
+                savegame_meta[i].skill = skill;
+                savegame_meta[i].episode = episode;
+                savegame_meta[i].map = map;
+                savegame_meta[i].leveltime = slot_leveltime;
+            }
+        }
+        else
+        {
+            savegame_meta[i].present = false;
+        }
+
+        savegamepreview_present[i] = LoadMenu[i].status
+                                  && V_SavePreview_ReadFromFile(handle, savegamepreviews[i]);
+        fclose(handle);
     }
+}
+
+// [PN] Draw decorative bezel around save preview area using classic BRDR patches.
+static void M_DrawSavePreviewBorder(int x, int y, int w, int h)
+{
+    patch_t *const patch_top = W_CacheLumpName(("brdr_t"), PU_CACHE);
+    patch_t *const patch_bottom = W_CacheLumpName(("brdr_b"), PU_CACHE);
+    patch_t *const patch_left = W_CacheLumpName(("brdr_l"), PU_CACHE);
+    patch_t *const patch_right = W_CacheLumpName(("brdr_r"), PU_CACHE);
+    patch_t *const patch_tl = W_CacheLumpName(("brdr_tl"), PU_CACHE);
+    patch_t *const patch_tr = W_CacheLumpName(("brdr_tr"), PU_CACHE);
+    patch_t *const patch_bl = W_CacheLumpName(("brdr_bl"), PU_CACHE);
+    patch_t *const patch_br = W_CacheLumpName(("brdr_br"), PU_CACHE);
+
+    for (int i = 0; i < w; i += 8)
+    {
+        V_DrawPatch(x + i, y - 8, patch_top);
+        V_DrawPatch(x + i, y + h, patch_bottom);
+    }
+
+    for (int i = 0; i < h; i += 8)
+    {
+        V_DrawPatch(x - 8, y + i, patch_left);
+        V_DrawPatch(x + w, y + i, patch_right);
+    }
+
+    V_DrawPatch(x - 8, y - 8, patch_tl);
+    V_DrawPatch(x + w, y - 8, patch_tr);
+    V_DrawPatch(x - 8, y + h, patch_bl);
+    V_DrawPatch(x + w, y + h, patch_br);
+}
+
+// [PN] Draw selected slot thumbnail or black fallback, then frame it with BRDR patches.
+static void M_DrawSavePreview(void)
+{
+    const int slot = (itemOn >= 0 && itemOn < load_end) ? itemOn : 0;
+    const boolean has_slot = (itemOn >= 0 && itemOn < load_end);
+
+    if (has_slot && savegamepreview_present[slot])
+    {
+        V_DrawScaledBlock(SAVE_PREVIEW_X, SAVE_PREVIEW_Y,
+                          V_SAVEPREVIEW_WIDTH, V_SAVEPREVIEW_HEIGHT,
+                          savegamepreviews[slot]);
+    }
+    else
+    {
+        const int x = (SAVE_PREVIEW_X + WIDESCREENDELTA) * vid_resolution;
+        const int y = SAVE_PREVIEW_Y * vid_resolution;
+        const int w = V_SAVEPREVIEW_WIDTH * vid_resolution;
+        const int h = V_SAVEPREVIEW_HEIGHT * vid_resolution;
+
+        V_DrawFilledBox(x, y, w, h, I_MapRGB(0x00, 0x00, 0x00));
+    }
+
+    M_DrawSavePreviewBorder(SAVE_PREVIEW_X, SAVE_PREVIEW_Y,
+                            V_SAVEPREVIEW_WIDTH, V_SAVEPREVIEW_HEIGHT);
 }
 
 
 // [FG] support up to 8 pages of savegames
 static void M_DrawSaveLoadBottomLine (void)
 {
-/*
     char pagestr[16];
 
     if (savepage > 0)
@@ -4362,19 +4533,21 @@ static void M_DrawSaveLoadBottomLine (void)
     }
     if (savepage < savepage_max)
     {
-        M_WriteText(LoadDef.x+(SAVESTRINGSIZE-6)*8, 151, "PGDN >", cr[CR_MENU_DARK2]);
+        M_WriteText(LoadDef.x+(SAVESTRINGSIZE-8)*8, 151, "PGDN >", cr[CR_MENU_DARK2]);
     }
 
     M_snprintf(pagestr, sizeof(pagestr), "PAGE %d/%d", savepage + 1, savepage_max + 1);
-    
-    M_WriteTextCentered(151, pagestr, cr[CR_MENU_DARK1]);
-*/
+
+    // [PN] Keep PAGE label aligned with Save/Load list shift (base x was 67).
+    M_WriteText(ORIGWIDTH / 2 + (LoadDef.x - 76) - M_StringWidth(pagestr) / 2,
+                151, pagestr, cr[CR_MENU_DARK1]);
 
     // [JN] Print "modified" (or created initially) time of savegame file.
-    if (itemOn != -1 && LoadMenu[itemOn].status)
+    if (itemOn >= 0 && itemOn < load_end && LoadMenu[itemOn].status)
     {
         struct stat filestat;
         char filedate[32];
+        char filetime[32];
 
         if (M_stat(P_SaveGameFile(itemOn), &filestat) == 0)
         {
@@ -4383,11 +4556,53 @@ static void M_DrawSaveLoadBottomLine (void)
 #  pragma GCC diagnostic push
 #  pragma GCC diagnostic ignored "-Wformat-y2k"
 #endif
-            strftime(filedate, sizeof(filedate), "%x %X", localtime(&filestat.st_mtime));
+        strftime(filedate, sizeof(filedate), "%x", localtime(&filestat.st_mtime));
+        strftime(filetime, sizeof(filetime), "%X", localtime(&filestat.st_mtime));
 #if defined(__GNUC__)
 #  pragma GCC diagnostic pop
 #endif
-            M_WriteTextCentered(152, filedate, cr[CR_MENU_DARK2]);
+        // [PN] Date/time under preview block: first line date, second line time.
+        M_WriteText(SAVE_PREVIEW_X + (V_SAVEPREVIEW_WIDTH - M_StringWidth(filedate)) / 2,
+                    SAVE_PREVIEW_Y + V_SAVEPREVIEW_HEIGHT + 5,
+                    filedate, cr[CR_MENU_DARK1]);
+        M_WriteText(SAVE_PREVIEW_X + (V_SAVEPREVIEW_WIDTH - M_StringWidth(filetime)) / 2,
+                    SAVE_PREVIEW_Y + V_SAVEPREVIEW_HEIGHT + 14,
+                    filetime, cr[CR_MENU_DARK1]);
+
+        if (savegame_meta[itemOn].present)
+        {
+            char mapid[16];
+            char mapline[32];
+            char skillline[32];
+            char timestr[16];
+            char timeline[32];
+            const char *skillname = "?";
+            const byte skill = savegame_meta[itemOn].skill;
+
+            M_FormatSaveMap(mapid, sizeof(mapid),
+                            savegame_meta[itemOn].episode,
+                            savegame_meta[itemOn].map);
+            M_snprintf(mapline, sizeof(mapline), "MAP: %s", mapid);
+
+            if (skill < 5)
+            {
+                skillname = DefSkillName[skill];
+            }
+
+            M_snprintf(skillline, sizeof(skillline), "SKILL: %s", skillname);
+            M_FormatSaveTime(timestr, sizeof(timestr), savegame_meta[itemOn].leveltime);
+            M_snprintf(timeline, sizeof(timeline), "TIME: %s", timestr);
+
+            M_WriteText(SAVE_PREVIEW_X + (V_SAVEPREVIEW_WIDTH - M_StringWidth(mapline)) / 2,
+                        SAVE_PREVIEW_Y + V_SAVEPREVIEW_HEIGHT + 32,
+                        mapline, cr[CR_MENU_DARK1]);
+            M_WriteText(SAVE_PREVIEW_X + (V_SAVEPREVIEW_WIDTH - M_StringWidth(skillline)) / 2,
+                        SAVE_PREVIEW_Y + V_SAVEPREVIEW_HEIGHT + 41,
+                        skillline, cr[CR_MENU_DARK1]);
+            M_WriteText(SAVE_PREVIEW_X + (V_SAVEPREVIEW_WIDTH - M_StringWidth(timeline)) / 2,
+                        SAVE_PREVIEW_Y + V_SAVEPREVIEW_HEIGHT + 50,
+                        timeline, cr[CR_MENU_DARK1]);
+        }
         }
     }
 }
@@ -4398,23 +4613,24 @@ static void M_DrawSaveLoadBottomLine (void)
 //
 static void M_DrawLoad(void)
 {
-    int i;
+    M_WriteTextBigCentered(8, "Load game", NULL);
 
-	M_WriteTextBigCentered(8, "Load game", NULL);
-
-	for (i = 0 ; i < load_end ; i++)
-	{
+    for (int i = 0;i < load_end; i++)
+    {
         // [JN] Highlight selected item (itemOn == i) or apply fading effect.
-        dp_translation = (itemOn == i) ? cr[CR_MENU_BRIGHT2] : NULL;
+        dp_translation = (itemOn == i /*&& menu_highlight*/) ? cr[CR_MENU_BRIGHT2] : NULL;
         M_DrawSaveLoadBorder(LoadDef.x,LoadDef.y+LINEHEIGHT*i+7);
         dp_translation = NULL;
 
+        // [PN] For save/load entries, use per-line glow state (tics),
+        // not only the current cursor line, so animated/static highlight works too.
         M_WriteTextGlow(LoadDef.x,LoadDef.y+LINEHEIGHT*i,savegamestrings[i],
                             NULL,
-                                (itemOn == i) ? cr[CR_MENU_BRIGHT5] : NULL, 
+                                currentMenu->menuitems[i].tics > 0 ? cr[CR_MENU_BRIGHT5] : NULL,
                                     LINE_ALPHA(i));
-	}
+    }
 
+    M_DrawSavePreview();
     M_DrawSaveLoadBottomLine();
 }
 
@@ -4427,15 +4643,15 @@ static void M_DrawSaveLoadBorder(int x,int y)
 {
     int             i;
 	
-    V_DrawShadowedPatchOptional(x - 8, y, W_CacheLumpName("M_LSLEFT", PU_CACHE));
+    V_DrawShadowedPatchOptional(x - 8, y, W_CacheLumpName(("M_LSLEFT"), PU_CACHE));
 	
-    for (i = 0;i < 24;i++)
+    for (i = 0;i < 22;i++)
     {
-	V_DrawShadowedPatchOptional(x, y, W_CacheLumpName("M_LSCNTR", PU_CACHE));
+	V_DrawShadowedPatchOptional(x, y, W_CacheLumpName(("M_LSCNTR"), PU_CACHE));
 	x += 8;
     }
 
-    V_DrawShadowedPatchOptional(x, y, W_CacheLumpName("M_LSRGHT", PU_CACHE));
+    V_DrawShadowedPatchOptional(x, y, W_CacheLumpName(("M_LSRGHT"), PU_CACHE));
 }
 
 
@@ -4472,32 +4688,36 @@ static void M_LoadGame (int choice)
 //
 static void M_DrawSave(void)
 {
-	int i;
+    int i;
 
-	M_WriteTextBigCentered(8, "Save game", NULL);
+    M_WriteTextBigCentered(8, "Save game", NULL);
 
-	for (i = 0 ; i < load_end ; i++)
-	{
+    for (i = 0; i < load_end; i++)
+    {
         // [JN] Highlight selected item (itemOn == i) or apply fading effect.
-        dp_translation = (itemOn == i) ? cr[CR_MENU_BRIGHT2] : NULL;
+        dp_translation = (itemOn == i /*&& menu_highlight*/) ? cr[CR_MENU_BRIGHT2] : NULL;
         M_DrawSaveLoadBorder(LoadDef.x,LoadDef.y+LINEHEIGHT*i+7);
         dp_translation = NULL;
 
+        // [PN] For save/load entries, use per-line glow state (tics),
+        // not only the current cursor line, so animated/static highlight works too.
         M_WriteTextGlow(LoadDef.x,LoadDef.y+LINEHEIGHT*i,savegamestrings[i],
                             NULL,
-                                (itemOn == i) ? cr[CR_MENU_BRIGHT5] : NULL, 
+                                currentMenu->menuitems[i].tics > 0 ? cr[CR_MENU_BRIGHT5] : NULL,
                                     LINE_ALPHA(i));
-	}
+    }
 
-	if (saveStringEnter)
-	{
-		i = M_StringWidth(savegamestrings[saveSlot]);
-		// [JN] Highlight "_" cursor, line is always active while typing.
-		M_WriteText(LoadDef.x + i,LoadDef.y+LINEHEIGHT*saveSlot,"_", cr[CR_MENU_BRIGHT5]);
-		// [JN] Forcefully hide the mouse cursor while typing.
-		menu_mouse_allow = false;
-	}
+    if (saveStringEnter)
+    {
+	i = M_StringWidth(savegamestrings[saveSlot]);
+	// [PN] Highlight "_" cursor only if menu highlighting is enabled.
+	M_WriteText(LoadDef.x + i,LoadDef.y+LINEHEIGHT*saveSlot,"_",
+	            /*menu_highlight ?*/ cr[CR_MENU_BRIGHT5] /*: NULL*/);
+	// [JN] Forcefully hide the mouse cursor while typing.
+	menu_mouse_allow = false;
+    }
 
+    M_DrawSavePreview();
     M_DrawSaveLoadBottomLine();
 }
 

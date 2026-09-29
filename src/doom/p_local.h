@@ -21,6 +21,7 @@
 #pragma once
 
 
+#include "v_savepreview.h"
 #include "r_local.h"
 
 
@@ -622,6 +623,11 @@ extern char    *P_TempSaveGameFile(void);
 extern void     P_ArchiveAutomap (void);
 extern void     P_ArchivePlayers (void);
 extern void     P_ArchiveOldSpecials (void);
+extern void     P_ArchiveGameplaySettings (void);
+extern void     P_ArchiveSavePreview (void);
+extern void     P_RequestSavePreviewCapture (void);
+extern boolean  P_IsSavePreviewReady (void);
+extern void     P_UpdateSavePreviewCache (void);
 extern void     P_ArchiveSpecials (void);
 extern void     P_ArchiveThinkers (void);
 extern void     P_ArchiveTotalTimes (void);

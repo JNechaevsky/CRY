@@ -20,6 +20,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <limits.h>
 #include "i_system.h"
 #include "z_zone.h"
 #include "p_local.h"
@@ -30,6 +32,9 @@
 #include "s_sound.h"
 #include "m_random.h"
 #include "mn_menu.h"
+#include "r_local.h"
+#include "v_video.h"
+#include "w_wad.h"
 
 #include "id_vars.h"
 
@@ -69,7 +74,7 @@ char *P_SaveGameFile(int slot)
         filename = malloc(filename_size);
     }
 
-    snprintf(basename, 32, "cry-save-" "%d.sav", /*10*savepage+*/slot);
+    snprintf(basename, 32, "cry-save-" "%d.sav", 10*savepage+slot);
     M_snprintf(filename, filename_size, "%s%s", savegamedir, basename);
 
     return filename;
@@ -173,6 +178,83 @@ static void saveg_write64(int64_t value)
     saveg_write8((value >> 40) & 0xff);
     saveg_write8((value >> 48) & 0xff);
     saveg_write8((value >> 56) & 0xff);
+}
+// -----------------------------------------------------------------------------
+// [PN] Savegame preview helpers.
+// -----------------------------------------------------------------------------
+
+static v_savepreview_cache_t saveg_preview_cache;
+
+static byte saveg_pixel_to_palette(pixel_t pixel, void *user_data)
+{
+    (void)user_data;
+
+    if (argbbuffer == NULL || argbbuffer->format == NULL)
+    {
+        return 0;
+    }
+
+    {
+        uint8_t r, g, b;
+        int best = 0;
+        int best_dist = INT_MAX;
+
+        SDL_GetRGB((uint32_t)pixel, argbbuffer->format, &r, &g, &b);
+
+        // [PN] Direct nearest-color search against the active palette.
+        for (int i = 0; i < 256; ++i)
+        {
+            const pixel_t pc = palette_pointer[i];
+            const int dr = (int)r - (int)((pc >> 16) & 0xFF);
+            const int dg = (int)g - (int)((pc >>  8) & 0xFF);
+            const int db = (int)b - (int)( pc        & 0xFF);
+            const int dist = (dr < 0 ? -dr : dr)
+                           + (dg < 0 ? -dg : dg)
+                           + (db < 0 ? -db : db);
+
+            if (dist < best_dist)
+            {
+                best_dist = dist;
+                best = i;
+
+                if (!dist)
+                    break;
+            }
+        }
+
+        return (byte)best;
+    }
+}
+
+void P_RequestSavePreviewCapture (void)
+{
+    V_SavePreview_RequestCapture(&saveg_preview_cache);
+}
+
+boolean P_IsSavePreviewReady (void)
+{
+    return V_SavePreview_IsReady(&saveg_preview_cache);
+}
+
+// [PN] Refresh clean world-only save preview cache from the freshly rendered view.
+void P_UpdateSavePreviewCache (void)
+{
+    if (!saveg_preview_cache.capture_requested)
+    {
+        return;
+    }
+
+    V_SavePreview_UpdateCache(&saveg_preview_cache,
+                               I_VideoBuffer,
+                               SCREENWIDTH,
+                               SCREENHEIGHT,
+                               viewwindowx,
+                               viewwindowy,
+                               scaledviewwidth,
+                               viewheight,
+                               NONWIDEWIDTH,
+                               saveg_pixel_to_palette,
+                               NULL);
 }
 
 // Pad to 4-byte boundaries
@@ -2171,6 +2253,31 @@ void P_ArchiveOldSpecials (void)
     for (i=0, sec = sectors ; i<numsectors ; i++,sec++)
     {
         saveg_write16(sec->oldspecial);
+    }
+}
+
+// -----------------------------------------------------------------------------
+// P_ArchiveSavePreview
+// [PN] Archive savegame preview thumbnail at end of save file
+// using shared V_SavePreview footer format.
+// -----------------------------------------------------------------------------
+
+void P_ArchiveSavePreview (void)
+{
+    byte thumb[V_SAVEPREVIEW_SIZE];
+    byte footer[V_SAVEPREVIEW_FOOTER_SIZE];
+
+    V_SavePreview_CopyOrBlack(&saveg_preview_cache, thumb);
+    V_SavePreview_WriteFooter(footer);
+
+    for (int i = 0; i < V_SAVEPREVIEW_SIZE; ++i)
+    {
+        saveg_write8(thumb[i]);
+    }
+
+    for (int i = 0; i < V_SAVEPREVIEW_FOOTER_SIZE; ++i)
+    {
+        saveg_write8(footer[i]);
     }
 }
 
