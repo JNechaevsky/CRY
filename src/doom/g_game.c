@@ -191,7 +191,9 @@ void G_CRL_ChangeGameSpeed (int direction, boolean show_message)
 
     M_snprintf(msg, sizeof(msg), "GAME SPEED: %d%%", game_speed);
     CT_SetMessage(&players[consoleplayer], msg, false, NULL);
-}typedef struct {
+}
+
+typedef struct {
     int *primary;
     int *secondary;
 } weapon_keys_pair_t;
@@ -460,8 +462,8 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
  	
 	// [JN] Deny all player control events while active menu 
 	// in multiplayer to eliminate movement and camera rotation.
- 	if (/*netgame &&*/ menuactive)
- 	return;
+ 	// if (netgame && menuactive)
+ 	// return;
 
  	// RestlessRodent -- If spectating then the player loses all input
  	memmove(&spect, cmd, sizeof(spect));
@@ -1439,8 +1441,8 @@ void G_Ticker (void)
     // Local time
     if (msg_local_time)
     {
-        time_t t = time(NULL);
-        struct tm *tm = localtime(&t);
+        const time_t t = time(NULL);
+        const struct tm *const tm = localtime(&t);
 
         if (msg_local_time == 1)
         {
