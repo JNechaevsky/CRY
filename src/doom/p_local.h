@@ -674,6 +674,7 @@ extern fixed_t   bmaporgy;      // origin of block map
 extern mobj_t  **blocklinks;    // for thing chains
 
 extern const char *level_names[];	// Array of all level names.
+extern const int num_level_names;	// [PN] Its size, for UMAPINFO overrides.
 
 // -----------------------------------------------------------------------------
 // P_SIGHT

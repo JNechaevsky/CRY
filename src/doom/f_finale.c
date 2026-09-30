@@ -29,6 +29,7 @@
 #include "v_video.h"
 #include "z_zone.h"
 #include "f_finale.h"
+#include "g_umapinfo.h"
 
 #include "id_func.h"
 
@@ -63,6 +64,11 @@ static finalestage_t finalestage;
 static unsigned int finalecount;
 static unsigned int finaleendcount;
 
+// [PN] Text to print and whether the roll call follows; resolved from
+// UMAPINFO (intertext/endcast) per level in F_StartFinale().
+static const char *finale_text;
+static boolean     finale_cast_after;
+
 static void F_StartCast (void);
 static void F_CastTicker (void);
 static void F_CastDrawer (void);
@@ -86,9 +92,25 @@ void F_StartFinale (void)
 
 	S_ChangeMusic(mus_map02, true);
 
+    // [PN] UMAPINFO: this level may bring its own ending text and/or cast.
+    // Without UMAPINFO the builtin Jaguar ending (MAP23 + JAGENDING) is used.
+    const umapinfo_map_t *umi = UMAPINFO_GetMap(gamemap);
+
+    finale_text       = (umi && umi->intertext[0]) ? umi->intertext : JAGENDING;
+    finale_cast_after = umi ? (umi->endcast == 1 || gamemap == 23) : (gamemap == 23);
+
+    // endcast without intertext: straight to the roll call.
+    if (umi && umi->endcast == 1 && !umi->intertext[0])
+    {
+        finaleendcount = 0;
+        finalecount = 0;
+        F_StartCast ();
+        return;
+    }
+
 	// [JN] Count intermission/finale text lenght. Once it's fully printed, 
 	// no extra "attack/use" button pressing is needed for skipping.
-	finaleendcount = strlen(JAGENDING) * TEXTSPEED + TEXTEND;
+	finaleendcount = strlen(finale_text) * TEXTSPEED + TEXTEND;
 	finalestage = F_STAGE_TEXT;
 	finalecount = 0;
 }
@@ -171,9 +193,16 @@ void F_Ticker (void)
 
 		if (i < MAXPLAYERS)
 		{
-			if (gamemap == 23) // [JN] Jaguar: final level
+			if (finale_cast_after) // [PN] endcast flag or the builtin MAP23 ending
 			{
 				F_StartCast ();
+			}
+			else
+			{
+				// [PN] intertext without endcast is not the end of the
+				// game: re-arm the world-done action that F_StartFinale
+				// cleared, so G_Ticker loads wminfo.next next tic.
+				gameaction = ga_worlddone;
 			}
 		}
 	}
@@ -206,7 +235,7 @@ static void F_TextWrite (void)
 	// draw some of the text onto the screen
 	cx = 10;
 	cy = 10;
-	ch = JAGENDING;
+	ch = finale_text;
 
 	count = ((signed int) finalecount - 10) / TEXTSPEED;
 

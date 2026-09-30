@@ -64,6 +64,7 @@
 // SKY handling - still the wrong place.
 
 #include "g_game.h"
+#include "g_umapinfo.h"
 
 #include "id_vars.h"
 #include "id_func.h"
@@ -880,28 +881,34 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
 // [JN] CRY: define sky textures with optional emulation. Jaguar skies are:
 // AREA 17 (Hell Keep) is using Deimos sky.
 // AREA 24 (Military base) is using hellish sky.
+// [PN] The per-episode defaults below are now only a fallback: UMAPINFO
+// (skytexture / skytexture2 / skyscrollspeed) overrides each field for the
+// current map when present, so PWADs without the lump keep classic skies.
 // -----------------------------------------------------------------------------
 
 void G_InitSkyTextures (void)
 {
-    if (gamemap < 9 || (!emu_jaguar_skies && gamemap == 24))
+    const char *sky1  = (gamemap < 9)  ? "SKY1_1" : (gamemap < 18) ? "SKY2_1" : "SKY3_1";
+    const char *sky2  = (gamemap < 9)  ? "SKY1_2" : (gamemap < 18) ? "SKY2_2" : "SKY3_2";
+    int         speed = (gamemap < 9)  ? 40       : (gamemap < 18) ? 60       : 75;
+
+    const umapinfo_map_t *umi = UMAPINFO_GetMap(gamemap);
+
+    if (umi)
     {
-        skytexture = R_TextureNumForName("SKY1_1");
-        skytexture2 = R_TextureNumForName("SKY1_2");
-        skyscrollspeed = 40; // slow for Phobos levels
+        if (umi->sky1[0])
+            sky1 = umi->sky1;
+
+        if (umi->sky2[0])
+            sky2 = umi->sky2;
+
+        if (umi->speed >= 0)
+            speed = umi->speed;
     }
-    else if (gamemap < (emu_jaguar_skies ? 18 : 17))
-    {
-        skytexture = R_TextureNumForName("SKY2_1");
-        skytexture2 = R_TextureNumForName("SKY2_2");
-        skyscrollspeed = 60; // Middle for Deimos levels
-    }
-    else
-    {
-        skytexture = R_TextureNumForName("SKY3_1");
-        skytexture2 = R_TextureNumForName("SKY3_2");
-        skyscrollspeed = 75; // Fast for Hellish levels
-    }
+
+    skytexture     = R_TextureNumForName(sky1);
+    skytexture2    = R_TextureNumForName(sky2);
+    skyscrollspeed = speed;
 }
 
 //
@@ -1622,6 +1629,11 @@ void G_DoCompleted (void)
 			// Secret exit from Toxin Refinery (3) to Military Base (24-1)
 			case 3:  wminfo.next = 23;
 			break;
+
+			// [PN] Secret exit taken but no secret destination defined:
+			// advance normally (previously wminfo.next was left stale here).
+			default: wminfo.next = gamemap;
+			break;
 		}
 	}
 	else
@@ -1635,6 +1647,19 @@ void G_DoCompleted (void)
 			default: wminfo.next = gamemap;
 		}
 	}
+
+    // [PN] UMAPINFO routing wins over the builtin shortcuts above. Per the
+    // spec, a secret exit without nextsecret falls back to next.
+    const umapinfo_map_t *umi = UMAPINFO_GetMap(gamemap);
+
+    if (umi)
+    {
+        const int dest = secretexit && umi->nextsecret >= 0
+                       ? umi->nextsecret : umi->next;
+
+        if (dest >= 0 && dest < num_level_names)
+            wminfo.next = dest;
+    }
 
 	wminfo.maxkills = totalkills; 
 	wminfo.maxitems = totalitems; 
@@ -1674,8 +1699,12 @@ void G_WorldDone (void)
     if (secretexit) 
 	players[consoleplayer].didsecret = true; 
 
-    if (gamemap == 23)
-	F_StartFinale ();
+    // [PN] The builtin Jaguar ending is MAP23; UMAPINFO lets any map end
+    // with a text screen (intertext) and/or the roll call (endcast).
+    const umapinfo_map_t *const umi = UMAPINFO_GetMap(gamemap);
+
+    if (gamemap == 23 || (umi && (umi->intertext[0] || umi->endcast == 1)))
+        F_StartFinale ();
 } 
  
 void G_DoWorldDone (void) 

@@ -49,6 +49,7 @@
 #include "i_joystick.h"
 #include "i_system.h"
 #include "g_game.h"
+#include "g_umapinfo.h"
 #include "wi_stuff.h"
 #include "st_bar.h"
 #include "am_map.h"
@@ -667,6 +668,9 @@ void D_DoomMain (void)
 
     // Generate the WAD hash table.  Speed things up a bit.
     W_GenerateHashTable();
+
+    // [PN] Apply UMAPINFO overrides (levelname et al.), if the lump exists.
+    UMAPINFO_Parse();
 
     // [JN] Set the default directory where savegames are saved.
     savegamedir = M_GetSaveGameDir("cry.wad");

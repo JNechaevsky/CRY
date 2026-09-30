@@ -109,6 +109,9 @@ boolean     playerstartsingame[MAXPLAYERS];
 
 // -----------------------------------------------------------------------------
 // [JN] Builtin map names. Set for automap and intermission screen.
+// [PN] The array of pointers is writable on purpose: UMAPINFO_Parse()
+// (g_umapinfo.c) may redirect entries to strings parsed from the UMAPINFO
+// lump. num_level_names keeps that override logic in sync with the size.
 // -----------------------------------------------------------------------------
 
 // Array holding all level names.
@@ -141,6 +144,8 @@ const char* level_names[] =
 	// "Fortress of Mystery",
 	// "Warrens",
 };
+
+const int num_level_names = sizeof(level_names) / sizeof(level_names[0]);
 
 // -----------------------------------------------------------------------------
 // P_LoadVertexes

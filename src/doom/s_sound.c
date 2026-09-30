@@ -35,6 +35,7 @@
 #include "m_argv.h"
 
 #include "p_local.h"
+#include "g_umapinfo.h"
 #include "w_wad.h"
 #include "z_zone.h"
 
@@ -746,6 +747,29 @@ void S_SetSfxVolume(int volume)
 // Starts some music with the music id found in sounds.h.
 //
 
+// [PN] UMAPINFO music override for the current map (the level being played
+// or, in Jaguar mode, just finished). Returns true and fills namebuf when
+// the map has a music key whose lump exists; a bogus name warns and falls
+// back to the builtin logic instead of killing startup.
+static boolean S_UMapInfoMusic (char *namebuf, size_t size)
+{
+    const umapinfo_map_t *const umi = UMAPINFO_GetMap(gamemap);
+
+    if (umi && umi->music[0])
+    {
+        if (W_CheckNumForName(umi->music) >= 0)
+        {
+            M_snprintf(namebuf, size, "%s", umi->music);
+            return true;
+        }
+
+        printf("S_ChangeMusic: UMAPINFO music lump '%s' not found, "
+               "using default\n", umi->music);
+    }
+
+    return false;
+}
+
 void S_ChangeMusic(int musicnum, int looping)
 {
     musicinfo_t *music = NULL;
@@ -791,7 +815,11 @@ void S_ChangeMusic(int musicnum, int looping)
             }
             else
             {
-                M_snprintf(namebuf, sizeof(namebuf), "m_%s", music->name);
+                // [PN] UMAPINFO music first; classic m_<name> as fallback.
+                if (!S_UMapInfoMusic(namebuf, sizeof(namebuf)))
+                {
+                    M_snprintf(namebuf, sizeof(namebuf), "m_%s", music->name);
+                }
                 music->lumpnum = W_GetNumForName(namebuf);
             }
         break;
@@ -799,13 +827,19 @@ void S_ChangeMusic(int musicnum, int looping)
         case GS_INTERMISSION:
             if (emu_jaguar_music)
             {
-                const int jag_intermusic[] =
+                // [PN] On the console the finished level's own track plays
+                // over the stats; UMAPINFO music provides it per map. The
+                // theme table below stays as the no-UMAPINFO fallback.
+                if (!S_UMapInfoMusic(namebuf, sizeof(namebuf)))
                 {
-                    1, 2, 4, 6, 9, 10, 11, 14, 16, 17,
-                    1, 2, 4, 6, 9, 10, 11, 14, 16, 17,
-                    1, 2, 4, 6, 6
-                };
-                M_snprintf(namebuf, sizeof(namebuf), "m_map%02d", jag_intermusic[gamemap]);
+                    const int jag_intermusic[] =
+                    {
+                        1, 2, 4, 6, 9, 10, 11, 14, 16, 17,
+                        1, 2, 4, 6, 9, 10, 11, 14, 16, 17,
+                        1, 2, 4, 6, 6
+                    };
+                    M_snprintf(namebuf, sizeof(namebuf), "m_map%02d", jag_intermusic[gamemap]);
+                }
             }
             else
             {
