@@ -1680,7 +1680,10 @@ void G_DoCompleted (void)
     // value; so our total is compatible with the "naive" total of just adding
     // the times in seconds shown for each level. Also means our total time
     // will agree with Compet-n.
-    wminfo.totaltimes = (totalleveltimes += (leveltime - leveltime % TICRATE));
+    // [PN] CRY accumulates full ticks instead: the Jaguar port has no
+    // Compet-n to agree with, and the intermission now shows real
+    // centiseconds in the Total line. Consumers all divide by TICRATE themselves.
+    wminfo.totaltimes = (totalleveltimes += leveltime);
 
     gamestate = GS_INTERMISSION; 
     automapactive = false; 

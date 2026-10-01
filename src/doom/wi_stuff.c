@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 #include "doomstat.h"
+#include "ct_chat.h"
 #include "g_game.h"
 #include "i_swap.h"
 #include "mn_menu.h"
@@ -136,9 +137,12 @@ static void WI_drawPercent (int x, int y, int p)
 // -----------------------------------------------------------------------------
 // WI_drawTime
 // Display level completion time and par, or "sucks" message if overflow.
+// [PN] "t" is the animated seconds; ticks is the exact raw time in ticks.
+// A rightmost ".SS" group shows centiseconds - at .00 while the seconds
+// count runs, the exact fraction once it settles.
 // -----------------------------------------------------------------------------
 
-static void WI_drawTime (int x, int y, int t, boolean suck)
+static void WI_drawTime (int x, int y, int t, int ticks, boolean suck)
 {
 	int div;
 	int n;
@@ -148,6 +152,20 @@ static void WI_drawTime (int x, int y, int t, boolean suck)
 
 	if (t <= 61*59 || !suck)
 	{
+		// [PN] Rounding to hundredths: TICRATE = 35, so 1 tick is ~2.857 cs.
+		const int rem  = (t == ticks / TICRATE) ? ticks % TICRATE : 0;
+		const int csec = (rem * 200 + TICRATE) / (2 * TICRATE);
+
+		// Centiseconds group sits at the far right.
+		x = WI_drawNum(x, y, csec, 2);
+
+		// Period: HU font dot, baseline-aligned with the big digits.
+		patch_t *const dot = hu_font_b['.' - HU_FONTSTART2];
+
+		x -= SHORT(dot->width);
+		V_DrawShadowedPatchOptional(x,
+		    y + (SHORT(num[0]->height) - SHORT(dot->height)), dot);
+
 		div = 1;
 
 		do
@@ -327,12 +345,12 @@ static void WI_drawStats (void)
 
 	// Time
 	M_WriteTextBig(74, 111, "Time", NULL);
-	WI_drawTime(ORIGWIDTH - SP_STATSX, 114, cnt_ltime, true);
+	WI_drawTime(ORIGWIDTH - SP_STATSX, 114, cnt_ltime, plrs[me].stime, true);
 
 	// Total time. Show total time only after level time is counted.
 	M_WriteTextBig(59, 129, "Total", NULL);
 	if (cnt_ltime == plrs[me].stime / TICRATE)
-	WI_drawTime(ORIGWIDTH - SP_STATSX, 132, cnt_ttime, false);
+	WI_drawTime(ORIGWIDTH - SP_STATSX, 132, cnt_ttime, wbs->totaltimes, false);
 
 	// Draws which level you are entering...
 	// Don't draw "Entering Military Base" after finishing map 23.
