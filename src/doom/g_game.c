@@ -1287,6 +1287,25 @@ static void G_ReadGameParms (void)
     nomonsters = M_CheckParm ("-nomonsters");
 }
  
+// -----------------------------------------------------------------------------
+// G_FormatTimeCS
+//  [PN] Formats a tick count as MM:SS.CS, widening to HH:MM:SS.CS only once
+//  the elapsed time reaches an hour.
+// -----------------------------------------------------------------------------
+
+static void G_FormatTimeCS (char *const buf, size_t size, int ticks)
+{
+	const int hours = ticks / (3600 * TICRATE);
+	const int mins  = (ticks / (60 * TICRATE)) % 60;
+	const int sec   = (ticks / TICRATE) % 60;
+	const int csec  = (((ticks % TICRATE) * 200) + TICRATE) / (2 * TICRATE);
+
+	if (hours)
+		M_snprintf(buf, size, "%02d:%02d:%02d.%02d", hours, mins, sec, csec);
+	else
+		M_snprintf(buf, size, "%02d:%02d.%02d", mins, sec, csec);
+}
+
 //
 // G_Ticker
 // Make ticcmd_ts for the players.
@@ -1432,18 +1451,12 @@ void G_Ticker (void)
     // Level timer
     if (widget_time)
     {
-        const int time = leveltime / TICRATE;
-    
-        M_snprintf(ID_Level_Time, sizeof(ID_Level_Time),
-                   "%02d:%02d:%02d", time/3600, (time%3600)/60, time%60);
+        G_FormatTimeCS(ID_Level_Time, sizeof(ID_Level_Time), leveltime);
     }
     // Total time
     if (widget_totaltime)
     {
-        const int totaltime = (totalleveltimes / TICRATE) + (leveltime / TICRATE);
-
-        M_snprintf(ID_Total_Time, sizeof(ID_Total_Time),
-                   "%02d:%02d:%02d", totaltime/3600, (totaltime%3600)/60, totaltime%60);
+        G_FormatTimeCS(ID_Total_Time, sizeof(ID_Total_Time), totalleveltimes + leveltime);
     }
     // Local time
     if (msg_local_time)
