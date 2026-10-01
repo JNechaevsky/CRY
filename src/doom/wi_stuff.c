@@ -162,9 +162,8 @@ static void WI_drawTime (int x, int y, int t, int ticks, boolean suck)
 		// Period: HU font dot, baseline-aligned with the big digits.
 		patch_t *const dot = hu_font_b['.' - HU_FONTSTART2];
 
-		x -= SHORT(dot->width);
-		V_DrawShadowedPatchOptional(x,
-		    y + (SHORT(num[0]->height) - SHORT(dot->height)), dot);
+		x -= SHORT(dot->width + 1);
+		V_DrawShadowedPatchOptional(x, y, dot);
 
 		div = 1;
 
