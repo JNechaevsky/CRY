@@ -12,6 +12,7 @@ add_library(doom STATIC
             f_finale.c      f_finale.h
             f_wipe.c        f_wipe.h
             g_game.c        g_game.h
+            g_rewind.c      g_rewind.h
             g_umapinfo.c    g_umapinfo.h
             info.c          info.h
             jagcry.c        jagcry.h

@@ -65,6 +65,7 @@
 
 #include "g_game.h"
 #include "g_umapinfo.h"
+#include "g_rewind.h"
 
 #include "id_vars.h"
 #include "id_func.h"
@@ -1076,6 +1077,13 @@ boolean G_Responder (event_t* ev)
 	return false; 
     } 
 
+    if (ev->type == ev_keydown
+     && (ev->data1 == key_rewind || ev->data1 == key_rewind2))
+    {
+        G_Rewind();
+        return true;
+    }
+
     if (gamestate == GS_LEVEL) 
     { 
 	if (ST_Responder (ev)) 
@@ -1344,6 +1352,9 @@ void G_Ticker (void)
 	  case ga_savegame: 
 	    G_DoSaveGame (); 
 	    break; 
+	  case ga_rewind:
+	    G_LoadAutoKeyframe();
+	    break;
 	  case ga_completed: 
 	    G_DoCompleted (); 
 	    break; 
@@ -1415,7 +1426,7 @@ void G_Ticker (void)
 	P_Ticker (); 
 	ST_Ticker (); 
 	AM_Ticker (); 
-
+	G_SaveAutoKeyframe ();
 	// [JN] Gather target's health for widget and/or crosshair.
 	if (widget_health || (xhair_draw && xhair_color > 1))
 	{
@@ -1728,6 +1739,7 @@ void G_DoWorldDone (void)
     idmusnum = -1;  // [JN] jff 3/17/98 allow new level's music to be loaded
     gamestate = GS_LEVEL; 
     gamemap = wminfo.next+1; 
+    G_ResetRewind(false);
     G_DoLoadLevel (); 
     gameaction = ga_nothing; 
     AM_clearMarks();  // [JN] jff 4/12/98 clear any marks on the automap
@@ -1957,6 +1969,7 @@ void G_DoNewGame (void)
     nomonsters = false;
     */
     consoleplayer = 0;
+    G_ResetRewind(true);
     G_InitNew (d_skill, d_episode, d_map); 
     gameaction = ga_nothing; 
 } 

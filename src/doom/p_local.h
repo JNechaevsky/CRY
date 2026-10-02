@@ -616,10 +616,15 @@ extern fixed_t bulletslope;
 // maximum size of a savegame description
 #define SAVESTRINGSIZE  24
 
+
 extern boolean  P_ReadSaveGameEOF(void);
 extern boolean  P_ReadSaveGameHeader(void);
 extern char    *P_SaveGameFile(int slot);
 extern char    *P_TempSaveGameFile(void);
+extern boolean  P_CloseMemorySaveGame(byte **data, size_t *len);
+extern void     P_CloseMemoryLoadGame(void);
+extern void     P_OpenMemoryLoadGame(byte *data, size_t len);
+extern void     P_OpenMemorySaveGame(void);
 extern void     P_ArchiveAutomap (void);
 extern void     P_ArchivePlayers (void);
 extern void     P_ArchiveOldSpecials (void);
