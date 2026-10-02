@@ -74,40 +74,12 @@ typedef PACKED_STRUCT (
 ===================
 */
 // [crispy] add support for ANIMATED lumps
-// [JN] TODO - remove support for ANIMATED
 animdef_t		animdefs_vanilla[] =
 {
-	{true,	"BFALL4",	"BFALL1",	8},
-	{true,	"FLAME03",	"FLAME01",	8},
-	{true,	"TVSNOW03",	"TVSNOW01",	4},
-
-	{false,	"BLOOD3",	"BLOOD1",	8},
-	{false,	"BSLIME01",	"BSLIME01",	8},
-	{false,	"CSLIME04",	"CSLIME01",	8},
-	{false,	"FWATER4",	"FWATER1",	8},
-	{false,	"GLOW04",	"GLOW01",	8},
-	{false,	"LAVA4",	"LAVA1",	8},
 	{false,	"NUKAGE3",	"NUKAGE1",	8},
-	
-    {-1,        "",             "",             0},
-};
-
-// [JN] Same sequences with swirling liquids.
-static animdef_t animdefs_swirling[] =
-{
-	{true,	"BFALL4",	"BFALL1",	8},
-	{true,	"FLAME03",	"FLAME01",	8},
-	{true,	"TVSNOW03",	"TVSNOW01",	4},
-
-	{false,	"BLOOD3",	"BLOOD1",	65537},
-	{false,	"BSLIME01",	"BSLIME01",	65537},
-	{false,	"CSLIME04",	"CSLIME01",	65539},
-	{false,	"FWATER4",	"FWATER1",	65536},
-	{false,	"GLOW04",	"GLOW01",	8},
-	{false,	"LAVA4",	"LAVA1",	65538},
-	{false,	"NUKAGE3",	"NUKAGE1",	65537},
-	
-    {-1,    "",         "",         0},
+	{false,	"FWATER4",	"FWATER1",	8},
+	{false,	"LAVA4",	"LAVA1",	8},
+	{-1,	"",	"",	0},
 };
 
 // [crispy] remove MAXANIMS limit
@@ -130,9 +102,19 @@ void P_InitPicAnims (void)
 {
     int		i;
     boolean init_swirl = false;
-    animdef_t *animdefs;
 
-	animdefs = vis_swirling_liquids ? animdefs_swirling : animdefs_vanilla;
+    // [crispy] add support for ANIMATED lumps
+    animdef_t *animdefs;
+    const boolean from_lump = (W_CheckNumForName("ANIMATED") != -1);
+
+    if (from_lump)
+    {
+	animdefs = W_CacheLumpName("ANIMATED", PU_STATIC);
+    }
+    else
+    {
+	animdefs = animdefs_vanilla;
+    }
     
     //	Init animation
     lastanim = anims;
@@ -172,7 +154,14 @@ void P_InitPicAnims (void)
 
 	lastanim->istexture = animdefs[i].istexture;
 	lastanim->numpics = lastanim->picnum - lastanim->basepic + 1;
-	lastanim->speed = animdefs[i].speed;
+	// [JN] Inject swirling speeds.
+	if (vis_swirling_liquids)
+	{
+		animdefs[0].speed = 65537; // NUKAGE
+		animdefs[1].speed = 65536; // FWATER
+		animdefs[2].speed = 65538; // LAVA
+	}
+	lastanim->speed = from_lump ? LONG(animdefs[i].speed) : animdefs[i].speed;
 
 	// [crispy] add support for SMMU swirling flats
 	if (lastanim->speed > 65535 || lastanim->numpics == 1)
@@ -191,6 +180,11 @@ void P_InitPicAnims (void)
 	lastanim++;
     }
 	
+    if (from_lump)
+    {
+	W_ReleaseLumpName("ANIMATED");
+    }
+
     if (init_swirl)
     {
 	R_InitDistortedFlats();
