@@ -1013,15 +1013,15 @@ static void M_DrawScrollPages (int x, int y, int itemOnGlow, const char *pagenum
 
 static menuitem_t ID_Menu_Main[]=
 {
-    { M_SWTC, "Video",       M_Choose_ID_Video,    'v' },
-    { M_SWTC, "Display",     M_Choose_ID_Display,  'd' },
-    { M_SWTC, "Audio",       M_Choose_ID_Sound,    'a' },
-    { M_SWTC, "Controls",    M_Choose_ID_Controls, 'c' },
-    { M_SWTC, "Widgets",     M_Choose_ID_Widgets,  'w' },
-    { M_SWTC, "Automap",     M_Choose_ID_Automap,  'a' },
-    { M_SWTC, "Gameplay",    M_Choose_ID_Gameplay, 'g' },
-    { M_SWTC, "End Game",    M_EndGame,            'e' },
-    { M_SWTC, "Reset",       M_Choose_ID_Reset,    'r' },
+    { M_SWTC, "VIDEO OPTIONS",     M_Choose_ID_Video,    'v' },
+    { M_SWTC, "DISPLAY OPTIONS",   M_Choose_ID_Display,  'd' },
+    { M_SWTC, "SOUND OPTIONS",     M_Choose_ID_Sound,    's' },
+    { M_SWTC, "CONTROL SETTINGS",  M_Choose_ID_Controls, 'c' },
+    { M_SWTC, "WIDGETS SETTINGS",  M_Choose_ID_Widgets,  'w' },
+    { M_SWTC, "AUTOMAP SETTINGS",  M_Choose_ID_Automap,  'a' },
+    { M_SWTC, "GAMEPLAY FEATURES", M_Choose_ID_Gameplay, 'g' },
+    { M_SWTC, "END GAME",          M_EndGame,            'e' },
+    { M_SWTC, "RESET SETTINGS",    M_Choose_ID_Reset,    'r' },
 };
 
 static menu_t ID_Def_Main =
@@ -1030,9 +1030,9 @@ static menu_t ID_Def_Main =
     &MainDef,
     ID_Menu_Main,
     M_Draw_ID_Main,
-    97, 16/*ID_MENU_TOPOFFSET*/,
+    ID_MENU_LEFTOFFSET_SML, ID_MENU_TOPOFFSET,
     0,
-    false, false, false,
+    true, false, false,
 };
 
 static void M_Choose_ID_Main (int choice)
@@ -1042,7 +1042,7 @@ static void M_Choose_ID_Main (int choice)
 
 static void M_Draw_ID_Main (void)
 {
-    M_WriteTextBigCentered(1, "Options", cr[CR_YELLOW]);
+    M_WriteTextCentered(9, "OPTIONS", cr[CR_YELLOW]);
 }
 
 // -----------------------------------------------------------------------------
@@ -4537,18 +4537,18 @@ static void M_DrawSaveLoadBottomLine (void)
 
     if (savepage > 0)
     {
-        M_WriteText(LoadDef.x, 151, "< PGUP", cr[CR_MENU_DARK2]);
+        M_WriteText(LoadDef.x, 152, "< PGUP", cr[CR_MENU_DARK2]);
     }
     if (savepage < savepage_max)
     {
-        M_WriteText(LoadDef.x+(SAVESTRINGSIZE-8)*8, 151, "PGDN >", cr[CR_MENU_DARK2]);
+        M_WriteText(LoadDef.x+(SAVESTRINGSIZE-8)*8, 152, "PGDN >", cr[CR_MENU_DARK2]);
     }
 
     M_snprintf(pagestr, sizeof(pagestr), "PAGE %d/%d", savepage + 1, savepage_max + 1);
 
     // [PN] Keep PAGE label aligned with Save/Load list shift (base x was 67).
     M_WriteText(ORIGWIDTH / 2 + (LoadDef.x - 76) - M_StringWidth(pagestr) / 2,
-                151, pagestr, cr[CR_MENU_DARK1]);
+                152, pagestr, cr[CR_MENU_DARK1]);
 
     // [JN] Print "modified" (or created initially) time of savegame file.
     if (itemOn >= 0 && itemOn < load_end && LoadMenu[itemOn].status)
