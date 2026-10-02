@@ -343,11 +343,11 @@ static void WI_drawStats (void)
 	WI_drawPercent(ORIGWIDTH - SP_STATSX, 87, cnt_scrts);
 
 	// Time
-	M_WriteTextBig(74, 111, "Time", NULL);
+	M_WriteTextBig(74, 114, "Time", NULL);
 	WI_drawTime(ORIGWIDTH - SP_STATSX, 114, cnt_ltime, plrs[me].stime, true);
 
 	// Total time. Show total time only after level time is counted.
-	M_WriteTextBig(59, 129, "Total", NULL);
+	M_WriteTextBig(59, 132, "Total", NULL);
 	if (cnt_ltime == plrs[me].stime / TICRATE)
 	WI_drawTime(ORIGWIDTH - SP_STATSX, 132, cnt_ttime, wbs->totaltimes, false);
 
