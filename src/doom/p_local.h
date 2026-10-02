@@ -737,6 +737,7 @@ typedef struct
 {
     char  name1[9];
     char  name2[9];
+    short episode;
 } switchlist_t;
 
 typedef enum
@@ -759,7 +760,8 @@ extern void P_ChangeSwitchTexture (line_t *line, int useAgain);
 extern void P_InitSwitchList (void);
 extern void P_StartButton (line_t *line, bwhere_e w, int texture, int time);
 
-extern button_t buttonlist[MAXBUTTONS];	
+extern button_t *buttonlist;	
+extern int       maxbuttons;
 
 // -----------------------------------------------------------------------------
 // P_TELEPT
