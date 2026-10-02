@@ -4280,7 +4280,6 @@ static void M_ID_ApplyResetHook (void)
     emu_jaguar_music = 0;
     emu_jaguar_alert = 1;
     emu_jaguar_explosion = 1;
-    emu_jaguar_skies = 1;
 
     // Compatibility-breaking
     compat_vertical_aiming = 0;
