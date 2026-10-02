@@ -1170,8 +1170,9 @@ static void M_Draw_ID_Video_1 (void)
     // Screen wipe effect
     sprintf(str, vid_screenwipe == 1 ? "LOADING" :
                  vid_screenwipe == 2 ? "MELT" :
-                 vid_screenwipe == 3 ? "CROSSFADE" :
-                 vid_screenwipe == 4 ? "FIZZLE" : "OFF");
+                 vid_screenwipe == 3 ? "FAST MELT" :
+                 vid_screenwipe == 4 ? "CROSSFADE" :
+                 vid_screenwipe == 5 ? "FIZZLE" : "OFF");
     M_WriteTextGlow(M_ItemRightAlign(str), 90, str,
                         vid_screenwipe == 1 ? cr[CR_DARKRED] : cr[CR_GREEN],
                             vid_screenwipe == 1 ? cr[CR_RED_BRIGHT] : cr[CR_GREEN_BRIGHT],
@@ -1182,13 +1183,14 @@ static void M_Draw_ID_Video_1 (void)
     {
         char  width[8];
         char  height[8];
-        const char *resolution;
+        char *resolution;
 
         M_snprintf(width, 8, "%d", (ORIGWIDTH + (WIDESCREENDELTA*2)) * vid_resolution);
         M_snprintf(height, 8, "%d", (ORIGHEIGHT * vid_resolution));
         resolution = M_StringJoin("CURRENT RESOLUTION: ", width, "x", height, NULL);
 
         M_WriteTextCentered(103, resolution, cr[CR_LIGHTGRAY_DARK]);
+        free(resolution);
     }
 
     // < Scroll pages >
@@ -1344,7 +1346,7 @@ static void M_ID_PixelScaling (int choice)
 
 static void M_ID_ScreenWipe (int choice)
 {
-    vid_screenwipe = M_INT_Slider(vid_screenwipe, 0, 4, choice, false);
+    vid_screenwipe = M_INT_Slider(vid_screenwipe, 0, 5, choice, false);
 }
 
 // -----------------------------------------------------------------------------

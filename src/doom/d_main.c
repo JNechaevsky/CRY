@@ -182,17 +182,17 @@ static void R_CleanShotHook (void)
 
 static void D_Display (void)
 {
+    if (nodrawers)
+    {
+        return;  // for comparative timing / profiling
+    }
+
     int      nowtime;
     int      tics;
     int      wipestart;
     boolean  done;
     boolean  wipe;
     static   gamestate_t oldgamestate = -1;
-
-    if (nodrawers)
-    {
-        return;  // for comparative timing / profiling
-    }
 
     // [crispy] post-rendering function pointer to apply config changes
     // that affect rendering and that are better applied after the current
@@ -357,7 +357,7 @@ static void D_Display (void)
         // [JN] Handle centered player messages.
         ID_DrawMessageCentered();
 
-        // menus go directly to the screen
+        // menu is drawn even on top of everything
         M_Drawer();
     }
 
@@ -391,18 +391,29 @@ static void D_Display (void)
 
     do
     {
-        do
+        if (vid_uncapped_fps && vid_screenwipe > 0 && (vid_screenwipe == 2 || vid_screenwipe == 3))
         {
             nowtime = I_GetTime ();
             tics = nowtime - wipestart;
-            I_Sleep(1);
-        } while (tics <= 0);
+
+            // [PN] Allow sub-tic melt rendering via fractionaltic interpolation.
+            I_UpdateFracTic();
+        }
+        else
+        {
+            do
+            {
+                nowtime = I_GetTime ();
+                tics = nowtime - wipestart;
+                I_Sleep(1);
+            } while (tics <= 0);
+        }
 
         wipestart = nowtime;
         done = wipe_ScreenWipe(tics);
         M_Drawer();        // menu is drawn even on top of wipes
         I_FinishUpdate();  // page flip or blit buffer
-        } while (!done);
+    } while (!done);
 }
 
 //

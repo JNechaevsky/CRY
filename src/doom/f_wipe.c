@@ -13,18 +13,21 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-
+// DESCRIPTION:
+//	Mission begin melt/wipe screen special effect.
+//
 
 #include <stdlib.h>
 #include <string.h>
+
 #include "z_zone.h"
 #include "i_system.h" // I_Realloc
 #include "i_video.h"
 #include "v_trans.h" // [crispy] blending functions
 #include "v_video.h"
-#include "m_random.h"
 #include "st_bar.h"
 #include "f_wipe.h"
+#include "m_random.h"
 
 #include "id_vars.h"
 
@@ -37,13 +40,16 @@ static pixel_t *wipe_scr_start;
 static pixel_t *wipe_scr_end;
 static pixel_t *wipe_scr;
 static int     *y;
+static int     *y_prev;
+static int      wipe_columns;
 
-// [JN] Function pointers to different wipe effects.
+// [JN] Function pointers to melt and crossfade effects.
 static void (*wipe_init) (void);
-static boolean (*wipe_do) (int ticks);
+static const int (*wipe_do) (int ticks);
 
 // [crispy] Additional fail-safe counter for performing crossfade effect.
 static int fade_counter;
+
 
 // -----------------------------------------------------------------------------
 // wipe_EnsureBuffers
@@ -53,7 +59,9 @@ static int fade_counter;
 static void wipe_EnsureBuffers (void)
 {
     static size_t wipe_capacity = 0;
+    static size_t wipe_columns_capacity = 0;
     const size_t need_area = (size_t)SCREENAREA;
+    const size_t need_columns = (size_t)SCREENWIDTH;
 
     if (need_area > wipe_capacity)
     {
@@ -62,12 +70,17 @@ static void wipe_EnsureBuffers (void)
         y              =     (int *)I_Realloc(y, need_area * sizeof(*y));
         wipe_capacity  = need_area;
     }
+
+    if (need_columns > wipe_columns_capacity)
+    {
+        y_prev = (int *)I_Realloc(y_prev, need_columns * sizeof(*y_prev));
+        wipe_columns_capacity = need_columns;
+    }
 }
 
-
-// =============================================================================
-// Loading
-// =============================================================================
+// -----------------------------------------------------------------------------
+// wipe_initLoading
+// -----------------------------------------------------------------------------
 
 static void wipe_initLoading (void)
 {
@@ -76,27 +89,20 @@ static void wipe_initLoading (void)
     fade_counter = 28;
 }
 
-static boolean wipe_doLoading (int ticks)
-{
-    boolean	done = true;
-
-    if (--fade_counter > 0)
-    {
-        done = false;
-    }
-
-    V_DrawPatch(132, 72, W_CacheLumpName("LOADING", PU_CACHE));
-    st_fullupdate = true;
-
-    return done;
-}
-
-// =============================================================================
-// Melt
-// =============================================================================
+// -----------------------------------------------------------------------------
+// wipe_initMelt
+// -----------------------------------------------------------------------------
 
 static void wipe_initMelt (void)
 {
+    const int scale = (vid_resolution > 0) ? vid_resolution : 1;
+
+    wipe_columns = SCREENWIDTH / (2 * scale);
+    if (wipe_columns < 1)
+    {
+        wipe_columns = 1;
+    }
+
     // copy start screen to main screen
     memcpy(wipe_scr, wipe_scr_start, SCREENAREA*sizeof(*wipe_scr));
 
@@ -104,9 +110,9 @@ static void wipe_initMelt (void)
     // (y<0 => not ready to scroll yet)
     y[0] = -(ID_RealRandom()%16);
 
-    for (int i = 1 ; i < SCREENWIDTH ; i++)
+    for (int i = 1 ; i < wipe_columns ; i++)
     {
-        const int r = (ID_RealRandom()%3) - 1;
+        int r = (ID_RealRandom()%3) - 1;
 
         y[i] = y[i-1] + r;
 
@@ -120,68 +126,13 @@ static void wipe_initMelt (void)
             y[i] = -15;
         }
     }
+
+    memcpy(y_prev, y, wipe_columns * sizeof(*y_prev));
 }
 
-static boolean wipe_doMelt (int ticks)
-{
-    int dy;
-    const int width = SCREENWIDTH / 2;
-    const int sh    = SCREENHEIGHT;
-
-    boolean done = true;
-
-    while (ticks--)
-    {
-        for (int i = 0; i < width; i++)
-        {
-            if (y[i] < 0)
-            {
-                y[i]++; done = false;
-            }
-            else if (y[i] < SCREENHEIGHT)
-            {
-                dy = (y[i] < 16) ? y[i] + 1 : (8 * vid_resolution);
-                if (y[i] + dy >= SCREENHEIGHT)
-                    dy = SCREENHEIGHT - y[i];
-
-                const int yold = y[i];
-                const int ynew = yold + dy;
-
-                // falling part from the end screen, and the area below the
-                // falling edge from the start screen, for both physical columns.
-                for (int c = 2 * i; c < 2 * i + 2 && c < SCREENWIDTH; c++)
-                {
-                    pixel_t       *scr    = wipe_scr       + (size_t)c * sh;
-                    const pixel_t *colend = wipe_scr_end   + (size_t)c * sh;
-                    const pixel_t *colsta = wipe_scr_start + (size_t)c * sh;
-
-                    // rows [yold, yold+dy) <- end screen
-                    memcpy(scr + yold, colend + yold,
-                           (size_t)dy * sizeof(pixel_t));
-                    // rows [ynew, SCREENHEIGHT) <- start screen top
-                    memcpy(scr + ynew, colsta,
-                           (size_t)(SCREENHEIGHT - ynew) * sizeof(pixel_t));
-                }
-
-                y[i] = ynew;
-                done = false;
-            }
-        }
-    }
-
-    return done;
-}
-
-// =============================================================================
-// Crossfade
-// =============================================================================
-
-static const uint8_t alpha_table[] = {
-      0,   8,  16,  24,  32,  40,  48,  56,
-     64,  72,  80,  88,  96, 104, 112, 120,
-    128, 136, 144, 152, 160, 168, 176, 184,
-    192, 200, 208, 216, 224, 232, 240, 248,
-};
+// -----------------------------------------------------------------------------
+// wipe_initCrossfade
+// -----------------------------------------------------------------------------
 
 static void wipe_initCrossfade (void)
 {
@@ -192,37 +143,9 @@ static void wipe_initCrossfade (void)
     fade_counter = 32;
 }
 
-static boolean wipe_doCrossfade (int ticks)
-{
-    pixel_t   *cur_screen = wipe_scr;
-    pixel_t   *end_screen = wipe_scr_end;
-    const int  pix = SCREENAREA;
-    boolean changed = false;
-
-    // [crispy] reduce fail-safe crossfade counter tics
-    if (--fade_counter > 0)
-    {
-        // [JN] Keep solid background to prevent blending with empty space.
-        V_DrawBlock(0, 0, SCREENWIDTH, SCREENHEIGHT, wipe_scr_start);
-
-        for (int i = pix; i > 0; i--)
-        {
-            if (*cur_screen != *end_screen && fade_counter)
-            {
-                changed = true;
-                *cur_screen = I_BlendOver_32(*end_screen, *cur_screen, alpha_table[fade_counter]);
-            }
-            ++cur_screen;
-            ++end_screen;
-        }
-    }
-
-    return !changed;
-}
-
-// =============================================================================
-// [PN] Fizzle
-// =============================================================================
+// -----------------------------------------------------------------------------
+// [PN] wipe_initFizzle
+// -----------------------------------------------------------------------------
 
 static void wipe_initFizzle (void)
 {
@@ -255,10 +178,223 @@ static void wipe_initFizzle (void)
     fade_counter = 0;
 }
 
-static boolean wipe_doFizzle (const int ticks)
+// -----------------------------------------------------------------------------
+// wipe_doLoading
+// -----------------------------------------------------------------------------
+
+static const int wipe_doLoading (int ticks)
+{
+    boolean	done = true;
+
+    if (--fade_counter > 0)
+    {
+        done = false;
+    }
+
+    V_DrawPatch(132, 72, W_CacheLumpName("LOADING", PU_CACHE));
+    st_fullupdate = true;
+
+    return done;
+}
+
+// -----------------------------------------------------------------------------
+// wipe_renderMelt
+// -----------------------------------------------------------------------------
+
+static void wipe_renderMelt (void)
+{
+    // [PN] Melt state is simulated in 320x200 space and scaled for current resolution.
+    const int vertblocksize = SCREENHEIGHT * 100 / ORIGHEIGHT;
+    const int horizblocksize = SCREENWIDTH * 100 / wipe_columns;
+    int tail_start = 0;
+
+    memcpy(wipe_scr, wipe_scr_end, SCREENAREA * sizeof(*wipe_scr));
+
+    for (int col = 0; col < wipe_columns; ++col)
+    {
+        int currcol = (col * horizblocksize) / 100;
+        const int currcolend = ((col + 1) * horizblocksize) / 100;
+        int current = y[col];
+
+        if (vid_uncapped_fps)
+        {
+            const int delta = y[col] - y_prev[col];
+            current = y_prev[col] + (int)(delta * FIXED2DOUBLE(fractionaltic));
+        }
+
+        if (current < 0)
+        {
+            for (; currcol < currcolend; ++currcol)
+            {
+                const pixel_t *source = wipe_scr_start + currcol * SCREENHEIGHT;
+                pixel_t       *dest   = wipe_scr + currcol * SCREENHEIGHT;
+
+                memcpy(dest, source, SCREENHEIGHT * sizeof(*dest));
+            }
+        }
+        else if (current < ORIGHEIGHT)
+        {
+            const int currrow = (current * vertblocksize) / 100;
+
+            for (; currcol < currcolend; ++currcol)
+            {
+                const pixel_t *source = wipe_scr_start + currcol * SCREENHEIGHT;
+                pixel_t       *dest   = wipe_scr + currcol * SCREENHEIGHT + currrow;
+
+                memcpy(dest, source, (SCREENHEIGHT - currrow) * sizeof(*dest));
+            }
+        }
+
+        tail_start = currcolend;
+    }
+
+    if (tail_start < SCREENWIDTH)
+    {
+        int current = y[wipe_columns - 1];
+
+        if (vid_uncapped_fps)
+        {
+            const int delta = y[wipe_columns - 1] - y_prev[wipe_columns - 1];
+            current = y_prev[wipe_columns - 1] + (int)(delta * FIXED2DOUBLE(fractionaltic));
+        }
+
+        if (current < 0)
+        {
+            for (int currcol = tail_start; currcol < SCREENWIDTH; ++currcol)
+            {
+                const pixel_t *source = wipe_scr_start + currcol * SCREENHEIGHT;
+                pixel_t       *dest   = wipe_scr + currcol * SCREENHEIGHT;
+
+                memcpy(dest, source, SCREENHEIGHT * sizeof(*dest));
+            }
+        }
+        else if (current < ORIGHEIGHT)
+        {
+            const int currrow = (current * vertblocksize) / 100;
+
+            for (int currcol = tail_start; currcol < SCREENWIDTH; ++currcol)
+            {
+                const pixel_t *source = wipe_scr_start + currcol * SCREENHEIGHT;
+                pixel_t       *dest   = wipe_scr + currcol * SCREENHEIGHT + currrow;
+
+                memcpy(dest, source, (SCREENHEIGHT - currrow) * sizeof(*dest));
+            }
+        }
+    }
+}
+
+// -----------------------------------------------------------------------------
+// wipe_doMelt
+// -----------------------------------------------------------------------------
+
+static const int wipe_doMelt (int ticks)
+{
+    boolean done = true;
+
+    if (ticks > 0)
+    {
+        while (ticks--)
+        {
+            memcpy(y_prev, y, wipe_columns * sizeof(*y_prev));
+
+            for (int col = 0; col < wipe_columns; ++col)
+            {
+                if (y_prev[col] < 0)
+                {
+                    y[col] = y_prev[col] + 1;
+                    done = false;
+                }
+                else if (y_prev[col] < ORIGHEIGHT)
+                {
+                    // [PN] Accelerate after warm-up rows; speed still scales via vid_screenwipe.
+                    int dy = (y_prev[col] < 16) ? y_prev[col] + 1 : (8 * vid_screenwipe);
+                    int next = y_prev[col] + dy;
+
+                    if (next > ORIGHEIGHT)
+                    {
+                        next = ORIGHEIGHT;
+                    }
+
+                    y[col] = next;
+                    done = false;
+                }
+                else
+                {
+                    y[col] = ORIGHEIGHT;
+                }
+            }
+        }
+    }
+    else
+    {
+        for (int col = 0; col < wipe_columns; ++col)
+        {
+            done = done && (y[col] >= ORIGHEIGHT);
+        }
+    }
+
+    if (done)
+    {
+        // [PN] Final frame must be exact end-screen; avoid sub-tic interpolation residue.
+        memcpy(y_prev, y, wipe_columns * sizeof(*y_prev));
+        memcpy(wipe_scr, wipe_scr_end, SCREENAREA * sizeof(*wipe_scr));
+        return true;
+    }
+
+    wipe_renderMelt();
+
+    return false;
+}
+
+// -----------------------------------------------------------------------------
+// wipe_doCrossfade
+// -----------------------------------------------------------------------------
+
+static const uint8_t alpha_table[] = {
+      0,   8,  16,  24,  32,  40,  48,  56,
+     64,  72,  80,  88,  96, 104, 112, 120,
+    128, 136, 144, 152, 160, 168, 176, 184,
+    192, 200, 208, 216, 224, 232, 240, 248,
+};
+
+static const int wipe_doCrossfade (const int ticks)
+{
+    pixel_t   *cur_screen = wipe_scr;
+    pixel_t   *end_screen = wipe_scr_end;
+    const int  pix = SCREENAREA;
+    boolean changed = false;
+
+    // [crispy] reduce fail-safe crossfade counter tics
+    if (--fade_counter > 0)
+    {
+        // [JN] Keep solid background to prevent blending with empty space.
+        V_DrawBlock(0, 0, SCREENWIDTH, SCREENHEIGHT, wipe_scr_start);
+
+        {
+            for (int i = 0; i < pix; i++)  // [PN] Modified index to standard loop
+            {
+                if (*cur_screen != *end_screen && fade_counter)
+                {
+                    *cur_screen = I_BlendOver_32(*end_screen, *cur_screen, alpha_table[fade_counter]);
+                    changed = true;
+                }
+                ++cur_screen;
+                ++end_screen;
+            }
+        }
+    }
+
+    return !changed;
+}
+
+// -----------------------------------------------------------------------------
+// [PN] wipe_doFizzle
+// -----------------------------------------------------------------------------
+
+static const int wipe_doFizzle (const int ticks)
 {
     pixel_t *cur_screen = wipe_scr;
-    pixel_t *end_screen = wipe_scr_end;
+    const pixel_t *end_screen = wipe_scr_end;
 
     fade_counter += 8;
 
@@ -266,10 +402,7 @@ static boolean wipe_doFizzle (const int ticks)
     {
         if (y[i] <= fade_counter)
         {
-            if (cur_screen[i] != end_screen[i])
-            {
-                cur_screen[i] = end_screen[i];
-            }
+            cur_screen[i] = end_screen[i];
         }
     }
 
@@ -302,30 +435,34 @@ void wipe_EndScreen (void)
 // wipe_ScreenWipe
 // -----------------------------------------------------------------------------
 
-boolean wipe_ScreenWipe (const int ticks)
+const int wipe_ScreenWipe (const int ticks)
 {
     // when zero, stop the wipe
     static boolean go = false;
 
-    // [JN] Initialize function pointers for different wipe effects.
-    switch (vid_screenwipe)
+    // [JN] Initialize function pointers to melt and crossfade effects.
+    if (vid_screenwipe == 1)
     {
-        case 1: // Loading
-            wipe_init = wipe_initLoading;
-            wipe_do = wipe_doLoading;
-        break;
-        case 2: // Melt
-            wipe_init = wipe_initMelt;
-            wipe_do = wipe_doMelt;
-        break;
-        case 3: // Crossfade
-            wipe_init = wipe_initCrossfade;
-            wipe_do = wipe_doCrossfade;
-        break;
-        case 4: // Fizzle
-            wipe_init = wipe_initFizzle;
-            wipe_do = wipe_doFizzle;
-        break;
+        wipe_init = wipe_initLoading;
+        wipe_do = wipe_doLoading;
+    }
+    else
+    if (vid_screenwipe == 2 || vid_screenwipe == 3)
+    {
+        wipe_init = wipe_initMelt;
+        wipe_do = wipe_doMelt;
+    }
+    else
+    if (vid_screenwipe == 4)
+    {
+        wipe_init = wipe_initCrossfade;
+        wipe_do = wipe_doCrossfade;
+    }
+    else
+    if (vid_screenwipe == 5)
+    {
+        wipe_init = wipe_initFizzle;
+        wipe_do = wipe_doFizzle;
     }
 
     // initial stuff
