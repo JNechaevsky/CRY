@@ -646,7 +646,7 @@ extern void     P_WriteSaveGameHeader(char *description);
 extern FILE    *save_stream;
 extern boolean  savegame_error;
 
-extern uint32_t P_ThinkerToIndex (const thinker_t *thinker);
+extern const uint32_t P_ThinkerToIndex (const thinker_t *thinker);
 
 // -----------------------------------------------------------------------------
 // P_SETUP
