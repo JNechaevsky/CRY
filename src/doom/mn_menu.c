@@ -734,7 +734,6 @@ static void M_ID_OnDeathAction (int choice);
 static void M_ID_JaguarMusic (int choice);
 static void M_ID_JaguarAlert (int choice);
 static void M_ID_JaguarExplosion (int choice);
-static void M_ID_JaguarSkies (int choice);
 
 static void M_ScrollGameplay (int choice);
 
@@ -3962,7 +3961,7 @@ static menuitem_t ID_Menu_Gameplay_3[]=
     { M_MUL1, "MUSIC ARRANGEMENT",             M_ID_JaguarMusic,       'm' },
     { M_MUL1, "ALERTED MONSTERS BEHAVIOUR",    M_ID_JaguarAlert,       'a' },
     { M_MUL1, "EXPLOSION RADIUS IMPACT",       M_ID_JaguarExplosion,   'e' },
-    { M_MUL1, "SKY TEXTURES",                  M_ID_JaguarSkies,       's' },
+    { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
@@ -4056,13 +4055,6 @@ static void M_Draw_ID_Gameplay_3 (void)
                             emu_jaguar_explosion ? cr[CR_RED_BRIGHT] : cr[CR_GREEN_BRIGHT],
                                 LINE_ALPHA(8));
 
-    // Sky textures
-    sprintf(str, emu_jaguar_skies ? "JAGUAR" : "PC");
-    M_WriteTextGlow(M_ItemRightAlign(str), 99, str,
-                        emu_jaguar_skies ? cr[CR_DARKRED] : cr[CR_GREEN],
-                            emu_jaguar_skies ? cr[CR_RED_BRIGHT] : cr[CR_GREEN_BRIGHT],
-                                LINE_ALPHA(9));
-
     // Print explanations of emulation accuracy features
     if (itemOn == 6 && emu_jaguar_music)
     {
@@ -4078,11 +4070,6 @@ static void M_Draw_ID_Gameplay_3 (void)
     {
         M_WriteTextCentered(117, "SOLID WALLS DON'T BLOCK", cr[CR_GRAY]);
         M_WriteTextCentered(126, "EXPLOSION RADIUS DAMAGE", cr[CR_GRAY]);
-    }
-    if (itemOn == 9 && emu_jaguar_skies)
-    {
-        M_WriteTextCentered(117, "AREA 17 USES DEIMOS SKY", cr[CR_GRAY]);
-        M_WriteTextCentered(126, "AREA 24 USES HELLISH SKY", cr[CR_GRAY]);
     }
 
     // < Scroll pages >
@@ -4141,14 +4128,6 @@ static void M_ID_JaguarAlert (int choice)
 static void M_ID_JaguarExplosion (int choice)
 {
     emu_jaguar_explosion ^= 1;
-}
-
-static void M_ID_JaguarSkies (int choice)
-{
-    emu_jaguar_skies ^= 1;
-
-    // Reset Jaguar sky textures.
-    G_InitSkyTextures();
 }
 
 static void M_ScrollGameplay (int choice)
