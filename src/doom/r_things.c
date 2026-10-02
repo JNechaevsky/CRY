@@ -990,18 +990,20 @@ static void R_ProjectSprite (const mobj_t *const thing)
 
     vis->patch = lump;
 
+    // [JN] Set pointer to current colormap to be used by sprites.
+    lighttable_t *const current_colormap = (invulcolormap ? invulmaps : colormaps);
+
     // get light level
     // [JN] Do not zero-out colormap for translucent fuzz.
     if (thing->flags & MF_SHADOW && (vis_improved_fuzz == 1 || vis_improved_fuzz == 3))
     {
         // shadow draw
-        vis->colormap[0] = NULL;
-        vis->colormap[1] = NULL;
+        vis->colormap[0] = vis->colormap[1] = NULL;
     }
     else if (thing->frame & FF_FULLBRIGHT)
     {
         // full bright
-        vis->colormap[0] = vis->colormap[1] = invulcolormap ? invulmaps : colormaps;
+        vis->colormap[0] = vis->colormap[1] = current_colormap;
     }
     else
     {
@@ -1017,8 +1019,7 @@ static void R_ProjectSprite (const mobj_t *const thing)
         if (!vis_brightmaps)
         {
             // [JN] Colorize sprite drawing.
-            vis->colormap[0] = R_SpriteSectorColormap(invulcolormap ? invulmaps : colormaps);
-            vis->colormap[1] = R_SpriteSectorColormap(invulcolormap ? invulmaps : colormaps);
+            vis->colormap[0] = vis->colormap[1] = R_SpriteSectorColormap(current_colormap);
         }
         else
         {
@@ -1026,14 +1027,13 @@ static void R_ProjectSprite (const mobj_t *const thing)
             ||  thing->sprite == SPR_CBRA)  // Candelabra
             {
                 vis->colormap[0] = R_SpriteSectorColormap(spritelights[index]);
-                vis->colormap[1] = invulcolormap ? &invulmaps[(thing->bmap_flick<<BMAPANIMSHIFT)*256] :
-                                                   &colormaps[(thing->bmap_flick<<BMAPANIMSHIFT)*256];
+                vis->colormap[1] = &current_colormap[(thing->bmap_flick<<BMAPANIMSHIFT)*256];
             }
             else
             {
                 // [JN] Colorize brightmapped sprite drawing.
                 vis->colormap[0] = R_SpriteSectorColormap(spritelights[index]);
-                vis->colormap[1] = R_SpriteSectorColormap(colormaps);
+                vis->colormap[1] = R_SpriteSectorColormap(current_colormap);
             }
         }
     }
