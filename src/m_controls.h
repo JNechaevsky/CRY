@@ -116,6 +116,7 @@ extern int key_menu_palette, key_menu_palette2;
 
 extern int key_pause, key_pause2;
 extern int key_menu_screenshot, key_menu_screenshot2;
+extern int key_menu_cleanshot, key_menu_cleanshot2;
 extern int key_message_refresh, key_message_refresh2;
 
 // Special menu keys, not available for rebinding

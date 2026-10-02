@@ -624,6 +624,7 @@ static void M_Bind_TogglePalette (int choice);
 static void M_Draw_ID_Keybinds_6 (void);
 static void M_Bind_Pause (int choice);
 static void M_Bind_SaveScreenshot (int choice);
+static void M_Bind_SaveCleanshot (int choice);
 static void M_Bind_LastMessage (int choice);
 static void M_Bind_Reset (int choice);
 
@@ -2688,6 +2689,7 @@ static menuitem_t ID_Menu_Keybinds_6[]=
 {
     { M_SWTC, "PAUSE GAME",                M_Bind_Pause,          'p' },
     { M_SWTC, "SAVE A SCREENSHOT",         M_Bind_SaveScreenshot, 's' },
+    { M_SWTC, "SAVE A CLEAN SCREENSHOT",   M_Bind_SaveCleanshot,  's' },
     { M_SWTC, "DISPLAY LAST MESSAGE",      M_Bind_LastMessage,    'd' },
     { M_SKIP, "", 0, '\0' },
     { M_SWTC, "RESET BINDINGS TO DEFAULT", M_Bind_Reset,          'r' },
@@ -2714,9 +2716,14 @@ static void M_Bind_SaveScreenshot (int choice)
     M_StartBind(601);  // key_menu_screenshot
 }
 
+static void M_Bind_SaveCleanshot (int choice)
+{
+    M_StartBind(602);  // key_menu_cleanshot
+}
+
 static void M_Bind_LastMessage (int choice)
 {
-    M_StartBind(602);  // key_message_refresh
+    M_StartBind(603);  // key_message_refresh
 }
 
 static void M_Bind_ResetResponse (int key)
@@ -2750,9 +2757,10 @@ static void M_Draw_ID_Keybinds_6 (void)
 
     M_DrawBindKey(0, 18, key_pause, key_pause2);
     M_DrawBindKey(1, 27, key_menu_screenshot, key_menu_screenshot2);
-    M_DrawBindKey(2, 36, key_message_refresh, key_message_refresh2);
+    M_DrawBindKey(2, 36, key_menu_cleanshot, key_menu_cleanshot2);
+    M_DrawBindKey(3, 45, key_message_refresh, key_message_refresh2);
 
-    M_WriteTextCentered(45, "RESET", cr[CR_YELLOW]);
+    M_WriteTextCentered(54, "RESET", cr[CR_YELLOW]);
 
     M_DrawBindFooter("6", true);
 }
@@ -6199,6 +6207,15 @@ boolean M_Responder (event_t* ev)
         return true;
     }
 
+    // [PN] Clean screenshot.
+    if (key != 0 && (key == key_menu_cleanshot || key == key_menu_cleanshot2))
+    {
+        R_SetViewSize(15, dp_detail_level);
+        S_StartSound(NULL, sfx_itemup);
+        cleanshot_pending = true;
+        return true;
+    }
+
     // F-Keys
     if (!menuactive)
     {
@@ -7236,9 +7253,10 @@ static const KeyBindEntry_t keybinds[] =
     KEYBIND_ENTRY(511, &ID_Def_Keybinds_5, 11, key_menu_palette,  key_menu_palette2,  KEY_F12, 0, KBS_GLOBAL),
 
     // Page 6
-    KEYBIND_ENTRY(600, &ID_Def_Keybinds_6, 0, key_pause,              key_pause2,              KEY_PAUSE,  0, KBS_GLOBAL),
-    KEYBIND_ENTRY(601, &ID_Def_Keybinds_6, 1, key_menu_screenshot,    key_menu_screenshot2,    KEY_PRTSCR, 0, KBS_GLOBAL),
-    KEYBIND_ENTRY(602, &ID_Def_Keybinds_6, 2, key_message_refresh,    key_message_refresh2,    KEY_ENTER,  0, KBS_GLOBAL),
+    KEYBIND_ENTRY(600, &ID_Def_Keybinds_6, 0,  key_pause,              key_pause2,              KEY_PAUSE,  0, KBS_GLOBAL),
+    KEYBIND_ENTRY(601, &ID_Def_Keybinds_6, 1,  key_menu_screenshot,    key_menu_screenshot2,    KEY_PRTSCR, 0, KBS_GLOBAL),
+    KEYBIND_ENTRY(602, &ID_Def_Keybinds_6, 2,  key_menu_cleanshot,     key_menu_cleanshot2,     0,          0, KBS_GLOBAL),
+    KEYBIND_ENTRY(603, &ID_Def_Keybinds_6, 3,  key_message_refresh,    key_message_refresh2,    KEY_ENTER,  0, KBS_GLOBAL),
 };
 
 #undef KEYBIND_ENTRY

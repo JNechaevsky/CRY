@@ -163,6 +163,19 @@ static void ID_DrawMessageCentered (void)
 }
 
 // -----------------------------------------------------------------------------
+// R_CleanShotHook
+//  [PN] Clean screenshot hook: V_ScreenShot reads the just-uploaded frame
+//  off-screen (i_video.c) while the screen stays frozen on the previous one.
+// -----------------------------------------------------------------------------
+
+static void R_CleanShotHook (void)
+{
+    V_ScreenShot("DOOM%02i.%s");
+    R_SetViewSize(dp_screen_size, dp_detail_level);
+    cleanshot_pending = false;
+}
+
+// -----------------------------------------------------------------------------
 // D_Display
 //  draw current display, possibly wiping it from the previous
 // -----------------------------------------------------------------------------
@@ -222,6 +235,11 @@ static void D_Display (void)
         wipe = false;
     }
 
+    // [JN/PN] Arm the clean-shot hook; it runs at the end of this frame,
+    // after I_FinishUpdate has uploaded the clean frame.
+    if (cleanshot_pending)
+    post_rendering_hook = R_CleanShotHook;
+
     // do buffered drawing
     switch (gamestate)
     {
@@ -235,7 +253,7 @@ static void D_Display (void)
             P_UpdateSavePreviewCache();
 
             // [JN] Fail-safe: return earlier if post rendering hook is still active.
-            if (post_rendering_hook)
+            if (post_rendering_hook && !cleanshot_pending)
             return;
 
             // see if the border needs to be initially drawn
@@ -246,102 +264,110 @@ static void D_Display (void)
             if (scaledviewwidth != SCREENWIDTH)
             R_DrawViewBorder();  // erase old menu stuff
 
-            // [JN] Draw automap on top of player view and view border,
-            // and update while playing. This also needed for widgets update.
-            if (automapactive)
-            AM_Drawer();
-
-            // [JN] Allow to draw level name separately from automap.
-            if (automapactive || (widget_levelname && widget_enable && dp_screen_size < 15))
-            AM_LevelNameDrawer();
-
-            // [JN] Do not draw any widgets if not in game level.
-            if (widget_enable)
+            // [PN] Skip all HUD overlays for clean screenshot.
+            if (!cleanshot_pending)
             {
-                // [JN] Left widgets are available while active game level.
-                if (dp_screen_size < 15)
-                ID_LeftWidgets();
+                // [JN] Draw automap on top of player view and view border,
+                // and update while playing. This also needed for widgets update.
+                if (automapactive)
+                AM_Drawer();
 
-                // [JN] Target's health widget.
-                // Actual health values are gathered in G_Ticker.
-                if (widget_health)
-                ID_DrawTargetsHealth();
+                // [JN] Allow to draw level name separately from automap.
+                if (automapactive || (widget_levelname && widget_enable && dp_screen_size < 15))
+                AM_LevelNameDrawer();
+
+                // [JN] Do not draw any widgets if not in game level.
+                if (widget_enable)
+                {
+                    // [JN] Left widgets are available while active game level.
+                    if (dp_screen_size < 15)
+                    ID_LeftWidgets();
+
+                    // [JN] Target's health widget.
+                    // Actual health values are gathered in G_Ticker.
+                    if (widget_health)
+                    ID_DrawTargetsHealth();
+                }
+
+                // [JN] Draw crosshair.
+                if (xhair_draw && !automapactive)
+                ID_DrawCrosshair();
+
+                // [JN] Main status bar drawing function.
+                if (dp_screen_size < 15 || (automapactive && !automap_overlay))
+                {
+                    // [JN] Only forcefully update/redraw on...
+                    const boolean st_forceredraw = 
+                                     (oldgametic < gametic  // Every game tic
+                                  ||  dp_screen_size > 10   // Crispy HUD (no solid status bar background)
+                                  ||  setsizeneeded         // Screen size changing
+                                  || (menuactive && dp_menu_shading)); // Menu shading while non-capped game mode
+
+                    ST_Drawer(st_forceredraw);
+                }
             }
-
-            // [JN] Draw crosshair.
-            if (xhair_draw && !automapactive)
-            ID_DrawCrosshair();
-
-            // [JN] Main status bar drawing function.
-            if (dp_screen_size < 15 || (automapactive && !automap_overlay))
-            {
-                // [JN] Only forcefully update/redraw on...
-                const boolean st_forceredraw = 
-                                 (oldgametic < gametic  // Every game tic
-                              ||  dp_screen_size > 10   // Crispy HUD (no solid status bar background)
-                              ||  setsizeneeded         // Screen size changing
-                              || (menuactive && dp_menu_shading)); // Menu shading while non-capped game mode
-            
-                ST_Drawer(st_forceredraw);
-            }
-        break;
+            break;
 
         case GS_INTERMISSION:
-        WI_Drawer();
-        break;
+            WI_Drawer();
+            break;
 
         case GS_FINALE:
-        F_Drawer();
-        break;
+            F_Drawer();
+            break;
 
         case GS_DEMOSCREEN:
-		// [JN] Jaguar: always show white background on demo screen.
-		// Swap big Doom logo with credits screen every 10 seconds,
-		// but don't draw them while active menu.
-        V_DrawPatchFullScreen(W_CacheLumpName("M_TITLE", PU_CACHE), false);
-        if (!menuactive)
-		{
-			V_DrawPatch(0, 0, W_CacheLumpName((pagetic < 10 * TICRATE ?
-			                                   "CREDITS" : "TITLE"), PU_CACHE));
-		}
-        break;
+		    // [JN] Jaguar: always show white background on demo screen.
+		    // Swap big Doom logo with credits screen every 10 seconds,
+		    // but don't draw them while active menu.
+            V_DrawPatchFullScreen(W_CacheLumpName("M_TITLE", PU_CACHE), false);
+            if (!menuactive)
+		    {
+			    V_DrawPatch(0, 0, W_CacheLumpName((pagetic < 10 * TICRATE ?
+			                                       "CREDITS" : "TITLE"), PU_CACHE));
+		    }
+            break;
     }
 
     // clean up border stuff
     if (gamestate != oldgamestate && gamestate != GS_LEVEL)
-	I_SetPalette (0);
+    I_SetPalette (0);
 
     oldgamestate = wipegamestate = gamestate;
 
-    // draw pause pic
-    if (paused)
+    // [PN] Skip pause pic, messages and menu for clean screenshot.
+    if (!cleanshot_pending)
     {
-		V_DrawShadowedPatchOptional(136, 72, W_CacheLumpName ("PAUSED", PU_CACHE));
-    }
-
-    // [JN] Draw right widgets in any states except finale text screens.
-    if (widget_enable)
-    {
-        if (gamestate != GS_FINALE)
+        // draw pause pic
+        if (paused)
         {
+		    V_DrawShadowedPatchOptional(136, 72, W_CacheLumpName ("PAUSED", PU_CACHE));
+        }
+
+        // [JN] Draw right widgets in any states except finale text screens.
+        if (widget_enable)
+        {
+            if (gamestate != GS_FINALE)
             ID_RightWidgets();
         }
+
+        // Handle player messages
+        ID_DrawMessage();
+
+        // [JN] Handle centered player messages.
+        ID_DrawMessageCentered();
+
+        // menus go directly to the screen
+        M_Drawer();
     }
-
-    // Handle player messages
-    ID_DrawMessage();
-
-    // [JN] Handle centered player messages.
-    ID_DrawMessageCentered();
-
-    // menus go directly to the screen
-    M_Drawer ();   // menu is drawn even on top of everything
 
     // [JN] Apply post-processing effects and forcefully
     // update status bar if any effect is active.
-    // Apply V_PProc_OverbrightGlow only on game level states,
-    // and not while active non-overlayed automap.
-    V_PProc_Display((gamestate != GS_LEVEL) || (automapactive && !automap_overlay));
+    // Supress V_PProc_OverbrightGlow ...
+                    // In non game level states
+    V_PProc_Display((gamestate != GS_LEVEL) || 
+                    // While active automap
+                    (automapactive && !automap_overlay));
     if (V_PProc_EffectsActive())
         st_fullupdate = true;
 
@@ -349,6 +375,13 @@ static void D_Display (void)
     if (!wipe)
     {
         I_FinishUpdate();  // page flip or blit buffer
+
+        // [PN] Finish the clean shot in this same non-presented frame.
+        if (post_rendering_hook && cleanshot_pending)
+        {
+            post_rendering_hook();
+            post_rendering_hook = NULL;
+        }
         return;
     }
 
@@ -386,7 +419,7 @@ static void D_BindVariables(void)
     M_BindControls();
 
     // [JN] Game-dependent variables:
-    M_BindIntVariable("key_message_refresh",    &key_message_refresh);
+    M_BindIntVariableKeybind("key_message_refresh", &key_message_refresh, "key_message_refresh2", &key_message_refresh2);
     M_BindIntVariable("sfx_volume",             &sfxVolume);
     M_BindIntVariable("music_volume",           &musicVolume);
     
@@ -411,6 +444,12 @@ static boolean D_GrabMouseCallback(void)
 
     if (crl_spectating)
         return menuactive ? false : true;
+
+    // [JN] CRL - ensure that cursor won't appear while
+    // active automap paining by mouse. But still show in menu, though,
+    // since it will overtako mouse contols.
+    if (!menuactive && automapactive && !am_followplayer && automap_mouse_pan)
+        return true;
 
     // when menu is active or game is paused, release the mouse 
  
