@@ -694,7 +694,9 @@ static void R_DrawVisSprite (const vissprite_t *const vis)
     && thing != NULL
     && (thing->flags & (MF_SHOOTABLE | MF_CORPSE))
     && vis->scale >= (FRACUNIT / 4)
-    && !(thing->flags & MF_SHADOW)
+    // && !(thing->flags & MF_SHADOW)
+    // [JN] CRY - draw shadow beneath solid Spectres (vis_improved_fuzz == 0).
+    && (colfunc != fuzztlcolfunc && colfunc != transtlfuzzcolfunc)
     && vis->colormap[0] != NULL)
     {
         const fixed_t shadow_scale = FixedMul(vis->scale, SPRITE_SHADOW_Y_SCALE);
