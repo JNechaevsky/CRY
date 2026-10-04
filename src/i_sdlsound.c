@@ -657,7 +657,7 @@ static boolean ExpandSoundData_SDL(sfxinfo_t *sfxinfo,
                           mixer_format, mixer_channels, mixer_freq))
     {
         convertor.len = length;
-        convertor.buf = malloc(convertor.len * convertor.len_mult);
+        convertor.buf = malloc((size_t)convertor.len * convertor.len_mult);
         assert(convertor.buf != NULL);
         memcpy(convertor.buf, data, length);
 
@@ -1037,15 +1037,16 @@ static int I_SDL_StartSound(sfxinfo_t *sfxinfo, int channel, int vol, int sep, i
         LockAllocatedSound(snd);
     }
 
+    // set separation, etc.
+    // [PN] Set separation and volume BEFORE playback.
+
+    I_SDL_UpdateSoundParams(channel, vol, sep);
+
     // play sound
 
     Mix_PlayChannel(channel, &snd->chunk, 0);
 
     channels_playing[channel] = snd;
-
-    // set separation, etc.
-
-    I_SDL_UpdateSoundParams(channel, vol, sep);
 
     return channel;
 }
