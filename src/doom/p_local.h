@@ -316,7 +316,7 @@ extern result_e T_MovePlane (sector_t *sector, fixed_t speed, fixed_t dest,
 // -----------------------------------------------------------------------------
 
 #define BONUSADD    6  // [JN] Externalized for smooth fading.
-#define REDADD      16 // [PN] Red damage fade step (see ST_doPaletteStuff).
+#define REDADD      6  // [PN] Red damage fade step (see ST_doPaletteStuff).
 
 extern boolean P_GivePower(player_t*, int);
 extern void    P_TouchSpecialThing (mobj_t *special, mobj_t *toucher);

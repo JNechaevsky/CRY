@@ -318,8 +318,7 @@ static void P_DeathThink (player_t *const player)
 	    //  so fade damage flash down.
 	    player->mo->angle = angle;
 
-	    if (player->damagecount
-	    && gametic & 1)  // [JN] CRY: smooth red palette fading.
+	    if (player->damagecount)
 		player->damagecount--;
 	}
 	else if (delta < ANG180)
@@ -327,8 +326,7 @@ static void P_DeathThink (player_t *const player)
 	else
 	    player->mo->angle -= ANG5;
     }
-    else if (player->damagecount
-    && gametic & 1)  // [JN] CRY: smooth red palette fading.
+    else if (player->damagecount)
 	player->damagecount--;
 	
 
@@ -516,8 +514,7 @@ void P_PlayerThink (player_t* player)
     if (player->powers[pw_ironfeet])
 	player->powers[pw_ironfeet]--;
 		
-    if (player->damagecount
-    && gametic & 1)  // [JN] CRY: smooth red palette fading.
+    if (player->damagecount)
 	player->damagecount--;
 		
     if (player->bonuscount)

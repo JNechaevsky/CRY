@@ -766,10 +766,12 @@ void P_DamageMobj (mobj_t *target, mobj_t *inflictor, mobj_t *source, int damage
 		player->attacker = source;
 		player->damagecount += damage;	/* add damage after armor / invuln */
 
-	// [JN] CRY: use 50 instead of 100 to prevent
-	// too long smooth pain palette duration.
-	if (player->damagecount > 50)
-	    player->damagecount = 50;	// teleport stomp does 10k points...
+	// [JN] Smooth palette. Avoid using too low red values, since palette
+	// is counted from alpha values, not from palette indexes.
+	if (player->damagecount < 16) 
+	    player->damagecount = 16;
+	if (player->damagecount > 100)
+	    player->damagecount = 100;	// teleport stomp does 10k points...
 	}
 
 /* */

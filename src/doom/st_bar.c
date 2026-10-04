@@ -914,7 +914,7 @@ static void ST_doPaletteStuff (void)
         // quick-fade timing, but now without the 16-texture staircase.
         // [PN] a11y_pal_flash shrinks (or zeroes) the red amount; a full
         // red_pane_alpha of 255 makes the white MOD pane a no-op.
-        const int amt = FlashScale(MIN(red * REDADD, 240));
+        const int amt = FlashScale(MIN(red * REDADD, 255));
 
         if (amt)
         {
