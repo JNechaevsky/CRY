@@ -97,6 +97,9 @@ endif()
 # Check for Miniz (replaces libpng).
 add_subdirectory("lib/miniz")
 
+# Check for stb_image_write (JPEG screenshots).
+add_subdirectory("lib/stb_image_write")
+
 find_package(m)
 
 include(CheckSymbolExists)

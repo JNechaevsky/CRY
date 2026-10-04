@@ -23,6 +23,14 @@
 // [JN] ID-specific config variables.
 // -----------------------------------------------------------------------------
 
+//
+// Screenshots
+//
+
+extern char *screenshots_format;
+extern int screenshots_png_compression;
+extern int screenshots_jpg_quality;
+
 // System and video
 extern int vid_resolution;
 extern int vid_widescreen;
@@ -132,6 +140,18 @@ extern int emu_jaguar_explosion;
 
 // Compatibility-breaking
 extern int compat_vertical_aiming;
+
+// Miscellaneous
+extern int a11y_invul;
+extern int a11y_pal_flash;
+extern int a11y_move_bob;
+extern int a11y_weapon_bob;
+extern int a11y_colorblind;
+extern int autoload_wad;
+extern int menu_highlight;
+extern int menu_esc_key;
+extern int menu_cap_fps;
+
 // Game modes
 extern int crl_spectating;
 extern int crl_freeze;

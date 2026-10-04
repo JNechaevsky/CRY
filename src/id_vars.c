@@ -25,6 +25,14 @@
 // -----------------------------------------------------------------------------
 
 //
+//
+// Screenshots
+//
+
+char *screenshots_format = "png";     // "png" or "jpg"
+int screenshots_png_compression = 6;  // 0 ... 10
+int screenshots_jpg_quality = 90;     // 1 ... 100
+
 // Video options
 //
 
@@ -160,6 +168,21 @@ int emu_jaguar_explosion = 1;
 
 // Compatibility-breaking
 int compat_vertical_aiming = 0;
+
+//
+// Miscellaneous
+//
+
+int a11y_invul = 0;
+int a11y_pal_flash = 0;
+int a11y_move_bob = 20;
+int a11y_weapon_bob = 20;
+int a11y_colorblind = 0;
+int autoload_wad = 1;
+int menu_highlight = 1;
+int menu_esc_key = 0;
+int menu_cap_fps = 0;
+
 //
 // Game modes
 //
@@ -180,6 +203,14 @@ int rewind_timeout = 10;
 void ID_BindVariables (void)
 {
     //
+    //
+    // Screenshots
+    //
+
+    M_BindStringVariable("screenshots_format",        &screenshots_format);
+    M_BindIntVariable("screenshots_png_compression",  &screenshots_png_compression);
+    M_BindIntVariable("screenshots_jpg_quality",      &screenshots_jpg_quality);
+
     // Video options
     //
 
@@ -314,6 +345,17 @@ void ID_BindVariables (void)
     M_BindIntVariable("emu_jaguar_explosion",           &emu_jaguar_explosion);
     
     M_BindIntVariable("compat_vertical_aiming",         &compat_vertical_aiming);
+
+    // Miscellaneous
+    M_BindIntVariable("autoload_wad",                   &autoload_wad);
+        M_BindIntVariable("a11y_invul",                 &a11y_invul);
+    M_BindIntVariable("a11y_pal_flash",                 &a11y_pal_flash);
+    M_BindIntVariable("a11y_move_bob",                  &a11y_move_bob);
+    M_BindIntVariable("a11y_weapon_bob",                &a11y_weapon_bob);
+    M_BindIntVariable("a11y_colorblind",                &a11y_colorblind);
+    M_BindIntVariable("menu_highlight",                 &menu_highlight);
+    M_BindIntVariable("menu_esc_key",                   &menu_esc_key);
+    M_BindIntVariable("menu_cap_fps",                   &menu_cap_fps);
 
     // Game modes
     M_BindIntVariable("game_speed",                     &game_speed);

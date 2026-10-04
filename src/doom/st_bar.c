@@ -873,6 +873,20 @@ static void ST_updateFaceWidget (void)
 // ST_doPaletteStuff
 // -----------------------------------------------------------------------------
 
+// [PN] A11Y: scale a palette-flash magnitude by the a11y_pal_flash setting
+// to soften or remove the rapid red/yellow flashing (photosensitivity).
+//   0 = full, 1 = halved, 2 = quartered, 3 = off.
+static int FlashScale (int amt)
+{
+    switch (a11y_pal_flash)
+    {
+        case 1:  return amt >> 1;
+        case 2:  return amt >> 2;
+        case 3:  return 0;
+        default: return amt;
+    }
+}
+
 static void ST_doPaletteStuff (void)
 {
     int red = plyr->damagecount;
@@ -898,21 +912,33 @@ static void ST_doPaletteStuff (void)
         // damagecount decays by 1 per tic, so alpha climbs by REDADD each tic.
         // REDADD=16 saturates at damagecount >= 15, i.e. the old hold-and-
         // quick-fade timing, but now without the 16-texture staircase.
-        palette = REDPAL;
-        red_pane_alpha = 255 - MIN(red * REDADD, 240);
+        // [PN] a11y_pal_flash shrinks (or zeroes) the red amount; a full
+        // red_pane_alpha of 255 makes the white MOD pane a no-op.
+        const int amt = FlashScale(MIN(red * REDADD, 240));
+
+        if (amt)
+        {
+            palette = REDPAL;
+            red_pane_alpha = 255 - amt;
+        }
     }
     else if (yel)
     {
-        palette = BONUSPAL;
-        yel_pane_alpha = MIN(yel * BONUSADD, 127);
-        
-        // [JN] If rad palette is active, use special bonus+radiation palette.
-        if (grn)
+        // [PN] A BLEND pane with alpha 0 is fully transparent, so scaling
+        // yel_pane_alpha down to 0 removes the bonus flash entirely.
+        const int amt = FlashScale(MIN(yel * BONUSADD, 127));
+
+        if (amt)
         {
-            palette = RADIATIONBONUSPAL;
+            yel_pane_alpha = amt;
+            // [JN] If rad palette is active, use special bonus+radiation palette.
+            palette = grn ? RADIATIONBONUSPAL : BONUSPAL;
         }
     }
-    else if (grn)
+
+    // [PN] Radiation suit: steady green tint, shown whenever no flash palette
+    // engaged (including when a11y_pal_flash suppressed the red/yellow one).
+    if (!palette && grn)
     {
         palette = RADIATIONPAL;
     }

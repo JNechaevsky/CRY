@@ -1402,9 +1402,8 @@ static SDL_Texture *CreatePaletteTexture (uint8_t r, uint8_t g, uint8_t b, SDL_B
 }
 
 // [PN] Apply the Display Options picture-adjustment to a full-screen pane
-// tint (display-space color: intensity -> saturation -> contrast, no gamma,
-// no lighting). Mirrors Inter's I_SetColorPanes minus the colorblind step,
-// which CRY has no cvar for.
+// tint (display-space color: intensity -> saturation -> contrast ->
+// colorblind, no gamma, no lighting). Same order as the world colormaps.
 static void AdjustPaneColor (uint8_t in_r, uint8_t in_g, uint8_t in_b,
                              uint8_t out[3])
 {
@@ -1424,9 +1423,17 @@ static void AdjustPaneColor (uint8_t in_r, uint8_t in_g, uint8_t in_b,
     float g = one_minus_a_hi * ig + a_lo * (ir + ib);
     float b = one_minus_a_hi * ib + a_lo * (ir + ig);
 
-    out[0] = (byte)BETWEEN(0, 255, (int)(ct * r + ct_adj));
-    out[1] = (byte)BETWEEN(0, 255, (int)(ct * g + ct_adj));
-    out[2] = (byte)BETWEEN(0, 255, (int)(ct * b + ct_adj));
+    // [PN] Contrast first, then the colorblind matrix as the final step
+    // (identical order to the r_data.c chain).
+    int cr = BETWEEN(0, 255, (int)(ct * r + ct_adj));
+    int cg = BETWEEN(0, 255, (int)(ct * g + ct_adj));
+    int cb = BETWEEN(0, 255, (int)(ct * b + ct_adj));
+
+    const double (*const cbm)[3] = colorblind_matrix[a11y_colorblind];
+    const int pr_ = cr, pg_ = cg, pb_ = cb;
+    out[0] = (byte)BETWEEN(0, 255, (int)(cbm[0][0] * pr_ + cbm[0][1] * pg_ + cbm[0][2] * pb_));
+    out[1] = (byte)BETWEEN(0, 255, (int)(cbm[1][0] * pr_ + cbm[1][1] * pg_ + cbm[1][2] * pb_));
+    out[2] = (byte)BETWEEN(0, 255, (int)(cbm[2][0] * pr_ + cbm[2][1] * pg_ + cbm[2][2] * pb_));
 }
 
 void I_SetColorPanes (boolean recreate_argbbuffer)

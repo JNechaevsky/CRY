@@ -625,6 +625,8 @@ static boolean D_AddFile(char *filename)
 }
 
 
+static const char *const loadparms[] = {"-file", "-merge", NULL}; // [crispy]
+
 //
 // D_DoomMain
 //
@@ -732,7 +734,8 @@ void D_DoomMain (void)
     //
     // Disable auto-loading of .wad and .deh files.
     //
-    if (!M_ParmExists("-noautoload"))
+    if (!M_ParmExists("-noautoload")
+    && autoload_wad)  // [JN] Allow autoload per both IWAD and PWAD.
     {
         char *autoload_dir;
 
@@ -751,6 +754,31 @@ void D_DoomMain (void)
     // Load PWAD files.
     modifiedgame = W_ParseCommandLine();
 
+    // [crispy] add wad files from autoload PWAD directories
+
+    if (!M_ParmExists("-noautoload")
+    && autoload_wad == 2)  // [JN] Allow autoload per PWAD only.
+    {
+        int i;
+
+        for (i = 0; loadparms[i]; i++)
+        {
+            int prm;
+            prm = M_CheckParmWithArgs(loadparms[i], 1);
+            if (prm)
+            {
+                while (++prm != myargc && myargv[prm][0] != '-')
+                {
+                    char *autoload_dir;
+                    if ((autoload_dir = M_GetAutoloadDir(M_BaseName(myargv[prm]))))
+                    {
+                        W_AutoLoadWADs(autoload_dir);
+                        free(autoload_dir);
+                    }
+                }
+            }
+        }
+    }
     // Generate the WAD hash table.  Speed things up a bit.
     W_GenerateHashTable();
 

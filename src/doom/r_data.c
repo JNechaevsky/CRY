@@ -1055,9 +1055,9 @@ static uint16_t CRY_EncodeRGB(int r, int g, int b)
 // [PN] Picture-adjustment chain ported from Inter (Display Options). The
 // coefficients below are computed once per R_InitColormaps() call, so the
 // macros can be dropped onto any RGB triple. Order matches Inter:
-//   intensity -> saturation -> (gamma) -> lighting -> contrast.
-// Gamma is folded in via gtab[] at each use site; contrast is applied last.
-// (Inter also has a colorblind step, but CRY has no a11y_colorblind cvar.)
+//   intensity -> saturation -> (gamma) -> lighting -> contrast -> colorblind.
+// Gamma is folded in via gtab[] at each use site; contrast and colorblind are
+// applied last (colorblind being the very final step, exactly like Inter).
 // -----------------------------------------------------------------------------
 
 // [PN] Per-channel intensity then desaturate/oversaturate toward the luma
@@ -1077,6 +1077,15 @@ static uint16_t CRY_EncodeRGB(int r, int g, int b)
     { (r) = BETWEEN(0, 255, (int)(ct  * (r) + ct_adj)); \
       (g) = BETWEEN(0, 255, (int)(ct  * (g) + ct_adj)); \
       (b) = BETWEEN(0, 255, (int)(ct  * (b) + ct_adj)); }
+
+// [PN] Colorblind emulation matrix (a11y_colorblind) applied as the very last
+// step, after contrast, on an int RGB triple. cbm points at the selected row
+// of colorblind_matrix[]; mode 0 is the identity, so this is a no-op then.
+#define ADJ_COLORBLIND(r, g, b) \
+    { const int cbr_ = (r), cbg_ = (g), cbb_ = (b); \
+      (r) = BETWEEN(0, 255, (int)(cbm[0][0] * cbr_ + cbm[0][1] * cbg_ + cbm[0][2] * cbb_)); \
+      (g) = BETWEEN(0, 255, (int)(cbm[1][0] * cbr_ + cbm[1][1] * cbg_ + cbm[1][2] * cbb_)); \
+      (b) = BETWEEN(0, 255, (int)(cbm[2][0] * cbr_ + cbm[2][1] * cbg_ + cbm[2][2] * cbb_)); }
 
 
 void R_InitColormaps (void)
@@ -1116,6 +1125,8 @@ void R_InitColormaps (void)
     const float a_lo = a_hi * 0.5f;
     const float ct = vid_contrast;
     const float ct_adj = 128.0f * (1.0f - ct);
+    // [PN] Selected colorblind emulation matrix (row 0 = identity).
+    const double (*const cbm)[3] = colorblind_matrix[a11y_colorblind];
     
     byte base_gamma_render[256][3];
     byte base_gamma_invul [256][3];
@@ -1130,6 +1141,26 @@ void R_InitColormaps (void)
     {
         int adj[3];
 
+        // [PN] Accessibility: when a11y_invul is on, the invulnerability
+        // palette (PLAYINVL) is reduced to equal-weight grayscale.
+        // Feeding a neutral gray source into the shared chain keeps
+        // the bright/dark inversion that PLAYINVL encodes while dropping
+        // all hue, so the effect stays legible without the color flicker.
+        byte isr, isg, isb;
+        if (a11y_invul)
+        {
+            const byte gray = (byte)((invulpal[3 * p + 0] +
+                                      invulpal[3 * p + 1] +
+                                      invulpal[3 * p + 2]) / 3);
+            isr = isg = isb = gray;
+        }
+        else
+        {
+            isr = invulpal[3 * p + 0];
+            isg = invulpal[3 * p + 1];
+            isb = invulpal[3 * p + 2];
+        }
+
         if (!dp_cry_palette)
         {
             // [PN] PLAYPAL: intensity/saturation on the source RGB, then gamma.
@@ -1139,8 +1170,7 @@ void R_InitColormaps (void)
             base_gamma_render[p][1] = gtab[adj[1]];
             base_gamma_render[p][2] = gtab[adj[2]];
 
-            ADJ_INTENSITY_SAT(invulpal[3 * p + 0], invulpal[3 * p + 1],
-                              invulpal[3 * p + 2], adj);
+            ADJ_INTENSITY_SAT(isr, isg, isb, adj);
             base_gamma_invul[p][0] = gtab[adj[0]];
             base_gamma_invul[p][1] = gtab[adj[1]];
             base_gamma_invul[p][2] = gtab[adj[2]];
@@ -1151,9 +1181,7 @@ void R_InitColormaps (void)
         // The invul base is our own cyan palette, so it is projected with
         // the free encoder instead of snapping to id's 256-color gamut.
         crybase_render[p] = CRYPAL_Jaguar[p];
-        crybase_invul[p] = CRY_EncodeRGB(invulpal[3 * p + 0],
-                                         invulpal[3 * p + 1],
-                                         invulpal[3 * p + 2]);
+        crybase_invul[p] = CRY_EncodeRGB(isr, isg, isb);
 
         // [JN] Apply gamma tables after CRY decoding so gamma
         // correction works the same way as with the PLAYPAL palette.
@@ -1167,7 +1195,12 @@ void R_InitColormaps (void)
         base_gamma_render[p][1] = gtab[adj[1]];
         base_gamma_render[p][2] = gtab[adj[2]];
 
-        ADJ_INTENSITY_SAT((rgbi >> 16) & 0xff, (rgbi >> 8) & 0xff, rgbi & 0xff, adj);
+        // [PN] Full grayscale a11y: CRY has no perfectly neutral chroma cell,
+        // so a gray re-decodes with a faint warm cast. Re-average the decoded
+        // RGB back to neutral to get true black-and-white.
+        int ir = (rgbi >> 16) & 0xff, ig = (rgbi >> 8) & 0xff, ib = rgbi & 0xff;
+        if (a11y_invul) { const int m = (ir + ig + ib) / 3; ir = ig = ib = m; }
+        ADJ_INTENSITY_SAT(ir, ig, ib, adj);
         base_gamma_invul[p][0] = gtab[adj[0]];
         base_gamma_invul[p][1] = gtab[adj[1]];
         base_gamma_invul[p][2] = gtab[adj[2]];
@@ -1212,12 +1245,16 @@ void R_InitColormaps (void)
                 r = gtab[adj[0]]; g = gtab[adj[1]]; b = gtab[adj[2]];
                 int R = r, G = g, B = b;
                 ADJ_CONTRAST(R, G, B);
+                ADJ_COLORBLIND(R, G, B);
                 row_col[i] = 0xff000000 | ((byte)R << 16) | ((byte)G << 8) | (byte)B;
 
-                ADJ_INTENSITY_SAT((deci >> 16) & 0xff, (deci >> 8) & 0xff, deci & 0xff, adj);
+                int ir = (deci >> 16) & 0xff, ig = (deci >> 8) & 0xff, ib = deci & 0xff;
+                if (a11y_invul) { const int m = (ir + ig + ib) / 3; ir = ig = ib = m; }
+                ADJ_INTENSITY_SAT(ir, ig, ib, adj);
                 r = gtab[adj[0]]; g = gtab[adj[1]]; b = gtab[adj[2]];
                 int Ri = r, Gi = g, Bi = b;
                 ADJ_CONTRAST(Ri, Gi, Bi);
+                ADJ_COLORBLIND(Ri, Gi, Bi);
                 row_inv[i] = 0xff000000 | ((byte)Ri << 16) | ((byte)Gi << 8) | (byte)Bi;
                 continue;
             }
@@ -1228,6 +1265,7 @@ void R_InitColormaps (void)
             int G = (int)(base_gamma_render[k][1] * k0 + kB);
             int B = (int)(base_gamma_render[k][2] * k0 + kB);
             ADJ_CONTRAST(R, G, B);
+            ADJ_COLORBLIND(R, G, B);
             row_col[i] = 0xff000000 | ((byte)R << 16) | ((byte)G << 8) | (byte)B;
     
             // [PN] Invulnerability colormap (invul palette)
@@ -1235,6 +1273,7 @@ void R_InitColormaps (void)
             int Gi = (int)(base_gamma_invul[k][1] * k0 + kB);
             int Bi = (int)(base_gamma_invul[k][2] * k0 + kB);
             ADJ_CONTRAST(Ri, Gi, Bi);
+            ADJ_COLORBLIND(Ri, Gi, Bi);
             row_inv[i] = 0xff000000 | ((byte)Ri << 16) | ((byte)Gi << 8) | (byte)Bi;
         }
     }
@@ -1253,6 +1292,7 @@ void R_InitColormaps (void)
 		r = gtab[adj[0]]; g = gtab[adj[1]]; b = gtab[adj[2]];
 		int pr = r, pg = g, pb = b;
 		ADJ_CONTRAST(pr, pg, pb);
+		ADJ_COLORBLIND(pr, pg, pb);
 
 		pal_color[j++] = 0xff000000 | (pr << 16) | (pg << 8) | pb;
 	}
@@ -1270,6 +1310,7 @@ void R_InitColormaps (void)
 		int cry_g = base_gamma_render[i][1];
 		int cry_b = base_gamma_render[i][2];
 		ADJ_CONTRAST(cry_r, cry_g, cry_b);
+		ADJ_COLORBLIND(cry_r, cry_g, cry_b);
 		cry_color[i] = 0xff000000 | (cry_r << 16) | (cry_g << 8) | cry_b;
 	}
 

@@ -20,10 +20,12 @@
 
 
 #include "d_event.h"
+#include "m_controls.h"
 #include "m_random.h"
 #include "p_local.h"
 #include "s_sound.h"
 #include "doomstat.h"
+#include "g_game.h"
 #include "d_main.h"
 
 #include "id_vars.h"
@@ -300,6 +302,55 @@ static inline void P_ApplyBobbing (int *sx, int *sy, boolean bob_y, fixed_t bob)
     {
         const int sin_value = finesine[angle & (FINEANGLES/2 - 1)];
         *sy = WEAPONTOP + FixedMul(bob, sin_value);
+    }
+}
+
+// -----------------------------------------------------------------------------
+// P_ApplyRealisticBobbing
+// [PN] Improved render-only weapon bobbing for phys_weapon_alignment 3..5.
+// -----------------------------------------------------------------------------
+
+static inline void P_ApplyRealisticBobbing (int *sx, int *sy,
+                                            boolean bob_y, fixed_t bob)
+{
+    const boolean running = always_run ^ speedkeydown();
+    const fixed_t target_scale = running ? FRACUNIT : FRACUNIT >> 1;
+    static fixed_t bob_scale = FRACUNIT;
+    const int angle = (128 * realleveltime) & FINEMASK;
+    const int step_angle = (angle * 2) & FINEMASK;
+
+    if (bob_scale < target_scale)
+    {
+        bob_scale += FRACUNIT >> 4;
+        if (bob_scale > target_scale)
+        {
+            bob_scale = target_scale;
+        }
+    }
+    else if (bob_scale > target_scale)
+    {
+        bob_scale -= FRACUNIT >> 4;
+        if (bob_scale < target_scale)
+        {
+            bob_scale = target_scale;
+        }
+    }
+
+    bob = FixedMul(bob, bob_scale);
+
+    const int cos_value = finecosine[angle];
+    const fixed_t side_swing = bob - (bob >> 2);
+    const fixed_t step_lift = (FRACUNIT - finecosine[step_angle]) >> 1;
+    const fixed_t bob_sway = bob >> 3;
+    const fixed_t sway_lift = (cos_value + FRACUNIT) >> 1;
+
+    *sx = FRACUNIT + FixedMul(side_swing, cos_value)
+                   + FixedMul(bob_sway, finesine[step_angle]);
+
+    if (bob_y)
+    {
+        *sy = WEAPONTOP + FixedMul(bob, step_lift)
+                        + FixedMul(bob_sway, sway_lift);
     }
 }
 
@@ -920,35 +971,57 @@ void P_MovePsprites (player_t *player)
 	psp->sx2 = psp->sx;
 	psp->sy2 = psp->sy;
 
-	if (psp->state)
-	{
-		const int state = player->psprites[ps_weapon].state - states;       // [crispy]
-		const weaponinfo_t *const winfo = &weaponinfo[player->readyweapon]; // [crispy]
-		const boolean movingState = (state != winfo->downstate && state != winfo->upstate);
+    if (psp->state)
+    {
+        // Don't apply bobbing during lowering and raising states
+        const boolean movingState = (/*psp->state->misc1 ||*/
+                                     psp->state->action.acp3 == (actionf_p3)A_Lower ||
+                                     psp->state->action.acp3 == (actionf_p3)A_Raise);
+        const boolean improved_bobbing = phys_weapon_alignment >= 3;
+        const int weapon_alignment = improved_bobbing ?
+                                     phys_weapon_alignment - 3 :
+                                     phys_weapon_alignment;
 
-		if (phys_weapon_alignment)
-		{
-			if (phys_weapon_alignment == 2 && player->attackdown && movingState)
-			{
-				// Center weapon while firing.
-				psp->sx2 = FRACUNIT;
-				psp->sy2 = WEAPONTOP;
-			}
-			else
-			{
-				// Apply X-only bobbing based on movingState.
-				P_ApplyBobbing(&psp->sx2, &psp->sy2, movingState, player->bob);
-			}
+        if (weapon_alignment)
+        {
+            if (weapon_alignment == 2 && player->attackdown && !movingState)
+            {
+                // Center weapon while firing.
+                psp->sx2 = FRACUNIT;
+                psp->sy2 = WEAPONTOP;
+            }
+            else
+            {
+                // Apply render-only bobbing based on !movingState.
+                if (improved_bobbing)
+                {
+                    P_ApplyRealisticBobbing(&psp->sx2, &psp->sy2,
+                                            !movingState, player->r_bob);
+                }
+                else
+                {
+                    P_ApplyBobbing(&psp->sx2, &psp->sy2,
+                                   !movingState, player->r_bob);
+                }
+            }
 
-			// [crispy] squat down weapon sprite a bit after hitting the ground
-			psp->sy2 += abs(player->psp_dy);
-		}
-		else if (movingState && !player->attackdown)
-		{
-			// Apply full bobbing only if not raising/lowering and not attacking.
-			P_ApplyBobbing(&psp->sx2, &psp->sy2, true, player->bob);
-		}
-	}
+            // [crispy] squat down weapon sprite a bit after hitting the ground
+            psp->sy2 += abs(player->psp_dy);
+        }
+        else if (!movingState && !player->attackdown)
+        {
+            // Apply full bobbing only if not raising/lowering and not attacking.
+            if (improved_bobbing)
+            {
+                P_ApplyRealisticBobbing(&psp->sx2, &psp->sy2,
+                                        true, player->r_bob);
+            }
+            else
+            {
+                P_ApplyBobbing(&psp->sx2, &psp->sy2, true, player->r_bob);
+            }
+        }
+    }
 
 	player->psprites[ps_flash].sx2 = player->psprites[ps_weapon].sx2;
 	player->psprites[ps_flash].sy2 = player->psprites[ps_weapon].sy2;

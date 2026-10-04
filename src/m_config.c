@@ -157,6 +157,24 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_COMMENT(""),
 
     //
+    // Autoload-related (Miscellaneous options)
+    //
+
+    CONFIG_VARIABLE_COMMENT("Autoload-related"),
+    CONFIG_VARIABLE_INT(autoload_wad),
+    CONFIG_VARIABLE_COMMENT(""),
+
+    //
+    // Screenshots
+    //
+
+    CONFIG_VARIABLE_COMMENT("Screenshots (\"png\" or \"jpg\")"),
+    CONFIG_VARIABLE_STRING(screenshots_format),
+    CONFIG_VARIABLE_INT(screenshots_png_compression),
+    CONFIG_VARIABLE_INT(screenshots_jpg_quality),
+    CONFIG_VARIABLE_COMMENT(""),
+
+    //
     // Render
     //
 
@@ -544,6 +562,16 @@ static default_t	doom_defaults_list[] =
 
     // Compatibility-breaking
     CONFIG_VARIABLE_INT(compat_vertical_aiming),
+
+    CONFIG_VARIABLE_INT(a11y_invul),
+    CONFIG_VARIABLE_INT(a11y_pal_flash),
+    CONFIG_VARIABLE_INT(a11y_move_bob),
+    CONFIG_VARIABLE_INT(a11y_weapon_bob),
+    CONFIG_VARIABLE_INT(a11y_colorblind),
+    CONFIG_VARIABLE_INT(menu_highlight),
+    CONFIG_VARIABLE_INT(menu_esc_key),
+    CONFIG_VARIABLE_INT(menu_cap_fps),
+
     // Game modes
     CONFIG_VARIABLE_INT(game_speed),
     CONFIG_VARIABLE_INT(rewind_enable),

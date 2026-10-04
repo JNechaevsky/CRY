@@ -24,6 +24,12 @@
 #define MINIZ_NO_ZLIB_APIS
 #include "miniz.h"
 
+// [PN] Provide prototypes for internal stb_image_write functions to silence -Wmissing-prototypes
+static unsigned char *stbi_zlib_compress(unsigned char *data, int data_len, int *out_len, int quality);
+static unsigned char *stbi_write_png_to_mem(const unsigned char *pixels, int stride_bytes, int x, int y, int n, int *out_len);
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+
 #include "doomtype.h"
 #include "i_input.h"
 #include "i_swap.h"
@@ -1267,24 +1273,105 @@ void V_RestoreBuffer(void)
 static void WritePNGfile (const char *filename)
 {
     byte *data;
+    byte *rgb_data = NULL;
     int width, height;
     size_t png_data_size = 0;
+    void *pPNG_data = NULL;
+    size_t pixel_count;
 
     I_RenderReadPixels(&data, &width, &height);
     {
-        void *pPNG_data = tdefl_write_image_to_png_file_in_memory(data, width, height, 4, &png_data_size);
+        pixel_count = (size_t) width * (size_t) height;
+        rgb_data = malloc(pixel_count * 3);
 
+        // [PN] Prefer RGB output: screenshots should not carry transparency.
+        if (rgb_data)
+        {
+            for (size_t i = 0; i < pixel_count; ++i)
+            {
+                const size_t src = i * 4;
+                const size_t dst = i * 3;
+                rgb_data[dst + 0] = data[src + 0];
+                rgb_data[dst + 1] = data[src + 1];
+                rgb_data[dst + 2] = data[src + 2];
+            }
+
+            // [PN] Using the _ex version to explicitly set compression level
+            // (screenshots_png_compression) and vertical flip (MZ_FALSE = do not flip).
+            pPNG_data = tdefl_write_image_to_png_file_in_memory_ex(
+                rgb_data, width, height, 3, &png_data_size, screenshots_png_compression, MZ_FALSE);
+        }
+
+        // [PN] Fallback to RGBA if RGB conversion buffer cannot be allocated.
         if (!pPNG_data)
         {
-            return;
+            pPNG_data = tdefl_write_image_to_png_file_in_memory_ex(
+                data, width, height, 4, &png_data_size, screenshots_png_compression, MZ_FALSE);
         }
-        else
+
+        if (pPNG_data)
         {
             FILE *handle = M_fopen(filename, "wb");
-            fwrite(pPNG_data, 1, png_data_size, handle);
-            fclose(handle);
+
+            if (handle != NULL)
+            {
+                fwrite(pPNG_data, 1, png_data_size, handle);
+                fclose(handle);
+            }
             mz_free(pPNG_data);
         }
+    }
+    free(rgb_data);
+    free(data);
+}
+
+// -----------------------------------------------------------------------------
+// stbi_write_fwrite_callback
+//  [PN] Callback for stb_image_write: writes into an already opened FILE*.
+//  This lets us keep using our own M_fopen / screenshotdir file layer
+//  instead of stb's internal stdio.
+// -----------------------------------------------------------------------------
+
+static void stbi_write_fwrite_callback(void *context, void *data, int size)
+{
+    FILE *f = (FILE *)context;
+
+    if (f != NULL && data != NULL && size > 0)
+    {
+        fwrite(data, 1, (size_t)size, f);
+    }
+}
+
+// -----------------------------------------------------------------------------
+// WriteJPEGfile
+//  [PN] Saves a JPEG screenshot using stb_image_write.
+//  JPEG ignores the alpha channel, so we can pass RGBA (comp=4) directly
+//  from I_RenderReadPixels without converting to RGB — saves a malloc
+//  and a loop over all pixels.
+// -----------------------------------------------------------------------------
+
+static void WriteJPEGfile(const char *filename)
+{
+    byte *data;
+    int   width, height;
+    FILE *handle;
+
+    I_RenderReadPixels(&data, &width, &height);
+
+    handle = M_fopen(filename, "wb");
+
+    if (handle != NULL)
+    {
+        // comp = 4 (RGBA), quality = screenshots_jpeg_quality (1 ... 100).
+        // Alpha is silently discarded by the JPEG encoder.
+        stbi_write_jpg_to_func(stbi_write_fwrite_callback,
+                               handle,
+                               width,
+                               height,
+                               4,
+                               data,
+                               screenshots_jpg_quality);
+        fclose(handle);
     }
 
     free(data);
@@ -1299,29 +1386,42 @@ void V_ScreenShot(const char *format)
     int i;
     char lbmname[16]; // haleyjd 20110213: BUG FIX - 12 is too small!
     char *file;
+    const char *ext;
+    boolean     use_jpeg;
     
+    // [PN] Pick the extension from the cvar, fall back to PNG on garbage.
+    if (screenshots_format != NULL && (!strcasecmp(screenshots_format, "jpg")))
+    {
+        ext      = "jpg";
+        use_jpeg = true;
+    }
+    else
+    {
+        ext      = "png";
+        use_jpeg = false;
+    }
+
     // find a file name to save it to
 
     for (i=0; i<=9999; i++)
     {
-        M_snprintf(lbmname, sizeof(lbmname), format, i, "png");
+        M_snprintf(lbmname, sizeof(lbmname), format, i, ext);
         // [JN] Construct full path to screenshot file.
         file = M_StringJoin(screenshotdir, lbmname, NULL);
 
         if (!M_FileExists(file))
         {
-            break;      // file doesn't exist
+            if (use_jpeg)
+            WriteJPEGfile(file);
+            else
+            WritePNGfile(file);
+            free(file);
+            return;
         }
         free(file);
     }
 
-    if (i == 10000)
-    {
-        I_Error ("V_ScreenShot: Couldn't create a PNG");
-    }
-
-    WritePNGfile(file);
-	free(file);
+    I_Error ("V_ScreenShot: Couldn't create a screenshot.");
 }
 
 // [FG] check if the lump can be a Doom patch

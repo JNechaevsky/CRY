@@ -41,6 +41,7 @@
 #include "z_zone.h"
 #include "r_local.h"
 #include "g_game.h"
+#include "g_rewind.h"
 #include "m_argv.h"
 #include "m_controls.h"
 #include "s_sound.h"
@@ -744,6 +745,26 @@ static void M_ID_JaguarExplosion (int choice);
 
 static void M_ScrollGameplay (int choice);
 
+static void M_Draw_ID_Misc_1 (void);
+static void M_ID_Misc_A11yInvul (int choice);
+static void M_ID_Misc_A11yPalFlash (int choice);
+static void M_ID_Misc_A11yMoveBob (int choice);
+static void M_ID_Misc_A11yWeaponBob (int choice);
+static void M_ID_Misc_A11yColorblind (int choice);
+static void M_ID_Misc_AutoloadWAD (int choice);
+static void M_ID_Misc_Hightlight (int choice);
+static void M_ID_Misc_MenuEscKey (int choice);
+static void M_ID_Misc_MenuCapFps (int choice);
+
+static void M_Draw_ID_Misc_2 (void);
+static void M_ID_Misc_RewindEnable (int choice);
+static void M_ID_Misc_RewindInterwal (int choice);
+static void M_ID_Misc_RewindDepth (int choice);
+static void M_ID_Misc_RewindTimeout (int choice);
+static void M_ID_Misc_ShotFormat (int choice);
+static void M_ID_Misc_ShotSetup (int choice);
+
+static void M_ScrollMisc (int choice);
 static void M_Choose_ID_Reset (int choice);
 static int  resetplaque_tics;
 
@@ -794,6 +815,8 @@ static menu_t ID_Def_Keybinds_6;
 static menu_t ID_Def_Gameplay_1;
 static menu_t ID_Def_Gameplay_2;
 static menu_t ID_Def_Gameplay_3;
+static menu_t ID_Def_Misc_1;
+static menu_t ID_Def_Misc_2;
 static menu_t ID_Def_GamepadBinds;
 static menu_t ID_Def_GamepadSettings_1;
 static menu_t ID_Def_GamepadSettings_2;
@@ -829,6 +852,20 @@ static menu_t *GameplayMenus[] =
 static void M_Choose_ID_Gameplay (int choice)
 {
     M_SetupNextMenu(GameplayMenus[Gameplay_Cur]);
+}
+
+// Remember last misc settings page.
+static int Misc_Cur;
+
+static menu_t *MiscMenus[] =
+{
+    &ID_Def_Misc_1,
+    &ID_Def_Misc_2,
+};
+
+static void M_Choose_ID_Misc (int choice)
+{
+    M_SetupNextMenu(MiscMenus[Misc_Cur]);
 }
 
 // Remember last gamepad bindings page.
@@ -888,6 +925,10 @@ static void M_ScrollPages (boolean direction)
     else if (currentMenu == &ID_Def_Gameplay_1) nextMenu = (direction ? &ID_Def_Gameplay_2 : &ID_Def_Gameplay_3);
     else if (currentMenu == &ID_Def_Gameplay_2) nextMenu = (direction ? &ID_Def_Gameplay_3 : &ID_Def_Gameplay_1);
     else if (currentMenu == &ID_Def_Gameplay_3) nextMenu = (direction ? &ID_Def_Gameplay_1 : &ID_Def_Gameplay_2);
+
+    // Misc features:
+    else if (currentMenu == &ID_Def_Misc_1) nextMenu = &ID_Def_Misc_2;
+    else if (currentMenu == &ID_Def_Misc_2) nextMenu = &ID_Def_Misc_1;
 
     // If a new menu was set up, play the navigation sound.
     if (nextMenu)
@@ -1027,6 +1068,7 @@ static menuitem_t ID_Menu_Main[]=
     { M_SWTC, "WIDGETS SETTINGS",  M_Choose_ID_Widgets,  'w' },
     { M_SWTC, "AUTOMAP SETTINGS",  M_Choose_ID_Automap,  'a' },
     { M_SWTC, "GAMEPLAY FEATURES", M_Choose_ID_Gameplay, 'g' },
+    { M_SWTC, "MISC FEATURES",     M_Choose_ID_Misc,     'm' },
     { M_SWTC, "END GAME",          M_EndGame,            'e' },
     { M_SWTC, "RESET SETTINGS",    M_Choose_ID_Reset,    'r' },
 };
@@ -4310,6 +4352,408 @@ static void M_ScrollGameplay (int choice)
 }
 
 // -----------------------------------------------------------------------------
+// Miscellaneous features
+// -----------------------------------------------------------------------------
+
+static menuitem_t ID_Menu_Misc_1[]=
+{
+    { M_MUL1, "INVULNERABILITY EFFECT",     M_ID_Misc_A11yInvul,      'i' },
+    { M_MUL2, "PALETTE FLASH EFFECTS",      M_ID_Misc_A11yPalFlash,   'p' },
+    { M_MUL1, "MOVEMENT BOBBING",           M_ID_Misc_A11yMoveBob,    'm' },
+    { M_MUL1, "WEAPON BOBBING",             M_ID_Misc_A11yWeaponBob,  'w' },
+    { M_MUL2, "COLORBLIND FILTER",          M_ID_Misc_A11yColorblind, 'c' },
+    { M_SKIP, "", 0, '\0' },
+    { M_MUL2, "AUTOLOAD WAD FILES",         M_ID_Misc_AutoloadWAD,    'a' },
+    { M_SKIP, "", 0, '\0' },
+    { M_MUL2, "HIGHLIGHTING EFFECT",        M_ID_Misc_Hightlight,     'h' },
+    { M_MUL1, "ESC KEY BEHAVIOUR",          M_ID_Misc_MenuEscKey,     'e' },
+    { M_MUL1, "CAP FRAMERATE IN THE MENU",  M_ID_Misc_MenuCapFps,     'c' },
+    { M_SKIP, "", 0, '\0' },
+    { M_SKIP, "", 0, '\0' },
+    { M_MUL2, "", /* < SCROLL PAGES >*/     M_ScrollMisc,             's' },
+};
+
+static menu_t ID_Def_Misc_1 =
+{
+    ITEMCOUNT(ID_Menu_Misc_1),
+    &ID_Def_Main,
+    ID_Menu_Misc_1,
+    M_Draw_ID_Misc_1,
+    ID_MENU_LEFTOFFSET_BIG, ID_MENU_TOPOFFSET,
+    0,
+    true, false, true,
+};
+
+static void M_Draw_ID_Misc_1 (void)
+{
+    char str[32];
+    const char *bobpercent[] = {
+        "OFF","5%","10%","15%","20%","25%","30%","35%","40%","45%","50%",
+        "55%","60%","65%","70%","75%","80%","85%","90%","95%","100%"
+    };
+    const char *colorblind_name[] = {
+        "NONE","PROTANOPIA","PROTANOMALY","DEUTERANOPIA","DEUTERANOMALY",
+        "TRITANOPIA","TRITANOMALY","ACHROMATOPSIA","ACHROMATOMALY"
+    };
+
+    Misc_Cur = 0;
+
+    M_WriteTextCentered(9, "ACCESSIBILITY", cr[CR_YELLOW]);
+
+    // Invulnerability effect
+    sprintf(str, a11y_invul ? "GRAYSCALE" : "DEFAULT");
+    M_WriteTextGlow(M_ItemRightAlign(str), 18, str,
+                        a11y_invul ? cr[CR_GREEN] : cr[CR_DARKRED],
+                            a11y_invul ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
+                                LINE_ALPHA(0));
+
+    // Palette flash effects
+    sprintf(str, a11y_pal_flash == 1 ? "HALVED" :
+                 a11y_pal_flash == 2 ? "QUARTERED" :
+                 a11y_pal_flash == 3 ? "OFF" : "DEFAULT");
+    M_WriteTextGlow(M_ItemRightAlign(str), 27, str,
+                        a11y_pal_flash == 1 ? cr[CR_YELLOW] :
+                        a11y_pal_flash == 2 ? cr[CR_ORANGE] :
+                        a11y_pal_flash == 3 ? cr[CR_RED] : cr[CR_DARKRED],
+                            a11y_pal_flash == 1 ? cr[CR_YELLOW_BRIGHT] :
+                            a11y_pal_flash == 2 ? cr[CR_ORANGE_BRIGHT] :
+                            a11y_pal_flash == 3 ? cr[CR_RED_BRIGHT] : cr[CR_RED_BRIGHT],
+                                LINE_ALPHA(1));
+
+    // Movement bobbing
+    sprintf(str, "%s", bobpercent[a11y_move_bob]);
+    M_WriteTextGlow(M_ItemRightAlign(str), 36, str,
+                        a11y_move_bob == 20 ? cr[CR_DARKRED] :
+                        a11y_move_bob ==  0 ? cr[CR_RED] : cr[CR_YELLOW],
+                            a11y_move_bob == 20 ? cr[CR_RED_BRIGHT] :
+                            a11y_move_bob ==  0 ? cr[CR_RED_BRIGHT] : cr[CR_YELLOW_BRIGHT],
+                                LINE_ALPHA(2));
+
+    // Weapon bobbing
+    sprintf(str, "%s", bobpercent[a11y_weapon_bob]);
+    M_WriteTextGlow(M_ItemRightAlign(str), 45, str,
+                        a11y_weapon_bob == 20 ? cr[CR_DARKRED] :
+                        a11y_weapon_bob ==  0 ? cr[CR_RED] : cr[CR_YELLOW],
+                            a11y_weapon_bob == 20 ? cr[CR_RED_BRIGHT] :
+                            a11y_weapon_bob ==  0 ? cr[CR_RED_BRIGHT] : cr[CR_YELLOW_BRIGHT],
+                                LINE_ALPHA(3));
+
+    // Colorblind filter
+    sprintf(str, "%s", colorblind_name[a11y_colorblind]);
+    M_WriteTextGlow(M_ItemRightAlign(str), 54, str,
+                        a11y_colorblind ? cr[CR_GREEN] : cr[CR_DARKRED],
+                            a11y_colorblind ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
+                                LINE_ALPHA(4));
+
+    M_WriteTextCentered(63, "AUTOLOAD", cr[CR_YELLOW]);
+
+    // Autoload WAD files
+    sprintf(str, autoload_wad == 1 ? "IWAD ONLY" :
+                 autoload_wad == 2 ? "IWAD AND PWAD" : "OFF");
+    M_WriteTextGlow(M_ItemRightAlign(str), 72, str,
+                        autoload_wad == 1 ? cr[CR_YELLOW] :
+                        autoload_wad == 2 ? cr[CR_GREEN] : cr[CR_DARKRED],
+                            autoload_wad == 1 ? cr[CR_YELLOW_BRIGHT] :
+                            autoload_wad == 2 ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
+                                LINE_ALPHA(6));
+
+    M_WriteTextCentered(81, "MENU SETTINGS", cr[CR_YELLOW]);
+
+    // Highlighting effect
+    sprintf(str, menu_highlight == 1 ? "ANIMATED" :
+                 menu_highlight == 2 ? "STATIC" : "OFF");
+    M_WriteTextGlow(M_ItemRightAlign(str), 90, str,
+                        menu_highlight == 1 ? cr[CR_GREEN] :
+                        menu_highlight == 2 ? cr[CR_YELLOW] : cr[CR_DARKRED],
+                            menu_highlight == 1 ? cr[CR_GREEN_BRIGHT] :
+                            menu_highlight == 2 ? cr[CR_YELLOW_BRIGHT] : cr[CR_RED_BRIGHT],
+                                LINE_ALPHA(8));
+
+    // ESC key behaviour
+    sprintf(str, menu_esc_key ? "GO BACK" : "CLOSE MENU" );
+    M_WriteTextGlow(M_ItemRightAlign(str), 99, str,
+                        menu_esc_key ? cr[CR_GREEN] : cr[CR_DARKRED],
+                            menu_esc_key ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
+                                LINE_ALPHA(9));
+
+    // Cap framerate in the menu
+    sprintf(str, menu_cap_fps ? "ON" : "OFF" );
+    M_WriteTextGlow(M_ItemRightAlign(str), 108, str,
+                        menu_cap_fps ? cr[CR_GREEN] : cr[CR_DARKRED],
+                            menu_cap_fps ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
+                                LINE_ALPHA(10));
+
+    // [PN] Added explanations for colorblind filters
+    if (itemOn == 4)
+    {
+        const char *colorblind_hint[] = {
+            "","RED-BLIND","RED-WEAK","GREEN-BLIND","GREEN-WEAK",
+            "BLUE-BLIND","BLUE-WEAK","MONOCHROMACY","BLUE CONE MONOCHROMACY"
+        };
+
+        M_WriteTextCentered(126, colorblind_hint[a11y_colorblind], cr[CR_LIGHTGRAY_DARK]);
+    }
+    // [PN] Added explanations for autoload variables
+    if (itemOn == 6)
+    {
+        const char *off = "AUTOLOAD IS DISABLED";
+        const char *first_line = "AUTOLOAD AND FOLDER CREATION";
+        const char *second_line1 = "ONLY ALLOWED FOR IWAD FILES";
+        const char *second_line2 = "ALLOWED FOR BOTH IWAD AND PWAD FILES";
+        const int   autoload_option = autoload_wad;
+
+        switch (autoload_option)
+        {
+            case 1:
+                M_WriteTextCentered(126, first_line, cr[CR_LIGHTGRAY_DARK]);
+                M_WriteTextCentered(135, second_line1, cr[CR_LIGHTGRAY_DARK]);
+                break;
+
+            case 2:
+                M_WriteTextCentered(126, first_line, cr[CR_LIGHTGRAY_DARK]);
+                M_WriteTextCentered(135, second_line2, cr[CR_LIGHTGRAY_DARK]);
+                break;
+
+            default:
+                M_WriteTextCentered(126, off, cr[CR_LIGHTGRAY_DARK]);
+                break;            
+        }
+    }
+    else
+    {
+        // < Scroll pages >
+        M_DrawScrollPages(ID_MENU_LEFTOFFSET_BIG, 135, 13, "1/2");
+    }
+}
+
+static void M_ID_Misc_A11yInvul (int choice)
+{
+    a11y_invul ^= 1;
+    // [JN] Recalculate colormaps to apply the appropriate invulnerability effect.
+    R_InitColormaps();
+}
+
+static void M_ID_Misc_A11yPalFlash (int choice)
+{
+    a11y_pal_flash = M_INT_Slider(a11y_pal_flash, 0, 3, choice, false);
+    I_SetPalette (st_palette);
+}
+
+static void M_ID_Misc_A11yMoveBob (int choice)
+{
+    a11y_move_bob = M_INT_Slider(a11y_move_bob, 0, 20, choice, true);
+}
+
+static void M_ID_Misc_A11yWeaponBob (int choice)
+{
+    a11y_weapon_bob = M_INT_Slider(a11y_weapon_bob, 0, 20, choice, true);
+}
+
+static void M_ID_Misc_A11yColorblindHook (void)
+{
+    R_InitColormaps();
+    R_FillBackScreen();
+    AM_Init();
+    st_fullupdate = true;
+    I_SetColorPanes(false);
+    I_SetPalette(st_palette);
+}
+
+static void M_ID_Misc_A11yColorblind (int choice)
+{
+    a11y_colorblind = M_INT_Slider(a11y_colorblind, 0, 8, choice, false);
+    post_rendering_hook = M_ID_Misc_A11yColorblindHook;
+}
+
+static void M_ID_Misc_AutoloadWAD (int choice)
+{
+    autoload_wad = M_INT_Slider(autoload_wad, 0, 2, choice, false);
+}
+
+static void M_ID_Misc_Hightlight (int choice)
+{
+    menu_highlight = M_INT_Slider(menu_highlight, 0, 2, choice, false);
+}
+
+static void M_ID_Misc_MenuEscKey (int choice)
+{
+    menu_esc_key ^= 1;
+}
+
+static void M_ID_Misc_MenuCapFps (int choice)
+{
+    menu_cap_fps ^= 1;
+}
+
+static menuitem_t ID_Menu_Misc_2[]=
+{
+    { M_MUL1, "ENABLE REWIND",               M_ID_Misc_RewindEnable,   'e' },
+    { M_MUL1, "REWIND INTERWAL (S)",         M_ID_Misc_RewindInterwal, 'r' },
+    { M_MUL1, "REWIND DEPTH (KEY FRAMES)",   M_ID_Misc_RewindDepth,    'r' },
+    { M_MUL1, "FULL KEY FRAME TIMEOUT (MS)", M_ID_Misc_RewindTimeout,  'f' },
+    { M_SKIP, "", 0, '\0' },
+    { M_MUL1, "SCREENSHOT FORMAT",           M_ID_Misc_ShotFormat,     's' },
+    { M_MUL1, "", /* Dynamic string */       M_ID_Misc_ShotSetup,      's' },
+    { M_SKIP, "", 0, '\0' },
+    { M_SKIP, "", 0, '\0' },
+    { M_SKIP, "", 0, '\0' },
+    { M_SKIP, "", 0, '\0' },
+    { M_SKIP, "", 0, '\0' },
+    { M_SKIP, "", 0, '\0' },
+    { M_MUL2, "", /* < SCROLL PAGES >*/      M_ScrollMisc,             's' },
+};
+
+static menu_t ID_Def_Misc_2 =
+{
+    ITEMCOUNT(ID_Menu_Misc_2),
+    &ID_Def_Main,
+    ID_Menu_Misc_2,
+    M_Draw_ID_Misc_2,
+    ID_MENU_LEFTOFFSET_BIG, ID_MENU_TOPOFFSET,
+    0,
+    true, false, true,
+};
+
+static void M_Draw_ID_Misc_2 (void)
+{
+    char str[32];
+
+    Misc_Cur = 1;
+
+    M_WriteTextCentered(9, "REWIND", cr[CR_YELLOW]);
+
+    // Enable rewind
+    sprintf(str, rewind_enable ? "ON" : "OFF");
+    M_WriteTextGlow(M_ItemRightAlign(str), 18, str,
+                        rewind_enable ? cr[CR_GREEN] : cr[CR_DARKRED],
+                            rewind_enable ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
+                                LINE_ALPHA(0));
+
+    // Rewind interwal (s)
+    sprintf(str, "%d", rewind_interval);
+    M_WriteTextGlow(M_ItemRightAlign(str), 27, str,
+                       !rewind_enable ? cr[CR_DARKRED] :
+                        rewind_interval == 600 ? cr[CR_YELLOW] : cr[CR_GREEN],
+                           !rewind_enable ? cr[CR_RED_BRIGHT] : 
+                            rewind_interval == 600 ? cr[CR_YELLOW_BRIGHT] : cr[CR_GREEN_BRIGHT],
+                                LINE_ALPHA(1));
+
+    // Rewind depth (key frames)
+    sprintf(str, "%d", rewind_depth);
+    M_WriteTextGlow(M_ItemRightAlign(str), 36, str,
+                       !rewind_enable ? cr[CR_DARKRED] :
+                        rewind_depth == 600 ? cr[CR_YELLOW] : cr[CR_GREEN],
+                           !rewind_enable ? cr[CR_RED_BRIGHT] :
+                            rewind_depth == 600 ? cr[CR_YELLOW_BRIGHT] : cr[CR_GREEN_BRIGHT],
+                                LINE_ALPHA(2));
+
+    // Full keyframe timeout (ms)
+    sprintf(str, rewind_timeout == 0 ? "NO LIMIT" : "%d", rewind_timeout);
+    M_WriteTextGlow(M_ItemRightAlign(str), 45, str,
+                       !rewind_enable ? cr[CR_DARKRED] :
+                        rewind_timeout == 25 ? cr[CR_YELLOW] : cr[CR_GREEN],
+                           !rewind_enable ? cr[CR_RED_BRIGHT] :
+                            rewind_timeout == 25 ? cr[CR_YELLOW_BRIGHT] : cr[CR_GREEN_BRIGHT],
+                                LINE_ALPHA(3));
+
+    M_WriteTextCentered(54, "SCREENSHOTS", cr[CR_YELLOW]);
+
+    // Screenshot format
+    sprintf(str, !strcmp(screenshots_format, "png") ? "PNG" : "JPEG");
+    M_WriteTextGlow(M_ItemRightAlign(str), 63, str,
+                        cr[CR_GREEN],
+                            cr[CR_GREEN_BRIGHT],
+                                LINE_ALPHA(5));
+
+    // Dynamic string: compression level for PNG, quality for JPG
+    const char *const label = !strcmp(screenshots_format, "png") ? "COMPRESSION LEVEL" : "QUALITY LEVEL";
+    int value = !strcmp(screenshots_format, "png") ? screenshots_png_compression : screenshots_jpg_quality;
+
+    M_WriteTextGlow(ID_MENU_LEFTOFFSET_BIG, 72, label,
+                        NULL, cr[CR_MENU_BRIGHT5], LINE_ALPHA(6));
+
+    M_snprintf(str, 4, "%d", value);
+    M_WriteTextGlow(M_ItemRightAlign(str), 72, str,
+                        cr[CR_GREEN], cr[CR_GREEN_BRIGHT], LINE_ALPHA(6));
+
+    // Dynamic hints for screenshot settings.
+    if (itemOn == 5)
+    {
+        M_WriteTextCentered(90, "\"PNG\" PROVIDES LOSSLESS QUALITY,", cr[CR_LIGHTGRAY_DARK]);
+        M_WriteTextCentered(99, "\"JPEG\" OFFERS FASTER SAVING",      cr[CR_LIGHTGRAY_DARK]);
+    }
+    if (itemOn == 6)
+    {
+        if (!strcmp(screenshots_format, "png"))
+        {
+            M_WriteTextCentered(90,  "HIGHER = SLOWER SAVE, SMALLER FILE", cr[CR_LIGHTGRAY_DARK]);
+            M_WriteTextCentered(99,  "LOWER = FASTER SAVE, LARGER FILE",   cr[CR_LIGHTGRAY_DARK]);
+            M_WriteTextCentered(108, "DEFAULT LEVEL IS 6",                 cr[CR_LIGHTGRAY_DARK]);
+        }
+        else
+        {
+            M_WriteTextCentered(90,  "HIGHER = BETTER QUALITY, LARGER FILE", cr[CR_LIGHTGRAY_DARK]);
+            M_WriteTextCentered(99,  "LOWER = WORSE QUALITY, SMALLER FILE",  cr[CR_LIGHTGRAY_DARK]);
+            M_WriteTextCentered(108, "DEFAULT LEVEL IS 90",                  cr[CR_LIGHTGRAY_DARK]);
+        }
+    }
+
+    // < Scroll pages >
+    M_DrawScrollPages(ID_MENU_LEFTOFFSET_BIG, 135, 13, "2/2");
+}
+
+static void M_ID_Misc_RewindEnable (int choice)
+{
+    rewind_enable ^= 1;
+
+    // Clear key frames after disabling.
+    if (!rewind_enable)
+    {
+        G_ResetRewind(true);
+    }
+}
+
+static void M_ID_Misc_RewindInterwal (int choice)
+{
+    rewind_interval = M_INT_Slider(rewind_interval, 1, 600, choice, false);
+}
+
+static void M_ID_Misc_RewindDepth (int choice)
+{
+    rewind_depth = M_INT_Slider(rewind_depth, 10, 600, choice, false);
+}
+
+static void M_ID_Misc_RewindTimeout (int choice)
+{
+    rewind_timeout = M_INT_Slider(rewind_timeout, 0, 25, choice, false);
+}
+
+static void M_ID_Misc_ShotFormat (int choice)
+{
+    screenshots_format = strcmp(screenshots_format, "png") ? "png" : "jpg";
+}
+
+static void M_ID_Misc_ShotSetup (int choice)
+{
+    if (!strcmp(screenshots_format, "png"))
+    {
+        screenshots_png_compression = M_INT_Slider(screenshots_png_compression, 0, 10, choice, false);
+    }
+    else
+    {
+        screenshots_jpg_quality = M_INT_Slider(screenshots_jpg_quality, 1, 100, choice, false);
+    }
+}
+
+static void M_ScrollMisc (int choice)
+{
+         if (currentMenu == &ID_Def_Misc_1) { M_SetupNextMenu(&ID_Def_Misc_2); }
+    else if (currentMenu == &ID_Def_Misc_2) { M_SetupNextMenu(&ID_Def_Misc_1); }
+
+    itemOn = 13;
+}
+
+// -----------------------------------------------------------------------------
 // Reset settings
 // -----------------------------------------------------------------------------
 
@@ -4795,7 +5239,7 @@ static void M_DrawLoad(void)
     for (int i = 0;i < load_end; i++)
     {
         // [JN] Highlight selected item (itemOn == i) or apply fading effect.
-        dp_translation = (itemOn == i /*&& menu_highlight*/) ? cr[CR_MENU_BRIGHT2] : NULL;
+        dp_translation = (itemOn == i && menu_highlight) ? cr[CR_MENU_BRIGHT2] : NULL;
         M_DrawSaveLoadBorder(LoadDef.x,LoadDef.y+LINEHEIGHT*i+7);
         dp_translation = NULL;
 
@@ -4872,7 +5316,7 @@ static void M_DrawSave(void)
     for (i = 0; i < load_end; i++)
     {
         // [JN] Highlight selected item (itemOn == i) or apply fading effect.
-        dp_translation = (itemOn == i /*&& menu_highlight*/) ? cr[CR_MENU_BRIGHT2] : NULL;
+        dp_translation = (itemOn == i && menu_highlight) ? cr[CR_MENU_BRIGHT2] : NULL;
         M_DrawSaveLoadBorder(LoadDef.x,LoadDef.y+LINEHEIGHT*i+7);
         dp_translation = NULL;
 
@@ -4889,7 +5333,7 @@ static void M_DrawSave(void)
 	i = M_StringWidth(savegamestrings[saveSlot]);
 	// [PN] Highlight "_" cursor only if menu highlighting is enabled.
 	M_WriteText(LoadDef.x + i,LoadDef.y+LINEHEIGHT*saveSlot,"_",
-	            /*menu_highlight ?*/ cr[CR_MENU_BRIGHT5] /*: NULL*/);
+	            menu_highlight ? cr[CR_MENU_BRIGHT5] : NULL);
 	// [JN] Forcefully hide the mouse cursor while typing.
 	menu_mouse_allow = false;
     }
@@ -5315,10 +5759,7 @@ M_DrawThermo
     int		i;
 
     // [JN] Highlight active slider and gem.
-    if (itemPos == itemOn)
-    {
-        dp_translation = cr[CR_MENU_BRIGHT2];
-    }
+    dp_translation = (itemPos == itemOn && menu_highlight) ? cr[CR_MENU_BRIGHT2] : NULL;
 
     xx = x;
     V_DrawShadowedPatchOptional(xx, y, W_CacheLumpName("M_THERML", PU_CACHE));
@@ -6685,15 +7126,32 @@ boolean M_Responder (event_t* ev)
     }
     else if (key == key_menu_activate)
     {
-        // Deactivate menu
-
-        currentMenu->lastOn = itemOn;
-        M_ClearMenus ();
-        S_StartSound(NULL, sfx_swtchx);
+        // [JN] If ESC key behaviour is set to "go back":
+        if (menu_esc_key)
+        {
+            if (currentMenu == &MainDef || currentMenu == &SoundDef
+            ||  currentMenu == &LoadDef || currentMenu == &SaveDef)
+            {
+                goto id_close_menu;  // [JN] Close menu imideatelly.
+            }
+            else
+            {
+                goto id_prev_menu;   // [JN] Go to previous menu.
+            }
+        }
+        else
+        {
+            id_close_menu:
+            // Deactivate menu
+            currentMenu->lastOn = itemOn;
+            M_ClearMenus();
+            S_StartSound(NULL, sfx_swtchx);
+        }
         return true;
     }
     else if (key == key_menu_back)
     {
+        id_prev_menu:
         // Go back to previous menu
         currentMenu->lastOn = itemOn;
 
@@ -7080,7 +7538,10 @@ void M_Drawer (void)
         // [JN] Draw glowing * symbol.
         if (itemOn != -1)
         M_WriteTextGlow(x - ID_MENU_CURSOR_OFFSET, y + itemOn * ID_MENU_LINEHEIGHT_SMALL, "*",
-                            cr[CR_MENU_DARK4], cr[CR_MENU_BRIGHT5], (cursor_tics * 17));
+                            cr[CR_MENU_DARK4], cr[CR_MENU_BRIGHT5],
+                            menu_highlight == 1 ? (cursor_tics * 17)        :  // Animated
+                            menu_highlight == 0 ? (whichSkull ?  50 : 200)  :  // Off
+                                                  (whichSkull ? 100 : 200)) ;  // Static
 
         for (i = 0 ; i < max ; i++)
         {
@@ -7169,10 +7630,24 @@ void M_Ticker (void)
     }
 
     // [JN] Menu item fading effect:
+    // Keep menu item bright or decrease tics for fading effect.
     for (int i = 0 ; i < currentMenu->numitems ; i++)
     {
-        currentMenu->menuitems[i].tics = (itemOn == i) ? 5 :
-            (currentMenu->menuitems[i].tics > 0 ? currentMenu->menuitems[i].tics - 1 : 0);
+        if (menu_highlight == 1)
+        {
+            currentMenu->menuitems[i].tics = (itemOn == i) ? 5 :
+                (currentMenu->menuitems[i].tics > 0 ? currentMenu->menuitems[i].tics - 1 : 0);
+        }
+        else
+        if (menu_highlight == 2)
+        {
+            currentMenu->menuitems[i].tics =
+                (itemOn == i) ? 5 : 0;
+        }
+        else
+        {
+            currentMenu->menuitems[i].tics = 0;
+        }
     }
     
     // [JN] "Defaults Restored" plaque timer.
