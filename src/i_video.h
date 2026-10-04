@@ -96,6 +96,10 @@ void I_RenderReadPixels (byte **data, int *w, int *h);
 // Takes full 8 bit values.
 void I_SetPalette (int palette);
 
+// [PN] Rebuild the damage/bonus/radiation pane textures applying the
+// Display Options picture-adjustment (intensity/saturation/contrast).
+void I_SetColorPanes (boolean recreate_argbbuffer);
+
 // [PN] We define a macro that manually assembles a 32-bit pixel from separate R/G/B values.
 // It applies the format's shift and loss adjustments, then merges all components (and alpha mask) with bitwise OR.
 // This avoids the overhead of the SDL_MapRGB() function call.

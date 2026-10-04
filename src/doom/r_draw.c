@@ -234,6 +234,30 @@ void R_SetFuzzPosDraw (void)
 }
 
 // -----------------------------------------------------------------------------
+// I_BlendFuzz_8
+//
+// [PN] Hash lookup: We use the Knuth multiplicative hash to find the slot
+// in our argb2pal_keys/vals table. That table was built earlier from all
+// colormap rows + PLAYPAL.
+//
+// Resolve index: If the ARGB value was found, we recover its original
+// palette index (idx).
+//
+// Vanilla fuzz logic: We remap that index through COLORMAP row #6
+// (colormaps_idx[(6<<8)+idx]), exactly like DOS Doom did for fuzz.
+// 
+// Convert back to ARGB: Using pal_color[idx2] we return the final ARGB color
+// to be drawn.
+// -----------------------------------------------------------------------------
+
+static inline pixel_t I_BlendFuzz(pixel_t bg, int amount)
+{
+    {
+        return I_BlendDark_32(bg, amount);
+    }
+}
+
+// -----------------------------------------------------------------------------
 // R_DrawFuzzColumn
 // Framebuffer postprocessing.
 // Creates a fuzzy image by copying pixels from adjacent ones to left and right.
@@ -269,10 +293,16 @@ void R_DrawFuzzColumn(void)
     const pixel_t *restrict const vbuf_start = I_VideoBuffer;
     const pixel_t *restrict const vbuf_end = I_VideoBuffer + SCREENAREA;
     const int fuzzwrap = FUZZTABLE;
+    const int fuzzalpha = fuzz_alpha;
     const int block = (vid_resolution > 1) ? vid_resolution : 1;
 
+    // Precompute "improved fuzz" flag once; behavior identical to original
+    const boolean improved_fuzz =
+        (vis_improved_fuzz == 1) && (realleveltime > oldleveltime);
+
     // --- Blocky mode for hi-res ---
-    if (block > 1)
+    // [JN] vis_improved_fuzz == 4 is "unscaled", skip this block
+    if (block > 1 && vis_improved_fuzz < 4)
     {
         // Draw only from leading column of each block
         if (dc_x % block)
@@ -301,14 +331,14 @@ void R_DrawFuzzColumn(void)
             if (src < vbuf_start) src = dest + sh - 1;
             if (src < vbuf_end)
             {
-                const pixel_t blended = I_BlendDark_32(*src, 0xD3); // 211 (17% darkening)
+                const pixel_t blended = I_BlendFuzz(*src, fuzzalpha);
 
-                // Fill rectangle: write_lines × fuzzblockwidth
+                // Fill rectangle: fuzzblockwidth columns × write_lines rows.
                 for (int j = 0; j < fuzzblockwidth; ++j)
                 {
-                    pixel_t *row = dest + (size_t)j * sh;
+                    pixel_t *col = dest + (size_t)j * sh;
                     for (int ly = 0; ly < write_lines; ++ly)
-                        row[ly] = blended;
+                        col[ly] = blended;
                 }
             }
 
@@ -320,6 +350,8 @@ void R_DrawFuzzColumn(void)
             if (++local_fuzzpos == fuzzwrap)
             {
                 local_fuzzpos = 0;
+                if (improved_fuzz)
+                    local_fuzzpos = ID_Random() % 49;
             }
 
             grid_lines = block;
@@ -329,7 +361,7 @@ void R_DrawFuzzColumn(void)
         if (cutoff)
         {
             const int fuzz_off = (fuzzoffsetbase[local_fuzzpos] - FUZZOFF) / 2;
-            const pixel_t blended = I_BlendDark_32(dest[fuzz_off], 0xD3); // 211 (17% darkening)
+            const pixel_t blended = I_BlendFuzz(dest[fuzz_off], fuzzalpha);
             for (int j = 0; j < fuzzblockwidth; ++j)
                 dest[j * sh] = blended;
         }
@@ -348,12 +380,14 @@ void R_DrawFuzzColumn(void)
         // Top clamp + in-bounds guard
         if (src < vbuf_start) src = dest + sh - 1;
         if (src < vbuf_end)
-            *dest = I_BlendDark_32(*src, 0xD3); // 211 (17% darkening)
+            *dest = I_BlendFuzz(*src, fuzzalpha);
 
         // Update fuzz position (compact wrap & optional jitter)
         if (++local_fuzzpos == fuzzwrap)
         {
             local_fuzzpos = 0;
+            if (improved_fuzz)
+                local_fuzzpos = ID_Random() % 49;
         }
 
         dest++;
@@ -363,7 +397,7 @@ void R_DrawFuzzColumn(void)
     if (cutoff)
     {
         const int fuzz_offset = (fuzzoffsetbase[local_fuzzpos] - FUZZOFF) / 2;
-        *dest = I_BlendDark_32(dest[fuzz_offset], 0xD3); // 211 (17% darkening)
+        *dest = I_BlendFuzz(dest[fuzz_offset], fuzzalpha);
     }
 
     fuzzpos = local_fuzzpos;
@@ -409,10 +443,16 @@ void R_DrawFuzzColumnLow(void)
     const pixel_t *restrict const vbuf_start = I_VideoBuffer;
     const pixel_t *restrict const vbuf_end   = I_VideoBuffer + SCREENAREA;
     const int fuzzwrap = FUZZTABLE;
+    const int fuzzalpha = fuzz_alpha;
     const int block = (vid_resolution > 1) ? vid_resolution : 1;
 
+    // Precompute "improved fuzz" once
+    const boolean improved_fuzz =
+        (vis_improved_fuzz == 1) && (realleveltime > oldleveltime);
+
     // --- Blocky mode for hi-res: draw rectangles aligned to the grid ---
-    if (block > 1)
+    // [JN] vis_improved_fuzz == 4 is "unscaled", skip this block
+    if (block > 1 && vis_improved_fuzz < 4)
     {
         // Choose block anchor among the two physical columns (x or x+1)
         int anchorShift = -1;
@@ -453,14 +493,14 @@ void R_DrawFuzzColumnLow(void)
             if (src < vbuf_start) src = draw + sh - 1;
             if (src < vbuf_end)
             {
-                const pixel_t blended = I_BlendDark_32(*src, 0xD3); // 211 (17% darkening)
+                const pixel_t blended = I_BlendFuzz(*src, fuzzalpha);
 
-                // Fill rectangle: write_lines × fuzzblockwidth (anchored)
+                // Fill rectangle: fuzzblockwidth columns × write_lines rows.
                 for (int j = 0; j < fuzzblockwidth; ++j)
                 {
-                    pixel_t *row = draw + (size_t)j * sh;
+                    pixel_t *col = draw + (size_t)j * sh;
                     for (int ly = 0; ly < write_lines; ++ly)
-                        row[ly] = blended;
+                        col[ly] = blended;
                 }
             }
 
@@ -474,6 +514,8 @@ void R_DrawFuzzColumnLow(void)
             if (++local_fuzzpos == fuzzwrap)
             {
                 local_fuzzpos = 0;
+                if (improved_fuzz)
+                    local_fuzzpos = ID_Random() % 49;
             }
 
             grid_lines = block;
@@ -483,7 +525,7 @@ void R_DrawFuzzColumnLow(void)
         if (cutoff)
         {
             const int fuzz_off = (fuzzoffsetbase[local_fuzzpos] - FUZZOFF) / 2;
-            const pixel_t blended = I_BlendDark_32(draw[fuzz_off], 0xD3); // 211 (17% darkening)
+            const pixel_t blended = I_BlendFuzz(draw[fuzz_off], fuzzalpha);
             for (int j = 0; j < fuzzblockwidth; ++j)
                 draw[j * sh] = blended;
         }
@@ -502,18 +544,20 @@ void R_DrawFuzzColumnLow(void)
         const pixel_t *restrict src2 = dest2 + off;
 
         // Top clamp + in-bounds guard
-        if (src1 < vbuf_start) src1 = dest + sh - 1;
+        if (src1 < vbuf_start) src1 = dest  + sh - 1;
         if (src2 < vbuf_start) src2 = dest2 + sh - 1;
 
         if (src1 < vbuf_end)
-            *dest = I_BlendDark_32(*src1, 0xD3); // 211 (17% darkening)
+            *dest = I_BlendFuzz(*src1, fuzzalpha);
         if (src2 < vbuf_end)
-            *dest2 = I_BlendDark_32(*src2, 0xD3); // 211 (17% darkening)
+            *dest2 = I_BlendFuzz(*src2, fuzzalpha);
 
         // Update fuzzpos (compact wrap & optional jitter)
         if (++local_fuzzpos == fuzzwrap)
         {
             local_fuzzpos = 0;
+            if (improved_fuzz)
+                local_fuzzpos = ID_Random() % 49;
         }
 
         dest++;
@@ -524,8 +568,8 @@ void R_DrawFuzzColumnLow(void)
     if (cutoff)
     {
         const int fuzz_offset = (fuzzoffsetbase[local_fuzzpos] - FUZZOFF) / 2;
-        *dest  = I_BlendDark_32(dest [fuzz_offset], 0xD3); // 211 (17% darkening)
-        *dest2 = I_BlendDark_32(dest2[fuzz_offset], 0xD3); // 211 (17% darkening)
+        *dest  = I_BlendFuzz(dest [fuzz_offset], fuzzalpha);
+        *dest2 = I_BlendFuzz(dest2[fuzz_offset], fuzzalpha);
     }
 
     // Persist fuzz position
@@ -566,7 +610,7 @@ void R_DrawFuzzBWColumn(void)
     const pixel_t *restrict const vbuf_start = I_VideoBuffer;
     const pixel_t *restrict const vbuf_end   = I_VideoBuffer + SCREENAREA;
     const int fuzzwrap = FUZZTABLE;
-    const int fuzzalpha = 0xD3; // fuzz_alpha;
+    const int fuzzalpha = fuzz_alpha;
     const int block = (vid_resolution > 1) ? vid_resolution : 1;
 
     // --- Blocky mode for hi-res: rectangles aligned to the block grid ---
@@ -703,7 +747,7 @@ void R_DrawFuzzBWColumnLow(void)
     const pixel_t *restrict const vbuf_start = I_VideoBuffer;
     const pixel_t *restrict const vbuf_end   = I_VideoBuffer + SCREENAREA;
     const int fuzzwrap = FUZZTABLE;
-    const int fuzzalpha = 0xD3; // fuzz_alpha;
+    const int fuzzalpha = fuzz_alpha;
     const int block = (vid_resolution > 1) ? vid_resolution : 1;
 
     // --- Blocky mode for hi-res: rectangles aligned to the block grid ---

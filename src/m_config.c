@@ -210,11 +210,16 @@ static default_t	doom_defaults_list[] =
 
     // Display options
     CONFIG_VARIABLE_COMMENT("Display options"),
+    CONFIG_VARIABLE_INT(dp_cry_palette),
     CONFIG_VARIABLE_INT(vid_gamma),
     CONFIG_VARIABLE_INT(vid_fov),
+    CONFIG_VARIABLE_INT(vid_saturation),
+    CONFIG_VARIABLE_FLOAT(vid_contrast),
+    CONFIG_VARIABLE_FLOAT(vid_r_intensity),
+    CONFIG_VARIABLE_FLOAT(vid_g_intensity),
+    CONFIG_VARIABLE_FLOAT(vid_b_intensity),
     CONFIG_VARIABLE_INT(dp_screen_size),
     CONFIG_VARIABLE_INT(dp_detail_level),
-    CONFIG_VARIABLE_INT(dp_cry_palette),
     CONFIG_VARIABLE_INT(dp_menu_shading),
     CONFIG_VARIABLE_INT(dp_level_brightness),
     CONFIG_VARIABLE_COMMENT(""),
@@ -224,6 +229,7 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_INT(msg_show),
     CONFIG_VARIABLE_INT(msg_alignment),
     CONFIG_VARIABLE_INT(msg_text_shadows),
+    CONFIG_VARIABLE_INT(msg_fade),
     CONFIG_VARIABLE_INT(msg_local_time),
     CONFIG_VARIABLE_COMMENT(""),
 

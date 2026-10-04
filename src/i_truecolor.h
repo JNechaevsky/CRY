@@ -27,6 +27,8 @@
 
 // TrueColor blending:
 extern uint8_t additive_lut_32[511];
+extern uint8_t shadow_alpha;
+extern uint8_t fuzz_alpha;
 
 extern void I_InitTCTransMaps (void);
 

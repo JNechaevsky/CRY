@@ -27,7 +27,8 @@
 #include "v_trans.h"
 #include "v_video.h"
 #include "z_zone.h"
-#include "jagcry.h"   // [PN] Jaguar CRY color space
+#include "jagcry.h"        // [PN] Jaguar CRY color space
+#include "i_truecolor.h"   // [PN] I_SaturationPercent for the picture-adjust chain
 
 
 //
@@ -1050,6 +1051,34 @@ static uint16_t CRY_EncodeRGB(int r, int g, int b)
     return (uint16_t)((best_c << CRY_CSHIFT) | (best_r << CRY_RSHIFT) | best_y);
 }
 
+// -----------------------------------------------------------------------------
+// [PN] Picture-adjustment chain ported from Inter (Display Options). The
+// coefficients below are computed once per R_InitColormaps() call, so the
+// macros can be dropped onto any RGB triple. Order matches Inter:
+//   intensity -> saturation -> (gamma) -> lighting -> contrast.
+// Gamma is folded in via gtab[] at each use site; contrast is applied last.
+// (Inter also has a colorblind step, but CRY has no a11y_colorblind cvar.)
+// -----------------------------------------------------------------------------
+
+// [PN] Per-channel intensity then desaturate/oversaturate toward the luma
+// axis. Reads the unclamped intensity floats, mixes with the a_hi/a_lo
+// coefficients and writes clamped 0..255 ints into out[0..2].
+#define ADJ_INTENSITY_SAT(in_r, in_g, in_b, out) \
+    { const float ir_ = (in_r) * vid_r_intensity; \
+      const float ig_ = (in_g) * vid_g_intensity; \
+      const float ib_ = (in_b) * vid_b_intensity; \
+      (out)[0] = BETWEEN(0, 255, (int)(one_minus_a_hi * ir_ + a_lo * (ig_ + ib_))); \
+      (out)[1] = BETWEEN(0, 255, (int)(one_minus_a_hi * ig_ + a_lo * (ir_ + ib_))); \
+      (out)[2] = BETWEEN(0, 255, (int)(one_minus_a_hi * ib_ + a_lo * (ir_ + ig_))); }
+
+// [PN] Contrast pivots around mid-gray; applied to a final (post-lighting)
+// RGB triple held as ints.
+#define ADJ_CONTRAST(r, g, b) \
+    { (r) = BETWEEN(0, 255, (int)(ct  * (r) + ct_adj)); \
+      (g) = BETWEEN(0, 255, (int)(ct  * (g) + ct_adj)); \
+      (b) = BETWEEN(0, 255, (int)(ct  * (b) + ct_adj)); }
+
+
 void R_InitColormaps (void)
 {
 	int i, j = 0;
@@ -1078,6 +1107,15 @@ void R_InitColormaps (void)
     // [PN] Precompute gamma'ed base RGB for both palettes (once per index)
     const byte *const restrict gtab = gammatable[vid_gamma];
     const int gamma_black = gtab[0];
+
+    // [PN] Picture-adjustment coefficients (see macros above).
+    const int saturation = BETWEEN(0, 200, vid_saturation);
+    const float a_hi = (saturation < 100) ? I_SaturationPercent[saturation]
+                                          : -(float)(saturation - 100) * 0.0066f;
+    const float one_minus_a_hi = 1.0f - a_hi;
+    const float a_lo = a_hi * 0.5f;
+    const float ct = vid_contrast;
+    const float ct_adj = 128.0f * (1.0f - ct);
     
     byte base_gamma_render[256][3];
     byte base_gamma_invul [256][3];
@@ -1090,15 +1128,22 @@ void R_InitColormaps (void)
     
     for (int p = 0; p < 256; ++p)
     {
+        int adj[3];
+
         if (!dp_cry_palette)
         {
-            base_gamma_render[p][0] = gtab[playpal[3 * p + 0]];
-            base_gamma_render[p][1] = gtab[playpal[3 * p + 1]];
-            base_gamma_render[p][2] = gtab[playpal[3 * p + 2]];
+            // [PN] PLAYPAL: intensity/saturation on the source RGB, then gamma.
+            ADJ_INTENSITY_SAT(playpal[3 * p + 0], playpal[3 * p + 1],
+                              playpal[3 * p + 2], adj);
+            base_gamma_render[p][0] = gtab[adj[0]];
+            base_gamma_render[p][1] = gtab[adj[1]];
+            base_gamma_render[p][2] = gtab[adj[2]];
 
-            base_gamma_invul[p][0] = gtab[invulpal[3 * p + 0]];
-            base_gamma_invul[p][1] = gtab[invulpal[3 * p + 1]];
-            base_gamma_invul[p][2] = gtab[invulpal[3 * p + 2]];
+            ADJ_INTENSITY_SAT(invulpal[3 * p + 0], invulpal[3 * p + 1],
+                              invulpal[3 * p + 2], adj);
+            base_gamma_invul[p][0] = gtab[adj[0]];
+            base_gamma_invul[p][1] = gtab[adj[1]];
+            base_gamma_invul[p][2] = gtab[adj[2]];
             continue;
         }
 
@@ -1112,16 +1157,20 @@ void R_InitColormaps (void)
 
         // [JN] Apply gamma tables after CRY decoding so gamma
         // correction works the same way as with the PLAYPAL palette.
+        // [PN] The picture-adjustment chain runs on the decoded RGB, i.e.
+        // AFTER the CRY color space, matching how it applies to PLAYPAL.
         const uint32_t rgb  = CRYToRGB[crybase_render[p]];
         const uint32_t rgbi = CRYToRGB[crybase_invul[p]];
 
-        base_gamma_render[p][0] = gtab[(rgb >> 16) & 0xff];
-        base_gamma_render[p][1] = gtab[(rgb >> 8) & 0xff];
-        base_gamma_render[p][2] = gtab[rgb & 0xff];
+        ADJ_INTENSITY_SAT((rgb >> 16) & 0xff, (rgb >> 8) & 0xff, rgb & 0xff, adj);
+        base_gamma_render[p][0] = gtab[adj[0]];
+        base_gamma_render[p][1] = gtab[adj[1]];
+        base_gamma_render[p][2] = gtab[adj[2]];
 
-        base_gamma_invul[p][0] = gtab[(rgbi >> 16) & 0xff];
-        base_gamma_invul[p][1] = gtab[(rgbi >> 8) & 0xff];
-        base_gamma_invul[p][2] = gtab[rgbi & 0xff];
+        ADJ_INTENSITY_SAT((rgbi >> 16) & 0xff, (rgbi >> 8) & 0xff, rgbi & 0xff, adj);
+        base_gamma_invul[p][0] = gtab[adj[0]];
+        base_gamma_invul[p][1] = gtab[adj[1]];
+        base_gamma_invul[p][2] = gtab[adj[2]];
     }
     
     // [PN] Build colormaps with simple gamma-space fade to black
@@ -1157,27 +1206,35 @@ void R_InitColormaps (void)
                 const uint32_t dec  = CRYToRGB[(cb & CRY_COLORMASK) | y];
                 const uint32_t deci = CRYToRGB[(ci & CRY_COLORMASK) | yi];
 
-                row_col[i] = 0xff000000 | (gtab[(dec >> 16) & 0xff] << 16)
-                                        | (gtab[(dec >> 8) & 0xff] << 8)
-                                        |  gtab[dec & 0xff];
-                row_inv[i] = 0xff000000 | (gtab[(deci >> 16) & 0xff] << 16)
-                                        | (gtab[(deci >> 8) & 0xff] << 8)
-                                        |  gtab[deci & 0xff];
+                // [PN] Picture adjust on the lit, post-CRY-decode RGB.
+                int adj[3];
+                ADJ_INTENSITY_SAT((dec >> 16) & 0xff, (dec >> 8) & 0xff, dec & 0xff, adj);
+                r = gtab[adj[0]]; g = gtab[adj[1]]; b = gtab[adj[2]];
+                int R = r, G = g, B = b;
+                ADJ_CONTRAST(R, G, B);
+                row_col[i] = 0xff000000 | ((byte)R << 16) | ((byte)G << 8) | (byte)B;
+
+                ADJ_INTENSITY_SAT((deci >> 16) & 0xff, (deci >> 8) & 0xff, deci & 0xff, adj);
+                r = gtab[adj[0]]; g = gtab[adj[1]]; b = gtab[adj[2]];
+                int Ri = r, Gi = g, Bi = b;
+                ADJ_CONTRAST(Ri, Gi, Bi);
+                row_inv[i] = 0xff000000 | ((byte)Ri << 16) | ((byte)Gi << 8) | (byte)Bi;
                 continue;
             }
 
-            // [PN] Normal colormap (render palette)
-            const int R = (int)(base_gamma_render[k][0] * k0 + kB);
-            const int G = (int)(base_gamma_render[k][1] * k0 + kB);
-            const int B = (int)(base_gamma_render[k][2] * k0 + kB);
-    
+            // [PN] Normal colormap (render palette): fade adjusted base to
+            // black, then apply contrast to the lit result.
+            int R = (int)(base_gamma_render[k][0] * k0 + kB);
+            int G = (int)(base_gamma_render[k][1] * k0 + kB);
+            int B = (int)(base_gamma_render[k][2] * k0 + kB);
+            ADJ_CONTRAST(R, G, B);
             row_col[i] = 0xff000000 | ((byte)R << 16) | ((byte)G << 8) | (byte)B;
     
             // [PN] Invulnerability colormap (invul palette)
-            const int Ri = (int)(base_gamma_invul[k][0] * k0 + kB);
-            const int Gi = (int)(base_gamma_invul[k][1] * k0 + kB);
-            const int Bi = (int)(base_gamma_invul[k][2] * k0 + kB);
-    
+            int Ri = (int)(base_gamma_invul[k][0] * k0 + kB);
+            int Gi = (int)(base_gamma_invul[k][1] * k0 + kB);
+            int Bi = (int)(base_gamma_invul[k][2] * k0 + kB);
+            ADJ_CONTRAST(Ri, Gi, Bi);
             row_inv[i] = 0xff000000 | ((byte)Ri << 16) | ((byte)Gi << 8) | (byte)Bi;
         }
     }
@@ -1187,13 +1244,17 @@ void R_InitColormaps (void)
 		pal_color = (pixel_t*) Z_Malloc(256 * sizeof(pixel_t), PU_STATIC, 0);
 	}
 
+	// [PN] Full-bright patch palette (PLAYPAL): same chain incl. contrast.
 	for (i = 0, j = 0; i < 256; i++)
 	{
-		r = gammatable[vid_gamma][playpal[3 * i + 0]];
-		g = gammatable[vid_gamma][playpal[3 * i + 1]];
-		b = gammatable[vid_gamma][playpal[3 * i + 2]];
+		int adj[3];
+		ADJ_INTENSITY_SAT(playpal[3 * i + 0], playpal[3 * i + 1],
+		                  playpal[3 * i + 2], adj);
+		r = gtab[adj[0]]; g = gtab[adj[1]]; b = gtab[adj[2]];
+		int pr = r, pg = g, pb = b;
+		ADJ_CONTRAST(pr, pg, pb);
 
-		pal_color[j++] = 0xff000000 | (r << 16) | (g << 8) | b;
+		pal_color[j++] = 0xff000000 | (pr << 16) | (pg << 8) | pb;
 	}
 
 	if (!cry_color)
@@ -1205,9 +1266,11 @@ void R_InitColormaps (void)
 	// to the projected render base above.
 	for (i = 0, j = 0; i < 256; i++)
 	{
-		cry_color[i] = 0xff000000 | (base_gamma_render[i][0] << 16)
-		                          | (base_gamma_render[i][1] << 8)
-		                          |  base_gamma_render[i][2];
+		int cry_r = base_gamma_render[i][0];
+		int cry_g = base_gamma_render[i][1];
+		int cry_b = base_gamma_render[i][2];
+		ADJ_CONTRAST(cry_r, cry_g, cry_b);
+		cry_color[i] = 0xff000000 | (cry_r << 16) | (cry_g << 8) | cry_b;
 	}
 
 	// [JN] Which palette to use for patch drawing, CRYPAL or PLAYPAL?
@@ -1218,6 +1281,13 @@ void R_InitColormaps (void)
 
 	// [PN] Base colormaps[] changed: rebuild colored sector-light LUT banks.
 	R_ColLight_RebuildBanks();
+
+	// [JN] Recalculate shadow alpha value for shadowed patches,
+	// and fuzz alpha value for fuzz effect drawing based on contrast.
+	// 0x80 (128) represents 50% darkening, 0xD3 (211) represents 17% darkening.
+	// Ensure the result stays within 0-255.
+	shadow_alpha = (uint8_t)BETWEEN(0, 255 - (32 * vid_contrast), 0x80 / vid_contrast);
+	fuzz_alpha = (uint8_t)BETWEEN(0, 255 - (8 * vid_contrast), 0xD3 / vid_contrast);
 }
 
 // -----------------------------------------------------------------------------

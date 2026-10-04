@@ -36,6 +36,7 @@ void V_CopyRect(int srcx, int srcy, pixel_t *source, int width, int height, int 
 void V_DrawPatch(int x, int y, patch_t *patch);
 void V_DrawShadowedPatchOptional(int x, int y, patch_t *patch);
 void V_DrawPatchFullScreen(patch_t *patch, boolean flipped);
+extern void V_DrawShadowedPatchOptionalFade(int x, int y, patch_t *patch, int alpha);
 extern void V_DrawPatchFlipped(int x, int y, patch_t *patch);
 void V_DrawPatchFinale(int x, int y, patch_t *patch);
 void V_DrawFadePatch(int x, int y, const patch_t *restrict patch, int alpha);

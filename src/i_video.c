@@ -1401,6 +1401,85 @@ static SDL_Texture *CreatePaletteTexture (uint8_t r, uint8_t g, uint8_t b, SDL_B
     return pal_texture;
 }
 
+// [PN] Apply the Display Options picture-adjustment to a full-screen pane
+// tint (display-space color: intensity -> saturation -> contrast, no gamma,
+// no lighting). Mirrors Inter's I_SetColorPanes minus the colorblind step,
+// which CRY has no cvar for.
+static void AdjustPaneColor (uint8_t in_r, uint8_t in_g, uint8_t in_b,
+                             uint8_t out[3])
+{
+    const int saturation = BETWEEN(0, 200, vid_saturation);
+    const float a_hi = (saturation < 100) ? I_SaturationPercent[saturation]
+                                          : -(float)(saturation - 100) * 0.0066f;
+    const float one_minus_a_hi = 1.0f - a_hi;
+    const float a_lo = a_hi * 0.5f;
+    const float ct = vid_contrast;
+    const float ct_adj = 128.0f * (1.0f - ct);
+
+    const float ir = in_r * vid_r_intensity;
+    const float ig = in_g * vid_g_intensity;
+    const float ib = in_b * vid_b_intensity;
+
+    float r = one_minus_a_hi * ir + a_lo * (ig + ib);
+    float g = one_minus_a_hi * ig + a_lo * (ir + ib);
+    float b = one_minus_a_hi * ib + a_lo * (ir + ig);
+
+    out[0] = (byte)BETWEEN(0, 255, (int)(ct * r + ct_adj));
+    out[1] = (byte)BETWEEN(0, 255, (int)(ct * g + ct_adj));
+    out[2] = (byte)BETWEEN(0, 255, (int)(ct * b + ct_adj));
+}
+
+void I_SetColorPanes (boolean recreate_argbbuffer)
+{
+    uint8_t c[3];
+
+    // [PN] (Re)create the shared fill surface if requested. Its layout is
+    // transposed (w=SCREENHEIGHT) to match the upload path in I_FinishUpdate.
+    if (recreate_argbbuffer)
+    {
+        if (argbbuffer != NULL)
+        {
+            SDL_FreeSurface(argbbuffer);
+            argbbuffer = NULL;
+        }
+
+        argbbuffer = SDL_CreateRGBSurfaceWithFormat(
+                     0, SCREENHEIGHT, SCREENWIDTH, 32, SDL_PIXELFORMAT_ARGB8888);
+    }
+
+    // [PN] Red damage pane is a neutral white MOD texture whose tint is
+    // driven at set-palette time via SDL_SetTextureColorMod, so its base
+    // color is intentionally left untouched.
+    if (palette_red != NULL)
+    {
+        SDL_DestroyTexture(palette_red);
+    }
+    palette_red = CreatePaletteTexture(255, 255, 255, SDL_BLENDMODE_MOD);
+
+    // [PN] Yellow (bonus) / green (radiation) / yellow+green panes carry a
+    // real tint, so apply the picture-adjustment to their source colors.
+    if (palette_yellow != NULL)
+    {
+        SDL_DestroyTexture(palette_yellow);
+    }
+    AdjustPaneColor(255, 164, 0, c);
+    palette_yellow = CreatePaletteTexture(c[0], c[1], c[2], SDL_BLENDMODE_BLEND);
+
+    if (palette_green != NULL)
+    {
+        SDL_DestroyTexture(palette_green);
+    }
+    AdjustPaneColor( 64, 255, 0, c);
+    palette_green = CreatePaletteTexture(c[0], c[1], c[2], SDL_BLENDMODE_MUL);
+
+    if (palette_bonusrad != NULL)
+    {
+        SDL_DestroyTexture(palette_bonusrad);
+    }
+    AdjustPaneColor(191, 255, 0, c);
+    palette_bonusrad = CreatePaletteTexture(c[0], c[1], c[2], SDL_BLENDMODE_MUL);
+}
+
 static void SetVideoMode(void)
 {
     int w, h;
@@ -1514,6 +1593,9 @@ static void SetVideoMode(void)
         // all associated textures get destroyed
         texture = NULL;
         texture_upscaled = NULL;
+        // [PN] The pane textures are tied to the old renderer too; clear the
+        // handles so I_SetColorPanes() rebuilds them without a double-free.
+        palette_red = palette_yellow = palette_green = palette_bonusrad = NULL;
     }
 
     renderer = SDL_CreateRenderer(screen, -1, renderer_flags);
@@ -1578,11 +1660,9 @@ static void SetVideoMode(void)
         argbbuffer = SDL_CreateRGBSurfaceWithFormat(
                      0, SCREENHEIGHT, SCREENWIDTH, 32, SDL_PIXELFORMAT_ARGB8888);
 
-        // [PN] Use the helper function to create textures for all palettes
-        palette_red      = CreatePaletteTexture(255, 255, 255, SDL_BLENDMODE_MOD);
-        palette_yellow   = CreatePaletteTexture(255, 164,   0, SDL_BLENDMODE_BLEND);
-        palette_green    = CreatePaletteTexture( 64, 255,   0, SDL_BLENDMODE_MUL);
-        palette_bonusrad = CreatePaletteTexture(191, 255,   0, SDL_BLENDMODE_MUL);
+        // [PN] Build the damage/bonus/radiation pane textures from the
+        // freshly created surface, applying the current picture-adjustment.
+        I_SetColorPanes(false);
 
         SDL_FillRect(argbbuffer, NULL, 0);
     }

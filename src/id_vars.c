@@ -58,10 +58,17 @@ int vid_gamma = 10;
 int vid_fov = 90;
 int dp_menu_shading = 0;
 int dp_level_brightness = 0;
+// Color settings
+int vid_saturation = 100;
+float vid_contrast = 1.000000;
+float vid_r_intensity = 1.000000;
+float vid_g_intensity = 1.000000;
+float vid_b_intensity = 1.000000;
 // Messages Settings
 int msg_show = 1;
 int msg_alignment = 0;
 int msg_text_shadows = 0;
+int msg_fade = 0;
 int msg_local_time = 0;
 
 //
@@ -206,10 +213,17 @@ void ID_BindVariables (void)
     M_BindIntVariable("vid_fov",                        &vid_fov);
     M_BindIntVariable("dp_menu_shading",                &dp_menu_shading);
     M_BindIntVariable("dp_level_brightness",            &dp_level_brightness);
+    // Color settings
+    M_BindIntVariable("vid_saturation",                 &vid_saturation);
+    M_BindFloatVariable("vid_contrast",                 &vid_contrast);
+    M_BindFloatVariable("vid_r_intensity",              &vid_r_intensity);
+    M_BindFloatVariable("vid_g_intensity",              &vid_g_intensity);
+    M_BindFloatVariable("vid_b_intensity",              &vid_b_intensity);
     // Messages Settings
     M_BindIntVariable("msg_show",                       &msg_show);
     M_BindIntVariable("msg_alignment",                  &msg_alignment);
     M_BindIntVariable("msg_text_shadows",               &msg_text_shadows);
+    M_BindIntVariable("msg_fade",                       &msg_fade);
     M_BindIntVariable("msg_local_time",                 &msg_local_time);    
 
     //

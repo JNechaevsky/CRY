@@ -522,13 +522,19 @@ static void M_ScrollVideo (int choice);
 
 static void M_Choose_ID_Display (int choice);
 static void M_Draw_ID_Display (void);
-static void M_ID_Gamma (int choice);
 static void M_ID_CRYPalette (int choice);
 static void M_ID_FOV (int choice);
 static void M_ID_MenuShading (int choice);
 static void M_ID_LevelBrightness (int choice);
+static void M_ID_Gamma (int choice);
+static void M_ID_Saturation (int choice);
+static void M_ID_Contrast (int choice);
+static void M_ID_R_Intensity (int choice);
+static void M_ID_G_Intensity (int choice);
+static void M_ID_B_Intensity (int choice);
 static void M_ID_MessagesAlignment (int choice);
 static void M_ID_TextShadows (int choice);
+static void M_ID_TextFade (int choice);
 static void M_ID_LocalTime (int choice);
 
 static void M_Choose_ID_Sound (int choice);
@@ -1524,17 +1530,22 @@ static void M_ScrollVideo (int choice)
 
 static menuitem_t ID_Menu_Display[]=
 {
-    { M_SLDR, "GAMMA-CORRECTION",        M_ID_Gamma,             'g' },
-    { M_SKIP, "", 0, '\0' },
-    { M_SKIP, "", 0, '\0' },
-    { M_MUL2, "CRY COLOR SPACE",         M_ID_CRYPalette,        'c' },
+    { M_MUL1, "CRY COLOR SPACE",         M_ID_CRYPalette,        'c' },
     { M_MUL1, "FIELD OF VIEW",           M_ID_FOV,               'f' },
     { M_MUL1, "MENU BACKGROUND SHADING", M_ID_MenuShading,       'm' },
     { M_MUL1, "EXTRA LEVEL BRIGHTNESS",  M_ID_LevelBrightness,   'e' },
     { M_SKIP, "", 0, '\0' },
+    { M_MUL1, "GAMMA-CORRECTION",        M_ID_Gamma,             'g' },
+    { M_MUL1, "SATURATION",              M_ID_Saturation,        's' },
+    { M_MUL1, "CONTRAST",                M_ID_Contrast,          'c' },
+    { M_MUL1, "RED INTENSITY",           M_ID_R_Intensity,       'r' },
+    { M_MUL1, "GREEN INTENSITY",         M_ID_G_Intensity,       'g' },
+    { M_MUL1, "BLUE INTENSITY",          M_ID_B_Intensity,       'b' },
+    { M_SKIP, "", 0, '\0' },
     { M_MUL2, "MESSAGES ENABLED",        M_ChangeMessages,       'm' },
     { M_MUL2, "MESSAGES ALIGNMENT",      M_ID_MessagesAlignment, 'm' },
     { M_MUL2, "TEXT CASTS SHADOWS",      M_ID_TextShadows,       't' },
+    { M_MUL1, "FADING EFFECT",           M_ID_TextFade,          'f' },
     { M_MUL2, "LOCAL TIME",              M_ID_LocalTime,         'l' },
 };
 
@@ -1557,92 +1568,131 @@ static void M_Choose_ID_Display (int choice)
 static void M_Draw_ID_Display (void)
 {
     char str[32];
+    const char *fade_speed[] = { "OFF", "SLOW", "NORMAL", "FAST" };
 
     M_WriteTextCentered(9, "DISPLAY OPTIONS", cr[CR_YELLOW]);
 
-    // Gamma-correction slider and num
-    M_DrawThermo(46, 27, 19, vid_gamma/2.1f, 0);
-    M_ID_HandleSliderMouseControl(52, 28, 156, &vid_gamma, false, 0, 40);
-    M_WriteTextGlow(216, 30, gammalvls[vid_gamma][1],
-                        NULL, cr[CR_MENU_BRIGHT5],
-                            LINE_ALPHA(0));
-
     // CRY Color Space
     sprintf(str, dp_cry_palette ? "ON" : "OFF");
-    M_WriteTextGlow(M_ItemRightAlign(str), 45, str,
+    M_WriteTextGlow(M_ItemRightAlign(str), 18, str,
                         dp_cry_palette ? cr[CR_GREEN] : cr[CR_DARKRED],
                             dp_cry_palette ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
-                                LINE_ALPHA(3));
+                                LINE_ALPHA(0));
 
     // Field of View
     sprintf(str, "%d", vid_fov);
-    M_WriteTextGlow(M_ItemRightAlign(str), 54, str,
+    M_WriteTextGlow(M_ItemRightAlign(str), 27, str,
                         vid_fov == 135 || vid_fov == 45 ? cr[CR_YELLOW] :
                         vid_fov == 90 ? cr[CR_DARKRED] : cr[CR_GREEN],
                             vid_fov == 135 || vid_fov == 45 ? cr[CR_YELLOW_BRIGHT] :
                             vid_fov == 90 ? cr[CR_RED_BRIGHT] : cr[CR_GREEN_BRIGHT],
-                                LINE_ALPHA(4));
+                                LINE_ALPHA(1));
 
     // Background shading
     sprintf(str, dp_menu_shading ? "%d" : "OFF", dp_menu_shading);
-    M_WriteTextGlow(M_ItemRightAlign(str), 63, str,
+    M_WriteTextGlow(M_ItemRightAlign(str), 36, str,
                         dp_menu_shading == 12 ? cr[CR_YELLOW] :
                         dp_menu_shading  > 0  ? cr[CR_GREEN] : cr[CR_DARKRED],
                             dp_menu_shading == 12 ? cr[CR_YELLOW_BRIGHT] :
                             dp_menu_shading  > 0  ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
-                                LINE_ALPHA(5));
+                                LINE_ALPHA(2));
 
     // Extra level brightness
     sprintf(str, dp_level_brightness ? "%d" : "OFF", dp_level_brightness);
-    M_WriteTextGlow(M_ItemRightAlign(str), 72, str,
+    M_WriteTextGlow(M_ItemRightAlign(str), 45, str,
                         dp_level_brightness == 8 ? cr[CR_YELLOW] :
                         dp_level_brightness  > 0  ? cr[CR_GREEN] : cr[CR_DARKRED],
                             dp_level_brightness == 8 ? cr[CR_YELLOW_BRIGHT] :
                             dp_level_brightness  > 0  ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
+                                LINE_ALPHA(3));
+
+    M_WriteTextCentered(54, "COLOR SETTINGS", cr[CR_YELLOW]);
+
+    // Gamma-correction
+    sprintf(str, "%s", gammalvls[vid_gamma][1]);
+    M_WriteTextGlow(M_ItemRightAlign(str), 63, str,
+                        NULL,
+                            cr[CR_MENU_BRIGHT5],
+                                LINE_ALPHA(5));
+
+    // Saturation
+    M_snprintf(str, 6, "%d%%", vid_saturation);
+    M_WriteTextGlow(M_ItemRightAlign(str), 72, str,
+                        cr[CR_LIGHTGRAY],
+                            cr[CR_LIGHTGRAY_BRIGHT],
                                 LINE_ALPHA(6));
 
-    M_WriteTextCentered(81, "MESSAGES SETTINGS", cr[CR_YELLOW]);
+    // Contrast
+    M_snprintf(str, 6, "%3f", vid_contrast);
+    M_WriteTextGlow(M_ItemRightAlign(str), 81, str,
+                        cr[CR_YELLOW],
+                            cr[CR_YELLOW_BRIGHT],
+                                LINE_ALPHA(7));
+
+    // RED intensity
+    M_snprintf(str, 6, "%3f", vid_r_intensity);
+    M_WriteTextGlow(M_ItemRightAlign(str), 90, str,
+                        cr[CR_RED],
+                            cr[CR_RED_BRIGHT],
+                                LINE_ALPHA(8));
+
+    // GREEN intensity
+    M_snprintf(str, 6, "%3f", vid_g_intensity);
+    M_WriteTextGlow(M_ItemRightAlign(str), 99, str,
+                        cr[CR_GREEN],
+                            cr[CR_GREEN_BRIGHT],
+                                LINE_ALPHA(9));
+
+    // BLUE intensity
+    M_snprintf(str, 6, "%3f", vid_b_intensity);
+    M_WriteTextGlow(M_ItemRightAlign(str), 108, str,
+                        cr[CR_BLUE2],
+                            cr[CR_BLUE2_BRIGHT],
+                                LINE_ALPHA(10));
+
+
+    M_WriteTextCentered(117, "MESSAGES SETTINGS", cr[CR_YELLOW]);
 
     // Messages enabled
     sprintf(str, msg_show ? "ON" : "OFF");
-    M_WriteTextGlow(M_ItemRightAlign(str), 90, str,
-                        msg_show ? cr[CR_GREEN] : cr[CR_DARKRED],
-                            msg_show ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT], 
-                                LINE_ALPHA(8));
+    M_WriteTextGlow(M_ItemRightAlign(str), 126, str,
+                        msg_show ? cr[CR_DARKRED] : cr[CR_YELLOW],
+                            msg_show ? cr[CR_RED_BRIGHT] : cr[CR_YELLOW_BRIGHT],
+                                LINE_ALPHA(12));
 
     // Messages alignment
     sprintf(str, msg_alignment == 1 ? "STATUS BAR" :
                  msg_alignment == 2 ? "CENTERED" : "LEFT");
-    M_WriteTextGlow(M_ItemRightAlign(str), 99, str,
+    M_WriteTextGlow(M_ItemRightAlign(str), 135, str,
                         msg_alignment ? cr[CR_GREEN] : cr[CR_DARKRED],
                             msg_alignment ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT], 
-                                LINE_ALPHA(9));
+                                LINE_ALPHA(13));
 
     // Text casts shadows
     sprintf(str, msg_text_shadows ? "ON" : "OFF");
-    M_WriteTextGlow(M_ItemRightAlign(str), 108, str, 
+    M_WriteTextGlow(M_ItemRightAlign(str), 144, str,
                         msg_text_shadows ? cr[CR_GREEN] : cr[CR_DARKRED],
                             msg_text_shadows ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT], 
-                                LINE_ALPHA(10));
+                                LINE_ALPHA(14));
+
+    // Fading effect
+    sprintf(str, "%s", fade_speed[msg_fade]);
+    M_WriteTextGlow(M_ItemRightAlign(str), 153, str,
+                        msg_fade == 1 ? cr[CR_GREEN]  :
+                        msg_fade == 2 ? cr[CR_YELLOW] :
+                        msg_fade == 3 ? cr[CR_ORANGE] : cr[CR_DARKRED],
+                            msg_fade == 1 ? cr[CR_GREEN_BRIGHT]  :
+                            msg_fade == 2 ? cr[CR_YELLOW_BRIGHT] :
+                            msg_fade == 3 ? cr[CR_ORANGE_BRIGHT] : cr[CR_RED_BRIGHT], 
+                                LINE_ALPHA(15));
 
     // Local time
     sprintf(str, msg_local_time == 1 ? "12-HOUR FORMAT" :
                  msg_local_time == 2 ? "24-HOUR FORMAT" : "OFF");
-    M_WriteTextGlow(M_ItemRightAlign(str), 117, str, 
+    M_WriteTextGlow(M_ItemRightAlign(str), 162, str,
                         msg_local_time ? cr[CR_GREEN] : cr[CR_DARKRED],
                             msg_local_time ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT], 
-                                LINE_ALPHA(11));
-}
-
-static void M_ID_Gamma (int choice)
-{
-    shade_wait = I_GetTime() + TICRATE;
-    vid_gamma = M_INT_Slider(vid_gamma, 0, MAXGAMMA-1, choice, true);
-
-    I_SetPalette(st_palette);
-    R_InitColormaps();
-    R_FillBackScreen();
-    st_fullupdate = true;
+                                LINE_ALPHA(16));
 }
 
 static void M_ID_CRYPalette (int choice)
@@ -1674,6 +1724,103 @@ static void M_ID_LevelBrightness (int choice)
     dp_level_brightness = M_INT_Slider(dp_level_brightness, 0, 8, choice, true);
 }
 
+static void M_ID_Gamma (int choice)
+{
+    shade_wait = I_GetTime() + TICRATE;
+    vid_gamma = M_INT_Slider(vid_gamma, 0, MAXGAMMA-1, choice, true);
+
+    I_SetPalette (st_palette);
+    R_InitColormaps();
+    // I_InitPALTransMaps();
+    R_FillBackScreen();
+    st_fullupdate = true;
+}
+
+static void M_ID_SaturationHook (void)
+{
+    R_InitColormaps();
+    R_FillBackScreen();
+    AM_Init();
+    st_fullupdate = true;
+    I_SetColorPanes(false);
+    I_SetPalette(st_palette);
+}
+
+static void M_ID_Saturation (int choice)
+{
+    shade_wait = I_GetTime() + TICRATE;
+    vid_saturation = M_INT_Slider(vid_saturation, 0, 200, choice, true);
+    post_rendering_hook = M_ID_SaturationHook;
+}
+
+static void M_ID_ContrastHook (void)
+{
+    R_InitColormaps();
+    R_FillBackScreen();
+    AM_Init();
+    st_fullupdate = true;
+    I_SetColorPanes(false);
+    I_SetPalette(st_palette);
+}
+
+static void M_ID_Contrast (int choice)
+{
+    shade_wait = I_GetTime() + TICRATE;
+    vid_contrast = M_FLOAT_Slider(vid_contrast, 0.100000f, 2.000000f, 0.025000f, choice, true);
+    post_rendering_hook = M_ID_ContrastHook;
+}
+
+static void M_ID_R_IntensityHook (void)
+{
+    R_InitColormaps();
+    R_FillBackScreen();
+    AM_Init();
+    st_fullupdate = true;
+    I_SetColorPanes(false);
+    I_SetPalette(st_palette);
+}
+
+static void M_ID_R_Intensity (int choice)
+{
+    shade_wait = I_GetTime() + TICRATE;
+    vid_r_intensity = M_FLOAT_Slider(vid_r_intensity, 0, 2.000000f, 0.025000f, choice, true);
+    post_rendering_hook = M_ID_R_IntensityHook;
+}
+
+static void M_ID_G_IntensityHook (void)
+{
+    R_InitColormaps();
+    R_FillBackScreen();
+    AM_Init();
+    st_fullupdate = true;
+    I_SetColorPanes(false);
+    I_SetPalette(st_palette);
+}
+
+static void M_ID_G_Intensity (int choice)
+{
+    shade_wait = I_GetTime() + TICRATE;
+    vid_g_intensity = M_FLOAT_Slider(vid_g_intensity, 0, 2.000000f, 0.025000f, choice, true);
+    post_rendering_hook = M_ID_G_IntensityHook;
+}
+
+static void M_ID_B_IntensityHook (void)
+{
+    R_InitColormaps();
+    R_FillBackScreen();
+    AM_Init();
+    st_fullupdate = true;
+    I_SetColorPanes(false);
+    I_SetPalette(st_palette);
+}
+
+static void M_ID_B_Intensity (int choice)
+{
+    shade_wait = I_GetTime() + TICRATE;
+    vid_b_intensity = M_FLOAT_Slider(vid_b_intensity, 0, 2.000000f, 0.025000f, choice, true);
+    post_rendering_hook = M_ID_B_IntensityHook;
+}
+
 static void M_ID_MessagesAlignment (int choice)
 {
     msg_alignment = M_INT_Slider(msg_alignment, 0, 2, choice, false);
@@ -1682,6 +1829,11 @@ static void M_ID_MessagesAlignment (int choice)
 static void M_ID_TextShadows (int choice)
 {
     msg_text_shadows ^= 1;
+}
+
+static void M_ID_TextFade (int choice)
+{
+    msg_fade = M_INT_Slider(msg_fade, 0, 3, choice, false);
 }
 
 static void M_ID_LocalTime (int choice)
@@ -4199,10 +4351,17 @@ static void M_ID_ApplyResetHook (void)
     vid_fov = 90;
     dp_menu_shading = 0;
     dp_level_brightness = 0;
+    // Color settings
+    vid_saturation = 100;
+    vid_contrast = 1.000000;
+    vid_r_intensity = 1.000000;
+    vid_g_intensity = 1.000000;
+    vid_b_intensity = 1.000000;
     // Messages settings
     msg_show = 1;
     msg_alignment = 0;
     msg_text_shadows = 0;
+    msg_fade = 0;
     msg_local_time = 0;
 
     //
@@ -5291,6 +5450,127 @@ void M_WriteText (int x, int y, const char *string, byte *table)
 }
 
 // -----------------------------------------------------------------------------
+// M_WriteTextFade
+//  [PN] Write a string using hu_font_s with custom alpha fade.
+// -----------------------------------------------------------------------------
+
+void M_WriteTextFade (int x, int y, const char *string, byte *table, int alpha)
+{
+    if (alpha <= 0)
+    {
+        return;
+    }
+
+    const char* ch;
+    int w, c, cx, cy;
+
+    ch = string;
+    cx = x;
+    cy = y;
+
+    dp_translation = table;
+
+    while (ch)
+    {
+        c = *ch++;
+
+        if (!c)
+        {
+            break;
+        }
+
+        if (c == '\n')
+        {
+            cx = x;
+            cy += 12;
+            continue;
+        }
+
+        c = toupper(c) - HU_FONTSTART;
+
+        if (c < 0 || c >= HU_FONTSIZE_S)
+        {
+            cx += 4;
+            continue;
+        }
+
+        w = SHORT (hu_font_s[c]->width);
+
+        if (cx + w > SCREENWIDTH)
+        {
+            break;
+        }
+
+        if (alpha >= 255)
+        {
+            V_DrawShadowedPatchOptional(cx, cy, hu_font_s[c]);
+        }
+        else
+        {
+            V_DrawShadowedPatchOptionalFade(cx, cy, hu_font_s[c], alpha);
+        }
+
+        cx += w;
+    }
+
+    dp_translation = NULL;
+}
+
+// -----------------------------------------------------------------------------
+// M_WriteTextNoShadow
+// Write a string using the hu_font, with forcefully disabled shadow.
+// -----------------------------------------------------------------------------
+
+void M_WriteTextNoShadow (int x, int y, const char *string, byte *table)
+{
+    const char*	ch;
+    int w, c, cx, cy;
+
+    ch = string;
+    cx = x;
+    cy = y;
+
+    dp_translation = table;
+
+    while (ch)
+    {
+        c = *ch++;
+
+        if (!c)
+        {
+            break;
+        }
+
+        if (c == '\n')
+        {
+            cx = x;
+            cy += 12;
+            continue;
+        }
+
+        c = toupper(c) - HU_FONTSTART;
+
+        if (c < 0 || c >= HU_FONTSIZE_S)
+        {
+            cx += 4;
+            continue;
+        }
+
+        w = SHORT (hu_font_s[c]->width);
+
+        if (cx + w > SCREENWIDTH)
+        {
+            break;
+        }
+
+        V_DrawPatch(cx, cy, hu_font_s[c]);
+        cx+=w;
+    }
+
+    dp_translation = NULL;
+}
+
+// -----------------------------------------------------------------------------
 // M_WriteTextCentered
 // [JN] Write a centered string using the hu_font_s.
 // -----------------------------------------------------------------------------
@@ -5360,6 +5640,18 @@ void M_WriteTextCentered (const int y, const char *string, byte *table)
     }
     
     dp_translation = NULL;
+}
+
+// -----------------------------------------------------------------------------
+// M_WriteTextCenteredFade
+// [PN] Write a centered string using the hu_font with custom alpha fade.
+// -----------------------------------------------------------------------------
+
+void M_WriteTextCenteredFade (const int y, const char *string, byte *table, int alpha)
+{
+    const int width = M_StringWidth(string);
+
+    M_WriteTextFade(ORIGWIDTH / 2 - width / 2, y, string, table, alpha);
 }
 
 // -----------------------------------------------------------------------------

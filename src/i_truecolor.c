@@ -50,6 +50,12 @@ void I_InitTCTransMaps (void)
     }
 }
 
+
+// [JN] Shadow alpha value for shadowed patches, and fuzz
+// alpha value for fuzz effect drawing based on contrast.
+uint8_t shadow_alpha;
+uint8_t fuzz_alpha;
+
 // [JN] Shade factor used for menu and automap background shading.
 const int I_ShadeFactor[] =
 {
@@ -81,6 +87,7 @@ const float I_SaturationPercent[100] =
     0.066000f, 0.059400f, 0.052800f, 0.046200f, 0.039600f,
     0.033000f, 0.026400f, 0.019800f, 0.013200f, 0
 };
+
 
 // =============================================================================
 //

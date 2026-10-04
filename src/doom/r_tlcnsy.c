@@ -20,7 +20,6 @@
 
 #include "id_vars.h"
 
-static const int shadow_alpha = 128; // [JN] TODO - contrast?
 
 // -----------------------------------------------------------------------------
 // R_DrawTLColumn
