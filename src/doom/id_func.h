@@ -18,6 +18,10 @@
 //
 
 
+#include "m_fixed.h" // fixed_t
+#include "tables.h"  // angle_t
+
+
 #pragma once
 
 
