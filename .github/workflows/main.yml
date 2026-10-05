@@ -123,7 +123,8 @@ jobs:
             -DSDL2_DIR="lib/win32/SDL2-2.32.10" ^
             -DSDL2_MIXER_DIR="lib/win32/SDL2_mixer-2.8.2" ^
             -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=Off ^
-            -DSAMPLERATE_DIR="lib/win32/libsamplerate-0.2.2-win32"
+            -DSAMPLERATE_DIR="lib/win32/libsamplerate-0.2.2-win32" ^
+            -DCMAKE_PREFIX_PATH="lib/win32/fluidsynth-2.4.2-winXP-x86"
 
       - name: Build
         run: cmake --build build_vs_32 --config Release --parallel -- /p:XPDeprecationWarning=false
@@ -154,7 +155,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y cmake g++ fuse patchelf \
             libsdl2-dev libsdl2-mixer-dev \
-            libsamplerate0-dev \
+            libsamplerate0-dev libfluidsynth-dev fluidsynth \
             libflac-dev libmodplug-dev libmpg123-dev libopusfile-dev \
             libx11-dev libxext-dev libxrender-dev libxrandr-dev \
             libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev

@@ -1905,7 +1905,7 @@ static menuitem_t ID_Menu_Sound[]=
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
     { M_MUL2, "SFX PLAYBACK",              M_ID_SFXSystem,    's' },
-    { M_MUL2, "MUSIC PLAYBACK",            M_ID_MusicSystem,  'm' },
+    { M_MUL2, "MUS/MIDI PLAYBACK",         M_ID_MusicSystem,  'm' },
     { M_MUL1, "SOUND EFFECTS MODE",        M_ID_SFXMode,      's' },
     { M_MUL2, "JAGUAR SFX PITCH-SHIFTING", M_ID_PitchShift,   'j' },
     { M_MUL1, "NUMBER OF SFX TO MIX",      M_ID_SFXChannels,  'n' },
@@ -1960,6 +1960,7 @@ static void M_Draw_ID_Sound (void)
                 (snd_musicdevice == 3 && !strcmp(snd_dmxoption, "")) ? "OPL2 SYNTH" : 
                 (snd_musicdevice == 3 && !strcmp(snd_dmxoption, "-opl3")) ? "OPL3 SYNTH" : 
                  snd_musicdevice == 8 ? "NATIVE MIDI" :
+                 snd_musicdevice == 11 ? "FLUIDSYNTH" :
                                         "UNKNOWN");
     M_WriteTextGlow(M_ItemRightAlign(str), 90, str,
                         snd_musicdevice ? cr[CR_GREEN] : cr[CR_RED],
@@ -1995,6 +1996,16 @@ static void M_Draw_ID_Sound (void)
                         snd_mute_inactive ? cr[CR_GREEN] : cr[CR_RED],
                             snd_mute_inactive ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
                                 LINE_ALPHA(12));
+    // Inform if FSYNTH/GUS paths anen't set.
+    if (itemOn == 8)
+    {
+#ifdef HAVE_FLUIDSYNTH
+        if (snd_musicdevice == 11 && strcmp(fsynth_sf_path, "") == 0)
+        {
+            M_WriteTextCentered(153, "\"FSYNTH_SF_PATH\" VARIABLE IS NOT SET", cr[CR_GRAY]);
+        }
+#endif // HAVE_FLUIDSYNTH
+    }
 }
 
 static void M_ID_SFXSystem (int choice)
@@ -2033,6 +2044,12 @@ static void M_ID_MusicSystem (int choice)
     {
         case 0:
             if (snd_musicdevice == 0)
+#ifdef HAVE_FLUIDSYNTH
+            {
+                snd_musicdevice = 11;    // Set to FluidSynth
+            }
+            else if (snd_musicdevice == 11)
+#endif // HAVE_FLUIDSYNTH
             {
                 snd_musicdevice = 8;    // Set to Native MIDI
             }
@@ -2067,11 +2084,20 @@ static void M_ID_MusicSystem (int choice)
                 snd_musicdevice  = 8;   // Set to Native MIDI
             }
             else if (snd_musicdevice == 8)
+#ifdef HAVE_FLUIDSYNTH
+            {
+                snd_musicdevice  = 11;   // Set to FluidSynth
+            }
+#endif // HAVE_FLUIDSYNTH
+            else if (snd_musicdevice == 11)
             {
                 snd_musicdevice  = 0;   // Disable
             }
-        default:
             break;
+        default:
+            {
+                break;
+            }
     }
 
     // Shut down current music

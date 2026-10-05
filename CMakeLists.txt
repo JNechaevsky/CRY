@@ -103,6 +103,12 @@ add_subdirectory("lib/spng")
 # Check for stb_image_write (JPEG screenshots).
 add_subdirectory("lib/stb_image_write")
 
+# Check for FluidSynth.
+find_package(FluidSynth)
+if(FluidSynth_FOUND)
+    set(HAVE_FLUIDSYNTH TRUE)
+endif()
+
 find_package(m)
 
 include(CheckSymbolExists)
