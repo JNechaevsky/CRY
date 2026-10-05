@@ -2083,16 +2083,21 @@ static void M_ID_MusicSystem (int choice)
             {
                 snd_musicdevice  = 8;   // Set to Native MIDI
             }
-            else if (snd_musicdevice == 8)
 #ifdef HAVE_FLUIDSYNTH
+            else if (snd_musicdevice == 8)
             {
-                snd_musicdevice  = 11;   // Set to FluidSynth
+                snd_musicdevice  = 11;  // Set to FluidSynth
             }
-#endif // HAVE_FLUIDSYNTH
             else if (snd_musicdevice == 11)
             {
                 snd_musicdevice  = 0;   // Disable
             }
+#else
+            else if (snd_musicdevice == 8)
+            {
+                snd_musicdevice  = 0;   // Disable
+            }
+#endif // HAVE_FLUIDSYNTH
             break;
         default:
             {
