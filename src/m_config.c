@@ -356,6 +356,7 @@ static default_t	doom_defaults_list[] =
 
     // Automap
     CONFIG_VARIABLE_KEYBIND(key_map_toggle, key_map_toggle2),
+    CONFIG_VARIABLE_KEYBIND(key_map_mini, key_map_mini2),
     CONFIG_VARIABLE_KEYBIND(key_map_zoomin, key_map_zoomin2),
     CONFIG_VARIABLE_KEYBIND(key_map_zoomout, key_map_zoomout2),
     CONFIG_VARIABLE_KEYBIND(key_map_maxzoom, key_map_maxzoom2),
@@ -505,10 +506,16 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_INT(automap_thick),
     CONFIG_VARIABLE_INT(automap_square),
     CONFIG_VARIABLE_INT(automap_secrets),
+    CONFIG_VARIABLE_INT(automap_blink),
     CONFIG_VARIABLE_INT(automap_rotate),
     CONFIG_VARIABLE_INT(automap_overlay),
     CONFIG_VARIABLE_INT(automap_shading),
     CONFIG_VARIABLE_INT(automap_mouse_pan),
+    CONFIG_VARIABLE_INT(automap_mini),
+    CONFIG_VARIABLE_INT(automap_mini_size),
+    CONFIG_VARIABLE_INT(automap_mini_thick),
+    CONFIG_VARIABLE_INT(automap_mini_shading),
+    CONFIG_VARIABLE_INT(automap_mini_zoom),
     CONFIG_VARIABLE_COMMENT(""),
 
     //

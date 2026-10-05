@@ -419,21 +419,20 @@ void ID_LeftWidgets (void)
 
 void ID_RightWidgets (void)
 {
-    int yy = 0;
+    int yy = 9;
 
-    // [JN] FPS counter
+    // [JN/PN] FPS counter
     if (vid_showfps)
     {
+        int  fps_x_pos;
         char fps[8];
-        char fps_str[4];
 
         sprintf(fps, "%d", id_fps_value);
-        sprintf(fps_str, "FPS");
+        fps_x_pos = ORIGWIDTH + WIDESCREENDELTA - 11 
+                  - M_StringWidth(fps) - M_StringWidth("FPS");
 
-        M_WriteText(ORIGWIDTH + WIDESCREENDELTA - 11 - M_StringWidth(fps) 
-                              - M_StringWidth(fps_str), 9 + yy, fps, cr[CR_LIGHTGRAY_DARK]);
-
-        M_WriteText(ORIGWIDTH + WIDESCREENDELTA - 7 - M_StringWidth(fps_str), 9 + yy, "FPS", cr[CR_LIGHTGRAY_DARK]);
+        M_WriteText(fps_x_pos, yy, fps, cr[CR_LIGHTGRAY_DARK]);
+        M_WriteText(fps_x_pos + M_StringWidth(fps) + 4, yy, "FPS", cr[CR_LIGHTGRAY_DARK]); // [PN] 4 for spacing
 
         yy += 9;
     }
@@ -442,7 +441,7 @@ void ID_RightWidgets (void)
     if (msg_local_time)
     {
         M_WriteText(ORIGWIDTH + WIDESCREENDELTA - 7
-                              - M_StringWidth(ID_Local_Time), 9 + yy, ID_Local_Time, cr[CR_GRAY]);
+                              - M_StringWidth(ID_Local_Time), yy, ID_Local_Time, cr[CR_GRAY]);
     }
 }
 

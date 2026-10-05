@@ -603,6 +603,7 @@ static void M_Bind_NextWeapon (int choice);
 
 static void M_Draw_ID_Keybinds_4 (void);
 static void M_Bind_ToggleMap (int choice);
+static void M_Bind_ToggleMini (int choice);
 static void M_Bind_ZoomIn (int choice);
 static void M_Bind_ZoomOut (int choice);
 static void M_Bind_MaxZoom (int choice);
@@ -702,10 +703,16 @@ static void M_ID_Automap_Smooth (int choice);
 static void M_ID_Automap_Thick (int choice);
 static void M_ID_Automap_Square (int choice);
 static void M_ID_Automap_Secrets (int choice);
+static void M_ID_Automap_Blink (int choice);
 static void M_ID_Automap_Rotate (int choice);
 static void M_ID_Automap_Overlay (int choice);
 static void M_ID_Automap_Shading (int choice);
 static void M_ID_Automap_Pan (int choice);
+static void M_ID_Automap_MiniShow (int choice);
+static void M_ID_Automap_MiniSize (int choice);
+static void M_ID_Automap_MiniThick (int choice);
+static void M_ID_Automap_MiniShading (int choice);
+static void M_ID_Automap_MiniZoom (int choice);
 
 static void M_Draw_ID_Gameplay_1 (void);
 static void M_ID_Brightmaps (int choice);
@@ -2656,6 +2663,7 @@ static void M_Draw_ID_Keybinds_3 (void)
 static menuitem_t ID_Menu_Keybinds_4[]=
 {
     { M_SWTC, "TOGGLE MAP",         M_Bind_ToggleMap,   't' },
+    { M_SWTC, "TOGGLE MINIMAP",     M_Bind_ToggleMini,  't' },
     { M_SWTC, "ZOOM IN",            M_Bind_ZoomIn,      'z' },
     { M_SWTC, "ZOOM OUT",           M_Bind_ZoomOut,     'z' },
     { M_SWTC, "MAXIMUM ZOOM OUT",   M_Bind_MaxZoom,     'm' },
@@ -2684,54 +2692,59 @@ static void M_Bind_ToggleMap (int choice)
     M_StartBind(400);  // key_map_toggle
 }
 
+static void M_Bind_ToggleMini (int choice)
+{
+    M_StartBind(401);  // key_map_mini
+}
+
 static void M_Bind_ZoomIn (int choice)
 {
-    M_StartBind(401);  // key_map_zoomin
+    M_StartBind(402);  // key_map_zoomin
 }
 
 static void M_Bind_ZoomOut (int choice)
 {
-    M_StartBind(402);  // key_map_zoomout
+    M_StartBind(403);  // key_map_zoomout
 }
 
 static void M_Bind_MaxZoom (int choice)
 {
-    M_StartBind(403);  // key_map_maxzoom
+    M_StartBind(404);  // key_map_maxzoom
 }
 
 static void M_Bind_FollowMode (int choice)
 {
-    M_StartBind(404);  // key_map_follow
+    M_StartBind(405);  // key_map_follow
 }
 
 static void M_Bind_RotateMode (int choice)
 {
-    M_StartBind(405);  // key_map_rotate
+    M_StartBind(406);  // key_map_rotate
 }
 
 static void M_Bind_OverlayMode (int choice)
 {
-    M_StartBind(406);  // key_map_overlay
+    M_StartBind(407);  // key_map_overlay
 }
 
 static void M_Bind_PanMode (int choice)
 {
-    M_StartBind(407);  // key_map_mousepan
+    M_StartBind(408);  // key_map_mousepan
 }
 
 static void M_Bind_ToggleGrid (int choice)
 {
-    M_StartBind(408);  // key_map_grid
+    M_StartBind(409);  // key_map_grid
 }
 
 static void M_Bind_AddMark (int choice)
 {
-    M_StartBind(409);  // key_map_mark
+    M_StartBind(410);  // key_map_mark
 }
 
 static void M_Bind_ClearMarks (int choice)
 {
-    M_StartBind(410);  // key_map_clearmark
+    M_StartBind(411);  // key_map_clearmark
 }
 
 static void M_Draw_ID_Keybinds_4 (void)
@@ -2744,16 +2757,17 @@ static void M_Draw_ID_Keybinds_4 (void)
     M_WriteTextCentered(9, "AUTOMAP", cr[CR_YELLOW]);
 
     M_DrawBindKey(0, 18, key_map_toggle, key_map_toggle2);
-    M_DrawBindKey(1, 27, key_map_zoomin, key_map_zoomin2);
-    M_DrawBindKey(2, 36, key_map_zoomout, key_map_zoomout2);
-    M_DrawBindKey(3, 45, key_map_maxzoom, key_map_maxzoom2);
-    M_DrawBindKey(4, 54, key_map_follow, key_map_follow2);
-    M_DrawBindKey(5, 63, key_map_rotate, key_map_rotate2);
-    M_DrawBindKey(6, 72, key_map_overlay, key_map_overlay2);
-    M_DrawBindKey(7, 81, key_map_mousepan, key_map_mousepan2);
-    M_DrawBindKey(8, 90, key_map_grid, key_map_grid2);
-    M_DrawBindKey(9, 99, key_map_mark, key_map_mark2);
-    M_DrawBindKey(10, 108, key_map_clearmark, key_map_clearmark2);
+    M_DrawBindKey(1, 27, key_map_mini, key_map_mini2);
+    M_DrawBindKey(2, 36, key_map_zoomin, key_map_zoomin2);
+    M_DrawBindKey(3, 45, key_map_zoomout, key_map_zoomout2);
+    M_DrawBindKey(4, 54, key_map_maxzoom, key_map_maxzoom2);
+    M_DrawBindKey(5, 63, key_map_follow, key_map_follow2);
+    M_DrawBindKey(6, 72, key_map_rotate, key_map_rotate2);
+    M_DrawBindKey(7, 81, key_map_overlay, key_map_overlay2);
+    M_DrawBindKey(8, 90, key_map_mousepan, key_map_mousepan2);
+    M_DrawBindKey(9, 99, key_map_grid, key_map_grid2);
+    M_DrawBindKey(10, 108, key_map_mark, key_map_mark2);
+    M_DrawBindKey(11, 117, key_map_clearmark, key_map_clearmark2);
 
     M_DrawBindFooter("4", true);
 }
@@ -3627,10 +3641,17 @@ static menuitem_t ID_Menu_Automap[]=
     { M_MUL1, "LINE THICKNESS",        M_ID_Automap_Thick,    'l' },
     { M_MUL2, "SQUARE ASPECT RATIO",   M_ID_Automap_Square,   's' },
     { M_MUL2, "MARK SECRET SECTORS",   M_ID_Automap_Secrets,  'm' },
+    { M_MUL2, "BLINKING LOCKED DOORS", M_ID_Automap_Blink,    'b' },
     { M_MUL2, "ROTATE MODE",           M_ID_Automap_Rotate,   'r' },
     { M_MUL2, "OVERLAY MODE",          M_ID_Automap_Overlay,  'o' },
     { M_MUL1, "OVERLAY SHADING LEVEL", M_ID_Automap_Shading,  'o' },
     { M_MUL2, "MOUSE PANNING MODE",    M_ID_Automap_Pan,      'm' },
+    { M_SKIP, "", 0, '\0' },
+    { M_MUL2, "SHOW MINIMAP",          M_ID_Automap_MiniShow,    's' },
+    { M_MUL1, "MINIMAP SIZE",          M_ID_Automap_MiniSize,    'm' },
+    { M_MUL1, "LINE THICKNESS",        M_ID_Automap_MiniThick,   'l' },
+    { M_MUL1, "SHADING LEVEL",         M_ID_Automap_MiniShading, 'b' },
+    { M_MUL1, "ZOOM LEVEL",            M_ID_Automap_MiniZoom,    'z' },
 };
 
 static menu_t ID_Def_Automap =
@@ -3654,6 +3675,9 @@ static void M_Draw_ID_Automap (void)
     char str[32];
     const char *thickness[] = {
         "DEFAULT","2X","3X","4X","5X","6X","AUTO"
+    };
+    const char *size[] = {
+        "UNKNOWN","SMALLEST","SMALLER","SMALL","MEDIUM","BIG","BIGGER","BIGGEST"
     };
 
     M_WriteTextCentered(9, "AUTOMAP", cr[CR_YELLOW]);
@@ -3687,37 +3711,89 @@ static void M_Draw_ID_Automap (void)
                             automap_secrets ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
                                 LINE_ALPHA(3));
 
+    // Blinking locked doors
+    sprintf(str, automap_blink ? "ON" : "OFF");
+    M_WriteTextGlow(M_ItemRightAlign(str), 54, str,
+                        automap_blink ? cr[CR_GREEN] : cr[CR_DARKRED],
+                            automap_blink ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
+                                LINE_ALPHA(4));
+
     // Rotate mode
     sprintf(str, automap_rotate ? "ON" : "OFF");
-    M_WriteTextGlow(M_ItemRightAlign(str), 54, str,
+    M_WriteTextGlow(M_ItemRightAlign(str), 63, str,
                         automap_rotate ? cr[CR_GREEN] : cr[CR_DARKRED],
                             automap_rotate ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
-                                LINE_ALPHA(4));
+                                LINE_ALPHA(5));
 
     // Overlay mode
     sprintf(str, automap_overlay ? "ON" : "OFF");
-    M_WriteTextGlow(M_ItemRightAlign(str), 63, str,
+    M_WriteTextGlow(M_ItemRightAlign(str), 72, str,
                         automap_overlay ? cr[CR_GREEN] : cr[CR_DARKRED],
                             automap_overlay ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
-                                LINE_ALPHA(5));
+                                LINE_ALPHA(6));
 
     // Overlay shading level
     sprintf(str,"%d", automap_shading);
-    M_WriteTextGlow(M_ItemRightAlign(str), 72, str,
+    M_WriteTextGlow(M_ItemRightAlign(str), 81, str,
                         !automap_overlay ? cr[CR_DARKRED] :
                          automap_shading ==  0 ? cr[CR_RED] :
                          automap_shading == 12 ? cr[CR_YELLOW] : cr[CR_GREEN],
                             !automap_overlay ? cr[CR_RED_BRIGHT] :
                              automap_shading ==  0 ? cr[CR_RED_BRIGHT] :
                              automap_shading == 12 ? cr[CR_YELLOW_BRIGHT] : cr[CR_GREEN_BRIGHT],
-                                LINE_ALPHA(6));
+                                LINE_ALPHA(7));
 
     // Mouse panning mode
     sprintf(str, automap_mouse_pan ? "ON" : "OFF");
-    M_WriteTextGlow(M_ItemRightAlign(str), 81, str,
+    M_WriteTextGlow(M_ItemRightAlign(str), 90, str,
                         automap_mouse_pan ? cr[CR_GREEN] : cr[CR_DARKRED],
                             automap_mouse_pan ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
-                                LINE_ALPHA(7));
+                                LINE_ALPHA(8));
+
+    M_WriteTextCentered(99, "MINIMAP", cr[CR_YELLOW]);
+
+    // Show minimap
+    sprintf(str, automap_mini ? "ON" : "OFF");
+    M_WriteTextGlow(M_ItemRightAlign(str), 108, str,
+                        automap_mini ? cr[CR_GREEN] : cr[CR_DARKRED],
+                            automap_mini ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
+                                LINE_ALPHA(10));
+
+    // Minimap size
+    sprintf(str,"%s", size[automap_mini_size]);
+    M_WriteTextGlow(M_ItemRightAlign(str), 117, str,
+                        !automap_mini ? cr[CR_DARKRED] :
+                         (automap_mini_size == 1 || automap_mini_size == 7) ? cr[CR_YELLOW] : cr[CR_GREEN],
+                            !automap_mini ? cr[CR_RED_BRIGHT] :
+                             (automap_mini_size == 1 || automap_mini_size == 7) ? cr[CR_YELLOW_BRIGHT] : cr[CR_GREEN_BRIGHT],
+                                LINE_ALPHA(11));
+
+    // Line thickness
+    sprintf(str, "%s", thickness[automap_mini_thick]);
+    M_WriteTextGlow(M_ItemRightAlign(str), 126, str,
+                       !automap_mini ? cr[CR_DARKRED] :
+                        automap_mini_thick ? cr[CR_GREEN] : cr[CR_DARKRED],
+                           !automap_mini ? cr[CR_RED_BRIGHT] :
+                            automap_mini_thick ? cr[CR_GREEN_BRIGHT] : cr[CR_RED_BRIGHT],
+                                LINE_ALPHA(12));
+
+    // Shading level
+    sprintf(str,"%d", automap_mini_shading);
+    M_WriteTextGlow(M_ItemRightAlign(str), 135, str,
+                        !automap_mini ? cr[CR_DARKRED] :
+                         automap_mini_shading == 0 ? cr[CR_RED] :
+                         (automap_mini_shading == 1 || automap_mini_shading == 13) ? cr[CR_YELLOW] : cr[CR_GREEN],
+                            !automap_mini ? cr[CR_RED_BRIGHT] :
+                             automap_mini_shading == 0 ? cr[CR_RED_BRIGHT] :
+                             (automap_mini_shading == 1 || automap_mini_shading == 13) ? cr[CR_YELLOW_BRIGHT] : cr[CR_GREEN_BRIGHT],
+                                LINE_ALPHA(13));
+
+    // Zoom level
+    sprintf(str, automap_mini_zoom ? "FIXED" : "TRACKING");
+    M_WriteTextGlow(M_ItemRightAlign(str), 144, str,
+                        !automap_mini ? cr[CR_DARKRED] : cr[CR_GREEN],
+                            !automap_mini ? cr[CR_RED_BRIGHT] : cr[CR_GREEN_BRIGHT],
+                                LINE_ALPHA(14));
 }
 
 static void M_ID_Automap_Smooth (int choice)
@@ -3741,6 +3817,11 @@ static void M_ID_Automap_Secrets (int choice)
     automap_secrets = M_INT_Slider(automap_secrets, 0, 2, choice, false);
 }
 
+static void M_ID_Automap_Blink (int choice)
+{
+    automap_blink ^= 1;
+}
+
 static void M_ID_Automap_Rotate (int choice)
 {
     automap_rotate ^= 1;
@@ -3759,6 +3840,31 @@ static void M_ID_Automap_Shading (int choice)
 static void M_ID_Automap_Pan (int choice)
 {
     automap_mouse_pan ^= 1;
+}
+
+static void M_ID_Automap_MiniShow (int choice)
+{
+    automap_mini ^= 1;
+}
+
+static void M_ID_Automap_MiniSize (int choice)
+{
+    automap_mini_size = M_INT_Slider(automap_mini_size, 1, 7, choice, true);
+}
+
+static void M_ID_Automap_MiniThick (int choice)
+{
+    automap_mini_thick = M_INT_Slider(automap_mini_thick, 0, 6, choice, false);
+}
+
+static void M_ID_Automap_MiniShading (int choice)
+{
+    automap_mini_shading = M_INT_Slider(automap_mini_shading, 0, 13, choice, true);
+}
+
+static void M_ID_Automap_MiniZoom (int choice)
+{
+    automap_mini_zoom ^= 1;
 }
 
 // -----------------------------------------------------------------------------
@@ -4846,10 +4952,16 @@ static void M_ID_ApplyResetHook (void)
     automap_thick = 0;
     automap_square = 0;
     automap_secrets = 0;
+    automap_blink = 0;
     automap_rotate = 0;
     automap_overlay = 0;
     automap_shading = 0;
     automap_mouse_pan = 0;
+    automap_mini = 0;
+    automap_mini_size = 4;
+    automap_mini_thick = 0;
+    automap_mini_shading = 7;
+    automap_mini_zoom = 0;
 
     //
     // Gameplay features
@@ -8000,16 +8112,17 @@ static const KeyBindEntry_t keybinds[] =
 
     // Page 4
     KEYBIND_ENTRY(400, &ID_Def_Keybinds_4, 0,  key_map_toggle,    key_map_toggle2,    KEY_TAB,      0, KBS_GLOBAL),
-    KEYBIND_ENTRY(401, &ID_Def_Keybinds_4, 1,  key_map_zoomin,    key_map_zoomin2,    '=',  KEYP_PLUS, KBS_AUTOMAP_ONLY),
-    KEYBIND_ENTRY(402, &ID_Def_Keybinds_4, 2,  key_map_zoomout,   key_map_zoomout2,   '-', KEYP_MINUS, KBS_AUTOMAP_ONLY),
-    KEYBIND_ENTRY(403, &ID_Def_Keybinds_4, 3,  key_map_maxzoom,   key_map_maxzoom2,   '0',          0, KBS_AUTOMAP_ONLY),
-    KEYBIND_ENTRY(404, &ID_Def_Keybinds_4, 4,  key_map_follow,    key_map_follow2,    'f',          0, KBS_AUTOMAP_ONLY),
-    KEYBIND_ENTRY(405, &ID_Def_Keybinds_4, 5,  key_map_rotate,    key_map_rotate2,    'r',          0, KBS_AUTOMAP_ONLY),
-    KEYBIND_ENTRY(406, &ID_Def_Keybinds_4, 6,  key_map_overlay,   key_map_overlay2,   'o',          0, KBS_AUTOMAP_ONLY),
-    KEYBIND_ENTRY(407, &ID_Def_Keybinds_4, 7,  key_map_mousepan,  key_map_mousepan2,  0,            0, KBS_AUTOMAP_ONLY),
-    KEYBIND_ENTRY(408, &ID_Def_Keybinds_4, 8,  key_map_grid,      key_map_grid2,      'g',          0, KBS_AUTOMAP_ONLY),
-    KEYBIND_ENTRY(409, &ID_Def_Keybinds_4, 9,  key_map_mark,      key_map_mark2,      'm',          0, KBS_AUTOMAP_ONLY),
-    KEYBIND_ENTRY(410, &ID_Def_Keybinds_4, 10, key_map_clearmark, key_map_clearmark2, 'c',          0, KBS_AUTOMAP_ONLY),
+    KEYBIND_ENTRY(401, &ID_Def_Keybinds_4, 1,  key_map_mini,      key_map_mini2,      0,            0, KBS_GLOBAL),
+    KEYBIND_ENTRY(402, &ID_Def_Keybinds_4, 2,  key_map_zoomin,    key_map_zoomin2,    '=',  KEYP_PLUS, KBS_AUTOMAP_ONLY),
+    KEYBIND_ENTRY(403, &ID_Def_Keybinds_4, 3,  key_map_zoomout,   key_map_zoomout2,   '-', KEYP_MINUS, KBS_AUTOMAP_ONLY),
+    KEYBIND_ENTRY(404, &ID_Def_Keybinds_4, 4,  key_map_maxzoom,   key_map_maxzoom2,   '0',          0, KBS_AUTOMAP_ONLY),
+    KEYBIND_ENTRY(405, &ID_Def_Keybinds_4, 5,  key_map_follow,    key_map_follow2,    'f',          0, KBS_AUTOMAP_ONLY),
+    KEYBIND_ENTRY(406, &ID_Def_Keybinds_4, 6,  key_map_rotate,    key_map_rotate2,    'r',          0, KBS_AUTOMAP_ONLY),
+    KEYBIND_ENTRY(407, &ID_Def_Keybinds_4, 7,  key_map_overlay,   key_map_overlay2,   'o',          0, KBS_AUTOMAP_ONLY),
+    KEYBIND_ENTRY(408, &ID_Def_Keybinds_4, 8,  key_map_mousepan,  key_map_mousepan2,  0,            0, KBS_AUTOMAP_ONLY),
+    KEYBIND_ENTRY(409, &ID_Def_Keybinds_4, 9,  key_map_grid,      key_map_grid2,      'g',          0, KBS_AUTOMAP_ONLY),
+    KEYBIND_ENTRY(410, &ID_Def_Keybinds_4, 10, key_map_mark,      key_map_mark2,      'm',          0, KBS_AUTOMAP_ONLY),
+    KEYBIND_ENTRY(411, &ID_Def_Keybinds_4, 11, key_map_clearmark, key_map_clearmark2, 'c',          0, KBS_AUTOMAP_ONLY),
 
     // Page 5
     KEYBIND_ENTRY(500, &ID_Def_Keybinds_5, 0,  key_menu_help,     key_menu_help2,     KEY_F1,  0, KBS_GLOBAL),

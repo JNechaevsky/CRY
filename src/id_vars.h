@@ -96,10 +96,16 @@ extern int automap_smooth;
 extern int automap_thick;
 extern int automap_square;
 extern int automap_secrets;
+extern int automap_blink;
 extern int automap_rotate;
 extern int automap_overlay;
 extern int automap_shading;
 extern int automap_mouse_pan;
+extern int automap_mini;
+extern int automap_mini_size;
+extern int automap_mini_thick;
+extern int automap_mini_shading;
+extern int automap_mini_zoom;
 
 // Gameplay features
 extern int vis_brightmaps;
