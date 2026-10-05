@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -418,14 +419,14 @@ void I_ResumeSong(void)
 
 // Determine whether memory block is a .mid file
 
-boolean IsMid(byte *mem, int len)
+boolean IsMid(const byte *mem, int len)
 {
     return len > 4 && !memcmp(mem, "MThd", 4);
 }
 
 // Determine whether memory block is a .mus file
 
-boolean IsMus(byte *mem, int len)
+boolean IsMus(const byte *mem, int len)
 {
     return len > 4 && !memcmp(mem, "MUS\x1a", 4);
 }
@@ -441,6 +442,7 @@ void *I_RegisterSong(void *data, int len)
         active_music_module = &music_jag_module;
         return active_music_module->RegisterSong(data, len);
     }
+
 
     if (!IsMid(data, len) && !IsMus(data, len))
     {

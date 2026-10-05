@@ -3,7 +3,8 @@
 // Copyright(C) 2005-2014 Simon Howard
 // Copyright(C) 2013-2017 Brad Harding
 // Copyright(C) 2017 Fabian Greffrath
-// Copyright(C) 2017-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,8 +21,16 @@
 //
 
 
+#include <ctype.h>
+#include <stdio.h>
+#include <string.h>
+
 #include "doomstat.h"
+#include "m_array.h"
+#include "m_misc.h"
 #include "r_local.h"
+#include "w_wad.h"
+#include "z_zone.h"
 
 #include "id_vars.h"
 

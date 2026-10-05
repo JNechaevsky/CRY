@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -57,6 +58,10 @@ void D_RegisterLoopCallbacks(loop_interface_t *i);
 // Create any new ticcmds and broadcast to other players.
 void NetUpdate (void);
 
+// Broadcasts special packets to other players
+//  to notify of game exit
+void D_QuitNetGame (void);
+
 //? how many ticks to run?
 void TryRunTics (void);
 
@@ -69,6 +74,7 @@ void D_StartGameLoop(void);
 void D_StartNetGame(net_gamesettings_t *settings,
                     netgame_startup_callback_t callback);
 
+extern boolean singletics;
 extern int gametic, ticdup;
 extern int oldgametic;   // [JN] Invoke certain actions independently from uncapped framerate.
 extern int oldleveltime; // [crispy] check if leveltime keeps tickin'
@@ -80,7 +86,7 @@ boolean D_NonVanillaRecord(boolean conditional, const char *feature);
 boolean D_NonVanillaPlayback(boolean conditional, int lumpnum,
                              const char *feature);
 
-void D_ReceiveTic(ticcmd_t *ticcmds, boolean *playeringame);
+void D_ReceiveTic(const ticcmd_t *ticcmds, const boolean *players_mask);
 
 
 extern fixed_t offsetms;

@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -846,7 +847,7 @@ mobj_t *Crispy_PlayerSO (int p)
 ============
 */
 
-void P_SpawnPlayer (mapthing_t *mthing)
+void P_SpawnPlayer (const mapthing_t *mthing)
 {
 	player_t	*p;
 	fixed_t		x,y,z;
@@ -928,7 +929,7 @@ y = 0xff500000;
 ==================
 */
 
-void P_SpawnMapThing (mapthing_t *mthing)
+void P_SpawnMapThing (const mapthing_t *const mthing)
 {
 	int			i, bit;
 	mobj_t		*mobj;

@@ -43,6 +43,8 @@ set(GAME_SOURCE_FILES
     m_random.c          m_random.h
     memio.c             memio.h
     tables.c            tables.h
+    v_diskicon.c        v_diskicon.h
+    v_png.c             v_png.h
     v_postproc.c        v_postproc.h
     v_video.c           v_video.h
                         v_patch.h
@@ -73,7 +75,7 @@ endif()
 
 set(SOURCE_FILES ${COMMON_SOURCE_FILES} ${GAME_SOURCE_FILES})
 
-set(EXTRA_LIBS SDL2::SDL2main SDL2::SDL2 miniz::miniz stb::image_write opl)
+set(EXTRA_LIBS SDL2::SDL2main SDL2::SDL2 miniz::miniz spng::spng stb::image_write opl)
 if(ENABLE_SDL2_MIXER)
     list(APPEND EXTRA_LIBS SDL2_mixer::SDL2_mixer)
 endif()

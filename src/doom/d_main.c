@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -13,6 +14,13 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
+// DESCRIPTION:
+//	DOOM main program (D_DoomMain) and game loop (D_DoomLoop),
+//	plus functions to determine game mode (shareware, registered),
+//	parse command line parameters, configure game parameters (turbo),
+//	and call the startup functions.
+//
+
 
 #include <ctype.h>
 #include <stdio.h>
@@ -620,7 +628,7 @@ void D_StartTitle (void)
 
 static boolean D_AddFile(char *filename)
 {
-    wad_file_t *handle;
+    const wad_file_t *handle;
 
     printf("  adding %s\n", filename);
     handle = W_AddFile(filename);
@@ -664,6 +672,7 @@ void D_DoomMain (void)
                             FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 #else
     // print banner
+
     I_PrintBanner(PACKAGE_FULLNAME);
 #endif
 
@@ -732,7 +741,7 @@ void D_DoomMain (void)
 
     printf("W_Init: Init WADfiles.\n");
     D_AddFile(iwadfile);
-	
+
     //!
     // @category mod
     //

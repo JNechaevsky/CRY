@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -50,7 +51,7 @@ static char *temp_timidity_cfg = NULL;
 // is needed to inject a "dir" command so that the patches are read
 // relative to the actual config file.
 
-static boolean WriteWrapperTimidityConfig(char *write_path)
+static boolean WriteWrapperTimidityConfig(const char *write_path)
 {
     char *path;
     FILE *fstream;
@@ -90,7 +91,14 @@ void I_InitTimidityConfig(void)
 
     temp_timidity_cfg = M_TempFile("timidity.cfg");
 
-    success = WriteWrapperTimidityConfig(temp_timidity_cfg);
+    // if (snd_musicdevice == SNDDEVICE_GUS)
+    // {
+    //     success = GUS_WriteConfig(temp_timidity_cfg);
+    // }
+    // else
+    {
+        success = WriteWrapperTimidityConfig(temp_timidity_cfg);
+    }
 
     // Set the TIMIDITY_CFG environment variable to point to the temporary
     // config file.
@@ -138,6 +146,8 @@ static void RemoveTimidityConfig(void)
     {
         M_remove(temp_timidity_cfg);
         free(temp_timidity_cfg);
+        // [PN] Prevent accidental double-free by nullifying the pointer
+        temp_timidity_cfg = NULL;
     }
 }
 
@@ -336,6 +346,8 @@ static void I_SDL_UnRegisterSong(void *handle)
     }
 }
 
+// [PN] No longer used in function below
+/*
 static boolean ConvertMus(byte *musdata, int len, const char *filename)
 {
     MEMFILE *instream;
@@ -361,61 +373,85 @@ static boolean ConvertMus(byte *musdata, int len, const char *filename)
 
     return result;
 }
+*/
+
+// -----------------------------------------------------------------------------
+// I_SDL_RegisterSong
+// [PN] Registers a music for playback without writing temporary files to disk.
+// 
+// Depending on the format of the input data, the function:
+// - Converts MUS data to MIDI in memory if necessary.
+// - Directly loads other music formats from memory.
+// 
+// This implementation avoids the use of temporary disk files, using SDL_RWops
+// to create memory streams instead. The memory stream is automatically freed
+// after loading the music.
+// -----------------------------------------------------------------------------
 
 static void *I_SDL_RegisterSong(void *data, int len)
 {
-    char *filename;
-    Mix_Music *music;
+    Mix_Music *music = NULL;
+    SDL_RWops *rw = NULL;
 
     if (!music_initialized)
     {
         return NULL;
     }
 
-    // MUS files begin with "MUS"
-    // Reject anything which doesnt have this signature
-
-    filename = M_TempFile("doom"); // [crispy] generic filename
-
-    // [crispy] Reverse Choco's logic from "if (MIDI)" to "if (not MUS)"
-    // MUS is the only format that requires conversion,
-    // let SDL_Mixer figure out the others
-/*
-    if (IsMid(data, len) && len < MAXMIDLENGTH)
-*/
-    if (!IsMus(data, len)) // [crispy] MUS_HEADER_MAGIC
+    // [PN] Check if the data is a MUS file (MUS files start with "MUS")
+    if (IsMus(data, len))
     {
-        M_WriteFile(filename, data, len);
+        MEMFILE *instream = mem_fopen_read(data, len);
+        MEMFILE *outstream = mem_fopen_write();
+        void *outbuf;
+        size_t outbuf_len;
+
+        if (instream && outstream)
+        {
+            const int result = mus2mid(instream, outstream);
+            if (result == 0)
+            {
+                // [PN] Retrieve converted data from memory stream
+                mem_get_buf(outstream, &outbuf, &outbuf_len);
+                rw = SDL_RWFromConstMem(outbuf, (int)outbuf_len);
+                if (rw == NULL)
+                {
+                    fprintf(stderr, "Error creating SDL_RWops: %s\n", SDL_GetError());
+                }
+            }
+            else
+            {
+                fprintf(stderr, "Error converting MUS to MIDI.\n");
+            }
+
+            // [PN] Close memory streams
+            mem_fclose(instream);
+            mem_fclose(outstream);
+        }
+        else
+        {
+            fprintf(stderr, "Error opening memory streams for MUS conversion.\n");
+        }
     }
     else
     {
-	// Assume a MUS file and try to convert
-
-        ConvertMus(data, len, filename);
+        // [PN] If not MUS, use the data directly
+        rw = SDL_RWFromConstMem(data, len);
+        if (rw == NULL)
+        {
+            fprintf(stderr, "Error creating SDL_RWops: %s\n", SDL_GetError());
+        }
     }
 
-    // Load the MIDI. In an ideal world we'd be using Mix_LoadMUS_RW()
-    // by now, but Mix_SetMusicCMD() only works with Mix_LoadMUS(), so
-    // we have to generate a temporary file.
-
-    music = Mix_LoadMUS(filename);
-    if (music == NULL)
+    if (rw)
     {
-        // Failed to load
-        fprintf(stderr, "Error loading midi: %s\n", Mix_GetError());
+        // [PN] Load the music from memory stream
+        music = Mix_LoadMUS_RW(rw, 1); // Automatically frees rw after loading
+        if (music == NULL)
+        {
+            fprintf(stderr, "Error loading music: %s\n", Mix_GetError());
+        }
     }
-
-    // Remove the temporary MIDI file; however, when using an external
-    // MIDI program we can't delete the file. Otherwise, the program
-    // won't find the file to play. This means we leave a mess on
-    // disk :(
-
-    if (strlen(snd_musiccmd) == 0)
-    {
-        M_remove(filename);
-    }
-
-    free(filename);
 
     return music;
 }

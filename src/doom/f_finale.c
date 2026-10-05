@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -13,30 +14,33 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
+// DESCRIPTION:
+//	Game completion, final screen animation.
+//
+
 
 #include <stdio.h>
 #include <ctype.h>
 
+// Functions.
 #include "ct_chat.h"
-#include "d_main.h"
-#include "d_englsh.h"
-#include "doomstat.h"
 #include "i_swap.h"
+#include "z_zone.h"
+#include "v_video.h"
+#include "s_sound.h"
 #include "mn_menu.h"
 #include "m_misc.h"
 #include "r_local.h"
-#include "s_sound.h"
-#include "v_video.h"
-#include "z_zone.h"
+
+// Data.
+#include "d_main.h"
+#include "d_englsh.h"
+#include "doomstat.h"
 #include "f_finale.h"
 #include "g_umapinfo.h"
 
 #include "id_func.h"
 
-
-#define	TEXTSPEED	4
-#define	TEXTWAIT	250
-#define	TEXTEND		25
 
 #define JAGENDING               \
 	"     id software\n"        \
@@ -54,15 +58,21 @@
 
 typedef enum
 {
-	F_STAGE_TEXT,
-	F_STAGE_ARTSCREEN,
-	F_STAGE_CAST,
+    F_STAGE_TEXT,
+    F_STAGE_ARTSCREEN,
+    F_STAGE_CAST,
 } finalestage_t;
 
 // Stage of animation:
 static finalestage_t finalestage;
+
 static unsigned int finalecount;
 static unsigned int finaleendcount;
+
+
+#define	TEXTSPEED	4
+#define	TEXTWAIT	250
+#define	TEXTEND		25
 
 // [PN] Text to print and whether the roll call follows; resolved from
 // UMAPINFO (intertext/endcast) per level in F_StartFinale().

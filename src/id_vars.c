@@ -2,7 +2,8 @@
 // Copyright(C) 2005-2014 Simon Howard
 // Copyright(C) 2014-2017 RestlessRodent
 // Copyright(C) 2015-2018 Fabian Greffrath
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -33,6 +34,7 @@ char *screenshots_format = "png";     // "png" or "jpg"
 int screenshots_png_compression = 6;  // 0 ... 10
 int screenshots_jpg_quality = 90;     // 1 ... 100
 
+//
 // Video options
 //
 
@@ -43,6 +45,7 @@ int vid_fpslimit = 0;
 int vid_vsync = 1;
 int vid_showfps = 0;
 int vid_smooth_scaling = 0;
+// Miscellaneous
 int vid_screenwipe = 1;
 // Post-processing
 int post_supersample = 0;
@@ -217,6 +220,7 @@ void ID_BindVariables (void)
     M_BindIntVariable("screenshots_png_compression",  &screenshots_png_compression);
     M_BindIntVariable("screenshots_jpg_quality",      &screenshots_jpg_quality);
 
+    //
     // Video options
     //
 
@@ -227,6 +231,7 @@ void ID_BindVariables (void)
     M_BindIntVariable("vid_vsync",                      &vid_vsync);
     M_BindIntVariable("vid_showfps",                    &vid_showfps);
     M_BindIntVariable("vid_smooth_scaling",             &vid_smooth_scaling);
+    // Miscellaneous
     M_BindIntVariable("vid_screenwipe",                 &vid_screenwipe);
     // Post-processing
     M_BindIntVariable("post_supersample",               &post_supersample);

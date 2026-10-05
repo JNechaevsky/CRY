@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -48,6 +49,9 @@ extern int WIDESCREENDELTA; // [crispy] horizontal widescreen offset
 extern void (*post_rendering_hook) (void); // [crispy]
 void I_GetScreenDimensions (void); // [crispy] re-calculate WIDESCREENDELTA
 extern void I_ToggleVsync (void);
+// [PN] Rebuild the damage/bonus/radiation pane textures applying the
+// Display Options picture-adjustment (intensity/saturation/contrast).
+extern void I_SetColorPanes (boolean recreate_argbbuffer);
 extern void I_UpdateExclusiveFullScreen(void);
 
 enum
@@ -96,10 +100,6 @@ void I_RenderReadPixels (byte **data, int *w, int *h);
 // Takes full 8 bit values.
 void I_SetPalette (int palette);
 
-// [PN] Rebuild the damage/bonus/radiation pane textures applying the
-// Display Options picture-adjustment (intensity/saturation/contrast).
-void I_SetColorPanes (boolean recreate_argbbuffer);
-
 // [PN] We define a macro that manually assembles a 32-bit pixel from separate R/G/B values.
 // It applies the format's shift and loss adjustments, then merges all components (and alpha mask) with bitwise OR.
 // This avoids the overhead of the SDL_MapRGB() function call.
@@ -107,6 +107,7 @@ void I_SetColorPanes (boolean recreate_argbbuffer);
 // Original human-readable mapping function from Crispy Doom is preserved as commented example in i_video.c file.
 // extern inline const pixel_t I_MapRGB (const uint8_t r, const uint8_t g, const uint8_t b);
 extern SDL_Surface *argbbuffer;
+
 #define I_MapRGB(r, g, b) ( \
     (pixel_t)( \
         (((uint32_t)(r) >> argbbuffer->format->Rloss) << argbbuffer->format->Rshift) | \
@@ -115,7 +116,6 @@ extern SDL_Surface *argbbuffer;
         (argbbuffer->format->Amask) \
     ) \
 )
-
 void I_FinishUpdate (void);
 
 void I_ReadScreen (pixel_t* scr);
@@ -149,8 +149,6 @@ extern boolean screenvisible;
 extern int vanilla_keyboard_mapping;
 extern boolean screensaver_mode;
 extern pixel_t *I_VideoBuffer;
-extern int red_pane_alpha;
-extern int yel_pane_alpha;
 
 extern int screen_width;
 extern int screen_height;
@@ -162,6 +160,9 @@ extern int vid_integer_scaling;
 extern int vid_vga_porch_flash;
 extern int vid_force_software_renderer;
 extern int id_fps_value;
+// [JN] Smooth palette.
+extern int red_pane_alpha;
+extern int yel_pane_alpha;
 
 // [AM] Fractional part of the current tic, in the half-open
 //      range of [0.0, 1.0).  Used for interpolation.

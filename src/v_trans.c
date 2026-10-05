@@ -1,7 +1,8 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
 // Copyright(C) 2014 Fabian Greffrath, Paul Haeberli
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -291,7 +292,7 @@ static inline void rgb_to_hsv(const vect *restrict rgb,
  
 // [crispy] copied over from i_video.c
 // [PN] Refactored for performance
-int V_GetPaletteIndex(byte *palette, int r, int g, int b)
+int V_GetPaletteIndex(const byte *palette, int r, int g, int b)
 {
     int best = 0;
     int best_diff = INT_MAX;
@@ -380,27 +381,27 @@ byte V_Colorize (byte *playpal, int clr, byte source, boolean keepgray109)
     else
     {
         // [crispy] hack colors to full saturation
-        hsv.y = 1.0;
+        hsv.y = 1.0f;
 
         if (clr == CR_RED)
         {
-            hsv.x = 0.;
+            hsv.x = 0.f;
         }
         else if (clr == CR_RED_BRIGHT)
         {
-            hsv.x = 0.;
+            hsv.x = 0.f;
             hsv.z *= 1.5f;
         }
 
         else if (clr == CR_DARKRED)
         {
-            hsv.x = 0.;
+            hsv.x = 0.f;
             hsv.z *= 0.666f;
         }
 
         else if (clr == CR_GREEN)
         {
-            hsv.x = (144. * hsv.z + 140. * (1. - hsv.z))/360.;
+            hsv.x = (144.f * hsv.z + 140.f * (1.f - hsv.z))/360.f;
         }
         else if (clr == CR_GREEN_BRIGHT)
         {
@@ -445,15 +446,15 @@ byte V_Colorize (byte *playpal, int clr, byte source, boolean keepgray109)
 
         else if (clr == CR_YELLOW)
         {
-            hsv.x = (7.0 + 53. * hsv.z)/360.;
-            hsv.y = 1.0 - 0.4 * hsv.z;
-            hsv.z = 0.2 + 0.8 * hsv.z;
+            hsv.x = (7.0f + 53.f * hsv.z)/360.f;
+            hsv.y = 1.0f - 0.4f * hsv.z;
+            hsv.z = 0.2f + 0.8f * hsv.z;
         }
         else if (clr == CR_YELLOW_BRIGHT)
         {
-            hsv.x = (7.0 + 53. * hsv.z)/360.;
-            hsv.y = 1.0 - 0.4 * hsv.z;
-            hsv.z = 0.2 + 1.05 * hsv.z;
+            hsv.x = (7.0f + 53.f * hsv.z)/360.f;
+            hsv.y = 1.0f - 0.4f * hsv.z;
+            hsv.z = 0.2f + 1.05f * hsv.z;
         }
 
         else if (clr == CR_ORANGE)
@@ -469,42 +470,41 @@ byte V_Colorize (byte *playpal, int clr, byte source, boolean keepgray109)
 
         else if (clr == CR_WHITE)
         {
-            hsv.y = 0.;
+            hsv.y = 0.f;
         }
-
         else if (clr == CR_GRAY)
         {
-            hsv.y = 0.;
+            hsv.y = 0.f;
             hsv.z *= 0.5f;
         }
         else if (clr == CR_GRAY_BRIGHT)
         {
-            hsv.y = 0.;
+            hsv.y = 0.f;
             hsv.z *= 0.75f;
         }
 
         else if (clr == CR_LIGHTGRAY)
         {
-            hsv.y = 0.;
+            hsv.y = 0.f;
             hsv.z *= 0.80f;
         }
         else if (clr == CR_LIGHTGRAY_BRIGHT)
         {
-            hsv.y = 0.;
+            hsv.y = 0.f;
             hsv.z *= 1.05f;
         }
         else if (clr == CR_LIGHTGRAY_DARK)
         {
-            hsv.y = 0.;
+            hsv.y = 0.f;
             hsv.z *= 0.6f;
         }
     }
 
     hsv_to_rgb(&hsv, &rgb);
 
-    rgb.x *= 255.;
-    rgb.y *= 255.;
-    rgb.z *= 255.;
+    rgb.x *= 255.f;
+    rgb.y *= 255.f;
+    rgb.z *= 255.f;
 
     return V_GetPaletteIndex(playpal, (int) rgb.x, (int) rgb.y, (int) rgb.z);
 }

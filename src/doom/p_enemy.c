@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -33,6 +34,20 @@
 #include "id_func.h"
 #include "id_vars.h"
 
+
+typedef enum
+{
+	DI_EAST,
+	DI_NORTHEAST,
+	DI_NORTH,
+	DI_NORTHWEST,
+	DI_WEST,
+	DI_SOUTHWEST,
+	DI_SOUTH,
+	DI_SOUTHEAST,
+	DI_NODIR,
+	NUMDIRS
+} dirtype_t;
 
 
 /*
@@ -131,7 +146,7 @@ P_NoiseAlert
 // and let sectors forget their soundtarget
 // -----------------------------------------------------------------------------
 
-void P_ForgetPlayer (player_t *player)
+void P_ForgetPlayer (const player_t *player)
 {
     if (player->cheats & CF_NOTARGET)
     {
@@ -991,7 +1006,7 @@ void A_Explode (mobj_t *thingy)
 ================
 */
 
-void A_BossDeath (mobj_t *mo)
+void A_BossDeath (const mobj_t *mo)
 {
 	mobj_t		*mo2;
 	line_t		junk;

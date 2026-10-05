@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -12,6 +13,10 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
+// DESCRIPTION:
+//	Handle Sector base lighting effects.
+//	Muzzle flash?
 //
 
 
@@ -145,7 +150,7 @@ void P_SpawnStrobeFlash (sector_t *sector,int fastOrSlow, int inSync)
 /*	Start strobing lights (usually from a trigger) */
 /* */
 /*================================================================== */
-void EV_StartLightStrobing(line_t *line)
+void EV_StartLightStrobing(const line_t *const line)
 {
 	int	secnum;
 	sector_t	*sec;
@@ -166,7 +171,7 @@ void EV_StartLightStrobing(line_t *line)
 /*	TURN LINE'S TAG LIGHTS OFF */
 /* */
 /*================================================================== */
-void EV_TurnTagLightsOff(line_t	*line)
+void EV_TurnTagLightsOff(const line_t	*const line)
 {
 	int			i;
 	int			j;
@@ -198,7 +203,7 @@ void EV_TurnTagLightsOff(line_t	*line)
 /*	TURN LINE'S TAG LIGHTS ON */
 /* */
 /*================================================================== */
-void EV_LightTurnOn(line_t *line, int bright)
+void EV_LightTurnOn(const line_t *line, int bright)
 {
 	int			i;
 	int			j;

@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -816,7 +817,7 @@ void A_FireShotgun (mobj_t *mobj, player_t *player, pspdef_t *psp)
 ================== 
 */ 
  
-void A_FireCGun (mobj_t *mobj, player_t *player, pspdef_t *psp) 
+void A_FireCGun (mobj_t *mobj, player_t *player, const pspdef_t *psp) 
 {
 	if (!player) return; // [crispy] let pspr action pointers get called from mobj states
 	S_StartSound (player->so, sfx_pistol); // [crispy] weapon sound source

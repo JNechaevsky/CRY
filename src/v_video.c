@@ -2,7 +2,8 @@
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 1993-2008 Raven Software
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 // Copyright(C) 2025 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
@@ -1437,7 +1438,8 @@ boolean V_IsPatchLump(const int lump)
     if (lump < 0)
         return false;
 
-    size = W_LumpLength(lump);
+    size = lumpinfo[lump]->cache_size > 0 ? lumpinfo[lump]->cache_size
+                                          : W_LumpLength(lump);
 
     // Minimum length of a valid Doom patch
     if (size < 13)
@@ -1447,7 +1449,7 @@ boolean V_IsPatchLump(const int lump)
 
     patch = (const patch_t *) W_CacheLumpNum(lump, PU_CACHE);
 
-    // [FG] detect patches in PNG format early
+    // [PN] Raw PNG data is not a Doom patch (converted PNGs arrive here as patch_t).
     if (!memcmp(patch, "\211PNG\r\n\032\n", 8))
     {
         return false;

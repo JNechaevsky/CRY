@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -13,24 +14,28 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
+//
+// DESCRIPTION:  the automap code
+//
+
 
 #include <stdio.h>
 
-#include "am_map.h"
-#include "ct_chat.h"
+#include "z_zone.h"
+#include "st_bar.h"
+#include "p_local.h"
+#include "w_wad.h"
+#include "m_controls.h"
+#include "m_misc.h"
+#include "i_system.h"
+#include "v_video.h"
 #include "doomstat.h"
 #include "d_englsh.h"
-#include "g_game.h"
-#include "i_system.h"
-#include "m_controls.h"
 #include "mn_menu.h"
-#include "m_misc.h"
-#include "p_local.h"
-#include "st_bar.h"
+#include "am_map.h"
+#include "ct_chat.h"
+#include "g_game.h"
 #include "v_trans.h"
-#include "v_video.h"
-#include "w_wad.h"
-#include "z_zone.h"
 
 #include "id_vars.h"
 
@@ -964,17 +969,20 @@ boolean AM_Responder (const event_t *ev)
         {
             am_followplayer = !am_followplayer;
 
-            CT_SetMessage(plr, am_followplayer ? AMSTR_FOLLOWON : AMSTR_FOLLOWOFF, false, NULL);
+            CT_SetMessage(plr, am_followplayer ?
+                          AMSTR_FOLLOWON : AMSTR_FOLLOWOFF, false, NULL);
         }
         else if (key == key_map_grid || key == key_map_grid2)
         {
             am_grid = !am_grid;
 
-            CT_SetMessage(plr, am_grid ? AMSTR_GRIDON : AMSTR_GRIDOFF, false, NULL);
+            CT_SetMessage(plr, am_grid ?
+                          AMSTR_GRIDON : AMSTR_GRIDOFF, false, NULL);
         }
         else if (key == key_map_mark || key == key_map_mark2)
         {
-            M_snprintf(buffer, sizeof(buffer), "%s %d", AMSTR_MARKEDSPOT, markpointnum);
+            M_snprintf(buffer, sizeof(buffer), "%s %d",
+                       AMSTR_MARKEDSPOT, markpointnum);
             CT_SetMessage(plr, buffer, false, NULL);
             AM_addMark();
         }
@@ -989,7 +997,8 @@ boolean AM_Responder (const event_t *ev)
             else
             {
                 markpointnum--;
-                M_snprintf(buffer, sizeof(buffer), "%s %d", AMSTR_MARKCLEARED, markpointnum);
+                M_snprintf(buffer, sizeof(buffer), "%s %d",
+                        AMSTR_MARKCLEARED, markpointnum);
                 CT_SetMessage(plr, buffer, false, NULL);
             }
         }
@@ -997,7 +1006,8 @@ boolean AM_Responder (const event_t *ev)
         {
             // [JN] Automap rotate mode.
             automap_rotate = !automap_rotate;
-            CT_SetMessage(plr, automap_rotate ? ID_AUTOMAPROTATE_ON : ID_AUTOMAPROTATE_OFF, false, NULL);
+            CT_SetMessage(plr, automap_rotate ?
+                          ID_AUTOMAPROTATE_ON : ID_AUTOMAPROTATE_OFF, false, NULL);
         }
         else if (key == key_map_overlay || key == key_map_overlay2)
         {
@@ -1174,26 +1184,18 @@ void AM_Ticker (void)
         blinking_arrow = 0;
     }
 
-    // [JN] Animate IDDT monster colors:
-
-    // Inactive:
+    // [JN/PN] Animate IDDT monster colors (inactive and active states):
     if (gametic & 1)
     {
-        // Brightening
-        if (!iddt_reds_direction && ++iddt_reds_inactive == IDDT_REDS_MAX)
+        iddt_reds_inactive += iddt_reds_direction ? -1 : 1;
+
+        if (iddt_reds_inactive == IDDT_REDS_MAX || iddt_reds_inactive == IDDT_REDS_MIN)
         {
-            iddt_reds_direction = true;
-        }
-        // Darkening
-        else
-        if (iddt_reds_direction && --iddt_reds_inactive == IDDT_REDS_MIN)
-        {
-            iddt_reds_direction = false;
+            iddt_reds_direction = !iddt_reds_direction;
         }
     }
 
-    // Active:
-    iddt_reds_active = (172) + ((gametic >> 1) % IDDT_REDS_RANGE);
+    iddt_reds_active = 172 + ((gametic >> 1) % IDDT_REDS_RANGE);
 
     // [JN/PN] Pulse player arrow in Spectator mode:
     arrow_color += arrow_color_direction ? -1 : 1;
@@ -1233,13 +1235,13 @@ static void AM_shadeBackground (void)
                   ? SCREENHEIGHT
                   : SCREENHEIGHT - ST_HEIGHT * vid_resolution;
 
-    for (int cx = 0; cx < SCREENWIDTH; cx++)
-    {
-        pixel_t *dest = I_VideoBuffer + (size_t)cx * SCREENHEIGHT;
+        for (int cx = 0; cx < SCREENWIDTH; cx++)
+        {
+            pixel_t *dest = I_VideoBuffer + (size_t)cx * SCREENHEIGHT;
 
-        for (int i = 0; i < hgt; i++, dest++)
-            *dest = I_BlendDark_32(*dest, I_ShadeFactor[shade]);
-    }
+            for (int i = 0; i < hgt; i++, dest++)
+                *dest = I_BlendDark_32(*dest, I_ShadeFactor[shade]);
+        }
 }
 
 // -----------------------------------------------------------------------------
@@ -1344,7 +1346,7 @@ static boolean AM_clipMline (mline_t *ml, fline_t *fl)
 // PUTDOT_THICK
 // [PN] Draws a resolution-aware thick pixel (filled disc) at (x, y).
 // - Thickness: user-defined (1x..6x) or auto (scales with resolution).
-// - Bounds safety: clamps the drawing bbox to [0..f_w-1] ? [0..f_h-1].
+// - Bounds safety: clamps the drawing bbox to [0..f_w-1] * [0..f_h-1].
 // - Hot-path optimizations: cached fb pointer and width, dx^2 hoisted out of
 //   inner loop, per-column flip index, pointer walking per row.
 // [JN] With support for "user-defined" (1x...6x) and "auto" thickness.

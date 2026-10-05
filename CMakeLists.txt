@@ -3,7 +3,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0069 NEW)
 cmake_policy(SET CMP0091 NEW)
-project("CRY" VERSION 2.3.0 LANGUAGES C)
+project("CRY" VERSION 3.0.0 LANGUAGES C)
 set(CMAKE_C_STANDARD 99)
 
 # Autotools variables
@@ -11,7 +11,7 @@ set(top_srcdir ${CMAKE_CURRENT_SOURCE_DIR})
 set(top_builddir ${CMAKE_CURRENT_BINARY_DIR})
 
 # AC_INIT variables
-set(PACKAGE_VERSION_CRY "2.3")
+set(PACKAGE_VERSION_CRY "3.0")
 set(PACKAGE_NAME "${PROJECT_NAME}")
 set(PACKAGE_FULLNAME "CRY ${PACKAGE_VERSION_CRY}")
 set(PACKAGE_TARNAME "cry")
@@ -20,7 +20,7 @@ set(PACKAGE_STRING "${PROJECT_NAME} ${PACKAGE_VERSION_CRY}")
 set(PACKAGE_BUGREPORT "julia.nechaevskaya@live.com")
 
 string(REGEX REPLACE " Doom$" "" PACKAGE_SHORTNAME "${PACKAGE_NAME}")
-set(PACKAGE_COPYRIGHT "Copyright (C) 2018-2025 Julia Nechaevskaya")
+set(PACKAGE_COPYRIGHT "Copyright (C) 2018-2026 Julia Nechaevskaya, 2024-2026 Polina 'Aura' N.")
 set(PACKAGE_LICENSE "GNU GPL (version 2)")
 
 # Any settings that should apply to all targets in this directory and all
@@ -96,6 +96,9 @@ endif()
 
 # Check for Miniz (replaces libpng).
 add_subdirectory("lib/miniz")
+
+# Check for libspng (support for PNG graphics).
+add_subdirectory("lib/spng")
 
 # Check for stb_image_write (JPEG screenshots).
 add_subdirectory("lib/stb_image_write")

@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -31,6 +32,8 @@
 #include "i_system.h"
 #include "i_video.h"
 #include "m_misc.h"
+#include "v_diskicon.h"
+#include "v_png.h"
 #include "z_zone.h"
 
 #include "w_wad.h"
@@ -45,6 +48,14 @@ unsigned int numlumps = 0;
 
 // Hash table for fast lookups
 static lumpindex_t *lumphash;
+
+// Variables for the reload hack: filename of the PWAD to reload, and the
+// lumps from WADs before the reload file, so we can resent numlumps and
+// load the file again.
+static wad_file_t *reloadhandle = NULL;
+static lumpinfo_t *reloadlumps = NULL;
+static char *reloadname = NULL;
+static int reloadlump = -1;
 
 static char **wad_filenames;
 
@@ -104,6 +115,25 @@ wad_file_t *W_AddFile (const char *filename)
     lumpinfo_t *filelumps;
     int numfilelumps;
 
+    // If the filename begins with a ~, it indicates that we should use the
+    // reload hack.
+    if (filename[0] == '~')
+    {
+        if (reloadname != NULL)
+        {
+            I_Error("Prefixing a WAD filename with '~' indicates that the "
+                    "WAD should be reloaded\n"
+                    "on each level restart, for use by level authors for "
+                    "rapid development. You\n"
+                    "can only reload one WAD file, and it must be the last "
+                    "file in the -file list.");
+        }
+
+        reloadname = strdup(filename);
+        reloadlump = numlumps;
+        ++filename;
+    }
+
     // Open the file and add to directory
     wad_file = W_OpenFile(filename);
 
@@ -152,6 +182,16 @@ wad_file_t *W_AddFile (const char *filename)
 
 	header.numlumps = LONG(header.numlumps);
 
+         // Vanilla Doom doesn't like WADs with more than 4046 lumps
+         // https://www.doomworld.com/vb/post/1010985
+         // [crispy] disable PWAD lump number limit
+         if (!strncmp(header.identification,"PWAD",4) && header.numlumps > 4046 && false)
+         {
+                 W_CloseFile(wad_file);
+                 I_Error ("Error: Vanilla limit for lumps in a WAD is 4046, "
+                          "PWAD %s has %d", filename, header.numlumps);
+         }
+
 	header.infotableofs = LONG(header.infotableofs);
 	length = header.numlumps*sizeof(filelump_t);
 	fileinfo = Z_Malloc(length, PU_STATIC, 0);
@@ -180,6 +220,7 @@ wad_file_t *W_AddFile (const char *filename)
         lump_p->position = LONG(filerover->filepos);
         lump_p->size = LONG(filerover->size);
         lump_p->cache = NULL;
+        lump_p->cache_size = 0;
         strncpy(lump_p->name, filerover->name, 8);
         lumpinfo[i] = lump_p;
 
@@ -192,6 +233,14 @@ wad_file_t *W_AddFile (const char *filename)
     {
         Z_Free(lumphash);
         lumphash = NULL;
+    }
+
+    // If this is the reload file, we need to save some details about the
+    // file so that we can close it later on when we do a reload.
+    if (reloadname)
+    {
+        reloadhandle = wad_file;
+        reloadlumps = filelumps;
     }
 
     AddWADFileName(filename);
@@ -399,6 +448,8 @@ void W_ReadLump(lumpindex_t lump, void *dest)
 
     l = lumpinfo[lump];
 
+    V_BeginRead(l->size);
+
     c = W_Read(l->wad_file, l->position, dest, l->size);
 
     if (c < l->size)
@@ -435,30 +486,94 @@ void *W_CacheLumpNum(lumpindex_t lumpnum, int tag)
 
     lump = lumpinfo[lumpnum];
 
-    // Get the pointer to return.  If the lump is in a memory-mapped
-    // file, we can just return a pointer to within the memory-mapped
-    // region.  If the lump is in an ordinary file, we may already
-    // have it cached; otherwise, load it into memory.
-
-    if (lump->wad_file->mapped != NULL)
+    // [PN] If this lump has already been converted/cached, just reuse it.
+    if (lump->cache != NULL)
     {
-        // Memory mapped file, return from the mmapped region.
-
-        result = lump->wad_file->mapped + lump->position;
-    }
-    else if (lump->cache != NULL)
-    {
-        // Already cached, so just switch the zone tag.
-
         result = lump->cache;
         Z_ChangeTag(lump->cache, tag);
     }
+    // [PN] Memory mapped file: return mapped data by default, but convert PNG
+    // graphics once to Doom patch format so sprites/textures can consume them.
+    else if (lump->wad_file->mapped != NULL)
+    {
+        const byte *const raw = lump->wad_file->mapped + lump->position;
+        void **owner = (void **) &lump->cache;
+
+        if (V_IsPNGImage(raw, lump->size))
+        {
+            int converted_size = 0;
+            patch_t *const patch = V_PNGToPatch(raw, lump->size, tag, owner, &converted_size);
+
+            if (patch != NULL)
+            {
+                lump->cache = patch;
+                lump->cache_size = converted_size;
+                result = lump->cache;
+            }
+            else
+            {
+                lump->cache_size = 0;
+                result = (byte *) raw;
+            }
+        }
+        else
+        {
+            lump->cache_size = 0;
+            result = (byte *) raw;
+        }
+    }
     else
     {
-        // Not yet loaded, so load it now
+        // Not yet loaded, so load it now.
+        byte png_sig[8];
+        boolean is_png = false;
 
-        lump->cache = Z_Malloc(W_LumpLength(lumpnum), tag, &lump->cache);
-	W_ReadLump (lumpnum, lump->cache);
+        if (lump->size >= (int) sizeof(png_sig)
+        &&  W_Read(lump->wad_file, lump->position, png_sig, sizeof(png_sig))
+            == (int) sizeof(png_sig))
+        {
+            is_png = V_IsPNGImage(png_sig, sizeof(png_sig));
+        }
+
+        if (is_png)
+        {
+            byte *const raw = Z_Malloc(W_LumpLength(lumpnum), PU_STATIC, NULL);
+            int converted_size = 0;
+            void **owner = (void **) &lump->cache;
+            patch_t *patch;
+
+            W_ReadLump(lumpnum, raw);
+            patch = V_PNGToPatch(raw, lump->size, tag, owner, &converted_size);
+
+            if (patch != NULL)
+            {
+                lump->cache = patch;
+                lump->cache_size = converted_size;
+                Z_Free(raw);
+            }
+
+            // [PN] If PNG conversion fails, keep original lump bytes.
+            else if (tag >= PU_PURGELEVEL)
+            {
+                lump->cache = Z_Malloc(W_LumpLength(lumpnum), tag, &lump->cache);
+                memcpy(lump->cache, raw, (size_t) W_LumpLength(lumpnum));
+                lump->cache_size = 0;
+                Z_Free(raw);
+            }
+            else
+            {
+                lump->cache = raw;
+                lump->cache_size = 0;
+                Z_ChangeTag(lump->cache, tag);
+            }
+        }
+        else
+        {
+            lump->cache = Z_Malloc(W_LumpLength(lumpnum), tag, &lump->cache);
+            W_ReadLump(lumpnum, lump->cache);
+            lump->cache_size = 0;
+        }
+
         result = lump->cache;
     }
 	
@@ -498,7 +613,12 @@ void W_ReleaseLumpNum(lumpindex_t lumpnum)
 
     if (lump->wad_file->mapped != NULL)
     {
-        // Memory-mapped file, so nothing needs to be done here.
+        // [PN] For mapped WADs we usually return raw pointers, but PNG lumps may
+        // have a converted patch cache that still needs normal tag handling.
+        if (lump->cache != NULL)
+        {
+            Z_ChangeTag(lump->cache, PU_CACHE);
+        }
     }
     else
     {
@@ -510,6 +630,72 @@ void W_ReleaseLumpName(const char *name)
 {
     W_ReleaseLumpNum(W_GetNumForName(name));
 }
+
+#if 0
+
+//
+// W_Profile
+//
+int		info[2500][10];
+int		profilecount;
+
+void W_Profile (void)
+{
+    int		i;
+    memblock_t*	block;
+    void*	ptr;
+    char	ch;
+    FILE*	f;
+    int		j;
+    char	name[9];
+	
+	
+    for (i=0 ; i<numlumps ; i++)
+    {	
+	ptr = lumpinfo[i].cache;
+	if (!ptr)
+	{
+	    ch = ' ';
+	    continue;
+	}
+	else
+	{
+	    block = (memblock_t *) ( (byte *)ptr - sizeof(memblock_t));
+	    if (block->tag < PU_PURGELEVEL)
+		ch = 'S';
+	    else
+		ch = 'P';
+	}
+	info[i][profilecount] = ch;
+    }
+    profilecount++;
+	
+    f = M_fopen ("waddump.txt","w");
+    name[8] = 0;
+
+    for (i=0 ; i<numlumps ; i++)
+    {
+	memcpy (name,lumpinfo[i].name,8);
+
+	for (j=0 ; j<8 ; j++)
+	    if (!name[j])
+		break;
+
+	for ( ; j<8 ; j++)
+	    name[j] = ' ';
+
+	fprintf (f,"%s ",name);
+
+	for (j=0 ; j<profilecount ; j++)
+	    fprintf (f,"    %c",info[i][j]);
+
+	fprintf (f,"\n");
+    }
+    fclose (f);
+}
+
+
+#endif
 
 // Generate a hash table for fast lookups
 
@@ -549,6 +735,51 @@ void W_GenerateHashTable(void)
     // All done!
 }
 
+// The Doom reload hack. The idea here is that if you give a WAD file to -file
+// prefixed with the ~ hack, that WAD file will be reloaded each time a new
+// level is loaded. This lets you use a level editor in parallel and make
+// incremental changes to the level you're working on without having to restart
+// the game after every change.
+// But: the reload feature is a fragile hack...
+void W_Reload(void)
+{
+    char *filename;
+    lumpindex_t i;
+
+    if (reloadname == NULL)
+    {
+        return;
+    }
+
+    // We must free any lumps being cached from the PWAD we're about to reload:
+    for (i = reloadlump; i < numlumps; ++i)
+    {
+        if (lumpinfo[i]->cache != NULL)
+        {
+            Z_Free(lumpinfo[i]->cache);
+        }
+    }
+
+    // Reset numlumps to remove the reload WAD file:
+    numlumps = reloadlump;
+
+    // Now reload the WAD file.
+    filename = reloadname;
+
+    W_CloseFile(reloadhandle);
+    free(reloadlumps);
+
+    reloadname = NULL;
+    reloadlump = -1;
+    reloadhandle = NULL;
+    W_AddFile(filename);
+    free(filename);
+
+    // The WAD directory has changed, so we have to regenerate the
+    // fast lookup hashtable:
+    W_GenerateHashTable();
+}
+
 const char *W_WadNameForLump(const lumpinfo_t *lump)
 {
 	return M_BaseName(lump->wad_file->path);
@@ -558,3 +789,39 @@ boolean W_IsIWADLump(const lumpinfo_t *lump)
 {
 	return lump->wad_file == lumpinfo[0]->wad_file;
 }
+
+// [crispy] dump lump data into a new LMP file
+/*
+int W_LumpDump (const char *lumpname)
+{
+    FILE *fp;
+    char *filename, *lump_p;
+    int i;
+
+    i = W_CheckNumForName(lumpname);
+
+    if (i < 0 || !lumpinfo[i]->size)
+    {
+	return -1;
+    }
+
+    // [crispy] open file for writing
+    filename = M_StringJoin(lumpname, ".lmp", NULL);
+    M_ForceLowercase(filename);
+    fp = fopen(filename, "wb");
+    if (!fp)
+    {
+	I_Error("W_LumpDump: Failed writing to file '%s'!", filename);
+    }
+    free(filename);
+
+    lump_p = malloc(lumpinfo[i]->size);
+    W_ReadLump(i, lump_p);
+    fwrite(lump_p, 1, lumpinfo[i]->size, fp);
+    free(lump_p);
+
+    fclose(fp);
+
+    return i;
+}
+*/

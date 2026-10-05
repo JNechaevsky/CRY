@@ -1,6 +1,7 @@
 //
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -21,6 +22,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <limits.h>
 
 #include "doomkeys.h"
 #include "d_iwad.h"
@@ -30,13 +32,6 @@
 #include "m_misc.h"
 #include "w_wad.h"
 #include "z_zone.h"
-
-#ifdef _WIN32
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <windows.h>
-#endif
 
 static const iwad_t iwads[] =
 {
@@ -76,6 +71,139 @@ static void AddIWADDir(const char *dir)
         ++num_iwad_dirs;
     }
 }
+
+// This is Windows-specific code that automatically finds the location
+// of installed IWAD files.  The registry is inspected to find special
+// keys installed by the Windows installers for various CD versions
+// of Doom.  From these keys we can deduce where to find an IWAD.
+
+#if defined(_WIN32) && !defined(_WIN32_WCE)
+
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+typedef struct 
+{
+    HKEY root;
+    char *path;
+    char *value;
+} registry_value_t;
+
+#define UNINSTALLER_STRING "\\uninstl.exe /S "
+
+// Keys installed by the various CD editions.  These are actually the 
+// commands to invoke the uninstaller and look like this:
+//
+// C:\Program Files\Path\uninstl.exe /S C:\Program Files\Path
+//
+// With some munging we can find where Doom was installed.
+
+// [AlexMax] From the persepctive of a 64-bit executable, 32-bit registry
+// keys are located in a different spot.
+#if _WIN64
+#define SOFTWARE_KEY "Software\\Wow6432Node"
+#else
+#define SOFTWARE_KEY "Software"
+#endif
+
+// Location where Steam is installed
+
+static registry_value_t steam_install_location =
+{
+    HKEY_LOCAL_MACHINE,
+    SOFTWARE_KEY "\\Valve\\Steam",
+    "InstallPath",
+};
+
+#define STEAM_BFG_GUS_PATCHES \
+    "steamapps\\common\\DOOM 3 BFG Edition\\base\\classicmusic\\instruments"
+
+static char *GetRegistryString(registry_value_t *reg_val)
+{
+    HKEY key;
+    DWORD len;
+    DWORD valtype;
+    char *result;
+
+    // Open the key (directory where the value is stored)
+
+    if (RegOpenKeyEx(reg_val->root, reg_val->path,
+                     0, KEY_READ, &key) != ERROR_SUCCESS)
+    {
+        return NULL;
+    }
+
+    result = NULL;
+
+    // Find the type and length of the string, and only accept strings.
+
+    if (RegQueryValueEx(key, reg_val->value,
+                        NULL, &valtype, NULL, &len) == ERROR_SUCCESS
+     && valtype == REG_SZ)
+    {
+        // Allocate a buffer for the value and read the value
+
+        result = malloc(len + 1);
+
+        if (RegQueryValueEx(key, reg_val->value, NULL, &valtype,
+                            (unsigned char *) result, &len) != ERROR_SUCCESS)
+        {
+            free(result);
+            result = NULL;
+        }
+        else
+        {
+            // Ensure the value is null-terminated
+            result[len] = '\0';
+        }
+    }
+
+    // Close the key
+
+    RegCloseKey(key);
+
+    return result;
+}
+
+// The BFG edition ships with a full set of GUS patches. If we find them,
+// we can autoconfigure to use them.
+
+static void CheckSteamGUSPatches(void)
+{
+    const char *current_path;
+    char *install_path;
+    char *test_patch_path, *patch_path;
+
+    // Already configured? Don't stomp on the user's choices.
+    current_path = M_GetStringVariable("gus_patch_path");
+    if (current_path != NULL && strlen(current_path) > 0)
+    {
+        return;
+    }
+
+    install_path = GetRegistryString(&steam_install_location);
+
+    if (install_path == NULL)
+    {
+        return;
+    }
+
+    patch_path = M_StringJoin(install_path, "\\", STEAM_BFG_GUS_PATCHES,
+                              NULL);
+    test_patch_path = M_StringJoin(patch_path, "\\ACBASS.PAT", NULL);
+
+    // Does acbass.pat exist? If so, then set gus_patch_path.
+    if (M_FileExists(test_patch_path))
+    {
+        M_SetVariable("gus_patch_path", patch_path);
+    }
+
+    free(test_patch_path);
+    free(patch_path);
+    free(install_path);
+}
+
+#endif
 
 // Returns true if the specified path is a path to a file
 // of the specified name.
@@ -193,7 +321,7 @@ static void AddXdgDirs(void)
 
 static void BuildIWADDirList(void)
 {
-    char *env;
+    const char *env;
 
     if (iwad_dirs_built)
     {
@@ -223,6 +351,9 @@ static void BuildIWADDirList(void)
 
 #ifdef _WIN32
 
+    // Check for GUS patches installed with the BFG edition!
+
+    CheckSteamGUSPatches();
 
 #else
     AddXdgDirs();
@@ -271,14 +402,13 @@ char *D_FindWADByName(const char *name)
         // Construct a string for the full path
 
         path = M_StringJoin(iwad_dirs[i], DIR_SEPARATOR_S, name, NULL);
-
         probe = M_FileCaseExists(path);
+        free(path);
+
         if (probe != NULL)
         {
             return probe;
         }
-
-        free(path);
     }
 
     // File not found

@@ -433,7 +433,7 @@ static void R_RenderSegLoop (void)
                                ? R_ColLight_Apply(frontsector->lightbank, base)
                                : (lighttable_t *)base;
                 dc_colormap[1] = invulcolormap ? invulmaps :
-                                vis_brightmaps ? colormaps : dc_colormap[0];
+                                 vis_brightmaps ? colormaps : dc_colormap[0];
             }
 
             dc_x = rw_x;

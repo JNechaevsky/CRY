@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -40,7 +41,9 @@ int M_CheckParm (const char* check);
 // following the specified argument.
 int M_CheckParmWithArgs(const char *check, int num_args);
 
+void M_FindResponseFile(void);
 void M_AddLooseFiles(void);
+boolean M_HasLooseFiles(void);
 
 // Parameter has been specified?
 

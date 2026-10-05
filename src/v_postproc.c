@@ -1,5 +1,5 @@
 //
-// Copyright(C) 2025 Polina "Aura" N.
+// Copyright(C) 2025-2026 Polina "Aura" N.
 // Copyright(C) 2025 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
@@ -17,6 +17,8 @@
 //
 
 #include <stdlib.h>
+#include <string.h>
+#include "d_loop.h"
 #include "m_random.h"
 #include "v_postproc.h"
 
@@ -40,6 +42,7 @@ void V_PProc_SupersampledSmoothing (boolean st_background_on, int st_height)
     if (!argbbuffer || argbbuffer->format->BytesPerPixel != 4)
         return;
 
+    // [PN] Transposed surface: w = SCREENHEIGHT (pitch), h = SCREENWIDTH.
     // [JN] Exclude status bar area from smoothing if active: the bar spans
     // screen rows, which are surface columns here.
     const int stride = argbbuffer->w;
@@ -440,7 +443,7 @@ static void V_PProc_AnalogRGBDrift (void)
         // [PN] Process each pixel in the row
         for (int x = 0; x < width; ++x)
         {
-            const size_t idx  = (size_t)x * height + y;
+            const size_t idx = (size_t)x * height + y;
             // [PN] Fetch original pixel and shifted red/blue samples
             const pixel_t orig = chromabuf[idx];
             const pixel_t rsrc = chromabuf[(size_t)x_src_r[x] * height + y]; // Shifted red
@@ -473,6 +476,8 @@ static void V_PProc_VHSLineDistortion (void)
     if (!argbbuffer || argbbuffer->format->BytesPerPixel != 4)
         return;
 
+    // [PN] Transposed layout: a screen row is a strided run along x
+    // (pitch SCREENHEIGHT); block ranges over screen y (contiguous).
     const int width  = SCREENWIDTH;  // screen x range
     const int height = SCREENHEIGHT; // screen y range
     const int pitch  = SCREENHEIGHT; // stride between screen columns
@@ -685,7 +690,7 @@ static void V_PProc_MotionBlur (void)
     }
 
     // [PN] Choose previous‑frame source
-    Uint32 *restrict const oldF = uncapped
+    const uint32_t *restrict const oldF = uncapped
         ? ring[(ring_idx + MAX_BLUR_LAG) & MAX_BLUR_LAG]
         : prev_frame;
 
@@ -751,7 +756,6 @@ static void V_PProc_FilmGrain (void)
         last_gametic_updated = -1; // [PN] Force full refresh
     }
 
-    extern int gametic;
     if (gametic != last_gametic_updated)
     {
         const unsigned int seed = ID_RealRandom();      // [PN] Per-frame noise basis
@@ -945,23 +949,23 @@ static void V_PProc_DepthOfFieldBlur (void)
         break;
     }
 
-    for (int fx = 1; fx < width - 1; ++fx)
+    // [PN] Border blur (3x3) for left/right edges only
+    for (int y = 1; y < height - 1; ++y)
     {
-        for (int fy = 0; fy < height; fy += height - 1)
+        const int dy  = y - cy;
+        const int dy2 = dy * dy;
+        Uint32 *restrict dst = pixels + y * stride;
+        for (int x = 0; x < width; x += (width - 1))
         {
-            const int dy  = fy - cy;
-            const int dy2 = dy * dy;
-            const int dx  = fx - cx;
+            const int dx = x - cx;
             if (dx * dx + dy2 < threshSq) continue;
             int r_sum = 0, g_sum = 0, b_sum = 0, count = 0;
             for (int ky = -1; ky <= 1; ++ky)
             {
-                int yy = fy + ky;
-                if ((unsigned)yy >= (unsigned)height) continue;
-                const Uint32 *restrict row = pixels + (size_t)yy * stride;
+                const Uint32 *restrict row = pixels + (y + ky) * stride;
                 for (int kx = -1; kx <= 1; ++kx)
                 {
-                    int xx = fx + kx;
+                    int xx = x + kx;
                     if ((unsigned)xx >= (unsigned)width) continue;
                     Uint32 c = row[xx];
                     r_sum += (c >> 16) & 0xFF;
@@ -970,9 +974,7 @@ static void V_PProc_DepthOfFieldBlur (void)
                     ++count;
                 }
             }
-            if (count)
-                pixels[(size_t)fy * stride + fx] =
-                    (0xFFu << 24) | ((r_sum / count) << 16) | ((g_sum / count) << 8) | (b_sum / count);
+            if (count) dst[x] = (0xFFu << 24) | ((r_sum / count) << 16) | ((g_sum / count) << 8) | (b_sum / count);
         }
     }
 }
@@ -997,6 +999,9 @@ void V_PProc_Display (boolean supress)
     pproc_display_effects =
         post_overglow || post_rgbdrift || post_vhsdist;
     
+    if (cleanshot_pending)
+        return;
+
     // Overbright Glow
     if (post_overglow && !supress)
         V_PProc_OverbrightGlow();
@@ -1014,6 +1019,9 @@ void V_PProc_PlayerView (void)
 {
     pproc_plyrview_effects =
         post_bloom || post_filmgrain || post_motionblur || post_dofblur || post_vignette;
+
+    if (cleanshot_pending)
+        return;
 
     // Soft bloom
     if (post_bloom)

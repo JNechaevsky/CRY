@@ -4,7 +4,7 @@ CRY is a reimagining of Jaguar Doom for PC, built on top of the [International D
 
 The goal was never to create a 1:1 port of Jaguar Doom for modern systems. Instead, I aimed to strike a balance between authenticity, visual polish, and overall enjoyment — while paying close attention to detail wherever possible.
 
-The project is created by [Julia Nechaevskaya](https://jnechaevsky.github.io/author.html).
+The project is created by [Julia Nechaevskaya](https://jnechaevsky.github.io/author.html) and Polina "Aura" N.
 
 ### Download
 

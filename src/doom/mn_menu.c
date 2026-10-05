@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -6951,7 +6952,7 @@ boolean M_Responder (event_t* ev)
 
                 if (ch >= 32 && ch <= 127
                 && saveCharIndex < SAVESTRINGSIZE - 1
-                && M_StringWidth(savegamestrings[saveSlot]) < (SAVESTRINGSIZE - 2) * 8)
+                && M_StringWidth(savegamestrings[saveSlot]) < (SAVESTRINGSIZE - 4) * 8)
                 {
                     savegamestrings[saveSlot][saveCharIndex++] = ch;
                     savegamestrings[saveSlot][saveCharIndex] = 0;
@@ -7280,9 +7281,8 @@ boolean M_Responder (event_t* ev)
             // [JN] Update mouse cursor position.
             M_ID_MenuMouseControl();
         }
-        // [JN] Close menu if pressed "back" in Doom main or CRL main menu.
-        else
-        if (currentMenu == &MainDef || currentMenu == &ID_Def_Main)
+        // [JN] Close menu if pressed "back" in Doom main or ID main menu.
+        else if (currentMenu == &MainDef || currentMenu == &ID_Def_Main)
         {
             S_StartSound(NULL, sfx_swtchx);
             M_ClearMenus();

@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -39,10 +40,10 @@ int M_stat(const char *path, struct stat *buf);
 char *M_getenv(const char *name);
 boolean M_WriteFile(const char *name, const void *source, int length);
 int M_ReadFile(const char *name, byte **buffer);
-void M_MakeDirectory(const char *dir);
+void M_MakeDirectory(const char *path);
 char *M_TempFile(const char *s);
-boolean M_FileExists(const char *file);
-char *M_FileCaseExists(const char *file);
+boolean M_FileExists(const char *filename);
+char *M_FileCaseExists(const char *path);
 long M_FileLength(FILE *handle);
 boolean M_StrToInt(const char *str, int *result);
 char *M_DirName(const char *path);

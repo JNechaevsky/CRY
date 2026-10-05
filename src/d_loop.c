@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -216,7 +217,7 @@ static void D_Disconnected(void)
 // available.
 //
 
-void D_ReceiveTic(ticcmd_t *ticcmds, boolean *players_mask)
+void D_ReceiveTic(const ticcmd_t *ticcmds, const boolean *players_mask)
 {
     int i;
 
@@ -252,6 +253,12 @@ void D_ReceiveTic(ticcmd_t *ticcmds, boolean *players_mask)
 
 void D_StartGameLoop(void)
 {
+    if (game_speed < 3)
+        game_speed = 3;
+    else if (game_speed > 10000)
+        game_speed = 10000;
+
+    I_SetTimeScale(/*net_client_connected ? 100 :*/ game_speed);
     lasttime = GetAdjustedTime() / ticdup;
 }
 
@@ -317,6 +324,7 @@ void D_StartNetGame(net_gamesettings_t *settings,
 
     ticdup = settings->ticdup;
     new_sync = settings->new_sync;
+    I_SetTimeScale(/*net_client_connected ? 100 :*/ game_speed);
 
     if (ticdup < 1)
     {

@@ -2,7 +2,8 @@
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 1993-2008 Raven Software
 // Copyright(C) 2005-2014 Simon Howard, Andrey Budko
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -1450,7 +1451,7 @@ static boolean PTR_NoWayTraverse (intercept_t *in)
 // i.e. if usable wall segment is really visible and touchable.
 // -----------------------------------------------------------------------------
 
-boolean PTR_NoWayAudible (line_t *line)
+boolean PTR_NoWayAudible (const line_t *const line)
 {
     P_LineOpening(line);
 
@@ -1680,7 +1681,7 @@ boolean PIT_ChangeSector (mobj_t*	thing)
 //
 boolean
 P_ChangeSector
-( sector_t*	sector,
+( const sector_t	*const sector,
   boolean	crunch )
 {
     int		x;

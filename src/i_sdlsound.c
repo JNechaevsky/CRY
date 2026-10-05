@@ -2,7 +2,8 @@
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
 // Copyright(C) 2008 David Flater
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -284,7 +285,7 @@ static void UnlockAllocatedSound(allocated_sound_t *snd)
 // Search through the list of allocated sounds and return the one that matches
 // the supplied sfxinfo entry and pitch level.
 
-static allocated_sound_t * GetAllocatedSoundBySfxInfoAndPitch(sfxinfo_t *sfxinfo, int pitch)
+static allocated_sound_t * GetAllocatedSoundBySfxInfoAndPitch(const sfxinfo_t *sfxinfo, int pitch)
 {
     allocated_sound_t * p = allocated_sounds_head;
 
@@ -568,7 +569,7 @@ static boolean ConvertibleRatio(int freq1, int freq2)
 
 // Debug code to dump resampled sound effects to WAV files for analysis.
 
-static void WriteWAV(char *filename, byte *data,
+static void WriteWAV(const char *filename, const byte *data,
                      uint32_t length, int samplerate)
 {
     FILE *wav;

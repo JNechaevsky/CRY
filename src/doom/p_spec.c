@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -281,7 +282,7 @@ int	twoSided(int sector,int line)
 /*	Return sector_t * of sector next to current. NULL if not two-sided line */
 /* */
 /*================================================================== */
-sector_t *getNextSector(line_t *line,sector_t *sec)
+sector_t *getNextSector(line_t *line, const sector_t *sec)
 {
 	if (!(line->flags & ML_TWOSIDED))
 		return NULL;
@@ -471,7 +472,7 @@ fixed_t	P_FindHighestCeilingSurrounding(sector_t *sec)
 /* */
 /*================================================================== */
 
-int	P_FindSectorFromLineTag(line_t	*line,int start)
+int	P_FindSectorFromLineTag(const line_t	*line,int start)
 {
 	int	i;
 	
@@ -778,7 +779,7 @@ void P_CrossSpecialLine (int linenum, int side, mobj_t *thing)
 ===============================================================================
 */
 
-void	P_ShootSpecialLine ( mobj_t *thing, line_t *line)
+void	P_ShootSpecialLine (const mobj_t *thing, line_t *line)
 {
 	int		shoot_ok;
 	
@@ -975,12 +976,15 @@ void P_UpdateSpecials (void)
 	// [crispy] draw fuzz effect independent of rendering frame rate
 	R_SetFuzzPosTic();
 
-	// [JN] Set offsets for flowing effect of swirling liquids.
-	if (vis_swirling_liquids)
-	{
-		swirlCoord_x = SwirlFlowSine[leveltime % 195];
-		swirlCoord_y = SwirlFlowCosine[leveltime % 195];
-	}
+    // [PN/JN] Set offsets for flowing effect of swirling liquids.
+    if (vis_swirling_liquids)
+    {
+        static int swirl_index = 0;
+
+        swirl_index  = (swirl_index + 1) & 255;
+        swirlCoord_x = SwirlFlowSine[swirl_index];
+        swirlCoord_y = SwirlFlowCosine[swirl_index];
+    }
 
     // [JN] Update sky cloud offsets.
     if (vis_animated_sky)

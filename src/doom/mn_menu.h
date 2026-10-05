@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -61,7 +62,7 @@ extern void M_WriteTextNoShadow (int x, int y, const char *string, byte *table);
 extern void M_WriteTextCentered (const int y, const char *string, byte *table);
 extern void M_WriteTextCenteredFade (const int y, const char *string, byte *table, int alpha);
 extern void M_WriteTextGlow (int x, int y, const char *string, byte *table1, byte *table2, int alpha);
-extern int  M_StringWidth (const char *string);
+extern int  M_StringWidth (const char *const string);
 extern void M_WriteTextBig (int x, int y, const char *string, byte *table);
 extern void M_WriteTextBigCentered (const int y, const char *string, byte *table);
 extern void M_WriteTextBigGlow (int x, int y, const char *string, byte *table1, byte *table2, int alpha);

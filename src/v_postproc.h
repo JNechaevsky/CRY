@@ -1,5 +1,5 @@
 //
-// Copyright(C) 2025 Polina "Aura" N.
+// Copyright(C) 2025-2026 Polina "Aura" N.
 // Copyright(C) 2025 Julia Nechaevskaya
 //
 // This program is free software; you can redistribute it and/or
@@ -20,6 +20,7 @@
 #pragma once
 
 #include "i_video.h"
+#include "v_video.h"
 #include "id_vars.h"
 
 extern void V_PProc_SupersampledSmoothing (boolean st_background_on, int st_height);

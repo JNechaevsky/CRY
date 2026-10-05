@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -53,6 +54,8 @@
 #include "w_wad.h"
 
 #include "p_local.h" 
+#include "g_rewind.h"
+#include "g_umapinfo.h"
 
 #include "s_sound.h"
 
@@ -64,8 +67,6 @@
 // SKY handling - still the wrong place.
 
 #include "g_game.h"
-#include "g_umapinfo.h"
-#include "g_rewind.h"
 
 #include "id_vars.h"
 #include "id_func.h"
@@ -1186,7 +1187,8 @@ boolean G_Responder (event_t* ev)
         crl_spectating ^= 1;
         CT_SetMessage(&players[consoleplayer], crl_spectating ?
                        ID_SPECTATOR_ON : ID_SPECTATOR_OFF, false, NULL);
-    }        
+        I_SetPalette(crl_spectating ? 0 : st_palette);
+    }
 
     // [JN] CRL - Toggle freeze mode.
     if (ev->data1 == key_freeze || ev->data1 == key_freeze2)
@@ -1408,7 +1410,7 @@ void G_Ticker (void)
 
 		    savegameslot =  
 			(players[i].cmd.buttons & BTS_SAVEMASK)>>BTS_SAVESHIFT; 
-            P_RequestSavePreviewCapture();
+		    P_RequestSavePreviewCapture();
 		    gameaction = ga_savegame; 
 		    break; 
 		} 
@@ -1985,14 +1987,15 @@ G_InitNew
 	// [crispy] make sure "fast" parameters are really only applied once
 	static boolean fast_applied;
 
-	if (paused)
-	{
-		paused = false;
-		S_ResumeSound ();
-	}
+    if (paused)
+    {
+	paused = false;
+	S_ResumeSound ();
+    }
 
-	if (skill > sk_nightmare)
-	skill = sk_nightmare;
+
+    if (skill > sk_nightmare)
+    skill = sk_nightmare;
 
 	// [JN] Episode itself is never used, but still necessary.
 	episode = 1;

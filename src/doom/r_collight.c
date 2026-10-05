@@ -31,7 +31,6 @@
 // lumps first, so a PWAD block fully redefines a level's colored sectors.
 // Lumps are parsed in WAD order; the last active block for a map wins.
 
-
 #include <ctype.h>
 #include <stddef.h>
 #include <stdlib.h>

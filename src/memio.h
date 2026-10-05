@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -33,8 +34,8 @@ size_t mem_fwrite(const void *ptr, size_t size, size_t nmemb, MEMFILE *stream);
 int mem_fputs(const char *str, MEMFILE *stream);
 void mem_get_buf(MEMFILE *stream, void **buf, size_t *buflen);
 void mem_fclose(MEMFILE *stream);
-long mem_ftell(MEMFILE *stream);
-int mem_fseek(MEMFILE *stream, signed long offset, mem_rel_t whence);
+long mem_ftell(const MEMFILE *stream);
+int mem_fseek(MEMFILE *stream, signed long position, mem_rel_t whence);
 
 #endif /* #ifndef MEMIO_H */
 	  

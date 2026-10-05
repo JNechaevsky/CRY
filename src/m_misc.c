@@ -2,7 +2,8 @@
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 1993-2008 Raven Software
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -39,7 +40,6 @@
 #include "i_system.h"
 #include "m_misc.h"
 #include "z_zone.h"
-
 
 #ifdef _WIN32
 static wchar_t *ConvertMultiByteToWide(const char *str, UINT code_page)
@@ -258,7 +258,8 @@ char *M_getenv(const char *name)
 {
 #ifdef _WIN32
     int i;
-    wchar_t *wenv = NULL, *wname = NULL;
+    const wchar_t *wenv = NULL;
+    wchar_t *wname = NULL;
     char *env = NULL;
 
     for (i = 0; i < num_vars; ++i)
@@ -495,7 +496,7 @@ int M_ReadFile(const char *name, byte **buffer)
 // Returns the path to a temporary file of the given name, stored
 // inside the system temporary directory.
 //
-// The returned value must be freed with Z_Free after use.
+// The returned value must be freed by the caller after use.
 
 char *M_TempFile(const char *s)
 {
@@ -714,6 +715,7 @@ char *M_StringDuplicate(const char *orig)
 
 //
 // String replace function.
+// allocates new string that must be freed by the caller
 //
 
 char *M_StringReplace(const char *haystack, const char *needle,

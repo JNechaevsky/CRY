@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -411,7 +412,7 @@ static opl_voice_t *GetFreeVoice(void)
 
 // Release a voice back to the freelist.
 
-static void VoiceKeyOff(opl_voice_t *voice);
+static void VoiceKeyOff(const opl_voice_t *voice);
 
 static void ReleaseVoice(int index)
 {
@@ -593,7 +594,7 @@ static void SetVoiceVolume(opl_voice_t *voice, unsigned int volume)
 
 static void SetVoicePan(opl_voice_t *voice, unsigned int pan)
 {
-    genmidi_voice_t *opl_voice;
+    const genmidi_voice_t *opl_voice;
 
     voice->reg_pan = pan;
     opl_voice = &voice->current_instr->voices[voice->current_instr_voice];;
@@ -670,13 +671,13 @@ static void I_OPL_SetMusicVolume(int volume)
     }
 }
 
-static void VoiceKeyOff(opl_voice_t *voice)
+static void VoiceKeyOff(const opl_voice_t *voice)
 {
     OPL_WriteRegister((OPL_REGS_FREQ_2 + voice->index) | voice->array,
                       voice->freq >> 8);
 }
 
-static opl_channel_data_t *TrackChannelForEvent(opl_track_data_t *track,
+static opl_channel_data_t *TrackChannelForEvent(const opl_track_data_t *track,
                                                 midi_event_t *event)
 {
     unsigned int channel_num = event->data.channel.channel;
@@ -700,7 +701,7 @@ static opl_channel_data_t *TrackChannelForEvent(opl_track_data_t *track,
 
 static void KeyOffEvent(opl_track_data_t *track, midi_event_t *event)
 {
-    opl_channel_data_t *channel;
+    const opl_channel_data_t *channel;
     int i;
     unsigned int key;
 
@@ -786,7 +787,7 @@ static void ReplaceExistingVoiceDoom1(void)
     ReleaseVoice(result);
 }
 
-static void ReplaceExistingVoiceDoom2(opl_channel_data_t *channel)
+static void ReplaceExistingVoiceDoom2(const opl_channel_data_t *channel)
 {
     int i;
     int result;
@@ -1169,7 +1170,7 @@ static void SetChannelPan(opl_channel_data_t *channel, unsigned int pan)
 }
 
 // Handler for the MIDI_CONTROLLER_ALL_NOTES_OFF channel event.
-static void AllNotesOff(opl_channel_data_t *channel, unsigned int param)
+static void AllNotesOff(const opl_channel_data_t *channel, unsigned int param)
 {
     int i;
 
@@ -1277,9 +1278,9 @@ static void MetaSetTempo(unsigned int tempo)
 
 // Process a meta event.
 
-static void MetaEvent(opl_track_data_t *track, midi_event_t *event)
+static void MetaEvent(const opl_track_data_t *track, midi_event_t *event)
 {
-    byte *data = event->data.meta.data;
+    const byte *data = event->data.meta.data;
     unsigned int data_len = event->data.meta.length;
 
     switch (event->data.meta.type)
@@ -1607,76 +1608,71 @@ static void I_OPL_UnRegisterSong(void *handle)
         return;
     }
 
+    OPL_Lock();
+
     if (handle != NULL)
     {
         MIDI_FreeFile(handle);
     }
+
+    OPL_Unlock();
 }
 
-static boolean ConvertMus(byte *musdata, int len, char *filename)
+static midi_file_t *LoadMus(byte *musdata, int len)
 {
     MEMFILE *instream;
     MEMFILE *outstream;
     void *outbuf;
     size_t outbuf_len;
-    int result;
+    midi_file_t *midi = NULL;
+    int mus2mid_result;
 
     instream = mem_fopen_read(musdata, len);
     outstream = mem_fopen_write();
 
-    result = mus2mid(instream, outstream);
+    mus2mid_result = mus2mid(instream, outstream);
 
-    if (result == 0)
+    if (mus2mid_result == 0)
     {
         mem_get_buf(outstream, &outbuf, &outbuf_len);
-
-        M_WriteFile(filename, outbuf, outbuf_len);
+        midi = MIDI_LoadFileFromData(outbuf, outbuf_len);
     }
 
     mem_fclose(instream);
     mem_fclose(outstream);
 
-    return result;
+    return midi;
 }
 
 static void *I_OPL_RegisterSong(void *data, int len)
 {
     midi_file_t *result;
-    char *filename;
 
     if (!music_initialized)
     {
         return NULL;
     }
 
-    // MUS files begin with "MUS"
-    // Reject anything which doesnt have this signature
-
-    filename = M_TempFile("doom.mid");
+    OPL_Lock();
 
     // [crispy] remove MID file size limit
     if (IsMid(data, len) /* && len < MAXMIDLENGTH */)
     {
-        M_WriteFile(filename, data, len);
+        result = MIDI_LoadFileFromData(data, len);
     }
     else
     {
         // Assume a MUS file and try to convert
 
-        ConvertMus(data, len, filename);
+        result = LoadMus(data, len);
     }
-
-    result = MIDI_LoadFile(filename);
 
     if (result == NULL)
     {
         fprintf(stderr, "I_OPL_RegisterSong: Failed to load MID.\n");
     }
 
-    // remove file now
-
-    M_remove(filename);
-    free(filename);
+    OPL_Unlock();
 
     return result;
 }
@@ -1823,7 +1819,7 @@ static int NumActiveChannels(void)
     return 0;
 }
 
-static int ChannelInUse(opl_channel_data_t *channel)
+static int ChannelInUse(const opl_channel_data_t *channel)
 {
     int i;
 

@@ -1,7 +1,8 @@
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
-// Copyright(C) 2016-2025 Julia Nechaevskaya
+// Copyright(C) 2016-2026 Julia Nechaevskaya
+// Copyright(C) 2024-2026 Polina "Aura" N.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -226,7 +227,7 @@ void P_ActivateInStasis(int tag)
 		}
 }
 
-void EV_StopPlat(line_t *line)
+void EV_StopPlat(const line_t *const line)
 {
 	int		j;
 	
@@ -252,7 +253,7 @@ void P_AddActivePlat(plat_t *plat)
 	I_Error ("P_AddActivePlat: no more plats!");
 }
 
-void P_RemoveActivePlat(plat_t *plat)
+void P_RemoveActivePlat(const plat_t *const plat)
 {
 	int		i;
 	for (i = 0;i < MAXPLATS;i++)
