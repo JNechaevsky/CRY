@@ -1905,7 +1905,7 @@ static menuitem_t ID_Menu_Sound[]=
     { M_SKIP, "", 0, '\0' },
     { M_SKIP, "", 0, '\0' },
     { M_MUL2, "SFX PLAYBACK",              M_ID_SFXSystem,    's' },
-    { M_MUL2, "MUS/MIDI PLAYBACK",         M_ID_MusicSystem,  'm' },
+    { M_MUL2, "MUSIC PLAYBACK",            M_ID_MusicSystem,  'm' },
     { M_MUL1, "SOUND EFFECTS MODE",        M_ID_SFXMode,      's' },
     { M_MUL2, "JAGUAR SFX PITCH-SHIFTING", M_ID_PitchShift,   'j' },
     { M_MUL1, "NUMBER OF SFX TO MIX",      M_ID_SFXChannels,  'n' },
@@ -1999,6 +1999,7 @@ static void M_Draw_ID_Sound (void)
     // Inform if FSYNTH/GUS paths anen't set.
     if (itemOn == 8)
     {
+        M_WriteTextCentered(144, "AFFECTS MUS/MIDI MUSIC LUMPS ONLY", cr[CR_GRAY]);
 #ifdef HAVE_FLUIDSYNTH
         if (snd_musicdevice == 11 && strcmp(fsynth_sf_path, "") == 0)
         {

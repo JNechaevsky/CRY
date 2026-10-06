@@ -439,6 +439,13 @@ void *I_RegisterSong(void *data, int len)
     if (I_JagMusic_Init() && !IsMid(data, len) && !IsMus(data, len)
         && I_JagMusic_IsNative(data, len))
     {
+        // Disable playback when music module is disabled.
+        if (snd_musicdevice == SNDDEVICE_NONE)
+        {
+            active_music_module = NULL;
+            return NULL;
+        }
+
         active_music_module = &music_jag_module;
         return active_music_module->RegisterSong(data, len);
     }
