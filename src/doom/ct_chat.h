@@ -35,9 +35,14 @@
 #define MESSAGETICS (TICRATE*4)
 
 extern void CT_Init (void);
+extern void CT_InitWidgetDrawingFuncs (void);
 extern void CT_SetMessage (player_t *player, const char *message, boolean ultmsg, byte *table);
 extern void CT_SetMessageCentered (player_t *player, const char *message, byte *table);
 extern void CT_Ticker (void);
+
+extern void (*fontfunc) (int x, int y, const char *text, byte *table);
+extern void (*fontcenteredfunc) (int y, const char *text, byte *table);
+extern int  (*widthfunc) (const char *string);
 
 extern boolean ultimatemsg;
 extern boolean chatmodeon;

@@ -62,6 +62,8 @@ enum
     CR_OLIVE,
     CR_OLIVE_BRIGHT,
 
+    CR_BLUE,
+
     CR_BLUE2,
     CR_BLUE2_BRIGHT,
 
@@ -79,6 +81,8 @@ enum
     CR_LIGHTGRAY,
     CR_LIGHTGRAY_BRIGHT,
     CR_LIGHTGRAY_DARK,
+
+    CR_BROWN,
 
     CR_RED2BLUE,
     CR_RED2GREEN,

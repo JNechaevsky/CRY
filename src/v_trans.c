@@ -54,6 +54,8 @@ static byte cr_darkgreen_bright[256];
 static byte cr_olive[256];
 static byte cr_olive_bright[256];
 
+static byte cr_blue[256];
+
 static byte cr_blue2[256];
 static byte cr_blue2_bright[256];
 
@@ -71,6 +73,8 @@ static byte cr_gray_bright[256];
 static byte cr_lightgray[256];
 static byte cr_lightgray_bright[256];
 static byte cr_lightgray_dark[256];
+
+static byte cr_brown[256];
 
 static const byte cr_red2blue[256] =
     {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,
@@ -134,6 +138,8 @@ byte *cr[] =
     (byte *) &cr_olive,
     (byte *) &cr_olive_bright,
 
+    (byte *) &cr_blue,
+
     (byte *) &cr_blue2,
     (byte *) &cr_blue2_bright,
 
@@ -152,6 +158,7 @@ byte *cr[] =
     (byte *) &cr_lightgray_bright,
     (byte *) &cr_lightgray_dark,
 
+    (byte *) &cr_brown,
     (byte *) &cr_red2blue,
     (byte *) &cr_red2green,
 };
@@ -433,6 +440,12 @@ byte V_Colorize (byte *playpal, int clr, byte source, boolean keepgray109)
             hsv.z *= 0.65f;
         }
 
+        else if (clr == CR_BLUE)
+        {
+            hsv.x = 0.60f;
+            hsv.z *= 2.1f;
+        }
+
         else if (clr == CR_BLUE2)
         {
             hsv.x = 0.65f;
@@ -497,6 +510,12 @@ byte V_Colorize (byte *playpal, int clr, byte source, boolean keepgray109)
         {
             hsv.y = 0.f;
             hsv.z *= 0.6f;
+        }
+        else if (clr == CR_BROWN)
+        {
+            hsv.x = 0.1f;
+            hsv.y = 0.75f;
+            hsv.z *= 0.65f;
         }
     }
 

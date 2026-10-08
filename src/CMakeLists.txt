@@ -21,6 +21,7 @@ set(GAME_SOURCE_FILES
     d_loop.c            d_loop.h
     d_mode.c            d_mode.h
                         d_ticcmd.h
+    dsda_font.c         dsda_font.h
     i_flmusic.c
     i_glob.c            i_glob.h
     i_input.c           i_input.h

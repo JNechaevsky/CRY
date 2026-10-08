@@ -488,6 +488,8 @@ static default_t	doom_defaults_list[] =
     // Widgets
     CONFIG_VARIABLE_COMMENT("Widgets"),
     CONFIG_VARIABLE_INT(widget_enable),
+    CONFIG_VARIABLE_INT(widget_font),
+    CONFIG_VARIABLE_INT(widget_scheme),
     CONFIG_VARIABLE_INT(widget_location),
     CONFIG_VARIABLE_INT(widget_alignment),
     CONFIG_VARIABLE_INT(widget_kis),
@@ -497,6 +499,7 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_INT(widget_totaltime),
     CONFIG_VARIABLE_INT(widget_levelname),
     CONFIG_VARIABLE_INT(widget_coords),
+    CONFIG_VARIABLE_INT(widget_speed),
     CONFIG_VARIABLE_INT(widget_render),
     CONFIG_VARIABLE_INT(widget_health),
     CONFIG_VARIABLE_COMMENT(""),

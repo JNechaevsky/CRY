@@ -18,6 +18,8 @@
 
 #include "doomstat.h"
 #include "ct_chat.h"
+#include "dsda_font.h"
+#include "mn_menu.h"
 #include "v_video.h"
 #include "z_zone.h"
 
@@ -29,6 +31,11 @@ patch_t *hu_font_b[HU_FONTSIZE_B];
 
 boolean     ultimatemsg;
 const char *lastmessage;
+
+// [JN] Depending on user preference, draw widgets via standard or DSDA font.
+void (*fontfunc) (int x, int y, const char *text, byte *table);
+void (*fontcenteredfunc) (int y, const char *text, byte *table);
+int  (*widthfunc) (const char *string);
 
 
 // -----------------------------------------------------------------------------
@@ -52,6 +59,33 @@ void CT_Init (void)
     {
         snprintf(buffer, sizeof(buffer), "CHAR_%.3d", n++);
         hu_font_b[i] = (patch_t *) W_CacheLumpName(buffer, PU_STATIC);
+    }
+
+    // Initialize small DSDA font.
+    DSDA_FontInit();
+
+    // Initialize pointers to widget drawing functions.
+    CT_InitWidgetDrawingFuncs();
+}
+
+// -----------------------------------------------------------------------------
+// CT_InitWidgetDrawingFuncs
+//  [JN] Set pointers to the font drawing functions.
+// -----------------------------------------------------------------------------
+
+void CT_InitWidgetDrawingFuncs (void)
+{
+    if (widget_font)
+    {
+        fontfunc = DSDA_DrawText;
+        fontcenteredfunc = DSDA_DrawTextCentered;
+        widthfunc = DSDA_StringWidth;
+    }
+    else
+    {
+        fontfunc = M_WriteText;
+        fontcenteredfunc = M_WriteTextCentered;
+        widthfunc = M_StringWidth;
     }
 }
 
