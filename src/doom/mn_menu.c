@@ -492,8 +492,6 @@ static int M_ItemRightAlign (const char *text)
     return ORIGWIDTH - currentMenu->x - M_StringWidth(text);
 }
 
-static player_t *player;
-
 static void M_Draw_ID_Main (void);
 
 static void M_Choose_ID_Video (int choice);
@@ -7868,9 +7866,6 @@ void M_Init (void)
     messageString = NULL;
     messageLastMenuActive = menuactive;
     quickSaveSlot = -1;
-
-    // [JN] Player is always local, "console" player.
-    player = &players[consoleplayer];
 
     // [JN] Set cursor position in skill menu to default skill level.
     NewDef.lastOn = gp_default_skill;

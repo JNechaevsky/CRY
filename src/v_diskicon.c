@@ -40,7 +40,7 @@ boolean diskicon_enabled = false;
 // static int loading_disk_yoffs = 0;
 
 // Number of bytes read since the last call to V_DrawDiskIcon().
-static size_t recent_bytes_read = 0;
+// static size_t recent_bytes_read = 0;
 
 // [JN] Which icon to use, diskette or cdrom.
 // char *disk_lump_name;
@@ -59,7 +59,7 @@ void V_EnableLoadingDisk (void)
 
 void V_BeginRead (const size_t nbytes)
 {
-    recent_bytes_read += nbytes;
+    // recent_bytes_read += nbytes;
 }
 
 void V_DrawDiskIcon (void)
@@ -76,7 +76,7 @@ void V_DrawDiskIcon (void)
         V_DrawPatch(loading_disk_xoffs, loading_disk_yoffs, 
                     W_CacheLumpName(disk_lump_name, PU_CACHE));
     }
-    */
 
     recent_bytes_read = 0;
+    */
 }

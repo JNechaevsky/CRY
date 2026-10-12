@@ -105,8 +105,6 @@ static SDL_Texture *palette_bonusrad = NULL;
 
 static int pane_alpha;
 
-static boolean palette_to_set;
-
 // display has been set up?
 
 static boolean initialized = false;
@@ -373,7 +371,6 @@ static void HandleWindowEvent(const SDL_WindowEvent *event)
             break;
 #endif
         case SDL_WINDOWEVENT_EXPOSED:
-            palette_to_set = true;
             break;
 
         case SDL_WINDOWEVENT_RESIZED:
@@ -960,7 +957,6 @@ void I_FinishUpdate (void)
             }
             CreateUpscaledTexture(false);
             need_resize = false;
-            palette_to_set = true;
         }
         else
         {
