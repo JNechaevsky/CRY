@@ -622,6 +622,8 @@ typedef struct mobj_s
     fixed_t		oldy;
     fixed_t		oldz;
     angle_t		oldangle;
+    // [PN] last leveltime old* were captured (once/tic)
+    int			oldtic;
 
     // [JN] Amplitude of floating powerups, used *only* while rendering.
     fixed_t     float_amp;
