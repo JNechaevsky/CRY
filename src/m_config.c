@@ -152,6 +152,8 @@ static default_t	doom_defaults_list[] =
     //
 
     CONFIG_VARIABLE_COMMENT("Autoload"),
+    CONFIG_VARIABLE_COMMENT(" Paths may be absolute (e.g. \"C:\\Games\\CRY\\autoload\")"),
+    CONFIG_VARIABLE_COMMENT(" or relative to the game folder (e.g. \".\\autoload\")."),
     CONFIG_VARIABLE_STRING(autoload_path),
     CONFIG_VARIABLE_STRING(savegames_path),
     CONFIG_VARIABLE_STRING(screenshots_path),
@@ -1253,7 +1255,7 @@ char *M_GetSaveGameDir(const char *iwadname)
         else
         {
             // Config file variable not existing or emptry, generate a path.
-            savegamedir = M_StringJoin(M_StringDuplicate(exedir), "savegames", NULL);
+            savegamedir = M_StringJoin(".\\", "savegames", NULL);
         }
         M_MakeDirectory(savegamedir);
 #else
@@ -1303,7 +1305,7 @@ char *M_GetAutoloadDir(const char *iwadname)
 
 #ifdef _WIN32
         // [JN] On Windows, create "autoload" directory in program folder.
-        prefdir = M_StringDuplicate(exedir);
+        prefdir = M_StringDuplicate(".\\");
 #else
         // [JN] On other OSes use system home folder.
         prefdir = SDL_GetPrefPath("", PACKAGE_TARNAME);
@@ -1381,7 +1383,7 @@ void M_SetScreenshotDir (void)
         {
 #ifdef _WIN32
             // [JN] Always use "screenshots" folder in program folder.
-            screenshotdir = M_StringJoin(exedir, "screenshots", NULL);
+            screenshotdir = M_StringJoin(".\\", "screenshots", NULL);
 #else
             // ~/.local/share/inter-doom/screenshots
             screenshotdir = M_StringJoin(configdir, "screenshots", NULL);
